@@ -1,11 +1,11 @@
 package utility
 
-import org.scalatest.junit.JUnitSuite
+import org.scalatest.wordspec.AnyWordSpecLike
 import org.junit.Test
 import org.junit.Assert._
 import utility.Geometry._
 
-class GeometryTest extends JUnitSuite {
+class GeometryTest extends AnyWordSpecLike {
 
   @Test def verifyMod(): Unit = {
     val v1: Vector = Vector2D(0,0)
