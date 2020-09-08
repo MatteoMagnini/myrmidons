@@ -1,7 +1,7 @@
 package model.insects
 
 import akka.actor.{Actor, ActorRef, Props}
-import utility.Clock
+import utility.{Clock, FoodPheromones}
 
 trait Insect extends Actor {
   def id: Int
@@ -9,15 +9,17 @@ trait Insect extends Actor {
 }
 
 case class ForagingAnt(override val id: Int,
-                       override val info: InsectInfo,
+                       override val info: ForagingAntInfo,
                        environment: ActorRef) extends Insect {
 
-  //TODO: for the moment just take the last one.
-  def subsumption(competences: Competence*): Competence = competences.last
+  def subsumption(competences: Competence*): Competence = competences.filter(c => c.hasPriority(info)).take(1).last
 
   override def receive: Receive = {
 
-    case Clock(t) if t > info.time => info.incTime(); subsumption(RandomWalk)(context, environment, info)
+    case Clock(t) if t == info.time + 1 =>
+      info.incTime(); subsumption(FoodPheromoneTaxis,RandomWalk)(context, environment, info)
+
+    case FoodPheromones(entities) => entities.foreach(e => info.pheromoneSensor.addEntity(e))
 
     case _ => println("Should never happen")
   }

@@ -2,9 +2,19 @@ package model.insects
 
 import utility.Geometry._
 
+/**
+ * The information in common with all kind of insects.
+ */
 trait InsectInfo {
 
-  val SEPARATOR = " "
+  private val SEPARATOR = " "
+  def MAX_ENERGY = 100
+  def MAX_FOOD = 3
+  def STARTING_ENERGY = 100
+  def STARTING_TIME = 0
+  def STARTING_FOOD_AMOUNT = 0
+  def STARTING_POSITION: Vector = Vector2D(0,0)
+
   def position: Vector
   def energy: Double
   def time: Int
@@ -16,29 +26,25 @@ trait InsectInfo {
   override def toString: String = position + SEPARATOR + energy + SEPARATOR + time + SEPARATOR + super.toString
 }
 
-object ForagingAntInfo extends InsectInfo {
+case class ForagingAntInfo() extends InsectInfo {
 
-  private val MAX_ENERGY = 100
-  private val MAX_FOOD = 3
-  var position: Vector = Vector2D(0,0)
-  var energy: Double = 100
-  var time: Int = 0
-  var foodAmount: Int = 0
+  val proximitySensor: Sensor = ProximitySensor()
+  val pheromoneSensor: Sensor = PheromoneSensor()
 
-  def updatePosition(newPosition: Vector): Unit = position = newPosition
+  var position: Vector = STARTING_POSITION
+  var energy: Double = STARTING_ENERGY
+  var time: Int = STARTING_TIME
+  var foodAmount: Int = STARTING_FOOD_AMOUNT
 
-  //TODO: when 0 die!
-  def updateEnergy(amount: Double): Unit = if (energy + amount > MAX_ENERGY) {
-    energy = MAX_ENERGY
-  } else if (energy + amount <=  0) {
-    println("Insect should die!")
-  } else {
-    energy = energy + amount
-  }
+  override def updatePosition(newPosition: Vector): Unit = position = newPosition
+
+  override def updateEnergy(amount: Double): Unit =
+    if (energy + amount > MAX_ENERGY) energy = MAX_ENERGY else energy = energy + amount
 
   override def incTime(): Unit = time = time + 1
 
-  def incFood(amount: Int): Unit = if (foodAmount + amount > MAX_FOOD) foodAmount = MAX_FOOD else foodAmount = foodAmount + amount
+  def incFood(amount: Int): Unit =
+    if (foodAmount + amount > MAX_FOOD) foodAmount = MAX_FOOD else foodAmount = foodAmount + amount
 
   def freeFood(): Unit = foodAmount = 0
 
