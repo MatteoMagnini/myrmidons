@@ -12,7 +12,7 @@ class VectorsTest extends AnyWordSpecLike with BeforeAndAfter {
 
     "calculated in opposite" should {
       "give the correct result" in {
-        assert((v -) == (-3, 4))
+        assert((v -) == Vector2D(-3, 4))
       }
     }
     "calculated in module" should {
@@ -29,7 +29,7 @@ class VectorsTest extends AnyWordSpecLike with BeforeAndAfter {
 
     "added" should {
       "give the correct result" in {
-        assert((v1 + v2) == v2)
+        assert((v1 >> v2) == implicitly[Vector2D](v2))
       }
     }
 
@@ -41,7 +41,7 @@ class VectorsTest extends AnyWordSpecLike with BeforeAndAfter {
 
     "calculated in their distance" should {
       "give the correct result" in {
-        assert((v1 |-| v2) == 5)
+        assert((v1 --> v2) == 5)
       }
     }
   }

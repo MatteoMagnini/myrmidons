@@ -1,7 +1,7 @@
 package model
 
 import akka.actor.{Actor, ActorLogging}
-import utility.Messages.{Clock, MoveMessage}
+import utility.Messages.{Clock, MoveMessage, StartSimulation}
 import model.Environment.EnvironmentState
 import TupleOp._
 
@@ -9,26 +9,27 @@ class Environment(state: EnvironmentState) extends Actor with ActorLogging {
 
   override def receive: Receive = {
 
-    case Clock(value: Int) => ???
+    case StartSimulation(nAnts: Int) => /* Create ants */
 
-    case MoveMessage(pos: (Double, Double), dir: (Int, Int)) =>
-      if (isInside(pos >> dir)) { /* send message to ant */}
-  }
+    case Clock(value: Int) => /* Send message to ants */
 
-  private def isInside(pos: (Double, Double)): Boolean = {
-    val x = pos.x
-    val y = pos.y
-    (x > state.boundary.v1.x) && (y > state.boundary.v1.y) &&
-    (x < state.boundary.v2.x) && (y > state.boundary.v2.y) &&
-    (x > state.boundary.v3.x) && (y < state.boundary.v3.y) &&
-    (x < state.boundary.v4.x) && (y < state.boundary.v4.y)
+    case MoveMessage(pos: Vector2D, dir: (Int, Int)) =>
+      if (state.boundary.isInside(pos >> dir)) {
+        /* check obstacles presence and send message to ant and to GUI */
+      }
   }
 
 }
 
 object Environment {
 
-  case class Boundary(v1:(Double, Double), v2:(Double, Double), v3:(Double, Double), v4:(Double, Double))
+  case class Boundary(topLeft: Vector2D, topRight: Vector2D, bottomLeft: Vector2D, bottomRight: Vector2D) {
+
+    def isInside(pos: Vector2D): Boolean = {
+      (pos.x >= topLeft.x) && (pos.y >= topLeft.y) &&
+      (pos.x <= topRight.x) && (pos.y <= bottomLeft.y)
+    }
+  }
 
   case class EnvironmentState(boundary: Boundary) {
 
