@@ -13,7 +13,7 @@ class Environment(state: EnvironmentState) extends Actor with ActorLogging {
 
     case Clock(value: Int) => /* Send message to ants */
 
-    case MoveMessage(pos: Vector2D, dir: (Int, Int)) =>
+    case MoveMessage(pos: Vector2D, dir: Vector2D) =>
       if (state.boundary.isInside(pos >> dir)) {
         /* check obstacles presence and send message to ant and to GUI */
       }
