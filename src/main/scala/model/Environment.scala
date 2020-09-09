@@ -12,7 +12,7 @@ class Environment(state: EnvironmentState) extends Actor with ActorLogging {
 
     case StartSimulation(nAnts: Int) =>
       val ants = (0 to nAnts).map(i =>
-        context.actorOf(ForagingAnt(id = i, ForagingAntInfo(), sender), s"ant-$i"))
+        context.actorOf(ForagingAnt(ForagingAntInfo(i), sender), s"ant-$i"))
       ants.foreach(_ ! Clock(0))
 
     case Clock(value: Int) => /* Send message to ants */

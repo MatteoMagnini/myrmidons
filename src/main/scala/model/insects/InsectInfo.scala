@@ -45,25 +45,25 @@ case class ForagingAntInfo(override val id: Int,
                            foodAmount: Int) extends InsectInfo {
 
   override def updatePosition(newPosition: Vector): InsectInfo =
-    ForagingAntInfo(id,proximitySensor,pheromoneSensor,newPosition,inertia,energy,time,foodAmount)
+    this.copy(position = newPosition)
 
   override def updateInertia(newInertia: Vector): InsectInfo =
-    ForagingAntInfo(id,proximitySensor,pheromoneSensor,position,newInertia,energy,time,foodAmount)
+    this.copy(inertia = newInertia)
 
   override def updateEnergy(amount: Double): InsectInfo =
     if (energy + amount > MAX_ENERGY)
-      ForagingAntInfo(id,proximitySensor,pheromoneSensor,position,inertia,MAX_ENERGY,time,foodAmount)
+      this.copy(energy = MAX_ENERGY)
     else
-      ForagingAntInfo(id,proximitySensor,pheromoneSensor,position,inertia,energy+amount,time,foodAmount)
+      this.copy(energy = energy + amount)
 
   override def incTime(): InsectInfo =
-    ForagingAntInfo(id,proximitySensor,pheromoneSensor,position,inertia,energy,time+1,foodAmount)
+    this.copy(time = time + 1)
 
   def clearSensors(): InsectInfo =
-    ForagingAntInfo(id,ProximitySensor(),PheromoneSensor(),position,inertia,energy,time,foodAmount)
+    this.copy(proximitySensor = ProximitySensor(), pheromoneSensor = PheromoneSensor())
 
   def addPheromones(pheromones: Iterable[Entity]): InsectInfo =
-    ForagingAntInfo(id,updateSensor(pheromones,proximitySensor),PheromoneSensor(),position,inertia,energy,time,foodAmount)
+    this.copy(pheromoneSensor = updateSensor(pheromones,proximitySensor))
 
   @scala.annotation.tailrec
   private def updateSensor( entities: Iterable[Entity], sensor: Sensor): Sensor =
@@ -74,12 +74,12 @@ case class ForagingAntInfo(override val id: Int,
 
   def incFood(amount: Int): InsectInfo =
     if (foodAmount + amount > MAX_FOOD)
-      ForagingAntInfo(id,proximitySensor,pheromoneSensor,position,inertia,energy,time,MAX_FOOD)
+      this.copy(foodAmount = MAX_FOOD)
     else
-      ForagingAntInfo(id,proximitySensor,pheromoneSensor,position,inertia,energy,time,foodAmount+amount)
+      this.copy(foodAmount = foodAmount+amount)
 
   def freeFood(): InsectInfo =
-    ForagingAntInfo(id,proximitySensor,pheromoneSensor,position,inertia,energy,time,STARTING_FOOD_AMOUNT)
+    this.copy(foodAmount = STARTING_FOOD_AMOUNT)
 
 }
 
