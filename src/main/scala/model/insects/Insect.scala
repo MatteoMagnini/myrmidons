@@ -1,9 +1,9 @@
 package model.insects
 
-import akka.actor.{Actor, ActorRef, Props}
+import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import utility.Messages.{Clock, FoodPheromones}
 
-trait Insect extends Actor {
+trait Insect extends Actor with ActorLogging {
   def id: Int
   def info: InsectInfo
 }
@@ -17,11 +17,12 @@ case class ForagingAnt(override val id: Int,
   override def receive: Receive = {
 
     case Clock(t) if t == info.time + 1 =>
-      info.incTime(); subsumption(FoodPheromoneTaxis,RandomWalk)(context, environment, info)
+      log.debug("Do a step")
+      info.incTime(); subsumption(FoodPheromoneTaxis, RandomWalk)(context, environment, info)
 
     case FoodPheromones(entities) => entities.foreach(e => info.pheromoneSensor.addEntity(e))
 
-    case _ => println("Should never happen")
+    case _ => log.debug("Should never happen")
   }
 }
 

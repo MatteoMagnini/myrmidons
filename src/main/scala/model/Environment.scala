@@ -1,42 +1,44 @@
 package model
 
-import akka.actor.{Actor, ActorLogging}
-import utility.Messages.{Clock, MoveMessage, StartSimulation, UpdateInsect}
-import model.Environment.EnvironmentState
-import TupleOp._
+import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import utility.Messages._
 import model.insects.{ForagingAnt, ForagingAntInfo, InsectInfo}
 
 class Environment(state: EnvironmentState) extends Actor with ActorLogging {
 
-  override def receive: Receive = {
+  override def receive: Receive = defaultBehaviour(state)
+
+  private def defaultBehaviour(state: EnvironmentState): Receive = {
 
     case StartSimulation(nAnts: Int) =>
+      log.debug("Started!")
       val ants = (0 to nAnts).map(i =>
         context.actorOf(ForagingAnt(id = i, ForagingAntInfo(), sender), s"ant-$i"))
-      ants.foreach(_ ! Clock(0))
+      ants.foreach(_ ! Clock(1))
 
-    case Clock(value: Int) => /* Send message to ants */
+    case Clock(value: Int) => state.ants.foreach(_ ! Clock(value))
 
     case MoveMessage(pos: Vector2D, delta: Vector2D) =>
-      if (state.boundary.isInside(pos >> delta)) {
-        /* check obstacles presence and send message to ant and to GUI */
+      val newPosition = pos >> delta
+      if (state.boundary.hasInside(newPosition)) {
+        /* check obstacles presence*/
+        sender ! NewPosition(newPosition)
       }
 
-    case UpdateInsect(info: InsectInfo) =>
+    case UpdateInsect(info: InsectInfo) => state.gui ! UpdateInsect(info)
   }
 }
 
 object Environment {
-
-  case class Boundary(topLeft: Vector2D, topRight: Vector2D, bottomLeft: Vector2D, bottomRight: Vector2D) {
-
-    def isInside(pos: Vector2D): Boolean = {
-      (pos.x >= topLeft.x) && (pos.y >= topLeft.y) &&
-      (pos.x <= topRight.x) && (pos.y <= bottomLeft.y)
-    }
-  }
-
-  case class EnvironmentState(boundary: Boundary) {
-
-  }
+  def apply(state: EnvironmentState): Props = Props(classOf[Environment], state)
 }
+
+
+case class EnvironmentState(gui: ActorRef, boundary: Boundary, ants: Seq[ActorRef])
+
+object EnvironmentState {
+
+  def apply(gui: ActorRef, boundary: Boundary, ants: Seq[ActorRef]): EnvironmentState = new EnvironmentState(gui, boundary, ants)
+  def apply(gui: ActorRef, boundary: Boundary): EnvironmentState = new EnvironmentState(gui, boundary, Seq.empty)
+}
+

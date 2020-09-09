@@ -19,8 +19,9 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
   val sender = TestProbe()
   implicit val senderRef: ActorRef = sender.ref
 
-  /*"Environment" when {
-    val environment = system.actorOf(Props[Environment], name = "env-actor")
+  "Environment" when {
+    val boundary = Boundary(0, 0, 10, 10)
+    val environment = system.actorOf(Environment(EnvironmentState(senderRef, boundary)), name = "env-actor")
     "started" should {
       val nAnts = 10
       environment ! StartSimulation(nAnts)
@@ -31,6 +32,5 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
 
       }
     }
-  }*/
-
+  }
 }

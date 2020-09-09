@@ -14,9 +14,11 @@ sealed trait Message
 
     case class InsectUpdate(info: InsectInfo) extends Message
 
+    case class NewPosition(pos: Vector2D) extends Message
+
     case class FoodPheromones(entities: Iterable[Entity]) extends Message
 
-    case class UpdateInsect(info: InsectInfo)
+    case class UpdateInsect(info: InsectInfo) extends Message
 
   }
 
