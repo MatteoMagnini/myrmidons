@@ -15,7 +15,7 @@ trait Competence {
   val ENERGY_FPT: Double = - 1.5
   val RANDOM: Random.type = scala.util.Random
 
-  def apply(context: ActorContext, environment: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit
+  def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit
 
   def hasPriority(info: InsectInfo): Boolean
 
@@ -23,9 +23,10 @@ trait Competence {
 
 object RandomWalk extends Competence {
 
-  override def apply(context: ActorContext, environment: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
+  override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
     val data = info.updateEnergy(ENERGY_RW)
-    environment ! Move(data.position, RandomVector2D(MAX_VELOCITY, MIN_VELOCITY))
+
+    environment.tell(Move(data.position, RandomVector2D(MAX_VELOCITY, MIN_VELOCITY)),ant)
     context become behaviour(data)
   }
 
@@ -34,10 +35,10 @@ object RandomWalk extends Competence {
 
 object FoodPheromoneTaxis extends Competence {
 
-  override def apply(context: ActorContext, environment: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
+  override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
     val delta = info.asInstanceOf[ForagingAntInfo].pheromoneSensor.weightedSum
     val data = info.updateEnergy(ENERGY_FPT)
-    environment ! Move(data.position, delta)
+    environment.tell(Move(data.position, delta),ant)
     context become behaviour(data.asInstanceOf[ForagingAntInfo].clearSensors())
   }
 

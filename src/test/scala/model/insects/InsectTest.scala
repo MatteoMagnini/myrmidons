@@ -5,8 +5,8 @@ import akka.testkit.{TestKit, TestProbe}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
+import utility.Geometry.ZeroVector2D
 import utility.Messages._
-import utility.Geometry._
 
 class InsectTest extends TestKit(ActorSystem("InsectTest"))
   with AnyWordSpecLike
@@ -22,13 +22,13 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
 
   "Foraging Ant" must {
 
-    val ant = system.actorOf(ForagingAnt(id = 0,ForagingAntInfo(),senderRef), "ant-0")
+    val ant = system.actorOf(ForagingAnt(ForagingAntInfo(),senderRef), "ant-0")
 
     "perform random walk" in {
       ant ! Clock(1)
       val result1 = sender.expectMsgType[Move]
       ant ! NewPosition(result1.start >> result1.delta)
-      val result2 = sender.expectMsgType[InsectUpdate]
+      val result2 = sender.expectMsgType[UpdateInsect]
       assert(result2.info.position != ZeroVector2D())
       assert(result2.info.energy == 99)
       val clock = sender.expectMsgType[Clock]
@@ -40,7 +40,7 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
       ant ! Clock(2)
       val result1 = sender.expectMsgType[Move]
       ant ! NewPosition(result1.start >> result1.delta)
-      val result2 = sender.expectMsgType[InsectUpdate]
+      val result2 = sender.expectMsgType[UpdateInsect]
       assert(result2.info.position != ZeroVector2D())
       assert(result2.info.energy == 98)
       val clock = sender.expectMsgType[Clock]
@@ -52,7 +52,7 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
 
   "Foraging Ant perceiving food pheromones" must {
 
-    val ant = system.actorOf(ForagingAnt(id = 0,ForagingAntInfo(),senderRef), "ant-1")
+    val ant = system.actorOf(ForagingAnt(ForagingAntInfo(id = 1),senderRef), "ant-1")
 
     /*"perform food pheromone taxis" in {
       val pheromones = List(Entity(Vector2D(10,0),0.5))

@@ -1,29 +1,34 @@
 package model.insects
 
-import akka.actor.{Actor, ActorRef, Props}
+import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import utility.Messages._
 
-trait Insect extends Actor {
-  def id: Int
+
+trait Insect extends Actor with ActorLogging {
+
   def info: InsectInfo
+  def environment: ActorRef
 }
 
-case class ForagingAnt(override val id: Int,
-                       override val info: ForagingAntInfo,
-                       environment: ActorRef) extends Insect {
+case class ForagingAnt(override val info: ForagingAntInfo,
+                       override val environment: ActorRef) extends Insect {
 
   def subsumption(competences: Competence*): Competence = competences.filter(c => c.hasPriority(info)).take(1).last
 
   override def receive: Receive = defaultBehaviour(info)
 
+
   private def defaultBehaviour(data: InsectInfo): Receive = {
 
+
     case Clock(t) if t == data.time + 1 =>
-      subsumption(FoodPheromoneTaxis,RandomWalk)(context, environment, data.incTime(), defaultBehaviour)
+      subsumption(FoodPheromoneTaxis,RandomWalk)(context, environment, self, data.incTime(), defaultBehaviour)
+
 
     case NewPosition(p) =>
+      log.debug("NewPos")
       val newData = data.updatePosition(p)
-      environment ! InsectUpdate(newData)
+      environment ! UpdateInsect(newData)
       environment ! Clock(newData.time)
       context become defaultBehaviour(newData)
 
@@ -36,6 +41,6 @@ case class ForagingAnt(override val id: Int,
 }
 
 object ForagingAnt {
-  def apply(id: Int, info: InsectInfo, environment: ActorRef): Props =
-    Props(classOf[ForagingAnt], id, info, environment)
+  def apply(info: InsectInfo, environment: ActorRef): Props =
+    Props(classOf[ForagingAnt], info, environment)
 }
