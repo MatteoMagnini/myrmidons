@@ -7,8 +7,9 @@ scalaVersion := "2.12.6"
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-Xcheckinit", "-encoding", "utf8")
 val AkkaVersion = "2.6.8"
 libraryDependencies ++= Seq(
+  "org.scalatest" %% "scalatest" % "3.1.2" % "test",
   "com.typesafe.akka" %% "akka-actor" % AkkaVersion,
-  "com.typesafe.akka" %% "akka-actor" % "2.3.16",
+ "com.typesafe.akka" %% "akka-testkit" % AkkaVersion % Test,
   "org.scalafx" %% "scalafx" % "14-R19",
   "org.scalafx" %% "scalafxml-core-sfx8" % "0.5"
 )
