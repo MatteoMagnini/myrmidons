@@ -38,4 +38,6 @@ case class Vector2D(x: Double, y: Double) {
 object TupleOp {
   implicit def toVec2D(value: (Double, Double)): Vector2D = Vector2D(value._1, value._2)
   implicit def intToVec2D(value: (Int, Int)): Vector2D = Vector2D(value._1.toDouble, value._2.toDouble)
+
+  implicit def vec3DToVec2D(value: Vector3D): Vector2D = Vector2D(value.x, value.y)
 }
