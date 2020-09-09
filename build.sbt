@@ -10,5 +10,3 @@ val AkkaVersion = "2.6.8"
 libraryDependencies += "com.typesafe.akka" %% "akka-actor" % AkkaVersion
 
 libraryDependencies += "com.typesafe.akka" %% "akka-testkit" % AkkaVersion % Test
-
-libraryDependencies += "junit" % "junit" % "4.11" % "test"

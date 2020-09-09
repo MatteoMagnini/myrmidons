@@ -10,11 +10,13 @@ sealed trait Message
 
     case class Clock(value: Int) extends Message
 
-    case class MoveMessage(pos: Vector2D, dir: Vector2D) extends Message
+    case class MoveMessage(pos: Vector2D, delta: Vector2D) extends Message
 
     case class InsectUpdate(info: InsectInfo) extends Message
 
     case class FoodPheromones(entities: Iterable[Entity]) extends Message
+
+    case class UpdateInsect(info: InsectInfo)
 
   }
 
