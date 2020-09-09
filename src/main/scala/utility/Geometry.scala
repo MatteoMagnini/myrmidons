@@ -3,10 +3,6 @@ package utility
 object Geometry {
 
   trait Vector {
-    val LEFT = "["
-    val RIGHT = "]"
-    val SEPARATOR = ", "
-
     def x: Double
     def y: Double
 
@@ -16,13 +12,6 @@ object Geometry {
     def *(scalar: Double) : Vector
     def || : Double
     def -->(p1: Vector): Double
-
-    override def toString: String = LEFT + x + SEPARATOR + y + RIGHT
-
-    override def equals( obj: Any ): Boolean = obj match {
-      case v:Vector => (this.x equals v.x) && (this.y equals v.y)
-      case _ => false
-    }
   }
 
   /** A vector in 2-dimensional space.
@@ -30,7 +19,7 @@ object Geometry {
    * @param x x-coordinate
    * @param y y-coordinate
    */
-  case class Vector2D( x: Double, y: Double) extends Vector {
+  case class Vector2D(override val x: Double, override val y: Double) extends Vector {
     import TupleOp._
 
     /** Returns a vector in its opposite form */
