@@ -6,7 +6,6 @@ import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import utility.Messages._
-import utility.Geometry._
 
 class InsectTest extends TestKit(ActorSystem("InsectTest"))
   with AnyWordSpecLike
@@ -29,7 +28,6 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
       val result1 = sender.expectMsgType[Move]
       ant ! NewPosition(result1.start >> result1.delta)
       val result2 = sender.expectMsgType[InsectUpdate]
-      assert(result2.info.position != ZeroVector2D())
       assert(result2.info.energy == 99)
       val clock = sender.expectMsgType[Clock]
       assert(clock.value == 1)
@@ -41,7 +39,6 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
       val result1 = sender.expectMsgType[Move]
       ant ! NewPosition(result1.start >> result1.delta)
       val result2 = sender.expectMsgType[InsectUpdate]
-      assert(result2.info.position != ZeroVector2D())
       assert(result2.info.energy == 98)
       val clock = sender.expectMsgType[Clock]
       assert(clock.value == 2)
