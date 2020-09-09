@@ -9,7 +9,7 @@ object Constant {
   def STARTING_ENERGY = 100
   def STARTING_TIME = 0
   def STARTING_FOOD_AMOUNT = 0
-  def STARTING_POSITION: Vector = Vector2D(0, 0)
+  def STARTING_POSITION: Vector = ZeroVector2D()
 }
 
 import Constant._
