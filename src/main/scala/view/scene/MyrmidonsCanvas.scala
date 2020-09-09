@@ -19,6 +19,7 @@ case class MyrmidonsCanvas() extends Canvas {
 
   height = canvasHeight
   width = canvasWidth
+
   def initializeCanvas(): Unit = {
     /*Add one ant*/
     context.fill = Color.Black
@@ -39,6 +40,8 @@ case class MyrmidonsCanvas() extends Canvas {
     context.fillRect(x * antSize, y * antSize, antSize, antSize)
     antsPosition = antsPosition + ((x, y))
   }
+
+  def getAntCount: Int = this.antsPosition.size
 
   handleEvent(MouseEvent.Any) {
     e: MouseEvent =>

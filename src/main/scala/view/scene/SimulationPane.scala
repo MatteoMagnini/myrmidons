@@ -1,9 +1,15 @@
 package view.scene
 
+
+import akka.actor.{ActorSystem, Props}
+import scalafx.animation.{KeyFrame, Timeline}
+import scalafx.event.ActionEvent
 import scalafx.scene.control.{Button, Label, Separator, ToolBar}
 import scalafx.scene.layout.{BorderPane, Pane}
 import scalafx.scene.paint.Color
 import scalafx.scene.text.Text
+import scalafx.util.Duration
+import view.actor.UiActor
 
 /**
  * BorderPane with box for managing simulation
@@ -12,13 +18,19 @@ import scalafx.scene.text.Text
 case class SimulationPane() extends BorderPane {
   /* Custom canvas */
   private val canvas = new MyrmidonsCanvas
+  private val system = ActorSystem("Myrmidons-system")
+  // private val uiActor = system.actorOf(Props(new UiActor(canvas, this)))
+  // private  val environment = system.actorOf(Props[Environment], name = "env-actor")
 
   /* ToolBar for manage ant simulation */
   private val toolBox: ToolBar = new ToolBar {
-    val generation = new Text("0")
-    val population = new Text("0")
-    val startButton = new Button("Start")
+    private val generation = new Text("0")
+    private val population = new Text("0")
+    private val startButton = new Button(text = "Start") {
+      // onAction = (_: ActionEvent) => uiActor ! StartSimulation(canvas.getAntCount)
+    }
     val stopButton = new Button("Stop")
+
     content = List(
       startButton,
       stopButton,
