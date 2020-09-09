@@ -25,6 +25,7 @@ object RandomWalk extends Competence {
 
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
     val data = info.updateEnergy(ENERGY_RW)
+
     environment.tell(Move(data.position, RandomVector2D(MAX_VELOCITY, MIN_VELOCITY)),ant)
     context become behaviour(data)
   }

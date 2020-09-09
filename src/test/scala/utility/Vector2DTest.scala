@@ -3,7 +3,7 @@ package utility
 import org.scalatest.BeforeAndAfter
 import org.scalatest.wordspec.AnyWordSpecLike
 
-class VectorsTest extends AnyWordSpecLike with BeforeAndAfter {
+class Vector2DTest extends AnyWordSpecLike with BeforeAndAfter {
 
   import utility.Geometry._
   import utility.Geometry.TupleOp._

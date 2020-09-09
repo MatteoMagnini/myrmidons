@@ -1,42 +1,40 @@
 package model
-
-import akka.actor.{Actor, ActorLogging}
+import utility.Messages._
+import akka.actor.{Actor, ActorLogging, Props}
 import utility.Messages.{Clock, Move, StartSimulation, UpdateInsect}
-import model.Environment.EnvironmentState
 import model.insects.{ForagingAnt, ForagingAntInfo, InsectInfo}
 import utility.Geometry._
 
-class Environment(state: EnvironmentState) extends Actor with ActorLogging {
+class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
-  override def receive: Receive = {
+  override def receive: Receive = defaultBehaviour(state)
 
-    case StartSimulation(nAnts: Int) =>
-      val ants = (0 to nAnts).map(i =>
-        context.actorOf(ForagingAnt(ForagingAntInfo(i), sender), s"ant-$i"))
-      ants.foreach(_ ! Clock(0))
+  private def defaultBehaviour(state: EnvironmentInfo): Receive = {
 
-    case Clock(value: Int) => /* Send message to ants */
+    case StartSimulation(nAnts: Int, obstacles: Seq[Obstacle]) =>
+      log.debug("Started!")
+      val ants = (0 until nAnts).map(i =>
+        context.actorOf(ForagingAnt(ForagingAntInfo(i), self), s"ant-$i"))
+      context.become(defaultBehaviour(state.insertAnts(ants).insertObstacles(obstacles)))
 
-    case Move(pos: Vector, delta: Vector) =>
-      if (state.boundary.isInside(pos >> delta)) {
-        /* check obstacles presence and send message to ant and to GUI */
-      }
+    case Clock(value: Int) if sender == state.gui => state.ants.foreach(_ ! Clock(value))
 
-    case UpdateInsect(info: InsectInfo) =>
+    case Clock(value: Int) =>
+      if (state.antCounter < state.ants.size) context.become(defaultBehaviour(state.incAntCounter()))
+      else state.gui ! Clock(value); context.become(defaultBehaviour(state.resetAntCounter()))
+
+    case Move(pos: Vector2D, delta: Vector2D) =>
+      import utility.Geometry.TupleOp._
+      log.debug("Move")
+      val newPosition = pos >> delta
+     // if (state.boundary.hasInside(newPosition) && state.obstacles.forall(_.isInside(newPosition))) {
+        sender ! NewPosition(newPosition)
+     // }
+
+    case UpdateInsect(info: InsectInfo) => log.debug(" "+state.gui); state.gui ! UpdateInsect(info)
   }
 }
 
 object Environment {
-
-  case class Boundary( topLeft: Vector, topRight: Vector, bottomLeft: Vector, bottomRight: Vector) {
-
-    def isInside(pos: Vector): Boolean = {
-      (pos.x >= topLeft.x) && (pos.y >= topLeft.y) &&
-      (pos.x <= topRight.x) && (pos.y <= bottomLeft.y)
-    }
-  }
-
-  case class EnvironmentState(boundary: Boundary) {
-
-  }
+  def apply(state: EnvironmentInfo): Props = Props(classOf[Environment], state)
 }
