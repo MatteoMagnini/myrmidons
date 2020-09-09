@@ -1,16 +1,18 @@
 package model
 
+import utility.Geometry.Vector
+
 case class Boundary(left: Double, top: Double, width: Double, height: Double) {
-  import TupleOp._
+  import utility.Geometry.TupleOp._
 
-  def topLeft: Vector2D = (left, top)
-  def topRight: Vector2D = (left + width, top)
-  def bottomLeft: Vector2D = (left, top + height)
-  def bottomRight: Vector2D = (left + width, top + height)
+  def topLeft: Vector = (left, top)
+  def topRight: Vector = (left + width, top)
+  def bottomLeft: Vector = (left, top + height)
+  def bottomRight: Vector = (left + width, top + height)
 
-  def center: Vector2D = (left + width / 2, top + height / 2)
+  def center: Vector = (left + width / 2, top + height / 2)
 
-  def hasInside(pos: Vector2D): Boolean = {
+  def hasInside(pos: Vector): Boolean = {
     (pos.x >= left) && (pos.x <= topRight.x) &&
       (pos.y >= top) && (pos.y <= bottomLeft.y)
   }

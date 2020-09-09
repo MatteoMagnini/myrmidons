@@ -2,7 +2,10 @@ package model
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import utility.Messages._
+import akka.actor.{Actor, ActorLogging}
+import utility.Messages.{Clock, Move, StartSimulation, UpdateInsect}
 import model.insects.{ForagingAnt, ForagingAntInfo, InsectInfo}
+import utility.Geometry._
 
 class Environment(state: EnvironmentState) extends Actor with ActorLogging {
 
@@ -18,7 +21,8 @@ class Environment(state: EnvironmentState) extends Actor with ActorLogging {
 
     case Clock(value: Int) => state.ants.foreach(_ ! Clock(value))
 
-    case MoveMessage(pos: Vector2D, delta: Vector2D) =>
+
+    case Move(pos: Vector2D, delta: Vector2D) =>
       val newPosition = pos >> delta
       if (state.boundary.hasInside(newPosition)) {
         /* check obstacles presence*/
@@ -32,7 +36,6 @@ class Environment(state: EnvironmentState) extends Actor with ActorLogging {
 object Environment {
   def apply(state: EnvironmentState): Props = Props(classOf[Environment], state)
 }
-
 
 case class EnvironmentState(gui: ActorRef, boundary: Boundary, ants: Seq[ActorRef])
 

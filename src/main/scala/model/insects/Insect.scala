@@ -1,7 +1,7 @@
 package model.insects
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-import utility.Messages.{Clock, FoodPheromones}
+import utility.Messages._
 
 trait Insect extends Actor with ActorLogging {
   def id: Int
@@ -14,15 +14,25 @@ case class ForagingAnt(override val id: Int,
 
   def subsumption(competences: Competence*): Competence = competences.filter(c => c.hasPriority(info)).take(1).last
 
-  override def receive: Receive = {
+  override def receive: Receive = defaultBehaviour(info)
 
-    case Clock(t) if t == info.time + 1 =>
-      log.debug("Do a step")
-      info.incTime(); subsumption(FoodPheromoneTaxis, RandomWalk)(context, environment, info)
 
-    case FoodPheromones(entities) => entities.foreach(e => info.pheromoneSensor.addEntity(e))
+  private def defaultBehaviour(data: InsectInfo): Receive = {
 
-    case _ => log.debug("Should never happen")
+    case Clock(t) if t == data.time + 1 =>
+      subsumption(FoodPheromoneTaxis,RandomWalk)(context, environment, data.incTime(), defaultBehaviour)
+
+    case NewPosition(p) =>
+      val newData = data.updatePosition(p)
+      environment ! InsectUpdate(newData)
+      environment ! Clock(newData.time)
+      context become defaultBehaviour(newData)
+
+    case FoodPheromones(entities) =>
+      context become defaultBehaviour(data.asInstanceOf[ForagingAntInfo].addPheromones(entities))
+
+    case x => println("Should never happen, received message: " + x.getClass + " from " + sender)
+
   }
 }
 

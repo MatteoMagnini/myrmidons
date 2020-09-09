@@ -1,6 +1,6 @@
 package utility
-import model.Vector2D
 import model.insects.{Entity, InsectInfo}
+import utility.Geometry._
 
 sealed trait Message
 
@@ -10,15 +10,14 @@ sealed trait Message
 
     case class Clock(value: Int) extends Message
 
-    case class MoveMessage(pos: Vector2D, delta: Vector2D) extends Message
+    case class Move(start: Vector, delta: Vector) extends Message
 
     case class InsectUpdate(info: InsectInfo) extends Message
-
-    case class NewPosition(pos: Vector2D) extends Message
 
     case class FoodPheromones(entities: Iterable[Entity]) extends Message
 
     case class UpdateInsect(info: InsectInfo) extends Message
 
-  }
+    case class NewPosition(position: Vector) extends Message
 
+  }
