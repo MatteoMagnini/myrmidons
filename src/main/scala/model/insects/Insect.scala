@@ -35,6 +35,6 @@ case class ForagingAnt(override val info: ForagingAntInfo,
 }
 
 object ForagingAnt {
-  def apply(id: Int, info: InsectInfo, environment: ActorRef): Props =
-    Props(classOf[ForagingAnt], id, info, environment)
+  def apply(info: InsectInfo, environment: ActorRef): Props =
+    Props(classOf[ForagingAnt], info, environment)
 }
