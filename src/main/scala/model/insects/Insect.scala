@@ -1,7 +1,7 @@
 package model.insects
 
 import akka.actor.{Actor, ActorRef, Props}
-import utility.{Clock, FoodPheromones, InsectUpdate, Message, NewPosition}
+import utility.Messages._
 
 trait Insect extends Actor {
   def id: Int
@@ -30,7 +30,7 @@ case class ForagingAnt(override val id: Int,
     case FoodPheromones(entities) =>
       context become defaultBehaviour(data.asInstanceOf[ForagingAntInfo].addPheromones(entities))
 
-    case x: Message => println("Should never happen, received message: " + x.getClass + " from " + sender)
+    case x => println("Should never happen, received message: " + x.getClass + " from " + sender)
 
   }
 }

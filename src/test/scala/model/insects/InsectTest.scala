@@ -5,8 +5,8 @@ import akka.testkit.{TestKit, TestProbe}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.{Clock, FoodPheromones, InsectUpdate, Move, NewPosition}
-import utility.Geometry.Vector2D
+import utility.Messages._
+import utility.Geometry._
 
 class InsectTest extends TestKit(ActorSystem("InsectTest"))
   with AnyWordSpecLike
@@ -69,7 +69,7 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
     }
 
     "multiple times" in {
-      val pheromones = List(Entity(Vector2D(5,0),0.5))
+      val pheromones = List(Entity((5,0),0.5))
       ant ! FoodPheromones(pheromones)
       ant ! Clock(2)
       val result1 = sender.expectMsgType[Move]

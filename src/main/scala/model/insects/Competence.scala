@@ -2,8 +2,8 @@ package model.insects
 
 import akka.actor.Actor.Receive
 import akka.actor.{ActorContext, ActorRef}
-import utility.Geometry.RandomVector2D
-import utility.Move
+import utility.Geometry._
+import utility.Messages._
 
 import scala.util.Random
 
@@ -37,7 +37,7 @@ object FoodPheromoneTaxis extends Competence {
   override def apply(context: ActorContext, environment: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
     val delta = info.asInstanceOf[ForagingAntInfo].pheromoneSensor.weightedSum
     val data = info.updateEnergy(ENERGY_FPT)
-    environment ! Move(info.position, delta)
+    environment ! Move(data.position, delta)
     context become behaviour(data.asInstanceOf[ForagingAntInfo].clearSensors())
   }
 
