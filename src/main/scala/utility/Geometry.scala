@@ -75,23 +75,6 @@ object Geometry {
     }
   }
 
-
-
-  /** Implicit conversions for [[utility.Geometry.Vector]] instances
-   *
-   * {{{
-   * import TupleOp._
-   * val v = (1, 2) >> (3, 4)
-   * }}}
-   */
-  object TupleOp {
-    implicit def toVec2D(value: (Double, Double)): Vector = Vector2D(value._1, value._2)
-    implicit def intToVec2D(value: (Int, Int)): Vector = Vector2D(value._1.toDouble, value._2.toDouble)
-    implicit def toVec3D(value: (Double, Double, Double)): Vector3D = Vector3D(value._1, value._2, value._3)
-    implicit def intToVec3D(value: (Int, Int, Int)): Vector3D = Vector3D(value._1.toDouble, value._2.toDouble, value._3.toDouble)
-    implicit def vec3DToVec2D(value: Vector2D): Vector3D = Vector3D(value.x, value.y, 1.0)
-  }
-
   object ZeroVector2D {
     def apply(): Vector = Vector2D(0, 0)
   }
@@ -109,4 +92,18 @@ object Geometry {
     }
   }
 
+  /** Implicit conversions for [[utility.Geometry.Vector]] instances
+   *
+   * {{{
+   * import TupleOp._
+   * val v = (1, 2) >> (3, 4)
+   * }}}
+   */
+  object TupleOp {
+    implicit def toVec2D(value: (Double, Double)): Vector = Vector2D(value._1, value._2)
+    implicit def intToVec2D(value: (Int, Int)): Vector = Vector2D(value._1.toDouble, value._2.toDouble)
+    implicit def toVec3D(value: (Double, Double, Double)): Vector3D = Vector3D(value._1, value._2, value._3)
+    implicit def intToVec3D(value: (Int, Int, Int)): Vector3D = Vector3D(value._1.toDouble, value._2.toDouble, value._3.toDouble)
+    implicit def vec3DToVec2D(value: Vector2D): Vector3D = Vector3D(value.x, value.y, 1.0)
+  }
 }

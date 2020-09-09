@@ -4,7 +4,7 @@ import scala.language.implicitConversions
 
 import utility.Geometry.Vector3D
 
-trait Obstacle{
+trait Obstacle {
   /**
    * function to verify if a coordinate is inside an obstacle
    *

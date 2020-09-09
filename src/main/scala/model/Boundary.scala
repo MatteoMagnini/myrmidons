@@ -18,7 +18,7 @@ case class Boundary(left: Double, top: Double, width: Double, height: Double) {
   }
 }
 
-object Boundary{
+object Boundary {
   def apply(left: Double, top: Double, width: Double, height: Double): Boundary =
     new Boundary(left, top, width, height)
 }
