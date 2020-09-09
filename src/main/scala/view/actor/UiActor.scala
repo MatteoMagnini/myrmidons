@@ -1,7 +1,10 @@
 package view.actor
 
 import akka.actor.{Actor, ActorLogging, Props, Timers}
+import model.insects.InsectInfo
+import utility.Messages.UpdateInsect
 import view.scene.{MyrmidonsCanvas, SimulationPane}
+
 import scala.concurrent.duration.DurationInt
 
 /**
@@ -10,13 +13,14 @@ import scala.concurrent.duration.DurationInt
  * - updateInsect : from Environment to UiActor to notify
  * new position of the simulation entities.
  */
+
 object UiActor {
 
-  private case object TickKey
+  private case object StepKey
 
-  private case object FirstTick
+  private case object FirstStep
 
-  private case object Tick
+  private case object Step
 
   def apply(canvas: MyrmidonsCanvas, pane: SimulationPane): Props =
     Props(classOf[UiActor], canvas, pane)
@@ -27,20 +31,20 @@ case class UiActor(canvas: MyrmidonsCanvas, pane: SimulationPane) extends Actor
 
   import UiActor._
 
-  timers.startSingleTimer(TickKey, FirstTick, 500.millis)
+  timers.startSingleTimer(StepKey, FirstStep, 500.millis)
+  var currentState = 0
 
-  override def receive: Receive = ???
+  override def receive: Receive = {
 
-  /*{
-    case  updateInsect(info: InsectInfo) =>
-  }*/
-  /*
-  case FirstTick =>
-      // do something useful here
-      timers.startTimerWithFixedDelay(TickKey, Tick, 1.second)
-    case Tick =>
-    // do something useful here
-    // send clock(value) to enviroment
-   */
+    case FirstStep =>
+      timers.startTimerWithFixedDelay(StepKey, Step, 1.second)
+
+    case Step =>
+      currentState = currentState + 1
+
+    case UpdateInsect(info: InsectInfo) =>
+
+  }
+
 
 }
