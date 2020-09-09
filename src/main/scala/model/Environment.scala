@@ -1,10 +1,10 @@
 package model
 
 import akka.actor.{Actor, ActorLogging}
-import utility.Messages.{Clock, MoveMessage, StartSimulation, UpdateInsect}
+import utility.Messages.{Clock, Move, StartSimulation, UpdateInsect}
 import model.Environment.EnvironmentState
-import TupleOp._
 import model.insects.{ForagingAnt, ForagingAntInfo, InsectInfo}
+import utility.Geometry._
 
 class Environment(state: EnvironmentState) extends Actor with ActorLogging {
 
@@ -17,7 +17,7 @@ class Environment(state: EnvironmentState) extends Actor with ActorLogging {
 
     case Clock(value: Int) => /* Send message to ants */
 
-    case MoveMessage(pos: Vector2D, delta: Vector2D) =>
+    case Move(pos: Vector, delta: Vector) =>
       if (state.boundary.isInside(pos >> delta)) {
         /* check obstacles presence and send message to ant and to GUI */
       }
@@ -28,9 +28,9 @@ class Environment(state: EnvironmentState) extends Actor with ActorLogging {
 
 object Environment {
 
-  case class Boundary(topLeft: Vector2D, topRight: Vector2D, bottomLeft: Vector2D, bottomRight: Vector2D) {
+  case class Boundary( topLeft: Vector, topRight: Vector, bottomLeft: Vector, bottomRight: Vector) {
 
-    def isInside(pos: Vector2D): Boolean = {
+    def isInside(pos: Vector): Boolean = {
       (pos.x >= topLeft.x) && (pos.y >= topLeft.y) &&
       (pos.x <= topRight.x) && (pos.y <= bottomLeft.y)
     }
