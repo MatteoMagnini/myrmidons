@@ -1,31 +1,46 @@
 package model.insects
 
-import akka.actor.{Actor, ActorRef, Props}
-import utility.Messages.{Clock, FoodPheromones}
+import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import utility.Messages._
 
-trait Insect extends Actor {
-  def id: Int
+
+trait Insect extends Actor with ActorLogging {
+
   def info: InsectInfo
+  def environment: ActorRef
 }
 
-case class ForagingAnt(override val id: Int,
-                       override val info: ForagingAntInfo,
-                       environment: ActorRef) extends Insect {
+case class ForagingAnt(override val info: ForagingAntInfo,
+                       override val environment: ActorRef) extends Insect {
 
   def subsumption(competences: Competence*): Competence = competences.filter(c => c.hasPriority(info)).take(1).last
 
-  override def receive: Receive = {
+  override def receive: Receive = defaultBehaviour(info)
 
-    case Clock(t) if t == info.time + 1 =>
-      info.incTime(); subsumption(FoodPheromoneTaxis,RandomWalk)(context, environment, info)
 
-    case FoodPheromones(entities) => entities.foreach(e => info.pheromoneSensor.addEntity(e))
+  private def defaultBehaviour(data: InsectInfo): Receive = {
 
-    case _ => println("Should never happen")
+
+    case Clock(t) if t == data.time + 1 =>
+      subsumption(FoodPheromoneTaxis,RandomWalk)(context, environment, self, data.incTime(), defaultBehaviour)
+
+
+    case NewPosition(p) =>
+      log.debug("NewPos")
+      val newData = data.updatePosition(p)
+      environment ! UpdateInsect(newData)
+      environment ! Clock(newData.time)
+      context become defaultBehaviour(newData)
+
+    case FoodPheromones(entities) =>
+      context become defaultBehaviour(data.asInstanceOf[ForagingAntInfo].addPheromones(entities))
+
+    case x => println("Should never happen, received message: " + x.getClass + " from " + sender)
+
   }
 }
 
 object ForagingAnt {
-  def apply(id: Int, info: InsectInfo, environment: ActorRef): Props =
-    Props(classOf[ForagingAnt], id, info, environment)
+  def apply(info: InsectInfo, environment: ActorRef): Props =
+    Props(classOf[ForagingAnt], info, environment)
 }

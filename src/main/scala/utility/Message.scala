@@ -1,22 +1,22 @@
 package utility
-import model.Vector2D
+import model.Obstacle
 import model.insects.{Entity, InsectInfo}
+import utility.Geometry._
 
 sealed trait Message
 
   object Messages {
 
-    case class StartSimulation(nAnts: Int) extends Message
+    case class StartSimulation(nAnts: Int, obstacles: Seq[Obstacle]) extends Message
 
     case class Clock(value: Int) extends Message
 
-    case class MoveMessage(pos: Vector2D, delta: Vector2D) extends Message
-
-    case class InsectUpdate(info: InsectInfo) extends Message
+    case class Move(start: Vector, delta: Vector) extends Message
 
     case class FoodPheromones(entities: Iterable[Entity]) extends Message
 
-    case class UpdateInsect(info: InsectInfo)
+    case class UpdateInsect(info: InsectInfo) extends Message
+
+    case class NewPosition(position: Vector) extends Message
 
   }
-

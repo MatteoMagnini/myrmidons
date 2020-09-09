@@ -1,13 +1,14 @@
-package model
+package utility
 
-import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatest.BeforeAndAfter
+import org.scalatest.wordspec.AnyWordSpecLike
 
+class Vector2DTest extends AnyWordSpecLike with BeforeAndAfter {
 
-class VectorsTest extends AnyWordSpecLike with BeforeAndAfter {
+  import utility.Geometry._
+  import utility.Geometry.TupleOp._
 
   "A vector" when {
-    import TupleOp._
 
     val v = (3, -4)
 
@@ -29,14 +30,13 @@ class VectorsTest extends AnyWordSpecLike with BeforeAndAfter {
   }
 
   "Two vectors" when {
-    import TupleOp._
 
     val v1 = (0, 0)
     val v2 = (3, -4)
 
     "added" should {
       "give the correct result" in {
-        assert((v1 >> v2) == implicitly[Vector2D](v2))
+        assert((v1 >> v2) == implicitly[Vector](v2))
       }
     }
 
