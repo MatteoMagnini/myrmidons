@@ -41,5 +41,14 @@ object Geometry {
     def apply(): Vector = Vector2D(0,0)
   }
 
+  object RandomVector2D {
+    def apply(min: Double, max: Double): Vector = {
+      val uniformDoubleGenerator = scala.util.Random
+      val x = (uniformDoubleGenerator.nextDouble() - 0.5) * max * 2
+      val y = (uniformDoubleGenerator.nextDouble() - 0.5) * max * 2
+      Vector2D(if (x.abs < min) x.signum * min else x, if (y.abs < min) y.signum * min else y)
+    }
+  }
+
 
 }
