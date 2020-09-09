@@ -1,10 +1,10 @@
-package model
+package utility
 
 import org.scalatest.BeforeAndAfter
 import org.scalatest.wordspec.AnyWordSpecLike
 import utility.Geometry.Vector3D
 
-class Vector3Test extends AnyWordSpecLike with BeforeAndAfter {
+class Vector3DTest extends AnyWordSpecLike with BeforeAndAfter {
 
   "A vector" when {
     import utility.Geometry.TupleOp._

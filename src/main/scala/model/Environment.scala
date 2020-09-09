@@ -15,20 +15,21 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       log.debug("Started!")
       val ants = (0 until nAnts).map(i =>
         context.actorOf(ForagingAnt(id = i, ForagingAntInfo(), self), s"ant-$i"))
-      context.become(defaultBehaviour(state.insertAnts(ants)))
+      context.become(defaultBehaviour(state.insertAnts(ants).insertObstacles(obstacles)))
 
-    case Clock(value: Int) if sender == state.gui => state.ants.foreach(_ ! Clock(value)); log.debug("CLOCK " + state.ants.size)
+    case Clock(value: Int) if sender == state.gui => state.ants.foreach(_ ! Clock(value))
 
-    //TODO
-   // case Clock(value: Int) => /* increment ant counter */ state.gui ! Clock(value)
+    case Clock(value: Int) =>
+      if (state.antCounter < state.ants.size) context.become(defaultBehaviour(state.incAntCounter()))
+      else state.gui ! Clock(value); context.become(defaultBehaviour(state.resetAntCounter()))
 
     case Move(pos: Vector2D, delta: Vector2D) =>
+      import utility.Geometry.TupleOp._
       log.debug("Move")
       val newPosition = pos >> delta
-     // if (state.boundary.hasInside(newPosition)) {
-        /* check obstacles presence*/
+      if (state.boundary.hasInside(newPosition) && state.obstacles.forall(_.isInside(newPosition))) {
         sender ! NewPosition(newPosition)
-     // }
+      }
 
     case UpdateInsect(info: InsectInfo) => log.debug(" "+state.gui); state.gui ! UpdateInsect(info)
   }

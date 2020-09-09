@@ -104,6 +104,6 @@ object Geometry {
     implicit def intToVec2D(value: (Int, Int)): Vector = Vector2D(value._1.toDouble, value._2.toDouble)
     implicit def toVec3D(value: (Double, Double, Double)): Vector3D = Vector3D(value._1, value._2, value._3)
     implicit def intToVec3D(value: (Int, Int, Int)): Vector3D = Vector3D(value._1.toDouble, value._2.toDouble, value._3.toDouble)
-    implicit def vec3DToVec2D(value: Vector2D): Vector3D = Vector3D(value.x, value.y, 1.0)
+    implicit def vec3DToVec2D(value: Vector): Vector3D = Vector3D(value.x, value.y, 1.0)
   }
 }
