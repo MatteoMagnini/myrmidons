@@ -19,8 +19,10 @@ case class ForagingAnt(override val id: Int,
 
   private def defaultBehaviour(data: InsectInfo): Receive = {
 
-    case Clock(t) if t == data.time + 1 => log.debug("Ant clock")
-      subsumption(FoodPheromoneTaxis,RandomWalk)(context, environment, data.incTime(), defaultBehaviour)
+
+    case Clock(t) if t == data.time + 1 =>
+      subsumption(FoodPheromoneTaxis,RandomWalk)(context, environment, self, data.incTime(), defaultBehaviour)
+
 
     case NewPosition(p) =>
       log.debug("NewPos")

@@ -5,7 +5,7 @@ import akka.testkit.{TestKit, TestProbe}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.Messages.{Clock, StartSimulation}
+import utility.Messages.{Clock, StartSimulation, UpdateInsect}
 
 class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
   with AnyWordSpecLike
@@ -27,8 +27,8 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
       environment ! StartSimulation(nAnts, Seq.empty)
       environment ! Clock(1)
       "create ants" in {
-       /* val result = sender.expectMsgType[UpdateInsect]
-        println(result.info.position)*/
+        val result = sender.expectMsgType[UpdateInsect]
+        println(result.info.position)
       }
       "send a clock message" in {
 
