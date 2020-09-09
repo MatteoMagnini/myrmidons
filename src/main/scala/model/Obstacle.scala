@@ -2,11 +2,15 @@ package model
 
 import scala.language.implicitConversions
 
+import utility.Geometry.Vector3D
+
 trait Obstacle{
   /**
    * function to verify if a coordinate is inside an obstacle
    *
    * @param coordinate to check
+   *
+   * @return true if coordinate is inside of the obstacle
    * */
   def isInside(coordinate: Vector3D):Boolean
 }

@@ -2,11 +2,12 @@ package model
 
 import org.scalatest.BeforeAndAfter
 import org.scalatest.wordspec.AnyWordSpecLike
+import utility.Geometry.Vector3D
 
 class Vector3Test extends AnyWordSpecLike with BeforeAndAfter {
 
   "A vector" when {
-    import TupleOp3._
+    import utility.Geometry.TupleOp._
 
     val v = (6, -4, 2)
 
@@ -33,7 +34,7 @@ class Vector3Test extends AnyWordSpecLike with BeforeAndAfter {
   }
 
   "Two vectors" when {
-    import TupleOp3._
+    import utility.Geometry.TupleOp._
 
     val v1 = (0, 0, 0)
     val v2 = (3, -4, 1)
