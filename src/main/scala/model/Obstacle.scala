@@ -3,67 +3,52 @@ package model
 import scala.language.implicitConversions
 
 trait Obstacle{
-  def isInside(tuple2: (Double, Double, Double)):Boolean
+  /**
+   * function to verify if a coordinate is inside an obstacle
+   *
+   * @param coordinate to check
+   * */
+  def isInside(coordinate: Vector3D):Boolean
 }
 
-class EnvObstacle(val points: List[(Double, Double, Double)]) extends Obstacle {
-  import HomogeneousConversion._
-  var segments: List[((Double, Double, Double), (Double, Double, Double), (Double, Double, Double))] = List()
+/**
+ * An implementation of obstacle.
+ *
+ * @param points list of vertex of polygon that describe an obstacle
+ * */
+class EnvObstacle(val points: List[Vector3D]) extends Obstacle {
+  // a segments is described as a two point and a line pass through them
+  var segments: List[(Vector3D, Vector3D, Vector3D)] = List()
 
-  if(points.size < 3){
+  if (points.size < 3) {
     throw new IllegalArgumentException("points list must have more than 2 elements")
   }
   //get a line given two points
   points.indices foreach (i => {
-    var before = if ( i == 0 ) points.length - 1 else i - 1
-    val product = crossProduct(points(before), points(i))
-    val line = (product._1/product._3, product._2/product._3, product._3/product._3)
+    var before = if (i == 0) points.length - 1 else i - 1
+    val product = points(before) X points(i)
+    val line = product / product.z
     segments ::= (points(before), points(i), line)
   })
 
-  override def isInside(tuple2: (Double, Double, Double)): Boolean = {
-    var maxX = points.sortWith((a,b) => a._1 > b._1) head
+  override def isInside(coordinate: Vector3D): Boolean = {
+    var maxX = points.sortWith((a, b) => a.x > b.x) head
     //track an ray in right version
-    val ray = crossProduct(tuple2, (maxX._1 + 1, tuple2._2, 1))
+    val ray = coordinate X Vector3D(maxX.x + 1, coordinate.y, 1)
     var counter = 0
     //find intersection between polygon segment and ray
-    segments.indices foreach(i => {
-      val crossIntersection = crossProduct(segments(i)._3, ray)
+    segments.indices foreach (i => {
+      val crossIntersection = segments(i)._3 X ray
       // intersection at ideal point (parallel line)
-      if (crossIntersection._3 != 0.0) {
-        val intersection = (crossIntersection._1 / crossIntersection._3,
-                            crossIntersection._2 / crossIntersection._3,
-                            crossIntersection._3 / crossIntersection._3)
-        if ((((segments(i)._1._1 >= intersection._1) && (segments(i)._2._1 <= intersection._1))
-          || ((segments(i)._1._1 <= intersection._1) && (segments(i)._2._1 >= intersection._1)))
-          && intersection._1 >= tuple2._1) {
+      if (crossIntersection.z != 0.0) {
+        val intersection = crossIntersection / crossIntersection.z
+        if ((((segments(i)._1.x >= intersection.x) && (segments(i)._2.x <= intersection.x))
+          || ((segments(i)._1.x <= intersection.x) && (segments(i)._2.x >= intersection.x)))
+          && intersection.x >= coordinate.x) {
           counter += 1
         }
       }
     })
     (counter % 2) != 0
-  }
-
-  def crossProduct(t1: (Double, Double, Double),t2: (Double, Double, Double)): (Double, Double, Double) = {
-    val x = (t1._2 * t2._3) - (t1._3 * t2._2)
-    val y = (t1._3 * t2._1) - (t1._1 * t2._3)
-    val z = (t1._1 * t2._2) - (t1._2 * t2._1)
-    (x, y, z)
-  }
-}
-
-// implicit to accept tuple2
-object HomogeneousConversion{
-  implicit def tuple2ToTuple3(t: (Double, Double)): (Double, Double, Double) = {
-    convT2ToT3(t)
-  }
-  implicit def listT2ToListT3(lt: List[(Double, Double)]): List[(Double, Double, Double)] ={
-    var temp: List[(Double, Double, Double)] = List()
-    lt foreach ( temp ::= convT2ToT3(_))
-    temp
-  }
-
-  def convT2ToT3 (t: (Double,Double)): (Double, Double, Double) = {
-    (t._1,t._2,1)
   }
 }
