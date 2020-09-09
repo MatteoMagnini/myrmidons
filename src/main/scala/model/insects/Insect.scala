@@ -3,14 +3,15 @@ package model.insects
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import utility.Messages._
 
+
 trait Insect extends Actor with ActorLogging {
-  def id: Int
+
   def info: InsectInfo
+  def environment: ActorRef
 }
 
-case class ForagingAnt(override val id: Int,
-                       override val info: ForagingAntInfo,
-                       environment: ActorRef) extends Insect {
+case class ForagingAnt(override val info: ForagingAntInfo,
+                       override val environment: ActorRef) extends Insect {
 
   def subsumption(competences: Competence*): Competence = competences.filter(c => c.hasPriority(info)).take(1).last
 
@@ -40,6 +41,6 @@ case class ForagingAnt(override val id: Int,
 }
 
 object ForagingAnt {
-  def apply(id: Int, info: InsectInfo, environment: ActorRef): Props =
-    Props(classOf[ForagingAnt], id, info, environment)
+  def apply(info: InsectInfo, environment: ActorRef): Props =
+    Props(classOf[ForagingAnt], info, environment)
 }
