@@ -27,7 +27,7 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
     "perform random walk" in {
       ant ! Clock(1)
       val result1 = sender.expectMsgType[Move]
-      ant ! NewPosition(result1.start >> result1.delta)
+      ant ! NewPosition(result1.start >> result1.delta, result1.delta)
       val result2 = sender.expectMsgType[UpdateInsect]
       assert(result2.info.position != ZeroVector2D())
       assert(result2.info.energy == 99)
@@ -39,7 +39,7 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
     "multiple times" in {
       ant ! Clock(2)
       val result1 = sender.expectMsgType[Move]
-      ant ! NewPosition(result1.start >> result1.delta)
+      ant ! NewPosition(result1.start >> result1.delta, result1.delta)
       val result2 = sender.expectMsgType[UpdateInsect]
       assert(result2.info.position != ZeroVector2D())
       assert(result2.info.energy == 98)

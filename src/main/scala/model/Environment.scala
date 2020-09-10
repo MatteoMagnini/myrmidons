@@ -26,7 +26,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       import utility.Geometry.TupleOp._
       val newPosition = pos >> delta
       if (state.boundary.hasInside(newPosition) && state.obstacles.forall(! _.isInside(newPosition))) {
-        sender ! NewPosition(newPosition)
+        sender ! NewPosition(newPosition, newPosition - pos)
       }
 
     case UpdateInsect(info: InsectInfo) => state.gui ! UpdateInsect(info)

@@ -6,16 +6,18 @@ object Geometry {
     def x: Double
     def y: Double
 
-    /** Returns a vector shifted of vector delta */
-    def >>(p1: Vector): Vector
+    /** Returns a vector shifted of vector v */
+    def >>(v: Vector): Vector
     /** Returns a vector in its opposite form */
     def - : Vector
     /** Returns a vector subtraction */
-    def -(p1: Vector) : Vector
-    /** Returns a vector multiplied bby a constant */
+    def -(v: Vector) : Vector
+    /** Returns a vector multiplied by a constant */
     def *(scalar: Double) : Vector
     /** Returns the norm of the vector */
     def || : Double
+    /** Returns the angle of the vector */
+    def /\ : Double
     /** Return the distance between vectors */
     def -->(p1: Vector): Double
   }
@@ -38,6 +40,8 @@ object Geometry {
 
     override def || : Double = math.sqrt(x * x + y * y)
 
+    override def /\ : Double = math.atan(y/x)
+
     override def -->(other: Vector) : Double = this - other ||
   }
 
@@ -50,19 +54,21 @@ object Geometry {
   case class Vector3D(override val x: Double, override val y: Double, z: Double) extends Vector{
     import TupleOp._
 
-    def - : Vector = (-x, -y, -z)
+    override def - : Vector = (-x, -y, -z)
 
-    def >> (delta: Vector): Vector3D = (x + delta.x, y + delta.y, z + delta.asInstanceOf[Vector3D].z)
+    override def >> (delta: Vector): Vector3D = (x + delta.x, y + delta.y, z + delta.asInstanceOf[Vector3D].z)
 
-    def - (delta: Vector): Vector3D = (x - delta.x, y - delta.y, z - delta.asInstanceOf[Vector3D].z)
+    override def - (delta: Vector): Vector3D = (x - delta.x, y - delta.y, z - delta.asInstanceOf[Vector3D].z)
 
-    def * (s: Double): Vector3D = (s * x, s * y, s * z)
+    override def * (s: Double): Vector3D = (s * x, s * y, s * z)
 
     def / (s: Double): Vector3D = (x / s, y / s, z / s)
 
-    def || : Double = math.sqrt(x * x + y * y + z * z)
+    override def || : Double = math.sqrt(x * x + y * y + z * z)
 
-    def --> (other: Vector) : Double = this - other ||
+    override def /\ : Double = math.atan(y/x)
+
+    override def --> (other: Vector) : Double = this - other ||
 
     /**
      * Cross product between two vector
@@ -84,12 +90,30 @@ object Geometry {
   }
 
   object RandomVector2D {
+
     def apply(min: Double, max: Double): Vector = {
       val uniformDoubleGenerator = scala.util.Random
       val x = (uniformDoubleGenerator.nextDouble() - 0.5) * max * 2
       val y = (uniformDoubleGenerator.nextDouble() - 0.5) * max * 2
-      Vector2D(if (x.abs < min) x.signum * min else x, if (y.abs < min) y.signum * min else y)
+      bound(min,max, Vector2D(x,y))
     }
+
+    def apply(min: Double, max: Double, perturbation: Vector): Vector =
+      bound(min,max, apply(min, max) >> perturbation)
+
+    def apply(minX: Double, maxX: Double, minY: Double, maxY: Double ): Vector =
+      Vector2D(doubleInRange(minX,maxX), doubleInRange(minY,maxY))
+
+    private def bound(min: Double, max: Double, v: Vector): Vector =
+      Vector2D(if (v.x.abs < min) v.x.signum * min else v.x, if (v.y.abs < min) v.y.signum * min else v.y)
+
+    private def doubleInRange(min: Double, max: Double): Double =
+      min + (max - min) * scala.util.Random.nextDouble()
+  }
+
+  object OrientedVector2D {
+    def apply(radiant: Double, module: Double ): Vector =
+      Vector2D(math.sin(radiant) * module, math.cos(radiant) * module)
   }
 
   /** Implicit conversions for [[utility.Geometry.Vector]] instances
