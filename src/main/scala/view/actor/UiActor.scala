@@ -2,7 +2,7 @@ package view.actor
 
 import akka.actor.{Actor, ActorLogging, Props, Timers}
 import model.insects.InsectInfo
-import utility.Messages.UpdateInsect
+import utility.Messages.{Clock, UpdateInsect}
 import view.scene.{MyrmidonsCanvas, SimulationPane}
 
 import scala.concurrent.duration.DurationInt
@@ -26,24 +26,35 @@ object UiActor {
     Props(classOf[UiActor], canvas, pane)
 }
 
-case class UiActor(canvas: MyrmidonsCanvas, pane: SimulationPane) extends Actor
-  with ActorLogging with Timers {
+case class UiActor(canvas: MyrmidonsCanvas, pane: SimulationPane)
+  extends Actor
+    with ActorLogging with Timers {
 
   import UiActor._
+  // timers.startSingleTimer(StepKey, FirstStep, 500.millis)
 
-  timers.startSingleTimer(StepKey, FirstStep, 500.millis)
   var currentState = 0
+  var currPosX = 0.0
+  var currPosY = 0.0
 
-  override def receive: Receive = {
+  override def receive: Receive = defaultBehaviour
 
-    case FirstStep =>
+  private def defaultBehaviour: Receive = {
+    case UiMessage.FirstStep =>
       timers.startTimerWithFixedDelay(StepKey, Step, 1.second)
 
     case Step =>
-      currentState = currentState + 1
-
-    case UpdateInsect(info: InsectInfo) =>
-
+      pane.step.text = (pane.step.text.value.toLong + 1).toString
+      currentState = pane.step.text.value.toInt
+      pane.environment.tell(Clock(currentState), self)
+    case UpdateInsect(info: InsectInfo) => {
+      currPosX = info.position.x
+      currPosY = info.position.y
+      print(info)
+    }
+    case Clock(value) => {
+        canvas.addAnt(currPosX, currPosX)
+    }
   }
 
 
