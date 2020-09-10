@@ -1,10 +1,15 @@
-package model
-import utility.Messages._
-import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-import utility.Messages.{Clock, Move, StartSimulation, UpdateInsect}
-import model.insects.{ForagingAnt, ForagingAntInfo, InsectInfo}
-import utility.Geometry._
+package model.environment
 
+import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import model.insects.{ForagingAnt, ForagingAntInfo, InsectInfo}
+import model.Obstacle
+import utility.Geometry._
+import utility.Messages.{Clock, Move, StartSimulation, UpdateInsect, _}
+
+/** Environment actor
+  *
+  * @param state environment internal state
+  */
 class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
   override def receive: Receive = defaultBehaviour(state)
@@ -18,31 +23,34 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     case Clock(value: Int) => state.ants.foreach(_ ! Clock(value))
 
     case Move(pos: Vector2D, delta: Vector2D) =>
-      import utility.Geometry.TupleOp._
+
       /*if (state.obstacles.forall(! _.isInside(newPosition))) {
         sender ! NewPosition(newPosition, newPosition - pos)
       }
       else*/
-      if(!state.boundary.hasInside(pos >> delta)){
-        sender ! NewPosition(pos - delta, delta-)
-      }else {
-        sender ! NewPosition(pos >> delta, pos >> delta - pos)
-      }
+      val newPosition = pos >> delta
+      if(state.boundary.hasInside(newPosition))
+        sender ! NewPosition(newPosition, newPosition - pos)
+      else
+        /* If ant is moving outside boundary, invert its new position */
+        sender ! NewPosition(pos - delta, delta -)
 
     case UpdateInsect(info: InsectInfo) =>
-      val updateInfo = state.updateAntsInfo(info)
-      if(updateInfo.antsInfo.size == state.ants.size){
-        state.gui ! RepaintInsects(updateInfo.antsInfo)
+      val updatedInfo = state.updateAntsInfo(info)
+      /* When all ants return their positions, environment send them to GUI */
+      if (updatedInfo.antsInfo.size == state.ants.size) {
+        state.gui ! RepaintInsects(updatedInfo.antsInfo)
         context.become(defaultBehaviour(state.emptyAntsInfo()))
-      }else {
-        context.become(defaultBehaviour(updateInfo))
-      }
+      } else context.become(defaultBehaviour(updatedInfo))
+
   }
 
+  /** Returns ants references, created from default position */
   private def createAntFromDefPosition(nAnts: Int): Seq[ActorRef] =
     (0 until nAnts).map(i =>
       context.actorOf(ForagingAnt(ForagingAntInfo(), self), s"ant-$i"))
 
+  /** Returns ants references, created from the center of boundary */
   private def createAntFromCenter(nAnts: Int): Seq[ActorRef] =
     (0 until nAnts).map(i => {
       val randomPosition = state.boundary.center

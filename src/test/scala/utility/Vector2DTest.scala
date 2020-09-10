@@ -56,7 +56,6 @@ class Vector2DTest extends AnyWordSpecLike with BeforeAndAfter {
   "A random vector" when {
 
     "created in range" should {
-
       val min = 0.3
       val max = 1.4
       val r = RandomVector2D(min,max)

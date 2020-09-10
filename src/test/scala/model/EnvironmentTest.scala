@@ -2,11 +2,12 @@ package model
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
+import model.environment.{Boundary, Environment, EnvironmentInfo}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import utility.Geometry.ZeroVector2D
-import utility.Messages.{Clock, StartSimulation, UpdateInsect}
+import utility.Messages.{Clock, RepaintInsects, StartSimulation}
 
 class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
   with AnyWordSpecLike
@@ -17,7 +18,6 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
     TestKit.shutdownActorSystem(system)
   }
 
-/*
   "Environment without obstacles" when {
     val sender = TestProbe()
     implicit val senderRef: ActorRef = sender.ref
@@ -30,18 +30,19 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
     "create an ant" should {
       val nAnts = 1
       environment ! StartSimulation(nAnts, Seq.empty, centerSpawn = true)
+      environment ! Clock(1)
 
       "receive its initial position" in {
-        val result = sender.expectMsgType[UpdateInsect]
-        initialPosition = result.info.position
+        val result = sender.expectMsgType[RepaintInsects]
+        initialPosition = result.info.head.position
       }
     }
     "make ant move" should {
-      environment ! Clock(1)
+      environment ! Clock(2)
 
       "receive its new position" in {
-        val result = sender.expectMsgType[UpdateInsect]
-        newPosition = result.info.position
+        val result = sender.expectMsgType[RepaintInsects]
+        newPosition = result.info.head.position
       }
       "receive no more messages" in {
         sender.expectNoMessage()
@@ -62,16 +63,20 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
 
     "create multiple ants" should {
       environment ! StartSimulation(nAnts, Seq.empty, centerSpawn = true)
+      environment ! Clock(1)
 
       "receive all their positions" in {
-        (0 until nAnts).map(_ => sender.expectMsgType[UpdateInsect])
+        val result = sender.expectMsgType[RepaintInsects]
+        assert(result.info.size == nAnts)
       }
     }
     "make them move" should {
-      environment ! Clock(1)
+      environment ! Clock(2)
       "receive all their new positions" in {
-        (0 until nAnts).map(_ => sender.expectMsgType[UpdateInsect])
+        val result = sender.expectMsgType[RepaintInsects]
+        assert(result.info.size == nAnts)
       }
+
       "receive no more messages" in {
         sender.expectNoMessage()
       }
@@ -87,10 +92,9 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
 
     "create ants" should {
       val nAnts = 1
-      environment ! StartSimulation(nAnts, Seq.empty)
+      environment ! StartSimulation(nAnts, Seq.empty, centerSpawn = true)
       environment ! Clock(1)
     }
   }
 
- */
 }
