@@ -2,10 +2,9 @@ package view.scene
 
 
 import akka.actor.{ActorRef, ActorSystem, Props}
-import model.{Boundary, Environment, EnvironmentInfo}
-import scalafx.animation.{KeyFrame, Timeline}
+import model.environment.{Boundary, Environment, EnvironmentInfo}
 import scalafx.event.ActionEvent
-import scalafx.scene.control.{Button, Label, Separator, ToggleButton, ToolBar}
+import scalafx.scene.control.{Button, Label, Separator, ToolBar}
 import scalafx.scene.layout.{BorderPane, Pane}
 import scalafx.scene.paint.Color
 import scalafx.scene.text.Text
@@ -34,9 +33,7 @@ case class SimulationPane() extends BorderPane {
     private val startButton = new Button("Start") {
       handleEvent(ActionEvent.Action) {
         _: ActionEvent =>
-          println("h" + canvas.height.toDouble)
-          println("w" + canvas.width.toDouble)
-          environment.tell(StartSimulation(100, Seq.empty, true),uiActor)
+          environment.tell(StartSimulation(100, Seq.empty, centerSpawn = true),uiActor)
           environment.tell(Clock(step.text.value.toInt), uiActor)
       }
     }
