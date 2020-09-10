@@ -55,15 +55,15 @@ object Geometry {
     import TupleOp._
     import VectorsOp._
 
-    override def - : Vector = (-x, -y, -z)
+    override def - : Vector3D = (-x, -y, -z)
 
-    override def >> (delta: Vector): Vector = (x + delta.x, y + delta.y, z + delta.z)
+    override def >> (delta: Vector): Vector3D = (x + delta.x, y + delta.y, z + delta.z)
 
-    override def - (delta: Vector): Vector = (x - delta.x, y - delta.y, z - delta.z) //this >> (delta -)
+    override def - (delta: Vector): Vector3D = (x - delta.x, y - delta.y, z - delta.z) //this >> (delta -)
 
-    override def * (s: Double): Vector = (s * x, s * y, s * z)
+    override def * (s: Double): Vector3D = (s * x, s * y, s * z)
 
-    def / (s: Double): Vector = (x / s, y / s, z / s)
+    def / (s: Double): Vector3D = (x / s, y / s, z / s)
 
     override def || : Double = math.sqrt(x * x + y * y + z * z)
 
