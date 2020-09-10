@@ -28,23 +28,20 @@ case class ForagingAnt(override val info: ForagingAntInfo,
    * @param competences a set of competences that the ant is able to perform.
    * @return the competence with heist priority.
    */
-  private def subsumption(competences: Competence*): Competence = competences.filter(c => c.hasPriority(info)).take(1).last
+  private def subsumption(data: InsectInfo, competences: Competence*): Competence = competences.filter(c => c.hasPriority(data)).take(1).last
 
   override def receive: Receive = defaultBehaviour(info)
 
   private def defaultBehaviour(data: InsectInfo): Receive = {
 
-
     case Clock(t) if t == data.time + 1 =>
-      subsumption(RandomWalk)(context, environment, self, data.incTime(), defaultBehaviour)
-
+      val newData = data.incTime()
+      subsumption(newData,FoodPheromoneTaxis,RandomWalk)(context, environment, self, newData, defaultBehaviour)
 
     case NewPosition(p, d) =>
-      println("Ant Logic Time:" + data.time + " New position: " + p.toString )
       val newData = data.updatePosition(p)
       val newData2 = newData.updateInertia(d)
       environment ! UpdateInsect(newData2)
-     // environment ! Clock(newData2.time)
       context become defaultBehaviour(newData2)
 
     case FoodPheromones(entities) => data match {

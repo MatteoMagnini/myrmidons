@@ -101,12 +101,12 @@ object Geometry {
     def apply(min: Double, max: Double, perturbation: Vector): Vector =
       bound(min,max, apply(min, max) >> perturbation)
 
-
     def apply(minX: Double, maxX: Double, minY: Double, maxY: Double ): Vector =
       Vector2D(doubleInRange(minX,maxX), doubleInRange(minY,maxY))
 
     private def bound(min: Double, max: Double, v: Vector): Vector =
-      Vector2D(if (v.x.abs < min) v.x.signum * min else v.x, if (v.y.abs < min) v.y.signum * min else v.y)
+      Vector2D(if (v.x.abs < min) v.x.signum * min else if (v.x.abs > max) v.x.signum * max else v.x,
+        if (v.y.abs < min) v.y.signum * min else if (v.y.abs > max) v.y.signum * max else v.y)
 
     private def doubleInRange(min: Double, max: Double): Double =
       min + (max - min) * scala.util.Random.nextDouble()

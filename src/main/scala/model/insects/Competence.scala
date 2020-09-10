@@ -42,7 +42,6 @@ object RandomWalk extends Competence {
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
 
     val data = info.updateEnergy(ENERGY_RW)
-    println("Ant Logic time: "+ data.time)
     val dummy: Vector = RandomVector2D(MIN_VELOCITY, MAX_VELOCITY, (info.inertia * INERTIA_FACTOR))
     environment.tell(Move(data.position, dummy ),ant)
     context become behaviour(data)
@@ -63,6 +62,8 @@ object FoodPheromoneTaxis extends Competence {
     context become behaviour(data.asInstanceOf[ForagingAntInfo].clearSensors())
   }
 
-  override def hasPriority(info: InsectInfo): Boolean =
-    info.asInstanceOf[ForagingAntInfo].pheromoneSensor.strongest.nonEmpty
+  override def hasPriority(info: InsectInfo): Boolean = info match {
+    case f: ForagingAntInfo => f.pheromoneSensor.entities.nonEmpty
+    case _ => false
+  }
 }

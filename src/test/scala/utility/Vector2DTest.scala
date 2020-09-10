@@ -52,4 +52,31 @@ class Vector2DTest extends AnyWordSpecLike with BeforeAndAfter {
       }
     }
   }
+
+  "A random vector" when {
+
+    "created in range" should {
+
+      val min = 0.3
+      val max = 1.4
+      val r = RandomVector2D(min,max)
+
+      "have its dimensions inside the range" in {
+        assert(r.x.abs >= min && r.x.abs <= max && r.y.abs >= min && r.y.abs <= max )
+      }
+    }
+
+    "created in range with a perturbation" should {
+
+      val min = 0.3
+      val max = 1.4
+      val perturbation = (-0.5,0.93)
+      val r = RandomVector2D(min,max,perturbation)
+
+      "have its dimensions inside the range" in {
+        assert(r.x.abs >= min && r.x.abs <= max && r.y.abs >= min && r.y.abs <= max )
+      }
+    }
+
+  }
 }
