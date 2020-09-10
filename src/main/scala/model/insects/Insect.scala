@@ -3,7 +3,6 @@ package model.insects
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import utility.Messages._
 
-
 trait Insect extends Actor with ActorLogging {
 
   def info: InsectInfo
@@ -17,16 +16,14 @@ case class ForagingAnt(override val info: ForagingAntInfo,
 
   override def receive: Receive = defaultBehaviour(info)
 
-
   private def defaultBehaviour(data: InsectInfo): Receive = {
 
+    case Clock(t) if t == 0 => sender ! UpdateInsect(info)
 
     case Clock(t) if t == data.time + 1 =>
       subsumption(FoodPheromoneTaxis,RandomWalk)(context, environment, self, data.incTime(), defaultBehaviour)
 
-
     case NewPosition(p) =>
-      log.debug("NewPos")
       val newData = data.updatePosition(p)
       environment ! UpdateInsect(newData)
       environment ! Clock(newData.time)

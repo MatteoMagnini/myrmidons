@@ -2,7 +2,6 @@ package model
 
 import akka.actor.ActorRef
 
-
 case class EnvironmentInfo(gui: ActorRef, boundary: Boundary, obstacles: Seq[Obstacle], ants: Seq[ActorRef], antCounter: Int) {
 
   def insertAnts(ants: Seq[ActorRef]): EnvironmentInfo = this.copy(ants = ants)

@@ -7,7 +7,7 @@ sealed trait Message
 
   object Messages {
 
-    case class StartSimulation(nAnts: Int, obstacles: Seq[Obstacle]) extends Message
+    case class StartSimulation(nAnts: Int, obstacles: Seq[Obstacle], centerSpawn: Boolean = false) extends Message
 
     case class Clock(value: Int) extends Message
 
