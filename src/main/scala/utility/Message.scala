@@ -17,6 +17,8 @@ sealed trait Message
 
     case class UpdateInsect(info: InsectInfo) extends Message
 
+    case class RepaintInsects(info: Seq[InsectInfo]) extends Message
+
     case class NewPosition(position: Vector, delta: Vector) extends Message
 
   }
