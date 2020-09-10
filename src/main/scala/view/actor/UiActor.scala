@@ -1,7 +1,10 @@
 package view.actor
 
 import akka.actor.{Actor, ActorLogging, Props, Timers}
+import model.insects.InsectInfo
+import utility.Messages.{Clock, UpdateInsect}
 import view.scene.{MyrmidonsCanvas, SimulationPane}
+
 import scala.concurrent.duration.DurationInt
 
 /**
@@ -10,37 +13,39 @@ import scala.concurrent.duration.DurationInt
  * - updateInsect : from Environment to UiActor to notify
  * new position of the simulation entities.
  */
+
 object UiActor {
 
-  private case object TickKey
+  private case object StepKey
 
-  private case object FirstTick
+  private case object StepOver
 
-  private case object Tick
+  private case object Step
 
   def apply(canvas: MyrmidonsCanvas, pane: SimulationPane): Props =
     Props(classOf[UiActor], canvas, pane)
 }
 
-case class UiActor(canvas: MyrmidonsCanvas, pane: SimulationPane) extends Actor
-  with ActorLogging with Timers {
+case class UiActor(canvas: MyrmidonsCanvas, pane: SimulationPane)
+  extends Actor
+    with ActorLogging with Timers {
 
   import UiActor._
 
-  timers.startSingleTimer(TickKey, FirstTick, 500.millis)
+  var currentState = 1
 
-  override def receive: Receive = ???
+  override def receive: Receive = defaultBehaviour
 
-  /*{
-    case  updateInsect(info: InsectInfo) =>
-  }*/
-  /*
-  case FirstTick =>
-      // do something useful here
-      timers.startTimerWithFixedDelay(TickKey, Tick, 1.second)
-    case Tick =>
-    // do something useful here
-    // send clock(value) to enviroment
-   */
+  private def defaultBehaviour: Receive = {
 
+    case UpdateInsect(info: InsectInfo) =>
+      println("Gui Logic Time: " + info.time)
+      canvas.clear()
+      canvas.addAnt(info.position.x, info.position.y)
+      currentState = currentState + 1
+      timers.startSingleTimer(StepKey, StepOver, 17.millis)
+
+    case StepOver =>
+      pane.environment.tell(Clock(currentState), self)
+  }
 }
