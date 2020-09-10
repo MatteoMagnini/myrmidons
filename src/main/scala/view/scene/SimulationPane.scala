@@ -2,7 +2,7 @@ package view.scene
 
 
 import akka.actor.{ActorSystem, Props}
-import model.Environment
+import model.{Boundary, Environment, EnvironmentInfo}
 import scalafx.animation.{KeyFrame, Timeline}
 import scalafx.event.ActionEvent
 import scalafx.scene.control.{Button, Label, Separator, ToggleButton, ToolBar}
@@ -11,27 +11,31 @@ import scalafx.scene.paint.Color
 import scalafx.scene.text.Text
 import scalafx.Includes._
 import utility.Messages.StartSimulation
-import view.actor.UiActor
+import view.actor.{UiActor, UiMessage}
+import view.actor.UiActor.FirstStep
 
 /**
  * BorderPane with box for managing simulation
  * and a short legend to understand color entities.
  */
+
 case class SimulationPane() extends BorderPane {
   /* Custom canvas */
-  private val canvas = new MyrmidonsCanvas
+  private val canvas = new MyrmidonsCanvas()
   private val system = ActorSystem("Myrmidons-system")
   private val uiActor = system.actorOf(Props(new UiActor(canvas, this)))
- // private val environment = system.actorOf(Props[Environment], name = "env-actor")
+  val boundary = Boundary(0, 0, 10, 10)
+  val environment = system.actorOf(Environment(EnvironmentInfo(uiActor, boundary)), name = "env-actor")
+  var step = new Text("0")
 
   /* ToolBar for manage ant simulation */
-  private val toolBox: ToolBar = new ToolBar {
-    val step = new Text("0")
+   var toolBox: ToolBar = new ToolBar {
     val population = new Text("0")
     private val startButton = new Button("Start") {
       handleEvent(ActionEvent.Action) {
         _: ActionEvent =>
-          uiActor ! StartSimulation(canvas.getAntCount)
+          environment.tell(StartSimulation(canvas.getAntCount, Seq.empty),uiActor)
+          uiActor ! UiMessage.FirstStep
       }
     }
 
@@ -79,5 +83,7 @@ case class SimulationPane() extends BorderPane {
 
   /* Initialize Canvas with predefined entities */
   canvas.initializeCanvas()
+
+
 
 }
