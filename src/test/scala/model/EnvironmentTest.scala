@@ -17,7 +17,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
     TestKit.shutdownActorSystem(system)
   }
 
-
+/*
   "Environment without obstacles" when {
     val sender = TestProbe()
     implicit val senderRef: ActorRef = sender.ref
@@ -91,4 +91,6 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
       environment ! Clock(1)
     }
   }
+
+ */
 }

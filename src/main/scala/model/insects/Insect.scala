@@ -35,17 +35,16 @@ case class ForagingAnt(override val info: ForagingAntInfo,
   private def defaultBehaviour(data: InsectInfo): Receive = {
 
 
-    case Clock(t) if t == 0 => sender ! UpdateInsect(info)
-
     case Clock(t) if t == data.time + 1 =>
-      subsumption(FoodPheromoneTaxis,RandomWalk)(context, environment, self, data.incTime(), defaultBehaviour)
+      subsumption(RandomWalk)(context, environment, self, data.incTime(), defaultBehaviour)
+
 
     case NewPosition(p, d) =>
-      log.debug("New position: " + p.toString)
+      println("Ant Logic Time:" + data.time + " New position: " + p.toString )
       val newData = data.updatePosition(p)
       val newData2 = newData.updateInertia(d)
       environment ! UpdateInsect(newData2)
-      environment ! Clock(newData2.time)
+     // environment ! Clock(newData2.time)
       context become defaultBehaviour(newData2)
 
     case FoodPheromones(entities) => data match {

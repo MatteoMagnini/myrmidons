@@ -13,23 +13,21 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
     case StartSimulation(nAnts: Int, obstacles: Seq[Obstacle], centerSpawn: Boolean) =>
       val ants = if (!centerSpawn) createAntFromDefPosition(nAnts) else createAntFromCenter(nAnts)
-      ants.foreach(_ ! Clock(0))
       context.become(defaultBehaviour(state.insertAnts(ants).insertObstacles(obstacles)))
 
-    case Clock(value: Int) if sender == state.gui => state.ants.foreach(_ ! Clock(value))
-
-    case Clock(value: Int) =>
-      if (state.antCounter < state.ants.size) context.become(defaultBehaviour(state.incAntCounter()))
-      else state.gui ! Clock(value); context.become(defaultBehaviour(state.resetAntCounter()))
+    case Clock(value: Int) => state.ants.foreach(_ ! Clock(value));  println("Env. Logic time: " +value )
 
     case Move(pos: Vector2D, delta: Vector2D) =>
       import utility.Geometry.TupleOp._
       val newPosition = pos >> delta
-      if (state.boundary.hasInside(newPosition) && state.obstacles.forall(! _.isInside(newPosition))) {
+      if ( state.obstacles.forall(! _.isInside(newPosition))) {
         sender ! NewPosition(newPosition, newPosition - pos)
       }
+      else if(state.boundary.hasInside(newPosition)){
+        sender ! NewPosition(pos - delta, delta-)
+      }
 
-    case UpdateInsect(info: InsectInfo) => state.gui ! UpdateInsect(info)
+    case UpdateInsect(info: InsectInfo) => state.gui ! UpdateInsect(info); println("Env 2 Time: "+ info.time)
   }
 
   private def createAntFromDefPosition(nAnts: Int): Seq[ActorRef] =
@@ -39,7 +37,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   private def createAntFromCenter(nAnts: Int): Seq[ActorRef] =
     (0 until nAnts).map(i => {
       val randomPosition = state.boundary.center
-      context.actorOf(ForagingAnt(ForagingAntInfo(position = randomPosition), self), s"ant-$i")
+      context.actorOf(ForagingAnt(ForagingAntInfo(id = i, position = randomPosition), self), s"ant-$i")
     })
 }
 

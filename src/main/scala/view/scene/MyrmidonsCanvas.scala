@@ -20,6 +20,7 @@ case class MyrmidonsCanvas() extends Canvas {
   height = canvasHeight
   width = canvasWidth
 
+  style = "-fx-background-color:#00FF00"
   def initializeCanvas(): Unit = {
     /*Add one ant*/
     context.fill = Color.Black
@@ -36,11 +37,16 @@ case class MyrmidonsCanvas() extends Canvas {
     a new ant will be filled.
    */
   def addAnt(x: Double, y: Double): Unit = {
+    //clear()
     context.fill = Color.Black
     context.fillRect(x * antSize, y * antSize, antSize, antSize)
     antsPosition = antsPosition + ((x, y))
-  }
 
+  }
+  def clear(): Unit = {
+    context.clearRect(0, 0, width.value, height.value)
+    antsPosition = Set.empty
+  }
   def getAntCount: Int = this.antsPosition.size
 
   handleEvent(MouseEvent.Any) {

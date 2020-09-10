@@ -93,13 +93,14 @@ object Geometry {
 
     def apply(min: Double, max: Double): Vector = {
       val uniformDoubleGenerator = scala.util.Random
-      val x = (uniformDoubleGenerator.nextDouble() - 0.5) * max * 2
-      val y = (uniformDoubleGenerator.nextDouble() - 0.5) * max * 2
+      val x = (uniformDoubleGenerator.nextDouble() - 0.5) * max * 2.0
+      val y = (uniformDoubleGenerator.nextDouble() - 0.5) * max * 2.0
       bound(min,max, Vector2D(x,y))
     }
 
     def apply(min: Double, max: Double, perturbation: Vector): Vector =
       bound(min,max, apply(min, max) >> perturbation)
+
 
     def apply(minX: Double, maxX: Double, minY: Double, maxY: Double ): Vector =
       Vector2D(doubleInRange(minX,maxX), doubleInRange(minY,maxY))

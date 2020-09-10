@@ -18,7 +18,7 @@ object UiActor {
 
   private case object StepKey
 
-  private case object FirstStep
+  private case object StepOver
 
   private case object Step
 
@@ -31,31 +31,21 @@ case class UiActor(canvas: MyrmidonsCanvas, pane: SimulationPane)
     with ActorLogging with Timers {
 
   import UiActor._
-  // timers.startSingleTimer(StepKey, FirstStep, 500.millis)
 
-  var currentState = 0
-  var currPosX = 0.0
-  var currPosY = 0.0
+  var currentState = 1
 
   override def receive: Receive = defaultBehaviour
 
   private def defaultBehaviour: Receive = {
-    case UiMessage.FirstStep =>
-      timers.startTimerWithFixedDelay(StepKey, Step, 1.second)
 
-    case Step =>
-      pane.step.text = (pane.step.text.value.toLong + 1).toString
-      currentState = pane.step.text.value.toInt
+    case UpdateInsect(info: InsectInfo) =>
+      println("Gui Logic Time: " + info.time)
+      canvas.clear()
+      canvas.addAnt(info.position.x, info.position.y)
+      currentState = currentState + 1
+      timers.startSingleTimer(StepKey, StepOver, 17.millis)
+
+    case StepOver =>
       pane.environment.tell(Clock(currentState), self)
-    case UpdateInsect(info: InsectInfo) => {
-      currPosX = info.position.x
-      currPosY = info.position.y
-      print(info)
-    }
-    case Clock(value) => {
-        canvas.addAnt(currPosX, currPosX)
-    }
   }
-
-
 }

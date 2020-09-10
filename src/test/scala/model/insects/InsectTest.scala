@@ -19,7 +19,7 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
 
   val sender: TestProbe = TestProbe()
   implicit val senderRef: ActorRef = sender.ref
-
+/*
   "Foraging Ant" must {
 
     val ant = system.actorOf(ForagingAnt(ForagingAntInfo(),senderRef), "ant-0")
@@ -81,6 +81,6 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
       assert(clock.value == 2)
       sender expectNoMessage
     }*/
-  }
+  } */
 
 }
