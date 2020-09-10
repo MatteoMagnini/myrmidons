@@ -12,12 +12,12 @@ class Vector2DTest extends AnyWordSpecLike with BeforeAndAfter {
 
     val v = (3, -4)
 
-    "calculate its opposite" should {
+    "calculating its opposite" should {
       "give the correct result" in {
         assert((v -) == Vector2D(-3, 4))
       }
     }
-    "calculated in module" should {
+    "calculating module" should {
       "give the correct result" in {
         assert((v ||) == 5)
       }
@@ -25,6 +25,12 @@ class Vector2DTest extends AnyWordSpecLike with BeforeAndAfter {
     "multiplied by a constant" should {
       "give the correct result" in {
         assert((v * 3) == Vector2D(9, -12))
+      }
+    }
+    "calculating direction" should {
+      "give the correct result" in {
+        println(v /\)
+        assert((v /\) == math.atan(v.y/v.x))
       }
     }
   }

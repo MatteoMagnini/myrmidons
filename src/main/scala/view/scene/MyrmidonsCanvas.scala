@@ -1,6 +1,7 @@
 package view.scene
 
 import scalafx.Includes._
+import scalafx.stage.Screen
 import scalafx.scene.canvas.Canvas
 import scalafx.scene.input.MouseEvent
 import scalafx.scene.input.MouseEvent.MouseClicked
@@ -11,14 +12,14 @@ import scalafx.scene.paint.Color
  * and its view behaviours.
  */
 case class MyrmidonsCanvas() extends Canvas {
-  private val canvasHeight = 800
-  private val canvasWidth = 800
+  private val canvasHeight = Screen.primary.bounds.height * 0.9
+  private val canvasWidth = Screen.primary.bounds.width * 0.9
   private val antSize = 10
   private var antsPosition: Set[(Double, Double)] = Set.empty
   private val context = graphicsContext2D
 
-  height = canvasHeight
-  width = canvasWidth
+  height = canvasHeight.getValue
+  width = canvasWidth.getValue
 
   /* When user click in one point of canvas
     a new ant will be filled.

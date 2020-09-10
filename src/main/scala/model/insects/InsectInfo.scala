@@ -46,11 +46,11 @@ case class ForagingAntInfo(override val id: Int,
   override def updateInertia(newInertia: Vector): InsectInfo =
     this.copy(inertia = newInertia)
 
-  override def updateEnergy(amount: Double): InsectInfo =
-    if (energy + amount > MAX_ENERGY)
+  override def updateEnergy( delta: Double): InsectInfo =
+    if (energy + delta > MAX_ENERGY)
       this.copy(energy = MAX_ENERGY)
     else
-      this.copy(energy = energy + amount)
+      this.copy(energy = energy + delta)
 
   override def incTime(): InsectInfo =
     this.copy(time = time + 1)
@@ -59,14 +59,7 @@ case class ForagingAntInfo(override val id: Int,
     this.copy(proximitySensor = ProximitySensor(), pheromoneSensor = PheromoneSensor())
 
   def addPheromones(pheromones: Iterable[Entity]): ForagingAntInfo =
-    this.copy(pheromoneSensor = updateSensor(pheromones,proximitySensor))
-
-  @scala.annotation.tailrec
-  private def updateSensor( entities: Iterable[Entity], sensor: Sensor): Sensor =
-    if (entities.isEmpty)
-      sensor
-    else
-      updateSensor(entities.takeRight(entities.size - 1), sensor.addEntity(entities.take(1).last))
+    this.copy(pheromoneSensor = PheromoneSensor(pheromones))
 
   def incFood(amount: Int): ForagingAntInfo =
     if (foodAmount + amount > MAX_FOOD)

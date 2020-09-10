@@ -42,6 +42,8 @@ case class ProximitySensor(override val entities: List[Entity]) extends Sensor {
 
 object ProximitySensor {
   def apply(): Sensor = new ProximitySensor(List.empty)
+
+  def apply(entities: Iterable[Entity]): Sensor = new ProximitySensor(entities.toList)
 }
 
 case class PheromoneSensor(override val entities: List[Entity]) extends Sensor {
@@ -53,4 +55,6 @@ case class PheromoneSensor(override val entities: List[Entity]) extends Sensor {
 
 object PheromoneSensor {
   def apply(): Sensor = new PheromoneSensor(List.empty)
+
+  def apply(entities: Iterable[Entity]): Sensor = new PheromoneSensor(entities.toList)
 }
