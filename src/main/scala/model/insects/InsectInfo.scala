@@ -2,7 +2,7 @@ package model.insects
 
 import utility.Geometry._
 
-object Constant {
+object ConstantInsectInfo {
 
   def MAX_ENERGY = 100
   def MAX_FOOD = 3
@@ -12,7 +12,7 @@ object Constant {
   def STARTING_POSITION: Vector = ZeroVector2D()
 }
 
-import Constant._
+import ConstantInsectInfo._
 
 /**
  * The information in common with all kind of insects.

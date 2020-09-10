@@ -28,7 +28,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       log.debug("Move")
       val newPosition = pos >> delta
      // if (state.boundary.hasInside(newPosition) && state.obstacles.forall(_.isInside(newPosition))) {
-        sender ! NewPosition(newPosition)
+        sender ! NewPosition(newPosition, newPosition - pos)
      // }
 
     case UpdateInsect(info: InsectInfo) => log.debug(" "+state.gui); state.gui ! UpdateInsect(info)
