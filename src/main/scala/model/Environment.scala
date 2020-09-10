@@ -1,6 +1,6 @@
 package model
 import utility.Messages._
-import akka.actor.{Actor, ActorLogging, Props}
+import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import utility.Messages.{Clock, Move, StartSimulation, UpdateInsect}
 import model.insects.{ForagingAnt, ForagingAntInfo, InsectInfo}
 import utility.Geometry._
@@ -11,10 +11,9 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
   private def defaultBehaviour(state: EnvironmentInfo): Receive = {
 
-    case StartSimulation(nAnts: Int, obstacles: Seq[Obstacle]) =>
-      log.debug("Started!")
-      val ants = (0 until nAnts).map(i =>
-        context.actorOf(ForagingAnt(ForagingAntInfo(), self), s"ant-$i"))
+    case StartSimulation(nAnts: Int, obstacles: Seq[Obstacle], centerSpawn: Boolean) =>
+      val ants = if (!centerSpawn) createAntFromDefPosition(nAnts) else createAntFromCenter(nAnts)
+      ants.foreach(_ ! Clock(0))
       context.become(defaultBehaviour(state.insertAnts(ants).insertObstacles(obstacles)))
 
     case Clock(value: Int) if sender == state.gui => state.ants.foreach(_ ! Clock(value))
@@ -25,14 +24,23 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
     case Move(pos: Vector2D, delta: Vector2D) =>
       import utility.Geometry.TupleOp._
-      log.debug("Move")
       val newPosition = pos >> delta
-     // if (state.boundary.hasInside(newPosition) && state.obstacles.forall(_.isInside(newPosition))) {
-        sender ! NewPosition(newPosition)
-     // }
+      if (state.boundary.hasInside(newPosition) && state.obstacles.forall(! _.isInside(newPosition))) {
+        sender ! NewPosition(newPosition, newPosition - pos)
+      }
 
-    case UpdateInsect(info: InsectInfo) => log.debug(" "+state.gui); state.gui ! UpdateInsect(info)
+    case UpdateInsect(info: InsectInfo) => state.gui ! UpdateInsect(info)
   }
+
+  private def createAntFromDefPosition(nAnts: Int): Seq[ActorRef] =
+    (0 until nAnts).map(i =>
+      context.actorOf(ForagingAnt(ForagingAntInfo(), self), s"ant-$i"))
+
+  private def createAntFromCenter(nAnts: Int): Seq[ActorRef] =
+    (0 until nAnts).map(i => {
+      val randomPosition = state.boundary.center
+      context.actorOf(ForagingAnt(ForagingAntInfo(position = randomPosition), self), s"ant-$i")
+    })
 }
 
 object Environment {

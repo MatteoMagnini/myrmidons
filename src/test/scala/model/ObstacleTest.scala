@@ -5,6 +5,7 @@ import org.scalatest._
 import model.EnvObstacle
 import utility.Geometry.Vector3D
 import utility.Geometry.TupleOp._
+
 class ObstacleTest  extends wordspec.AnyWordSpec {
   "An obstacle" when {
     "initialized" should {
