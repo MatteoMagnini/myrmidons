@@ -20,4 +20,8 @@ sealed trait Message
 
     case class NewPosition(position: Vector) extends Message
 
+    case class StorageFood(quantity: Int) extends Message
+
+    case class TakeFood(quantity: Int) extends Message
+
   }
