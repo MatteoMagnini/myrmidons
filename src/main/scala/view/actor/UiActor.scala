@@ -36,7 +36,6 @@ case class UiActor(canvas: MyrmidonsCanvas, pane: SimulationPane)
   private def defaultBehaviour: Receive = {
 
     case RepaintInsects(info: Seq[InsectInfo]) =>
-      println(info.size)
       canvas.clear()
       info.foreach(x => canvas.addAnt(x.position.x,x.position.y))
       currentState = currentState + 1
