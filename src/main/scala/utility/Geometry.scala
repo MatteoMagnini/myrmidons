@@ -32,9 +32,9 @@ object Geometry {
 
     override def - : Vector = (-x, -y)
 
-    override def >>(delta: Vector): Vector = (x + delta.x, y + delta.y)
+    override def >> (delta: Vector): Vector = (x + delta.x, y + delta.y)
 
-    override def - (delta: Vector): Vector = (x - delta.x, y - delta.y)
+    override def - (delta: Vector): Vector = this >> (delta -)
 
     override def * (s: Double): Vector = (s * x, s * y)
 
@@ -53,12 +53,13 @@ object Geometry {
    */
   case class Vector3D(override val x: Double, override val y: Double, z: Double) extends Vector{
     import TupleOp._
+    import VectorsOp._
 
-    override def - : Vector = (-x, -y, -z)
+    override def - : Vector3D = (-x, -y, -z)
 
-    override def >> (delta: Vector): Vector3D = (x + delta.x, y + delta.y, z + delta.asInstanceOf[Vector3D].z)
+    override def >> (delta: Vector): Vector3D = (x + delta.x, y + delta.y, z + delta.z)
 
-    override def - (delta: Vector): Vector3D = (x - delta.x, y - delta.y, z - delta.asInstanceOf[Vector3D].z)
+    override def - (delta: Vector): Vector3D = (x - delta.x, y - delta.y, z - delta.z) //this >> (delta -)
 
     override def * (s: Double): Vector3D = (s * x, s * y, s * z)
 
@@ -66,13 +67,11 @@ object Geometry {
 
     override def || : Double = math.sqrt(x * x + y * y + z * z)
 
-    override def /\ : Double = math.atan(y/x)
+    override def /\ : Double = math.atan(y / x)
 
     override def --> (other: Vector) : Double = this - other ||
 
-    /**
-     * Cross product between two vector
-     * */
+    /** Cross product between two vectors * */
     def X (other: Vector3D) : Vector3D = {
       val x = (this.y * other.z) - (this.z * other.y)
       val y = (this.z * other.x) - (this.x * other.z)
@@ -101,12 +100,12 @@ object Geometry {
     def apply(min: Double, max: Double, perturbation: Vector): Vector =
       bound(min,max, apply(min, max) >> perturbation)
 
-
     def apply(minX: Double, maxX: Double, minY: Double, maxY: Double ): Vector =
       Vector2D(doubleInRange(minX,maxX), doubleInRange(minY,maxY))
 
     private def bound(min: Double, max: Double, v: Vector): Vector =
-      Vector2D(if (v.x.abs < min) v.x.signum * min else v.x, if (v.y.abs < min) v.y.signum * min else v.y)
+      Vector2D(if (v.x.abs < min) v.x.signum * min else if (v.x.abs > max) v.x.signum * max else v.x,
+        if (v.y.abs < min) v.y.signum * min else if (v.y.abs > max) v.y.signum * max else v.y)
 
     private def doubleInRange(min: Double, max: Double): Double =
       min + (max - min) * scala.util.Random.nextDouble()
@@ -125,10 +124,16 @@ object Geometry {
    * }}}
    */
   object TupleOp {
-    implicit def toVec2D(value: (Double, Double)): Vector = Vector2D(value._1, value._2)
-    implicit def intToVec2D(value: (Int, Int)): Vector = Vector2D(value._1.toDouble, value._2.toDouble)
+    implicit def toVec2D(value: (Double, Double)): Vector2D = Vector2D(value._1, value._2)
+    implicit def intToVec2D(value: (Int, Int)): Vector2D = Vector2D(value._1.toDouble, value._2.toDouble)
     implicit def toVec3D(value: (Double, Double, Double)): Vector3D = Vector3D(value._1, value._2, value._3)
     implicit def intToVec3D(value: (Int, Int, Int)): Vector3D = Vector3D(value._1.toDouble, value._2.toDouble, value._3.toDouble)
-    implicit def vec3DToVec2D(value: Vector): Vector3D = Vector3D(value.x, value.y, 1.0)
+  }
+
+  /** Implicit conversion to convert [[utility.Geometry.Vector]] instances into
+    * [[utility.Geometry.Vector3D]] ones.
+    * */
+  object VectorsOp {
+    implicit def vec2DToVec3D(value: Vector): Vector3D = Vector3D(value.x, value.y, 1.0)
   }
 }
