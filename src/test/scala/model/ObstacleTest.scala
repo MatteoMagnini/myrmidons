@@ -2,6 +2,7 @@ package model
 
 import org.scalatest._
 import utility.Geometry.{Vector2D, Vector3D}
+import utility.Geometry.TupleOp3._
 import utility.Geometry.TupleOp._
 
 class ObstacleTest  extends wordspec.AnyWordSpec {
@@ -18,8 +19,8 @@ class ObstacleTest  extends wordspec.AnyWordSpec {
         val points: List[Vector3D] = List((1,1,1), (2,1,1), (3.0,1.5,1.0), (2,2,1), (3.0,2.5,1.0), (1,3,1))
         val o = Obstacle(points);
 
-        assert(o.hasInside((1.5,2.25,1.0)))
-        assert(o.hasInside((2.5,2.0,1.0)) === false)
+        assert(o.hasInside((1.5,2.25)))
+        assert(o.hasInside((2.5,2.0)) === false)
       }
     }
   }
@@ -43,7 +44,7 @@ class ObstacleTest  extends wordspec.AnyWordSpec {
       "return true" in {
         val points: List[Vector3D] = List((1, 1, 1), (2, 1, 1), (2, 2, 1), (1, 2, 1))
         val o = Obstacle(points)
-        assert(o.hasInside((1.5, 1.5, 1.0)))
+        assert(o.hasInside((1.5, 1.5)))
         }
       }
     }
@@ -52,7 +53,7 @@ class ObstacleTest  extends wordspec.AnyWordSpec {
     "return false" in {
       val points: List[Vector3D] = List((1,1,1), (1,2,1), (2,2,1), (2,1,1))
       val o = Obstacle(points)
-      assert(o.hasInside((2.5,0.5,1.0)) === false)
+      assert(o.hasInside((2.5,0.5)) === false)
     }
   }
 }
