@@ -9,7 +9,7 @@ import utility.Geometry.Vector
   * @param width environment width
   * @param height environment height
   */
-case class Boundary(left: Double, top: Double, width: Double, height: Double) {
+case class Boundary(left: Double, top: Double, width: Int, height: Int) {
   import utility.Geometry.TupleOp._
 
   def topLeft: Vector = (left, top)
@@ -28,6 +28,6 @@ case class Boundary(left: Double, top: Double, width: Double, height: Double) {
 }
 
 object Boundary {
-  def apply(left: Double, top: Double, width: Double, height: Double): Boundary =
+  def apply(left: Double, top: Double, width: Int, height: Int): Boundary =
     new Boundary(left, top, width, height)
 }

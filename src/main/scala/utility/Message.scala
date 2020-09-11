@@ -1,5 +1,5 @@
 package utility
-import model.Obstacle
+import model.{Bordered, Obstacle}
 import model.insects.{Entity, InsectInfo}
 import utility.Geometry._
 
@@ -13,7 +13,7 @@ sealed trait Message
       * @param obstacles obstacles to put in environment
       * @param centerSpawn whether spawn ants from center of boundaries
       */
-    case class StartSimulation(nAnts: Int, obstacles: Seq[Obstacle], centerSpawn: Boolean = false) extends Message
+    case class StartSimulation(nAnts: Int, obstacles: Seq[Bordered], centerSpawn: Boolean = false) extends Message
 
     /** Message sent from GUI to environment and from environment to ants, to do a step in simulation.
       *
@@ -48,5 +48,9 @@ sealed trait Message
       * @param inertia ant new inertia value
       */
     case class NewPosition(position: Vector, inertia: Vector) extends Message
+
+    case class StorageFood(quantity: Int) extends Message
+
+    case class TakeFood(quantity: Int) extends Message
 
   }

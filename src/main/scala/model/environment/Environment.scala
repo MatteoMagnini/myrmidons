@@ -2,7 +2,7 @@ package model.environment
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import model.insects.{ForagingAnt, ForagingAntInfo, InsectInfo}
-import model.Obstacle
+import model.{Bordered, Obstacle}
 import utility.Geometry._
 import utility.Messages.{Clock, Move, StartSimulation, UpdateInsect, _}
 
@@ -16,24 +16,19 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
   private def defaultBehaviour(state: EnvironmentInfo): Receive = {
 
-    case StartSimulation(nAnts: Int, obstacles: Seq[Obstacle], centerSpawn: Boolean) =>
+    case StartSimulation(nAnts: Int, obstacles: Seq[Bordered], centerSpawn: Boolean) =>
       val ants = if (!centerSpawn) createAntFromDefPosition(nAnts) else createAntFromCenter(nAnts)
       context.become(defaultBehaviour(state.insertAnts(ants).insertObstacles(obstacles)))
 
     case Clock(value: Int) => state.ants.foreach(_ ! Clock(value))
 
     case Move(pos: Vector2D, delta: Vector2D) =>
-
-      /*if (state.obstacles.forall(! _.isInside(newPosition))) {
-        sender ! NewPosition(newPosition, newPosition - pos)
-      }
-      else*/
       val newPosition = pos >> delta
-      if(state.boundary.hasInside(newPosition))
-        sender ! NewPosition(newPosition, newPosition - pos)
-      else
-        /* If ant is moving outside boundary, invert its new position */
-        sender ! NewPosition(pos - delta, delta -)
+      if (state.obstacles.forall(_.hasInside(newPosition)) && state.boundary.hasInside(newPosition))
+          sender ! NewPosition(newPosition, newPosition - pos)
+        else
+        /* If ant is moving outside boundary or through an obstacle, invert its new position */
+          sender ! NewPosition(pos - delta, delta -)
 
     case UpdateInsect(info: InsectInfo) =>
       val updatedInfo = state.updateAntsInfo(info)

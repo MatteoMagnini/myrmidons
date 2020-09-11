@@ -27,7 +27,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
     var initialPosition = ZeroVector2D()
     var newPosition = ZeroVector2D()
 
-    "create an ant" should {
+    "spawn an ant" should {
       val nAnts = 1
       environment ! StartSimulation(nAnts, Seq.empty, centerSpawn = true)
       environment ! Clock(1)
@@ -61,7 +61,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
     val environment = system.actorOf(Environment(EnvironmentInfo(senderRef, boundary)), name = "env-actor-2")
     val nAnts = 10
 
-    "create multiple ants" should {
+    "spawn multiple ants" should {
       environment ! StartSimulation(nAnts, Seq.empty, centerSpawn = true)
       environment ! Clock(1)
 
@@ -84,17 +84,24 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
   }
 
   "Environment with an obstacle" when {
+    import BorderedEntityFactory._
     val sender = TestProbe()
     implicit val senderRef: ActorRef = sender.ref
 
+    val nAnts = 10
     val boundary = Boundary(0, 0, 100, 100)
+    val obstacle: Bordered = createRandomSimpleObstacle(boundary.left, boundary.top, boundary.width, boundary.height)
     val environment = system.actorOf(Environment(EnvironmentInfo(senderRef, boundary)), name = "env-actor-3")
 
-    "create ants" should {
-      val nAnts = 1
-      environment ! StartSimulation(nAnts, Seq.empty, centerSpawn = true)
+    "spawn ants and make them move" should {
+      environment ! StartSimulation(nAnts, Seq(obstacle), centerSpawn = true)
       environment ! Clock(1)
     }
+    "receive all their positions" in {
+      val result = sender.expectMsgType[RepaintInsects]
+      assert(result.info.size == nAnts)
+    }
   }
+  //TODO find a pretty way to test borders and obstacles collisions
 
 }

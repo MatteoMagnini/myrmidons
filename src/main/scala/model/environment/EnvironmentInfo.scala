@@ -1,7 +1,7 @@
 package model.environment
 
 import akka.actor.ActorRef
-import model.Obstacle
+import model.Bordered
 import model.insects.InsectInfo
 
 /** Internal state of environment.
@@ -12,14 +12,14 @@ import model.insects.InsectInfo
   * @param ants references to ant actors
   * @param antsInfo ants information
   */
-case class EnvironmentInfo(gui: ActorRef, boundary: Boundary, obstacles: Seq[Obstacle],
+case class EnvironmentInfo(gui: ActorRef, boundary: Boundary, obstacles: Seq[Bordered],
                            ants: Seq[ActorRef], antsInfo: Seq[InsectInfo]) {
 
   /** Returns info, adding ants references */
   def insertAnts(ants: Seq[ActorRef]): EnvironmentInfo = this.copy(ants = ants)
 
   /** Returns info, adding obstacles */
-  def insertObstacles(obstacles: Seq[Obstacle]): EnvironmentInfo = this.copy(obstacles = obstacles)
+  def insertObstacles(obstacles: Seq[Bordered]): EnvironmentInfo = this.copy(obstacles = obstacles)
 
   /** Returns info, adding ant information */
   def updateAntsInfo(antInfo: InsectInfo): EnvironmentInfo = this.copy(antsInfo = antInfo +: antsInfo)
