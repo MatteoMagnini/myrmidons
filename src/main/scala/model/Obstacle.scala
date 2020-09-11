@@ -26,7 +26,6 @@ class SimpleObstacle(position: Vector2D, xDim: Int, yDim: Int) extends Bordered 
   }
 }
 
-
 /**
  * An implementation of bordered obstacle.
  * This class can accept every polygonal obstacle form. The algorithm

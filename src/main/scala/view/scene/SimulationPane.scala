@@ -1,17 +1,16 @@
 package view.scene
 
 
-import akka.actor.{ActorSystem, Props}
-import model.{Boundary, Environment, EnvironmentInfo}
-import scalafx.animation.{KeyFrame, Timeline}
+import akka.actor.{ActorRef, ActorSystem, Props}
+import model.environment.{Boundary, Environment, EnvironmentInfo}
 import scalafx.event.ActionEvent
-import scalafx.scene.control.{Button, Label, Separator, ToggleButton, ToolBar}
+import scalafx.scene.control.{Button, Label, Separator, ToolBar}
 import scalafx.scene.layout.{BorderPane, Pane}
 import scalafx.scene.paint.Color
 import scalafx.scene.text.Text
 import scalafx.Includes._
 import utility.Messages.{Clock, StartSimulation}
-import view.actor.{UiActor, UiMessage}
+import view.actor.UiActor
 
 /**
  * BorderPane with box for managing simulation
@@ -23,17 +22,18 @@ case class SimulationPane() extends BorderPane {
   private val canvas = new MyrmidonsCanvas()
   private val system = ActorSystem("Myrmidons-system")
   private val uiActor = system.actorOf(Props(new UiActor(canvas, this)))
-  val boundary = Boundary(0,0, 50, 50)
-  val environment = system.actorOf(Environment(EnvironmentInfo(uiActor, boundary)), name = "env-actor")
+  private val boundary = Boundary(0,0, canvas.width.toInt / 10 , canvas.height.toInt / 10)
+  val environment: ActorRef = system.actorOf(Environment(EnvironmentInfo(uiActor, boundary)), name = "env-actor")
   var step = new Text("1")
+  val nAnt = new Text("0")
 
   /* ToolBar for manage ant simulation */
    var toolBox: ToolBar = new ToolBar {
-    val population = new Text("0")
+
     private val startButton = new Button("Start") {
       handleEvent(ActionEvent.Action) {
         _: ActionEvent =>
-          environment.tell(StartSimulation(1, Seq.empty, true),uiActor)
+          environment.tell(StartSimulation(100, Seq.empty, centerSpawn = true),uiActor)
           environment.tell(Clock(step.text.value.toInt), uiActor)
       }
     }
@@ -46,8 +46,8 @@ case class SimulationPane() extends BorderPane {
       new Separator,
       new Label("Step:"),
       step,
-      new Label("population:"),
-      population)
+      new Label("N. Ants:"),
+      nAnt)
   }
 
   /* ToolBar for understand entities color */
@@ -80,10 +80,5 @@ case class SimulationPane() extends BorderPane {
     children = canvas
   }
   bottom = legendBox
-
-  /* Initialize Canvas with predefined entities */
-  //canvas.initializeCanvas()
-
-
 
 }

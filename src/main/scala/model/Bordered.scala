@@ -55,7 +55,7 @@ object BorderedEntityFactory{
    * */
   def createRandomSimpleObstacle(minPos: Double = 50, maxPos: Double = 550, xDim: Int = 100, yDim: Int = 50):SimpleObstacle = {
     val pos= RandomVector2D(minPos, maxPos)
-    new SimpleObstacle(Vector2D(pos.x, pos.y), xDim, yDim);
+    new SimpleObstacle(Vector2D(pos.x, pos.y), xDim, yDim)
   }
 
 
@@ -70,6 +70,6 @@ object BorderedEntityFactory{
    * */
   def createRandomFood(minPos: Double = 50, maxPos: Double = 550, quantity: Int = 100):Food = {
     val pos= RandomVector2D(minPos, maxPos)
-    Food(Vector2D(pos.x, pos.y), quantity);
+    Food(Vector2D(pos.x, pos.y), quantity)
   }
 }
