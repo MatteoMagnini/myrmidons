@@ -1,7 +1,7 @@
 package model
 
 import scala.language.implicitConversions
-import utility.Geometry.{RandomVector2D, Vector2D, Vector3D, Vector}
+import utility.Geometry.{RandomVector2D, Vector2D}
 import utility.Geometry.TupleOp._
 
 /**
@@ -16,7 +16,7 @@ trait Bordered{
    *
    * @return true if coordinate is inside of the obstacle
    * */
-  def hasInside(coordinate: Vector):Boolean
+  def hasInside(coordinate: Vector2D):Boolean
 }
 
 object BorderedEntityFactory{
@@ -32,7 +32,7 @@ object BorderedEntityFactory{
    *
    * @return an EnvObstacle in a random position
    * */
-  def createRandomComplexObstacle(minPos: Double = 50, maxPos: Double = 550, xDim: Double = 100, yDim: Double = 50): Obstacle = {
+ /* def createRandomComplexObstacle(minPos: Double = 50, maxPos: Double = 550, xDim: Double = 100, yDim: Double = 50): Obstacle = {
     val pos = RandomVector2D(minPos, maxPos)
     Obstacle(List(
       (pos.x - xDim/2, pos.y - yDim/2, 1.0),
@@ -41,7 +41,7 @@ object BorderedEntityFactory{
       (pos.x - xDim/2, pos.y + yDim/2, 1.0)
     ))
   }
-
+*/
   /**
    * Create and instance of simple obstacle in a random position
    * with dimension xDim on x-axis and yDim on y-axis.

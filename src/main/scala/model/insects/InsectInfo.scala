@@ -9,7 +9,7 @@ object ConstantInsectInfo {
   def STARTING_ENERGY = 100
   def STARTING_TIME = 0
   def STARTING_FOOD_AMOUNT = 0
-  def STARTING_POSITION: Vector = ZeroVector2D()
+  def STARTING_POSITION: Vector2D = ZeroVector2D()
 }
 
 import ConstantInsectInfo._
@@ -20,13 +20,13 @@ import ConstantInsectInfo._
 trait InsectInfo {
 
   def id: Int
-  def position: Vector
-  def inertia: Vector
+  def position: Vector2D
+  def inertia: Vector2D
   def energy: Double
   def time: Int
 
-  def updatePosition(newPosition: Vector): InsectInfo
-  def updateInertia(newInertia: Vector): InsectInfo
+  def updatePosition(newPosition: Vector2D): InsectInfo
+  def updateInertia(newInertia: Vector2D): InsectInfo
   def updateEnergy(amount: Double): InsectInfo
   def incTime(): InsectInfo
 }
@@ -34,16 +34,16 @@ trait InsectInfo {
 case class ForagingAntInfo(override val id: Int,
                            proximitySensor: Sensor,
                            pheromoneSensor: Sensor,
-                           override val position: Vector,
-                           override val inertia: Vector,
+                           override val position: Vector2D,
+                           override val inertia: Vector2D,
                            override val energy: Double,
                            override val time: Int,
                            foodAmount: Int) extends InsectInfo {
 
-  override def updatePosition(newPosition: Vector): InsectInfo =
+  override def updatePosition(newPosition: Vector2D): InsectInfo =
     this.copy(position = newPosition)
 
-  override def updateInertia(newInertia: Vector): InsectInfo =
+  override def updateInertia(newInertia: Vector2D): InsectInfo =
     this.copy(inertia = newInertia)
 
   override def updateEnergy( delta: Double): InsectInfo =
@@ -73,7 +73,7 @@ case class ForagingAntInfo(override val id: Int,
 }
 
 object ForagingAntInfo {
-  def apply(id: Int = 0, position: Vector = STARTING_POSITION, energy: Double = STARTING_ENERGY, time: Int = STARTING_TIME): ForagingAntInfo =
+  def apply(id: Int = 0, position: Vector2D = STARTING_POSITION, energy: Double = STARTING_ENERGY, time: Int = STARTING_TIME): ForagingAntInfo =
     new ForagingAntInfo(id, ProximitySensor(), PheromoneSensor(), position, ZeroVector2D(), energy, time, STARTING_FOOD_AMOUNT)
 }
 

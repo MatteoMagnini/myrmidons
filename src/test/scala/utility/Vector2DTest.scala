@@ -42,7 +42,7 @@ class Vector2DTest extends AnyWordSpecLike with BeforeAndAfter {
 
     "added" should {
       "give the correct result" in {
-        assert((v1 >> v2) == implicitly[Vector](v2))
+        assert((v1 >> v2) == implicitly[Vector2D](v2))
       }
     }
 
