@@ -23,7 +23,7 @@ case class SimulationPane() extends BorderPane {
   private val system = ActorSystem("Myrmidons-system")
   private val uiActor = system.actorOf(Props(new UiActor(canvas, this)))
   private val boundary = Boundary(0,0, canvas.width.toInt / 10 , canvas.height.toInt / 10)
-  val environment: ActorRef = system.actorOf(Environment(EnvironmentInfo(uiActor, boundary)), name = "env-actor")
+  val environment: ActorRef = system.actorOf(Environment(EnvironmentInfo(boundary)), name = "env-actor")
   var step = new Text("1")
   val nAnt = new Text("0")
 

@@ -2,7 +2,7 @@ package model.environment
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import model.insects.{ForagingAnt, ForagingAntInfo, InsectInfo}
-import model.{Bordered, Obstacle}
+import model.Bordered
 import utility.Geometry._
 import utility.Messages.{Clock, Move, StartSimulation, UpdateInsect, _}
 
@@ -17,8 +17,9 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   private def defaultBehaviour(state: EnvironmentInfo): Receive = {
 
     case StartSimulation(nAnts: Int, obstacles: Seq[Bordered], centerSpawn: Boolean) =>
+
       val ants = if (!centerSpawn) createAntFromDefPosition(nAnts) else createAntFromCenter(nAnts)
-      context.become(defaultBehaviour(state.insertAnts(ants).insertObstacles(obstacles)))
+      context.become(defaultBehaviour(EnvironmentInfo(Some(sender), state.boundary, obstacles, ants)))
 
     case Clock(value: Int) => state.ants.foreach(_ ! Clock(value))
 
@@ -34,7 +35,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       val updatedInfo = state.updateAntsInfo(info)
       /* When all ants return their positions, environment send them to GUI */
       if (updatedInfo.antsInfo.size == state.ants.size) {
-        state.gui ! RepaintInsects(updatedInfo.antsInfo)
+        state.gui.get ! RepaintInsects(updatedInfo.antsInfo)
         context.become(defaultBehaviour(state.emptyAntsInfo()))
       } else context.become(defaultBehaviour(updatedInfo))
 
