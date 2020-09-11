@@ -1,13 +1,19 @@
 package  model
 
-import utility.Geometry.Vector2D
+import utility.Geometry.{Vector2D, Vector3D}
 
 /**
  * SimpleObstacle represent a boxed obstacle.
  *
- * hasInside algorithm is easiest than Obstacle class
+ * The coordinate of SimpleObstacle are defined as:
+ *  - Bottom-Left: (position.x - xDim / 2, position.y - yDim / 2)
+ *  - Bottom-Right: (position.x + xDim / 2, position.y - yDim / 2)
+ *  - Top-Right: (position.x + xDim / 2, position.y + yDim / 2)
+ *  - Top-Left: (position.x - xDim / 2, position.y + yDim / 2)
+ *
+ * hasInside implementation is easiest than Obstacle class.
  * */
-class SimpleObstacle(position: Vector2D, xDim: Int, yDim: Int) extends Bordered {
+class SimpleObstacle(val position: Vector2D, val xDim: Int, val yDim: Int) extends Bordered {
   /**
    * function to verify if an entity has inside itself an
    * position.
@@ -26,7 +32,7 @@ class SimpleObstacle(position: Vector2D, xDim: Int, yDim: Int) extends Bordered 
   }
 }
 
-/*/**
+/**
  * An implementation of bordered obstacle.
  * This class can accept every polygonal obstacle form. The algorithm
  * to elaborate hasInside is more complex respect SimpleObstacle class
@@ -48,13 +54,11 @@ case class Obstacle(points: List[Vector3D]) extends Bordered {
     segments ::= (points(before), points(i), line)
   })
 
-  override def hasInside(coordinate: Vector): Boolean = {
-    if (!coordinate.isInstanceOf[Vector3D])
-      throw new IllegalArgumentException("Need a Vector3D argument (2D homogeneous coordinate)")
-
+  override def hasInside(coordinate: Vector2D): Boolean = {
+    import utility.Geometry.TupleOp3._
     var maxX = points.sortWith((a, b) => a.x > b.x) head
     //track an ray in right version
-    val ray = coordinate.asInstanceOf[Vector3D] X Vector3D(maxX.x + 1, coordinate.y, 1)
+    val ray = coordinate X Vector3D(maxX.x + 1, coordinate.y, 1)
     var counter = 0
     //find intersection between polygon segment and ray
     segments.indices foreach (i => {
@@ -71,4 +75,4 @@ case class Obstacle(points: List[Vector3D]) extends Bordered {
     })
     (counter % 2) != 0
   }
-}*/
+}

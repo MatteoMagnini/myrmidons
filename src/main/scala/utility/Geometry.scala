@@ -85,48 +85,51 @@ object Geometry {
   }
 
 
- /* /** A vector in 3-dimensional space.
+ /** A vector in 3-dimensional space.
     *
     * @param x x-coordinate
     * @param y y-coordinate
     * @param z z-coordinate
     */
-   case class Vector3D(override val x: Double, override val y: Double, z: Double) extends Vector{
-     import TupleOp._
-     import VectorsOp._
+  case class Vector3D(x: Double, y: Double, z: Double) {
 
-     override def - : Vector3D = (-x, -y, -z)
+   import TupleOp3._
+   def - : Vector3D = (-x, -y, -z)
 
-     override def >> (delta: Vector): Vector3D = (x + delta.x, y + delta.y, z + delta.z)
+   def >>(delta: Vector3D): Vector3D = (x + delta.x, y + delta.y, z + delta.z)
 
-     override def - (delta: Vector): Vector3D = (x - delta.x, y - delta.y, z - delta.z) //this >> (delta -)
+   def -(delta: Vector3D): Vector3D = (x - delta.x, y - delta.y, z - delta.z) //this >> (delta -)
 
-     override def * (s: Double): Vector3D = (s * x, s * y, s * z)
+   def *(s: Double): Vector3D = (s * x, s * y, s * z)
 
-     def / (s: Double): Vector3D = (x / s, y / s, z / s)
+   def /(s: Double): Vector3D = (x / s, y / s, z / s)
 
-     override def || : Double = math.sqrt(x * x + y * y + z * z)
+   def || : Double = math.sqrt(x * x + y * y + z * z)
 
-     override def /\ : Double = math.atan(y / x)
+   def /\ : Double = math.atan(y / x)
 
-     override def --> (other: Vector) : Double = this - other ||
+   def -->(other: Vector3D): Double = this - other ||
 
-     /** Cross product between two vectors * */
-     def X (other: Vector3D) : Vector3D = {
-       val x = (this.y * other.z) - (this.z * other.y)
-       val y = (this.z * other.x) - (this.x * other.z)
-       val z = (this.x * other.y) - (this.y * other.x)
-       (x, y, z)
-     }
-   }*/
+   /** Cross product between two vectors * */
+   def X(other: Vector3D): Vector3D = {
+     val x = (this.y * other.z) - (this.z * other.y)
+     val y = (this.z * other.x) - (this.x * other.z)
+     val z = (this.x * other.y) - (this.y * other.x)
+     (x, y, z)
+   }
+ }
 
 
-  /* /** Implicit conversion to convert [[utility.Geometry.Vector]] instances into
-     * [[utility.Geometry.Vector3D]] ones.
+   /** Implicit conversion to convert [[utility.Geometry.Vector3D]] instances
+    *
+    * {{{
+    * import TupleOp3._
+    * val v = (1, 2, 1) >> (3, 4, 1)
+    * }}}
      * */
-   object VectorsOp {
+   object TupleOp3 {
      implicit def toVec3D(value: (Double, Double, Double)): Vector3D = Vector3D(value._1, value._2, value._3)
      implicit def intToVec3D(value: (Int, Int, Int)): Vector3D = Vector3D(value._1.toDouble, value._2.toDouble, value._3.toDouble)
-     implicit def vec2DToVec3D(value: Vector): Vector3D = Vector3D(value.x, value.y, 1.0)
-   }*/
+     implicit def vec2DToVec3D(value: Vector2D): Vector3D = Vector3D(value.x, value.y, 1.0)
+   }
 }
