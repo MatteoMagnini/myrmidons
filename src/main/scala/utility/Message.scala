@@ -1,7 +1,7 @@
 package utility
-import model.{Bordered, Obstacle}
+import model.Bordered
 import model.insects.{Entity, InsectInfo}
-import utility.Geometry._
+import utility.Geometry.Vector2D
 
 sealed trait Message
 
@@ -26,7 +26,7 @@ sealed trait Message
       * @param start initial position
       * @param delta shift vector
       */
-    case class Move(start: Vector, delta: Vector) extends Message
+    case class Move(start: Vector2D, delta: Vector2D) extends Message
 
     case class FoodPheromones(entities: Iterable[Entity]) extends Message
 
@@ -47,7 +47,7 @@ sealed trait Message
       * @param position ant new position
       * @param inertia ant new inertia value
       */
-    case class NewPosition(position: Vector, inertia: Vector) extends Message
+    case class NewPosition(position: Vector2D, inertia: Vector2D) extends Message
 
     case class StorageFood(quantity: Int) extends Message
 
