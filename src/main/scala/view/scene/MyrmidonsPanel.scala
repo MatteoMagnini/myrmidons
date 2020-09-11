@@ -1,37 +1,43 @@
 package view.scene
 
-import scalafx.Includes._
-import scalafx.stage.Screen
-import scalafx.application.Platform
+import java.awt.{Canvas, Graphics}
 
-import scalafx.scene.canvas.Canvas
-import scalafx.scene.input.MouseEvent
-import scalafx.scene.input.MouseEvent.MouseClicked
-import scalafx.scene.paint.Color
+import javax.swing.{JFrame, JPanel}
+import model.insects.InsectInfo
 
 /**
  * Canvas that will be contain simulation entities
  * and its view behaviours.
  */
-case class MyrmidonsCanvas() extends Canvas {
-  private val canvasHeight = Screen.primary.bounds.height * 0.9
-  private val canvasWidth = Screen.primary.bounds.width * 0.9
+case class MyrmidonsCanvas() extends JPanel {
+ /* private val canvasHeight = 800
+  private val canvasWidth = 800
   private val antSize = 10
   private val obstacleSize = 60
-  private var antsPosition: Set[(Double, Double)] = Set.empty
+  var antsPosition: Seq[InsectInfo] = Seq.empty
   private val context = graphicsContext2D
 
-  height = canvasHeight.getValue
-  width = canvasWidth.getValue
+  height = canvasHeight
+  width = canvasWidth
 
   /* When user click in one point of canvas
     a new ant will be filled.
    */
   def addAnt(x: Double, y: Double): Unit = {
-      context.fill = Color.Black
-      /* center origin of the ant */
-      context.fillOval((x * antSize) - (antSize / 2), (y * antSize) - (antSize / 2), antSize, antSize)
-      //antsPosition = antsPosition + ((x, y))
+    /*if(id == 0) {
+      println("First ant ")
+    }*/
+
+    context.fill = Color.Black
+    /* center origin of the ant */
+    context.fillOval((x * antSize) - (antSize / 2), (y * antSize) - (antSize / 2), antSize, antSize)
+    //antsPosition = antsPosition + ((x, y))
+  }
+
+  override def paint(g: Graphics): Unit = super.paint(g)
+  def draw(): Unit = {
+    rep
+    antsPosition.foreach(x => addAnt(x.position.x, x.position.y))
   }
 
   def clear(): Unit = {
@@ -41,17 +47,21 @@ case class MyrmidonsCanvas() extends Canvas {
     context.fillRect((300 - obstacleSize / 2), (300 - obstacleSize / 2), obstacleSize, obstacleSize)
     /* center origin of rectange */
     context.fillRect((600 - obstacleSize / 2), (600 - obstacleSize / 2), obstacleSize, obstacleSize)
-    antsPosition = Set.empty
+    antsPosition = Seq.empty[InsectInfo]
   }
 
-  def drawObstacle(x: Double, y: Double): Unit ={
+  def drawObstacle(x: Double, y: Double): Unit = {
     context.fill = Color.Brown
     context.fillRect(x * obstacleSize, y * obstacleSize, obstacleSize, obstacleSize)
-
   }
+
   def getAntCount: Int = this.antsPosition.size
 
-  handleEvent(MouseEvent.Any) {
+  def setAnts(ants: Seq[InsectInfo]): Unit = {
+    this.antsPosition = ants
+  }
+
+  /*handleEvent(MouseEvent.Any) {
     e: MouseEvent =>
       e.eventType match {
         case MouseClicked =>
@@ -60,6 +70,6 @@ case class MyrmidonsCanvas() extends Canvas {
           addAnt(x, y)
         case _ => ()
       }
-  }
-
+  }*/
+*/
 }
