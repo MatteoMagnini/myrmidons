@@ -3,7 +3,7 @@ package model.insects
 import akka.actor.Actor.Receive
 import akka.actor.{ActorContext, ActorRef}
 import utility.Geometry._
-import utility.Messages._
+import utility.Messages.Move
 
 import scala.util.Random
 
@@ -42,7 +42,7 @@ object RandomWalk extends Competence {
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
 
     val data = info.updateEnergy(ENERGY_RW)
-    val dummy: Vector = RandomVector2D(MIN_VELOCITY, MAX_VELOCITY, (info.inertia * INERTIA_FACTOR))
+    val dummy: Vector2D = RandomVector2D(MIN_VELOCITY, MAX_VELOCITY, (info.inertia * INERTIA_FACTOR))
     environment.tell(Move(data.position, dummy ),ant)
     context become behaviour(data)
   }

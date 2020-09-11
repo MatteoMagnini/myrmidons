@@ -1,6 +1,6 @@
 package model.environment
 
-import utility.Geometry.Vector
+import utility.Geometry.Vector2D
 
 /** Environment boundary
   *
@@ -12,16 +12,16 @@ import utility.Geometry.Vector
 case class Boundary(left: Double, top: Double, width: Int, height: Int) {
   import utility.Geometry.TupleOp._
 
-  def topLeft: Vector = (left, top)
-  def topRight: Vector = (left + width, top)
-  def bottomLeft: Vector = (left, top + height)
-  def bottomRight: Vector = (left + width, top + height)
+  def topLeft: Vector2D = (left, top)
+  def topRight: Vector2D = (left + width, top)
+  def bottomLeft: Vector2D = (left, top + height)
+  def bottomRight: Vector2D = (left + width, top + height)
 
   /** Center of boundary */
-  def center: Vector = (left + width / 2, top + height / 2)
+  def center: Vector2D = (left + width / 2, top + height / 2)
 
   /** Returns whether a vector is inside boundaries */
-  def hasInside(pos: Vector): Boolean = {
+  def hasInside(pos: Vector2D): Boolean = {
     (pos.x >= left) && (pos.x <= topRight.x) &&
       (pos.y >= top) && (pos.y <= bottomLeft.y)
   }
