@@ -2,6 +2,7 @@ package view.scene
 
 
 import akka.actor.{ActorRef, ActorSystem, Props}
+import model.{Bordered, SimpleObstacle}
 import model.environment.{Boundary, Environment, EnvironmentInfo}
 import scalafx.event.ActionEvent
 import scalafx.scene.control.{Button, Label, Separator, ToolBar}
@@ -9,6 +10,7 @@ import scalafx.scene.layout.{BorderPane, Pane}
 import scalafx.scene.paint.Color
 import scalafx.scene.text.Text
 import scalafx.Includes._
+import utility.Geometry.Vector2D
 import utility.Messages.{Clock, StartSimulation}
 import view.actor.UiActor
 
@@ -27,13 +29,17 @@ case class SimulationPane() extends BorderPane {
   var step = new Text("1")
   val nAnt = new Text("0")
 
+
   /* ToolBar for manage ant simulation */
    var toolBox: ToolBar = new ToolBar {
 
     private val startButton = new Button("Start") {
       handleEvent(ActionEvent.Action) {
         _: ActionEvent =>
-          environment.tell(StartSimulation(100, Seq.empty, centerSpawn = true),uiActor)
+        //  canvas.drawObstacle(20,20)
+          val seqObstacle = Seq(new SimpleObstacle(Vector2D(30,30),6,6),
+            new SimpleObstacle(Vector2D(60,60),6,6))
+          environment.tell(StartSimulation(1000,seqObstacle , centerSpawn = true),uiActor)
           environment.tell(Clock(step.text.value.toInt), uiActor)
       }
     }

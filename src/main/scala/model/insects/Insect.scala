@@ -39,6 +39,9 @@ case class ForagingAnt(override val info: ForagingAntInfo,
       subsumption(newData,FoodPheromoneTaxis,RandomWalk)(context, environment, self, newData, defaultBehaviour)
 
     case NewPosition(p, d) =>
+      if(data.id == 0){
+        println(s"Time: ${data.time} Position: ${data.position}")
+      }
       val newData = data.updatePosition(p)
       val newData2 = newData.updateInertia(d)
       environment ! UpdateInsect(newData2)

@@ -24,11 +24,11 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
     case Move(pos: Vector2D, delta: Vector2D) =>
       val newPosition = pos >> delta
-      if (state.obstacles.forall(_.hasInside(newPosition)) && state.boundary.hasInside(newPosition))
+      if (state.obstacles.forall(!_.hasInside(newPosition)) && state.boundary.hasInside(newPosition)) {
           sender ! NewPosition(newPosition, newPosition - pos)
-        else
+      } else
         /* If ant is moving outside boundary or through an obstacle, invert its new position */
-          sender ! NewPosition(pos - delta, delta -)
+          sender ! NewPosition(pos, delta -)
 
     case UpdateInsect(info: InsectInfo) =>
       val updatedInfo = state.updateAntsInfo(info)

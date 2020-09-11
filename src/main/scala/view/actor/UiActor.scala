@@ -16,8 +16,6 @@ import scala.concurrent.duration.DurationInt
 
 object UiActor {
 
-  private case object StepKey
-
   private case object StepOver
 
   def apply(canvas: MyrmidonsCanvas, pane: SimulationPane): Props =
@@ -36,12 +34,18 @@ case class UiActor(canvas: MyrmidonsCanvas, pane: SimulationPane)
   private def defaultBehaviour: Receive = {
 
     case RepaintInsects(info: Seq[InsectInfo]) =>
+
       canvas.clear()
-      info.foreach(x => canvas.addAnt(x.position.x,x.position.y))
+      info match {
+        case i : Seq[InsectInfo] =>  i.foreach(x => canvas.addAnt(x.position.x,x.position.y))
+        case _ => System.err.println("The problem is here")
+      }
+
       currentState = currentState + 1
+      println(s"Repaint Logic time: ${currentState} , antsNumber: ${info.size})")
       pane.step.text.value = currentState.toString
       pane.nAnt.text.value = 1.toString
-      timers.startSingleTimer(StepKey, StepOver, 17.millis)
+      timers.startSingleTimer(currentState, StepOver, 30.millis)
 
     case StepOver =>
       pane.environment.tell(Clock(currentState), self)
