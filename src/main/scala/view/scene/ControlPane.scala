@@ -19,8 +19,10 @@ case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends FlowPanel {
 
   private val system = ActorSystem("Myrmidons-system")
   private val boundary = Boundary(0, 0, 80, 80)
+  val seqObstacle = Seq(new SimpleObstacle(Vector2D(30, 30), 6, 6),
+    new SimpleObstacle(Vector2D(60, 60), 6, 6))
   private val uiActor = system.actorOf(Props(new UiActor(myrmidonsPanel, this)))
-  val environment: ActorRef = system.actorOf(Environment(EnvironmentInfo(uiActor, boundary)), name = "env-actor")
+  val environment: ActorRef = system.actorOf(Environment(EnvironmentInfo(boundary)), name = "env-actor")
   private val startButton = new Button("Start")
   private val stopButton = new Button("Stop")
   var stepText = new Label("0")
@@ -37,8 +39,7 @@ case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends FlowPanel {
    */
   reactions += {
     case _: MouseClicked => {
-      val seqObstacle = Seq(new SimpleObstacle(Vector2D(30, 30), 6, 6),
-        new SimpleObstacle(Vector2D(60, 60), 6, 6))
+
       environment.tell(StartSimulation(1000, seqObstacle, centerSpawn = true), uiActor)
       environment.tell(Clock(1), uiActor)
     }
