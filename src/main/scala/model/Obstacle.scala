@@ -1,26 +1,39 @@
-package model
+package  model
 
-import scala.language.implicitConversions
+import utility.Geometry.{Vector, Vector2D, Vector3D}
 
-import utility.Geometry.Vector3D
-
-trait Obstacle {
+/**
+ * SimpleObstacle represent a boxed obstacle.
+ *
+ * hasInside algorithm is easiest than Obstacle class
+ * */
+class SimpleObstacle(position: Vector2D, xDim: Int, yDim: Int) extends Bordered {
   /**
-   * function to verify if a coordinate is inside an obstacle
+   * function to verify if an entity has inside itself an
+   * position.
    *
    * @param coordinate to check
-   *
    * @return true if coordinate is inside of the obstacle
-   * */
-  def isInside(coordinate: Vector3D):Boolean
+   **/
+  override def hasInside(coordinate: Vector): Boolean = {
+    if((coordinate.x > (position.x - xDim/2))
+      && (coordinate.x < (position.x + xDim/2))
+      && (coordinate.y > (position.y - yDim/2))
+      && (coordinate.y < (position.y + yDim/2))) {
+      true
+    }
+    else false
+  }
 }
 
 /**
- * An implementation of obstacle.
+ * An implementation of bordered obstacle.
+ * This class can accept every polygonal obstacle form. The algorithm
+ * to elaborate hasInside is more complex respect SimpleObstacle class
  *
  * @param points list of vertex of polygon that describe an obstacle
  * */
-class EnvObstacle(val points: List[Vector3D]) extends Obstacle {
+case class Obstacle(points: List[Vector3D]) extends Bordered {
   // a segments is described as a two point and a line pass through them
   var segments: List[(Vector3D, Vector3D, Vector3D)] = List()
 
@@ -35,10 +48,13 @@ class EnvObstacle(val points: List[Vector3D]) extends Obstacle {
     segments ::= (points(before), points(i), line)
   })
 
-  override def isInside(coordinate: Vector3D): Boolean = {
+  override def hasInside(coordinate: Vector): Boolean = {
+    if (!coordinate.isInstanceOf[Vector3D])
+      throw new IllegalArgumentException("Need a Vector3D argument (2D homogeneous coordinate)")
+
     var maxX = points.sortWith((a, b) => a.x > b.x) head
     //track an ray in right version
-    val ray = coordinate X Vector3D(maxX.x + 1, coordinate.y, 1)
+    val ray = coordinate.asInstanceOf[Vector3D] X Vector3D(maxX.x + 1, coordinate.y, 1)
     var counter = 0
     //find intersection between polygon segment and ray
     segments.indices foreach (i => {

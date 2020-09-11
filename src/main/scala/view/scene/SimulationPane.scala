@@ -1,44 +1,53 @@
 package view.scene
 
 
-import akka.actor.{ActorSystem, Props}
-import scalafx.animation.{KeyFrame, Timeline}
+import akka.actor.{ActorRef, ActorSystem, Props}
+import model.environment.{Boundary, Environment, EnvironmentInfo}
 import scalafx.event.ActionEvent
 import scalafx.scene.control.{Button, Label, Separator, ToolBar}
 import scalafx.scene.layout.{BorderPane, Pane}
 import scalafx.scene.paint.Color
 import scalafx.scene.text.Text
-import scalafx.util.Duration
+import scalafx.Includes._
+import utility.Messages.{Clock, StartSimulation}
 import view.actor.UiActor
 
 /**
  * BorderPane with box for managing simulation
  * and a short legend to understand color entities.
  */
+
 case class SimulationPane() extends BorderPane {
   /* Custom canvas */
-  private val canvas = new MyrmidonsCanvas
+  private val canvas = new MyrmidonsCanvas()
   private val system = ActorSystem("Myrmidons-system")
-  // private val uiActor = system.actorOf(Props(new UiActor(canvas, this)))
-  // private  val environment = system.actorOf(Props[Environment], name = "env-actor")
+  private val uiActor = system.actorOf(Props(new UiActor(canvas, this)))
+  private val boundary = Boundary(0,0, canvas.width.toInt / 10 , canvas.height.toInt / 10)
+  val environment: ActorRef = system.actorOf(Environment(EnvironmentInfo(uiActor, boundary)), name = "env-actor")
+  var step = new Text("1")
+  val nAnt = new Text("0")
 
   /* ToolBar for manage ant simulation */
-  private val toolBox: ToolBar = new ToolBar {
-    private val generation = new Text("0")
-    private val population = new Text("0")
-    private val startButton = new Button(text = "Start") {
-      // onAction = (_: ActionEvent) => uiActor ! StartSimulation(canvas.getAntCount)
+   var toolBox: ToolBar = new ToolBar {
+
+    private val startButton = new Button("Start") {
+      handleEvent(ActionEvent.Action) {
+        _: ActionEvent =>
+          environment.tell(StartSimulation(100, Seq.empty, centerSpawn = true),uiActor)
+          environment.tell(Clock(step.text.value.toInt), uiActor)
+      }
     }
+
     val stopButton = new Button("Stop")
 
     content = List(
       startButton,
       stopButton,
       new Separator,
-      new Label("generation:"),
-      generation,
-      new Label("population:"),
-      population)
+      new Label("Step:"),
+      step,
+      new Label("N. Ants:"),
+      nAnt)
   }
 
   /* ToolBar for understand entities color */
@@ -67,11 +76,9 @@ case class SimulationPane() extends BorderPane {
 
   top = toolBox
   center = new Pane {
+
     children = canvas
   }
   bottom = legendBox
-
-  /* Initialize Canvas with predefined entities */
-  canvas.initializeCanvas()
 
 }

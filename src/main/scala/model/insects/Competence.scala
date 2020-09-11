@@ -8,10 +8,10 @@ import utility.Messages._
 import scala.util.Random
 
 object Constant {
-  val MAX_VELOCITY: Int = 5
-  val MIN_VELOCITY: Int = 1
+  val MAX_VELOCITY: Double = 0.5
+  val MIN_VELOCITY: Double = 0.1
   val INERTIA_FACTOR: Double = 0.9
-  val ENERGY_RW: Int = - 1
+  val ENERGY_RW: Double = - 1.0
   val ENERGY_FPT: Double = - 1.5
   val RANDOM: Random.type = scala.util.Random
 }
@@ -42,7 +42,8 @@ object RandomWalk extends Competence {
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
 
     val data = info.updateEnergy(ENERGY_RW)
-    environment.tell(Move(data.position, RandomVector2D(MAX_VELOCITY, MIN_VELOCITY,(info.inertia * INERTIA_FACTOR))),ant)
+    val dummy: Vector = RandomVector2D(MIN_VELOCITY, MAX_VELOCITY, (info.inertia * INERTIA_FACTOR))
+    environment.tell(Move(data.position, dummy ),ant)
     context become behaviour(data)
   }
 
@@ -61,6 +62,8 @@ object FoodPheromoneTaxis extends Competence {
     context become behaviour(data.asInstanceOf[ForagingAntInfo].clearSensors())
   }
 
-  override def hasPriority(info: InsectInfo): Boolean =
-    info.asInstanceOf[ForagingAntInfo].pheromoneSensor.strongest.nonEmpty
+  override def hasPriority(info: InsectInfo): Boolean = info match {
+    case f: ForagingAntInfo => f.pheromoneSensor.entities.nonEmpty
+    case _ => false
+  }
 }
