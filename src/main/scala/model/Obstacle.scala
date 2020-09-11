@@ -1,6 +1,6 @@
 package  model
 
-import utility.Geometry.{Vector, Vector2D, Vector3D}
+import utility.Geometry.Vector2D
 
 /**
  * SimpleObstacle represent a boxed obstacle.
@@ -15,7 +15,7 @@ class SimpleObstacle(position: Vector2D, xDim: Int, yDim: Int) extends Bordered 
    * @param coordinate to check
    * @return true if coordinate is inside of the obstacle
    **/
-  override def hasInside(coordinate: Vector): Boolean = {
+  override def hasInside(coordinate: Vector2D): Boolean = {
     if((coordinate.x > (position.x - xDim/2))
       && (coordinate.x < (position.x + xDim/2))
       && (coordinate.y > (position.y - yDim/2))
@@ -33,7 +33,7 @@ class SimpleObstacle(position: Vector2D, xDim: Int, yDim: Int) extends Bordered 
  *
  * @param points list of vertex of polygon that describe an obstacle
  * */
-case class Obstacle(points: List[Vector3D]) extends Bordered {
+/*case class Obstacle(points: List[Vector3D]) extends Bordered {
   // a segments is described as a two point and a line pass through them
   var segments: List[(Vector3D, Vector3D, Vector3D)] = List()
 
@@ -71,4 +71,4 @@ case class Obstacle(points: List[Vector3D]) extends Bordered {
     })
     (counter % 2) != 0
   }
-}
+}*/

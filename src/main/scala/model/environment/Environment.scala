@@ -2,7 +2,7 @@ package model.environment
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import model.insects.{ForagingAnt, ForagingAntInfo, InsectInfo}
-import model.{Bordered, Obstacle}
+import model.Bordered
 import utility.Geometry._
 import utility.Messages.{Clock, Move, StartSimulation, UpdateInsect, _}
 
