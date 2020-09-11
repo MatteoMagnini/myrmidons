@@ -26,14 +26,14 @@ class SimpleObstacle(position: Vector2D, xDim: Int, yDim: Int) extends Bordered 
   }
 }
 
-/**
+/*/**
  * An implementation of bordered obstacle.
  * This class can accept every polygonal obstacle form. The algorithm
  * to elaborate hasInside is more complex respect SimpleObstacle class
  *
  * @param points list of vertex of polygon that describe an obstacle
  * */
-/*case class Obstacle(points: List[Vector3D]) extends Bordered {
+case class Obstacle(points: List[Vector3D]) extends Bordered {
   // a segments is described as a two point and a line pass through them
   var segments: List[(Vector3D, Vector3D, Vector3D)] = List()
 
