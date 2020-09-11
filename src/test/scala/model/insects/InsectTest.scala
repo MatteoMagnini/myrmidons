@@ -25,9 +25,9 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
     "initialized" should {
 
       def checkAll(info: ForagingAntInfo,
-                   position: Vector = ZeroVector2D(),
+                   position: Vector2D = ZeroVector2D(),
                    energy: Double = 100,
-                   inertia: Vector = ZeroVector2D(),
+                   inertia: Vector2D = ZeroVector2D(),
                    pheromoneIsEmpty: Boolean = true,
                    proximityIsEmpty: Boolean = true, //Not tested now
                    foodAmount: Double = 0,
