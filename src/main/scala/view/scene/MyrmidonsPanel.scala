@@ -13,7 +13,7 @@ import scala.swing.{Graphics2D, Panel}
 case class MyrmidonsPanel() extends Panel {
 
   private val antSize = 10
-  private val obstacleSize = 60
+  private val obstacleSize = 50
   private var antsPosition: Seq[InsectInfo] = Seq.empty
 
   override def paintComponent(g: Graphics2D) {
@@ -32,8 +32,8 @@ case class MyrmidonsPanel() extends Panel {
      */
     g.setColor(Color.black)
     antsPosition.foreach(x => {
-      g.fillOval((x.position.x.toInt * antSize) - (antSize / 2),
-        (x.position.y.toInt * antSize) - (antSize / 2), antSize, antSize)
+      g.fillOval((x.position.x.toInt * antSize),
+        (x.position.y.toInt * antSize), antSize, antSize)
     })
   }
 
