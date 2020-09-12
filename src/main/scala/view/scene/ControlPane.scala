@@ -39,7 +39,6 @@ case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends FlowPanel {
    */
   reactions += {
     case _: MouseClicked => {
-
       environment.tell(StartSimulation(1000, seqObstacle, centerSpawn = true), uiActor)
       environment.tell(Clock(1), uiActor)
     }
