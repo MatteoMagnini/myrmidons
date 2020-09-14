@@ -1,6 +1,7 @@
 package view.scene
 
 import java.awt.Color
+import java.awt.geom.Ellipse2D
 
 import model.insects.InsectInfo
 
@@ -22,18 +23,21 @@ case class MyrmidonsPanel() extends Panel {
 
     /**
      * Draw first 2 obstacle.
+     * In simple-GUI version.
      */
     g.setColor(Color.GRAY)
-    g.fillRect((300 - obstacleSize / 2), (300 - obstacleSize / 2), obstacleSize, obstacleSize)
-    g.fillRect((600 - obstacleSize / 2), (600 - obstacleSize / 2), obstacleSize, obstacleSize)
+    g.fillRect(300 - obstacleSize / 2, 300 - obstacleSize / 2, obstacleSize, obstacleSize)
+    g.fillRect(600 - obstacleSize / 2, 600 - obstacleSize / 2, obstacleSize, obstacleSize)
 
     /**
      * Foreach ants draw its new position in Panel.
+     * Use java.awt.geom.Ellipse2D because draw with double coordinates.
      */
     g.setColor(Color.black)
     antsPosition.foreach(x => {
-      g.fillOval((x.position.x.toInt * antSize),
-        (x.position.y.toInt * antSize), antSize, antSize)
+      val ellipse = new Ellipse2D.Double(x.position.x * antSize - (antSize / 2),
+        x.position.y * antSize - (antSize / 2), antSize, antSize)
+      g.fill(ellipse)
     })
   }
 
