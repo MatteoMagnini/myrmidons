@@ -13,7 +13,7 @@ import utility.Geometry.{Vector2D, Vector3D}
  *
  * hasInside implementation is easiest than Obstacle class.
  * */
-class SimpleObstacle(val position: Vector2D, val xDim: Int, val yDim: Int) extends Bordered {
+class SimpleObstacle(override val position: Vector2D, val xDim: Double, val yDim: Double) extends Bordered {
   /**
    * function to verify if an entity has inside itself an
    * position.
@@ -30,6 +30,10 @@ class SimpleObstacle(val position: Vector2D, val xDim: Int, val yDim: Int) exten
     }
     else false
   }
+
+  def unapply(arg: SimpleObstacle): Option[(Vector2D, Double, Double)] = {
+    Some(position, xDim, yDim)
+  }
 }
 
 /**
@@ -41,6 +45,15 @@ class SimpleObstacle(val position: Vector2D, val xDim: Int, val yDim: Int) exten
  * */
 case class Obstacle(points: List[Vector3D]) extends Bordered {
   // a segments is described as a two point and a line pass through them
+  def findCentroid(l: List[Vector3D]): Vector2D = {
+    import utility.Geometry.TupleOp._
+    val centroid = (points.foldRight(Vector3D(0.0, 0.0, 0.0))(_ >> _) / points.size)
+    val normalizedCentroid = centroid / centroid.z
+    (normalizedCentroid.x, normalizedCentroid.y)
+  }
+
+  override val position: Vector2D = findCentroid(points)
+
   var segments: List[(Vector3D, Vector3D, Vector3D)] = List()
 
   if (points.size < 3) {

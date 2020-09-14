@@ -1,5 +1,6 @@
 package model.insects
 
+import model.Placeable
 import utility.Geometry._
 
 object ConstantInsectInfo {
@@ -17,10 +18,9 @@ import ConstantInsectInfo._
 /**
  * The information in common with all kind of insects.
  */
-trait InsectInfo {
+trait InsectInfo extends Placeable{
 
   def id: Int
-  def position: Vector2D
   def inertia: Vector2D
   def energy: Double
   def time: Int
