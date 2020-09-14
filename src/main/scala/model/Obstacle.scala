@@ -13,7 +13,7 @@ import utility.Geometry.{Vector2D, Vector3D}
  *
  * hasInside implementation is easiest than Obstacle class.
  * */
-class SimpleObstacle(val position: Vector2D, val xDim: Double, val yDim: Double) extends Bordered {
+class SimpleObstacle(override val position: Vector2D, val xDim: Double, val yDim: Double) extends Bordered {
   /**
    * function to verify if an entity has inside itself an
    * position.
@@ -29,6 +29,10 @@ class SimpleObstacle(val position: Vector2D, val xDim: Double, val yDim: Double)
       true
     }
     else false
+  }
+
+  def unapply(arg: SimpleObstacle): Option[(Vector2D, Double, Double)] = {
+    Some(position, xDim, yDim)
   }
 }
 
