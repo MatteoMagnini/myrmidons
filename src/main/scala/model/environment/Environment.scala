@@ -18,7 +18,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
     case StartSimulation(nAnts: Int, obstacles: Seq[Bordered], centerSpawn: Boolean) =>
 
-      val ants = if (!centerSpawn) createAntFromDefPosition(nAnts) else createAntFromCenter(nAnts)
+      val ants = if (! centerSpawn) createAntFromDefPosition(nAnts) else createAntFromCenter(nAnts)
       context.become(defaultBehaviour(EnvironmentInfo(Some(sender), state.boundary, obstacles, ants)))
 
     case Clock(value: Int) => state.ants.foreach(_ ! Clock(value))
