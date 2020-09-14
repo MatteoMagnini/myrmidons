@@ -17,12 +17,15 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
   override def afterAll: Unit = {
     TestKit.shutdownActorSystem(system)
   }
+  val topLeftCorner:(Int, Int) = (0,0)
+  val width = 100
+  val height = 100
+  val boundary = Boundary(topLeftCorner._1, topLeftCorner._2, width, height)
 
   "Environment without obstacles" when {
     val sender = TestProbe()
     implicit val senderRef: ActorRef = sender.ref
 
-    val boundary = Boundary(0, 0, 100, 100)
     val environment = system.actorOf(Environment(EnvironmentInfo(boundary)), name = "env-actor-1")
     var initialPosition = ZeroVector2D()
     var newPosition = ZeroVector2D()
@@ -57,7 +60,6 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
     val sender = TestProbe()
     implicit val senderRef: ActorRef = sender.ref
 
-    val boundary = Boundary(0, 0, 100, 100)
     val environment = system.actorOf(Environment(EnvironmentInfo(boundary)), name = "env-actor-2")
     val nAnts = 10
 
@@ -89,8 +91,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
     implicit val senderRef: ActorRef = sender.ref
 
     val nAnts = 10
-    val boundary = Boundary(0, 0, 100, 100)
-    val obstacle: Bordered = createRandomSimpleObstacle(boundary.left, boundary.top, boundary.width, boundary.height)
+    val obstacle: Bordered = createRandomSimpleObstacle(topLeftCorner._1, topLeftCorner._2, width, height)
     val environment = system.actorOf(Environment(EnvironmentInfo(boundary)), name = "env-actor-3")
 
     "spawn ants and make them move" should {

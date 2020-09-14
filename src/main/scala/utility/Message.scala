@@ -40,7 +40,7 @@ sealed trait Message
       *
       * @param info ants information
       */
-    case class RepaintInsects(info: Seq[InsectInfo]) extends Message
+    case class RepaintInsects(info: Iterable[InsectInfo]) extends Message
 
     /** Message sent from environment to ant, to share its new position.
       *
