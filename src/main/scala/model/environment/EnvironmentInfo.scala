@@ -13,7 +13,7 @@ import model.insects.InsectInfo
   * @param antsInfo ants information
   */
 case class EnvironmentInfo(gui: Option[ActorRef], boundary: Boundary, obstacles: Seq[Bordered],
-                           ants: Seq[ActorRef], antsInfo: Seq[InsectInfo]) {
+                           ants: Seq[ActorRef], antsInfo: Seq[InsectInfo], anthill: Option[ActorRef]) {
 
   /** Returns info, adding ant information */
   def updateAntsInfo(antInfo: InsectInfo): EnvironmentInfo = this.copy(antsInfo = antInfo +: antsInfo)
@@ -25,8 +25,8 @@ case class EnvironmentInfo(gui: Option[ActorRef], boundary: Boundary, obstacles:
 
 object EnvironmentInfo {
   def apply(boundary: Boundary): EnvironmentInfo =
-    new EnvironmentInfo(None, boundary, Seq.empty, Seq.empty, Seq.empty)
+    new EnvironmentInfo(None, boundary, Seq.empty, Seq.empty, Seq.empty, None)
 
-  def apply(gui: Option[ActorRef], boundary: Boundary, obstacles:Seq[Bordered], ants: Seq[ActorRef] ): EnvironmentInfo =
-    new EnvironmentInfo(gui, boundary, obstacles, ants, Seq.empty)
+  def apply(gui: Option[ActorRef], boundary: Boundary, obstacles:Seq[Bordered], ants: Seq[ActorRef], anthill: Option[ActorRef] = None ): EnvironmentInfo =
+    new EnvironmentInfo(gui, boundary, obstacles, ants, Seq.empty, anthill)
 }

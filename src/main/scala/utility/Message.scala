@@ -1,7 +1,7 @@
 package utility
-import model.Bordered
 import model.anthill.AnthillInfo
-import model.insects.{Entity, InsectInfo}
+import model.{Bordered, Drawable}
+import model.insects.{Entity, ForagingAntInfo, InsectInfo}
 import utility.Geometry.Vector2D
 
 sealed trait Message
@@ -29,6 +29,7 @@ sealed trait Message
       */
     case class Move(start: Vector2D, delta: Vector2D) extends Message
 
+    //TODO: next sprint
     case class FoodPheromones(entities: Iterable[Entity]) extends Message
 
     /** Message sent from ant to environment, to update its information.

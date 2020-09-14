@@ -44,7 +44,7 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
           info.id == id
       }
 
-      val info1 = ForagingAntInfo()
+      val info1 = ForagingAntInfo(senderRef)
 
       "be correctly initialized" in {
         assert(checkAll(info1))
@@ -101,7 +101,7 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
 
   "Foraging Ant" must {
 
-    val ant = system.actorOf(ForagingAnt(ForagingAntInfo(),senderRef), "ant-0")
+    val ant = system.actorOf(ForagingAnt(ForagingAntInfo(senderRef),senderRef), "ant-0")
 
     "perform random walk" in {
       ant ! Clock(1)
@@ -127,7 +127,7 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
 
   "Pheromone sensor" must {
 
-    val info = ForagingAntInfo()
+    val info = ForagingAntInfo(senderRef)
     val pheromones = List(Entity(ZeroVector2D(), 1))
 
     "be updated" in {
@@ -139,7 +139,7 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
 
   "Foraging Ant perceiving food pheromones" must {
 
-    val ant = system.actorOf(ForagingAnt(ForagingAntInfo(id = 1),senderRef), "ant-1")
+    val ant = system.actorOf(ForagingAnt(ForagingAntInfo(senderRef, id = 1),senderRef), "ant-1")
 
     "perform food pheromone taxis" in {
       val pheromones = List(Entity(Vector2D(10,0),0.5))

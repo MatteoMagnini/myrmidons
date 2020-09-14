@@ -1,6 +1,7 @@
 package model.insects
 
-import model.Placeable
+import akka.actor.ActorRef
+import model.Drawable
 import utility.Geometry._
 
 object ConstantInsectInfo {
@@ -18,7 +19,7 @@ import ConstantInsectInfo._
 /**
  * The information in common with all kind of insects.
  */
-trait InsectInfo extends Placeable{
+trait InsectInfo extends Drawable{
 
   def id: Int
   def inertia: Vector2D
@@ -31,14 +32,21 @@ trait InsectInfo extends Placeable{
   def incTime(): InsectInfo
 }
 
-case class ForagingAntInfo(override val id: Int,
+trait AntInfo extends InsectInfo {
+
+  def anthill: ActorRef
+
+}
+
+case class ForagingAntInfo(override val anthill: ActorRef,
+                           override val id: Int,
                            proximitySensor: Sensor,
                            pheromoneSensor: Sensor,
                            override val position: Vector2D,
                            override val inertia: Vector2D,
                            override val energy: Double,
                            override val time: Int,
-                           foodAmount: Double) extends InsectInfo {
+                           foodAmount: Double) extends AntInfo {
 
   override def updatePosition(newPosition: Vector2D): InsectInfo =
     this.copy(position = newPosition)
@@ -67,8 +75,8 @@ case class ForagingAntInfo(override val id: Int,
 }
 
 object ForagingAntInfo {
-  def apply(id: Int = 0, position: Vector2D = STARTING_POSITION, energy: Double = STARTING_ENERGY, time: Int = STARTING_TIME): ForagingAntInfo =
-    new ForagingAntInfo(id, ProximitySensor(), PheromoneSensor(), position, ZeroVector2D(), energy, time, STARTING_FOOD_AMOUNT)
+  def apply(anthill: ActorRef, id: Int = 0, position: Vector2D = STARTING_POSITION, energy: Double = STARTING_ENERGY, time: Int = STARTING_TIME): ForagingAntInfo =
+    new ForagingAntInfo(anthill, id, ProximitySensor(), PheromoneSensor(), position, ZeroVector2D(), energy, time, STARTING_FOOD_AMOUNT)
 }
 
 

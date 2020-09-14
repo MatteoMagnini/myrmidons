@@ -3,6 +3,7 @@ package model.environment
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import model.insects.{ForagingAnt, ForagingAntInfo, InsectInfo}
 import model.Bordered
+import model.anthill.{Anthill, AnthillInfo}
 import utility.Geometry._
 import utility.Messages.{Clock, Move, StartSimulation, UpdateInsect, _}
 
@@ -18,8 +19,9 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
     case StartSimulation(nAnts: Int, obstacles: Seq[Bordered], centerSpawn: Boolean) =>
 
-      val ants = if (!centerSpawn) createAntFromDefPosition(nAnts) else createAntFromCenter(nAnts)
-      context.become(defaultBehaviour(EnvironmentInfo(Some(sender), state.boundary, obstacles, ants)))
+      val anthill = context.actorOf(Anthill(AnthillInfo(state.boundary.center),self), name = "anthill")
+      val ants = if (!centerSpawn) createAntFromDefPosition(nAnts,anthill) else createAntFromCenter(nAnts,anthill)
+      context.become(defaultBehaviour(EnvironmentInfo(Some(sender), state.boundary, obstacles, ants, Some(anthill))))
 
     case Clock(value: Int) => state.ants.foreach(_ ! Clock(value))
 
@@ -42,15 +44,15 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   }
 
   /** Returns ants references, created from default position */
-  private def createAntFromDefPosition(nAnts: Int): Seq[ActorRef] =
+  private def createAntFromDefPosition(nAnts: Int, anthill: ActorRef): Seq[ActorRef] =
     (0 until nAnts).map(i =>
-      context.actorOf(ForagingAnt(ForagingAntInfo(), self), s"ant-$i"))
+      context.actorOf(ForagingAnt(ForagingAntInfo(anthill, id = i), self), s"ant-$i"))
 
   /** Returns ants references, created from the center of boundary */
-  private def createAntFromCenter(nAnts: Int): Seq[ActorRef] =
+  private def createAntFromCenter(nAnts: Int, anthill: ActorRef): Seq[ActorRef] =
     (0 until nAnts).map(i => {
       val randomPosition = state.boundary.center
-      context.actorOf(ForagingAnt(ForagingAntInfo(id = i, position = randomPosition), self), s"ant-$i")
+      context.actorOf(ForagingAnt(ForagingAntInfo(anthill, id = i, position = randomPosition), self), s"ant-$i")
     })
 }
 

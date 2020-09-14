@@ -1,13 +1,13 @@
 package model.anthill
 
 import akka.actor.{Actor, ActorRef, Props}
-import model.environment.Environment
+import model.Drawable
 import utility.Geometry.Vector2D
 import utility.Messages.{Clock, StoreFood, TakeFood, UpdateAnthill}
 
-case class AnthillInfo(position: Vector2D,
+case class AnthillInfo(override val position: Vector2D,
                        foodAmount: Double,
-                       maxFoodAmount: Double) {
+                       maxFoodAmount: Double) extends Drawable{
 
   def incFood(delta: Double): AnthillInfo =
     this.copy(foodAmount = if (foodAmount + delta > maxFoodAmount) maxFoodAmount else foodAmount + delta)
