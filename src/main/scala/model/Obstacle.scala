@@ -45,6 +45,15 @@ class SimpleObstacle(override val position: Vector2D, val xDim: Double, val yDim
  * */
 case class Obstacle(points: List[Vector3D]) extends Bordered {
   // a segments is described as a two point and a line pass through them
+  def findCentroid(l: List[Vector3D]): Vector2D = {
+    import utility.Geometry.TupleOp._
+    val centroid = (points.foldRight(Vector3D(0.0, 0.0, 0.0))(_ >> _) / points.size)
+    val normalizedCentroid = centroid / centroid.z
+    (normalizedCentroid.x, normalizedCentroid.y)
+  }
+
+  override val position: Vector2D = findCentroid(points)
+
   var segments: List[(Vector3D, Vector3D, Vector3D)] = List()
 
   if (points.size < 3) {
