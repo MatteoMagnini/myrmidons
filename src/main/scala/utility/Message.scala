@@ -53,4 +53,5 @@ sealed trait Message
 
     case class TakeFood(quantity: Int) extends Message
 
+    case object Eat extends Message
   }

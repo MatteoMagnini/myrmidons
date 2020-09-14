@@ -19,7 +19,7 @@ trait Bordered{
   def hasInside(coordinate: Vector2D):Boolean
 }
 
-object BorderedEntityFactory{
+object BorderedEntityFactory {
   /**
    * Create an obstacle in a random position in coordinate
    * between minPos and maxPos, with dimension xDim on x-axis

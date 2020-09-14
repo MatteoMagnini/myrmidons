@@ -2,7 +2,7 @@ package model.environment
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import model.insects.{ForagingAnt, ForagingAntInfo, InsectInfo}
-import model.Bordered
+import model.{Bordered, Food}
 import utility.Geometry._
 import utility.Messages.{Clock, Move, StartSimulation, UpdateInsect, _}
 
@@ -25,11 +25,21 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
     case Move(pos: Vector2D, delta: Vector2D) =>
       val newPosition = pos >> delta
-      if (state.obstacles.forall(!_.hasInside(newPosition)) && state.boundary.hasInside(newPosition)) {
+      if(state.boundary.hasInside(newPosition)) {
+        if (state.obstacles.forall(!_.hasInside(newPosition))) {
           sender ! NewPosition(newPosition, newPosition - pos)
-      } else
-        /* If ant is moving outside boundary or through an obstacle, invert its new position */
-          sender ! NewPosition(pos, delta -)
+        } else {
+          /* If ant is moving outside boundary or through an obstacle, invert its new position */
+          val collision = state.obstacles.find(_.hasInside(newPosition)).get
+          collision match {
+            case x@Food(_, _) =>
+              sender ! Eat
+              context become defaultBehaviour(state.updateFood(x, x-10))
+            case _ => log.debug("Collision")
+              sender ! NewPosition(pos, delta -)
+          }
+        }
+      } else sender ! NewPosition(pos, delta -)
 
     case UpdateInsect(info: InsectInfo) =>
       val updatedInfo = state.updateAntsInfo(info)

@@ -1,7 +1,7 @@
 package view.scene
 
 import akka.actor.{ActorRef, ActorSystem, Props}
-import model.SimpleObstacle
+import model.{Food, SimpleObstacle}
 import model.environment.{Boundary, Environment, EnvironmentInfo}
 import utility.Geometry.Vector2D
 import utility.Messages.{Clock, StartSimulation}
@@ -16,11 +16,12 @@ import scala.swing.{Button, FlowPanel, Label}
  * @param myrmidonsPanel
  */
 case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends FlowPanel {
+import utility.Geometry.TupleOp._
 
   private val system = ActorSystem("Myrmidons-system")
   private val boundary = Boundary(0, 0, 80, 80)
   val seqObstacle = Seq(new SimpleObstacle(Vector2D(30, 30), 6, 6),
-    new SimpleObstacle(Vector2D(60, 60), 6, 6))
+    new SimpleObstacle(Vector2D(60, 60), 6, 6), Food((20, 20), 20))
   private val uiActor = system.actorOf(Props(new UiActor(myrmidonsPanel, this)))
   val environment: ActorRef = system.actorOf(Environment(EnvironmentInfo(boundary)), name = "env-actor")
   private val startButton = new Button("Start")
@@ -39,7 +40,7 @@ case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends FlowPanel {
    */
   reactions += {
     case _: MouseClicked => {
-      environment.tell(StartSimulation(1000, seqObstacle, centerSpawn = true), uiActor)
+      environment.tell(StartSimulation(10, seqObstacle, centerSpawn = true), uiActor)
       environment.tell(Clock(1), uiActor)
     }
   }

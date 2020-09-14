@@ -1,7 +1,7 @@
 package model.environment
 
 import akka.actor.ActorRef
-import model.Bordered
+import model.{Bordered, Food}
 import model.insects.InsectInfo
 
 
@@ -28,6 +28,8 @@ trait EnvironmentInfo {
 
   /** Empties ants information */
   def emptyAntsInfo(): EnvironmentInfo
+
+  def updateFood(food:Food, updatedFood:Food): EnvironmentInfo
 }
 
 
@@ -44,9 +46,12 @@ object EnvironmentInfo {
                                            override val antsInfo: Seq[InsectInfo]) extends EnvironmentInfo {
 
     /** Returns info, adding ant information */
-    def updateAntsInfo(antInfo: InsectInfo): EnvironmentData = this.copy(antsInfo = antInfo +: antsInfo)
+    override def updateAntsInfo(antInfo: InsectInfo): EnvironmentData = this.copy(antsInfo = antInfo +: antsInfo)
 
     /** Returns info, emptying ants information */
-    def emptyAntsInfo(): EnvironmentData = this.copy(antsInfo = Seq.empty)
+    override def emptyAntsInfo(): EnvironmentData = this.copy(antsInfo = Seq.empty)
+
+    import utility.SeqWithReplace._
+    override def updateFood(food: Food, updatedFood:Food): EnvironmentData = this.copy(obstacles = obstacles replace(food, updatedFood))
   }
 }
