@@ -1,5 +1,6 @@
 package utility
 import model.Bordered
+import model.anthill.AnthillInfo
 import model.insects.{Entity, InsectInfo}
 import utility.Geometry.Vector2D
 
@@ -49,8 +50,10 @@ sealed trait Message
       */
     case class NewPosition(position: Vector2D, inertia: Vector2D) extends Message
 
-    case class StorageFood(quantity: Int) extends Message
+    case class StoreFood(delta: Double) extends Message
 
-    case class TakeFood(quantity: Int) extends Message
+    case class TakeFood(delta: Double) extends Message
+
+    case class UpdateAnthill(info: AnthillInfo) extends Message
 
   }

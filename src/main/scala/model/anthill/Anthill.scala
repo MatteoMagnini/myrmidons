@@ -1,0 +1,47 @@
+package model.anthill
+
+import akka.actor.{Actor, ActorRef, Props}
+import model.environment.Environment
+import utility.Geometry.Vector2D
+import utility.Messages.{Clock, StoreFood, TakeFood, UpdateAnthill}
+
+case class AnthillInfo(position: Vector2D,
+                       foodAmount: Double,
+                       maxFoodAmount: Double) {
+
+  def incFood(delta: Double): AnthillInfo =
+    this.copy(foodAmount = if (foodAmount + delta > maxFoodAmount) maxFoodAmount else foodAmount + delta)
+
+  def decFood(delta: Double): AnthillInfo =
+    this.copy(foodAmount = if (foodAmount - delta < 0) 0 else foodAmount - delta)
+}
+
+object AnthillInfo {
+  def apply( position: Vector2D, foodAmount: Double = 0, maxFoodAmount: Double = 1000): AnthillInfo =
+    new AnthillInfo(position, foodAmount, maxFoodAmount)
+}
+
+case class Anthill(info: AnthillInfo, environment: ActorRef) extends Actor {
+
+  override def receive: Receive = defaultBehaviour(info)
+
+  def defaultBehaviour(data: AnthillInfo): Receive = {
+
+    case StoreFood(delta) =>
+      context become defaultBehaviour(data.incFood(delta))
+
+    case TakeFood(delta) =>
+      val newData = data.decFood(delta)
+      sender ! TakeFood(data.foodAmount - newData.foodAmount)
+      context become defaultBehaviour(newData)
+
+    case Clock(value) =>
+      environment ! UpdateAnthill(data)
+
+  }
+}
+
+object Anthill {
+  def apply(info: AnthillInfo, environment: ActorRef): Props =
+    Props(classOf[Anthill], info, environment)
+}

@@ -38,7 +38,7 @@ case class ForagingAntInfo(override val id: Int,
                            override val inertia: Vector2D,
                            override val energy: Double,
                            override val time: Int,
-                           foodAmount: Int) extends InsectInfo {
+                           foodAmount: Double) extends InsectInfo {
 
   override def updatePosition(newPosition: Vector2D): InsectInfo =
     this.copy(position = newPosition)
@@ -47,10 +47,7 @@ case class ForagingAntInfo(override val id: Int,
     this.copy(inertia = newInertia)
 
   override def updateEnergy( delta: Double): InsectInfo =
-    if (energy + delta > MAX_ENERGY)
-      this.copy(energy = MAX_ENERGY)
-    else
-      this.copy(energy = energy + delta)
+    this.copy(energy = if (energy + delta > MAX_ENERGY) MAX_ENERGY else energy + delta)
 
   override def incTime(): InsectInfo =
     this.copy(time = time + 1)
@@ -61,11 +58,8 @@ case class ForagingAntInfo(override val id: Int,
   def addPheromones(pheromones: Iterable[Entity]): ForagingAntInfo =
     this.copy(pheromoneSensor = PheromoneSensor(pheromones))
 
-  def incFood(amount: Int): ForagingAntInfo =
-    if (foodAmount + amount > MAX_FOOD)
-      this.copy(foodAmount = MAX_FOOD)
-    else
-      this.copy(foodAmount = foodAmount+amount)
+  def incFood(amount: Double): ForagingAntInfo =
+    this.copy(foodAmount = if (foodAmount + amount > MAX_FOOD) MAX_FOOD else foodAmount + amount)
 
   def freeFood(): ForagingAntInfo =
     this.copy(foodAmount = STARTING_FOOD_AMOUNT)
