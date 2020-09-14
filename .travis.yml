@@ -8,14 +8,8 @@ scala:
 os:
   - linux
 
-env:
-  # This splits the build into two parts
-  matrix:
-    - TEST_COMMAND="scripted sbt-assembly/*"
-    - TEST_COMMAND="scripted merging/* caching/*"
-
 script:
-  - sbt -Dfile.encoding=UTF8 -J-XX:ReservedCodeCacheSize=256M "$TEST_COMMAND"
+  - sbt ++$TRAVIS_SCALA_VERSION test
 
 before_cache:
   - rm -fv $HOME/.ivy2/.sbt.ivy.lock
