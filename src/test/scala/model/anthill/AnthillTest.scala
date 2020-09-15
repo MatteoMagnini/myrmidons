@@ -38,6 +38,7 @@ class AnthillTest extends TestKit(ActorSystem("EnvironmentTest"))
 
     "interacting with insects" should {
 
+      val radius = startingInfo.radius
       val foodToStore = 7.25
       val foodToTake = 2.5
       val newFoodToTake = 10.1
@@ -45,7 +46,7 @@ class AnthillTest extends TestKit(ActorSystem("EnvironmentTest"))
 
       "increment the food storage if an insect drop some food" in {
 
-        val newInfo = AnthillInfo(startingPosition, foodToStore)
+        val newInfo = AnthillInfo(startingPosition, radius, foodToStore)
 
         anthill ! StoreFood(foodToStore)
         anthill ! Clock(1)
@@ -56,7 +57,7 @@ class AnthillTest extends TestKit(ActorSystem("EnvironmentTest"))
 
       "decrease the food storage if an insect take some food" in {
 
-        val newInfo = AnthillInfo(startingPosition, foodToStore - foodToTake)
+        val newInfo = AnthillInfo(startingPosition, radius, foodToStore - foodToTake)
 
         anthill ! TakeFood(foodToTake)
         sender.expectMsg(TakeFood(foodToTake))
@@ -82,7 +83,7 @@ class AnthillTest extends TestKit(ActorSystem("EnvironmentTest"))
 
       "increase to max amount if an insect store more food than allowed by the anthill" in {
 
-        val newInfo = AnthillInfo(startingPosition, startingInfo.maxFoodAmount)
+        val newInfo = AnthillInfo(startingPosition, radius, startingInfo.maxFoodAmount)
 
         anthill ! StoreFood(newFoodToStore)
         anthill ! Clock(4)
