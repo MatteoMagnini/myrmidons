@@ -6,7 +6,7 @@ import utility.Geometry.{RandomVector2D, Vector2D}
 /**
  * trait for a entity that present a border
  * */
-trait Bordered extends Placeable {
+trait Bordered extends Drawable {
   /**
    * function to verify if an entity has inside itself an
    * position.

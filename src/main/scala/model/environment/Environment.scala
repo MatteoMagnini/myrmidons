@@ -2,10 +2,11 @@ package model.environment
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import model.insects.{ForagingAnt, ForagingAntInfo, InsectInfo}
-import model.Food
 import utility.Geometry._
 import utility.Messages.{Clock, Move, StartSimulation, UpdateInsect, _}
 import model.BorderedEntityFactory._
+import model.Food
+import model.anthill.{Anthill, AnthillInfo}
 
 /** Environment actor
   *
@@ -18,12 +19,12 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   private def defaultBehaviour(state: EnvironmentInfo): Receive = {
 
     case StartSimulation(nAnts: Int, centerSpawn: Boolean) =>
-
-      val ants = if (! centerSpawn) createAntFromDefPosition(nAnts) else createAntFromCenter(nAnts)
+      val anthill = context.actorOf(Anthill(AnthillInfo(state.boundary.center),self), name = "anthill")
+      val ants = if (!centerSpawn) createAntFromDefPosition(nAnts,anthill) else createAntFromCenter(nAnts,anthill)
       val obstacles = (0 to 3).map(_ => createRandomSimpleObstacle(state.boundary.topLeft.x, state.boundary.bottomRight.x, 40, 40))
       val foods = (0 to 3).map(_ => createRandomFood(state.boundary.topLeft.x, state.boundary.bottomRight.x,1000))
       sender ! Repaint(foods ++ obstacles)
-      context.become(defaultBehaviour(EnvironmentInfo(Some(sender), state.boundary, foods ++ obstacles, ants)))
+      context.become(defaultBehaviour(EnvironmentInfo(Some(sender), state.boundary, foods ++ obstacles, ants, Some(anthill))))
 
     case Clock(value: Int) => state.ants.foreach(_ ! Clock(value))
 
@@ -56,15 +57,15 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   }
 
   /** Returns ants references, created from default position */
-  private def createAntFromDefPosition(nAnts: Int): Seq[ActorRef] =
+  private def createAntFromDefPosition(nAnts: Int, anthill: ActorRef): Seq[ActorRef] =
     (0 until nAnts).map(i =>
-      context.actorOf(ForagingAnt(ForagingAntInfo(), self), s"ant-$i"))
+      context.actorOf(ForagingAnt(ForagingAntInfo(anthill, id = i), self), s"ant-$i"))
 
   /** Returns ants references, created from the center of boundary */
-  private def createAntFromCenter(nAnts: Int): Seq[ActorRef] =
+  private def createAntFromCenter(nAnts: Int, anthill: ActorRef): Seq[ActorRef] =
     (0 until nAnts).map(i => {
       val randomPosition = state.boundary.center
-      context.actorOf(ForagingAnt(ForagingAntInfo(id = i, position = randomPosition), self), s"ant-$i")
+      context.actorOf(ForagingAnt(ForagingAntInfo(anthill, id = i, position = randomPosition), self), s"ant-$i")
     })
 }
 

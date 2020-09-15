@@ -29,7 +29,7 @@ class Vector2DTest extends AnyWordSpecLike with BeforeAndAfter {
     }
     "calculating direction" should {
       "give the correct result" in {
-        assert((v /\) == math.atan(v.y/v.x))
+        assert((v /\) == math.atan2(v.y,v.x))
       }
     }
   }

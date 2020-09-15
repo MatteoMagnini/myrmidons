@@ -26,7 +26,7 @@ object Geometry {
     def || : Double = math.sqrt(x * x + y * y)
 
     /** Returns the angle of the vector */
-    def /\ : Double = math.atan(y/x)
+    def /\ : Double = math.atan2(y,x)
 
     /** Return the distance between vectors */
     def -->(other: Vector2D) : Double = this - other ||
@@ -71,7 +71,7 @@ object Geometry {
   /** Random vector factory */
   object OrientedVector2D {
     def apply(radiant: Double, module: Double ): Vector2D =
-      Vector2D(math.sin(radiant) * module, math.cos(radiant) * module)
+      Vector2D(math.cos(radiant) * module, math.sin(radiant) * module)
   }
 
   /** Implicit conversions for [[utility.Geometry.Vector2D]] instances

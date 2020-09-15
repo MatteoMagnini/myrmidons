@@ -1,8 +1,8 @@
 package view.actor
 
 import akka.actor.{Actor, ActorLogging, Props, Timers}
-import model.{Food, Placeable, SimpleObstacle}
 import model.insects.ForagingAntInfo
+import model.{Drawable, Food, SimpleObstacle}
 import utility.Messages.{Clock, Repaint}
 import view.scene.{ControlPane, MyrmidonsPanel}
 
@@ -34,7 +34,7 @@ case class UiActor(panel: MyrmidonsPanel, control: ControlPane)
 
   private def defaultBehaviour: Receive = {
 
-    case Repaint(info: Seq[Placeable]) =>
+    case Repaint(info: Seq[Drawable]) =>
       var antsInfo:Seq[ForagingAntInfo] = Seq.empty
       var food:Seq[Food] = Seq.empty
       var obstacles:Seq[SimpleObstacle] = Seq.empty

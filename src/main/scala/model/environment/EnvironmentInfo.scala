@@ -36,14 +36,26 @@ trait EnvironmentInfo {
 object EnvironmentInfo {
 
   def apply(boundary: Boundary): EnvironmentInfo =
-    EnvironmentData(None, boundary, Seq.empty, Seq.empty, Seq.empty)
+    EnvironmentData(None, boundary, Seq.empty, Seq.empty, Seq.empty, None)
 
   def apply(gui: Option[ActorRef], boundary: Boundary, obstacles:Seq[Bordered], ants: Seq[ActorRef] ): EnvironmentInfo =
-    EnvironmentData(gui, boundary, obstacles, ants, Seq.empty)
+    EnvironmentData(gui, boundary, obstacles, ants, Seq.empty, None)
 
+  def apply(gui: Option[ActorRef], boundary: Boundary, obstacles:Seq[Bordered], ants: Seq[ActorRef], anthill: Option[ActorRef] = None ): EnvironmentInfo =
+    EnvironmentData(gui, boundary, obstacles, ants, Seq.empty, anthill)
+
+  /** Internal state of environment.
+    *
+    * @param gui reference to gui actor
+    * @param boundary boundary constrains of environment
+    * @param obstacles obstacles in environment
+    * @param ants references to ant actors
+    * @param antsInfo ants information
+    * @param anthill ants anthill reference
+    */
   private[this] case class EnvironmentData(override val gui: Option[ActorRef], override val boundary: Boundary,
                                            override val obstacles: Seq[Bordered], override val ants: Seq[ActorRef],
-                                           override val antsInfo: Seq[InsectInfo]) extends EnvironmentInfo {
+                                           override val antsInfo: Seq[InsectInfo], anthill: Option[ActorRef]) extends EnvironmentInfo {
 
     /** Returns info, adding ant information */
     override def updateAntsInfo(antInfo: InsectInfo): EnvironmentData = this.copy(antsInfo = antInfo +: antsInfo)
@@ -54,4 +66,5 @@ object EnvironmentInfo {
     import utility.SeqWithReplace._
     override def updateFood(food: Food, updatedFood:Food): EnvironmentData = this.copy(obstacles = obstacles replace(food, updatedFood))
   }
+
 }
