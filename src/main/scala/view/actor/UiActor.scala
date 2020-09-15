@@ -1,9 +1,12 @@
 package view.actor
 
-import akka.actor.{Actor, ActorLogging, Props, Timers}
+import akka.actor.{Actor, ActorLogging, ActorRef, Props, Timers}
+import model.environment.Environment
 import model.insects.InsectInfo
 import utility.Messages.{Clock, RepaintInsects}
+import view.actor.uiMessage.{RestartSimulation, StopSimulation}
 import view.scene.{ControlPane, MyrmidonsPanel}
+
 import scala.concurrent.duration.DurationInt
 
 /**
@@ -27,6 +30,7 @@ case class UiActor(panel: MyrmidonsPanel, control: ControlPane)
   import UiActor._
 
   private var currentState = 1
+  private var stopFlag = true
 
   override def receive: Receive = defaultBehaviour
 
@@ -38,9 +42,19 @@ case class UiActor(panel: MyrmidonsPanel, control: ControlPane)
       currentState = currentState + 1
       control.stepText.text = currentState.toString
       control.antPopulationText.text = info.size.toString
-      timers.startSingleTimer(currentState, StepOver, 30.millis)
+      if(stopFlag){
+        timers.startSingleTimer(currentState, StepOver, 30.millis)
+      }
 
     case StepOver =>
       control.environment.tell(Clock(currentState), self)
+
+    case StopSimulation(stopFlag: Boolean) =>
+      this.stopFlag = stopFlag
+      timers.cancel(currentState)
+
+    case RestartSimulation() =>
+      this.stopFlag = true
+      timers.startSingleTimer(currentState, StepOver, 30.millis)
   }
 }
