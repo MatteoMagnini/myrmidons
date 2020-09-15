@@ -57,4 +57,13 @@ sealed trait Message
 
     case class UpdateAnthill(info: AnthillInfo) extends Message
 
+    /**
+     * An ant has a bit of memory (it counts its steps).
+     * The memory is emulated by asking the anthill actor to send the resulting movement to perform.
+     *
+     * @param position the ant position
+     * @param maxSpeed ant max velocity
+     */
+    case class AntTowardsAnthill(position: Vector2D, maxSpeed: Double) extends Message
+
   }

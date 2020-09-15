@@ -25,17 +25,12 @@ trait InsectInfo extends Drawable{
   def inertia: Vector2D
   def energy: Double
   def time: Int
+  def anthill: ActorRef
 
   def updatePosition(newPosition: Vector2D): InsectInfo
   def updateInertia(newInertia: Vector2D): InsectInfo
   def updateEnergy(amount: Double): InsectInfo
   def incTime(): InsectInfo
-}
-
-trait AntInfo extends InsectInfo {
-
-  def anthill: ActorRef
-
 }
 
 case class ForagingAntInfo(override val anthill: ActorRef,
@@ -46,7 +41,7 @@ case class ForagingAntInfo(override val anthill: ActorRef,
                            override val inertia: Vector2D,
                            override val energy: Double,
                            override val time: Int,
-                           foodAmount: Double) extends AntInfo {
+                           foodAmount: Double) extends InsectInfo {
 
   override def updatePosition(newPosition: Vector2D): InsectInfo =
     this.copy(position = newPosition)
