@@ -34,9 +34,7 @@ trait Competence {
 
 }
 
-/**
- * Competence performing a random walk.
- */
+/** Competence performing a random walk. */
 object RandomWalk extends Competence {
 
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
@@ -61,6 +59,7 @@ object GoBackToHome extends Competence {
   override def hasPriority( info: InsectInfo ): Boolean = info.energy < 40
 }
 
+/** Competence that enables ant to eat food when it find it */
 object TakeFood extends Competence {
 
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
@@ -72,9 +71,7 @@ object TakeFood extends Competence {
   override def hasPriority(info: InsectInfo): Boolean = true
 }
 
-/**
- * Competence that enable an ant to follow the traces of the (food) pheromone.
- */
+/** Competence that enable an ant to follow the traces of the (food) pheromone. */
 object FoodPheromoneTaxis extends Competence {
 
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {

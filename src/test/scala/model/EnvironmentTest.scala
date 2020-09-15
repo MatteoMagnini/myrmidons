@@ -108,7 +108,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
     "receive all their positions" in {
       val result = sender.expectMsgType[Repaint]
       val positions = result.info.filter {
-        case _:ForagingAntInfo => true
+        case _: ForagingAntInfo => true
         case _ => false
       }
       assert(positions.size == nAnts)

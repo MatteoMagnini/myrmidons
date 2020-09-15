@@ -14,7 +14,7 @@ import scala.swing.{Graphics2D, Panel}
  */
 case class MyrmidonsPanel() extends Panel {
 
-  private val antSize = 10
+  private val antSize = 8
   private var antsPosition: Seq[InsectInfo] = Seq.empty
   private var restartFlag = false
   private var drawAnts: Seq[(Int, Int)] = Seq.empty
