@@ -109,7 +109,7 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
       ant ! NewPosition(result1.start >> result1.delta, result1.delta)
       val result2 = sender.expectMsgType[UpdateInsect]
       assert(result2.info.position != ZeroVector2D())
-      assert(result2.info.energy == 99)
+      assert(result2.info.energy == 99.6)
       sender expectNoMessage
     }
 
@@ -119,7 +119,7 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
       ant ! NewPosition(result1.start >> result1.delta, result1.delta)
       val result2 = sender.expectMsgType[UpdateInsect]
       assert(result2.info.position != ZeroVector2D())
-      assert(result2.info.energy == 98)
+      assert(result2.info.energy == 99.3)
       sender expectNoMessage
     }
 
