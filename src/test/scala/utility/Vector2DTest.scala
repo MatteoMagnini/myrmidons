@@ -29,7 +29,6 @@ class Vector2DTest extends AnyWordSpecLike with BeforeAndAfter {
     }
     "calculating direction" should {
       "give the correct result" in {
-        println(v /\)
         assert((v /\) == math.atan(v.y/v.x))
       }
     }
@@ -64,10 +63,11 @@ class Vector2DTest extends AnyWordSpecLike with BeforeAndAfter {
     "created in range" should {
       val min = 0.3
       val max = 1.4
-      val r = RandomVector2D(min,max)
+      val r = RandomVector2D(min, max)
+      println(r)
 
       "have its dimensions inside the range" in {
-        assert(r.x.abs >= min && r.x.abs <= max && r.y.abs >= min && r.y.abs <= max )
+        assert(r.x >= min && r.x <= max && r.y >= min && r.y <= max )
       }
     }
 
@@ -75,11 +75,11 @@ class Vector2DTest extends AnyWordSpecLike with BeforeAndAfter {
 
       val min = 0.3
       val max = 1.4
-      val perturbation = (-0.5,0.93)
-      val r = RandomVector2D(min,max,perturbation)
+      val perturbation = (-0.5, 0.93)
+      val r = RandomVector2D(min, max, perturbation)
 
       "have its dimensions inside the range" in {
-        assert(r.x.abs >= min && r.x.abs <= max && r.y.abs >= min && r.y.abs <= max )
+        assert(r.x >= min && r.x <= max && r.y >= min && r.y <= max )
       }
     }
 

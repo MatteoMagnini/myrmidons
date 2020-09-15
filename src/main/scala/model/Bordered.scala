@@ -2,7 +2,6 @@ package model
 
 import scala.language.implicitConversions
 import utility.Geometry.{RandomVector2D, Vector2D}
-import utility.Geometry.TupleOp._
 
 /**
  * trait for a entity that present a border
@@ -32,7 +31,7 @@ object BorderedEntityFactory {
    * @return a SimpleObstacle istance
    * */
   def createRandomSimpleObstacle(minPos: Double = 50, maxPos: Double = 550, xDim: Int = 100, yDim: Int = 50):SimpleObstacle = {
-    val pos= RandomVector2D(minPos, maxPos)
+    val pos = RandomVector2D(minPos, maxPos)
     new SimpleObstacle(Vector2D(pos.x, pos.y), xDim, yDim)
   }
 
@@ -47,7 +46,8 @@ object BorderedEntityFactory {
    *
    * */
   def createRandomFood(minPos: Double = 50, maxPos: Double = 550, quantity: Int = 100):Food = {
-    val pos= RandomVector2D(minPos, maxPos)
+    val pos = RandomVector2D(minPos, maxPos)
+    println("POS: "+pos)
     Food(Vector2D(pos.x, pos.y), quantity)
   }
 }

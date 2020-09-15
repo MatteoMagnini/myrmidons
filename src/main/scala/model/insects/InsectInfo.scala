@@ -18,7 +18,7 @@ import ConstantInsectInfo._
 /**
  * The information in common with all kind of insects.
  */
-trait InsectInfo extends Placeable{
+trait InsectInfo extends Placeable {
 
   def id: Int
   def inertia: Vector2D

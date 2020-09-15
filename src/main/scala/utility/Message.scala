@@ -1,5 +1,5 @@
 package utility
-import model.Bordered
+import model.{Bordered, Food, Placeable}
 import model.insects.{Entity, InsectInfo}
 import utility.Geometry.Vector2D
 
@@ -13,7 +13,7 @@ sealed trait Message
       * @param obstacles obstacles to put in environment
       * @param centerSpawn whether spawn ants from center of boundaries
       */
-    case class StartSimulation(nAnts: Int, obstacles: Seq[Bordered], centerSpawn: Boolean = false) extends Message
+    case class StartSimulation(nAnts: Int, centerSpawn: Boolean = false) extends Message
 
     /** Message sent from GUI to environment and from environment to ants, to do a step in simulation.
       *
@@ -40,7 +40,7 @@ sealed trait Message
       *
       * @param info ants information
       */
-    case class RepaintInsects(info: Iterable[InsectInfo]) extends Message
+    case class Repaint(info: Iterable[Placeable]) extends Message
 
     /** Message sent from environment to ant, to share its new position.
       *

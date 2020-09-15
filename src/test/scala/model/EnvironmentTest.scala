@@ -7,7 +7,7 @@ import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import utility.Geometry.ZeroVector2D
-import utility.Messages.{Clock, RepaintInsects, StartSimulation}
+import utility.Messages.{Clock, Repaint, StartSimulation}
 
 class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
   with AnyWordSpecLike
@@ -32,11 +32,11 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
 
     "spawn an ant" should {
       val nAnts = 1
-      environment ! StartSimulation(nAnts, Seq.empty, centerSpawn = true)
+      environment ! StartSimulation(nAnts, centerSpawn = true)
       environment ! Clock(1)
 
       "receive its initial position" in {
-        val result = sender.expectMsgType[RepaintInsects]
+        val result = sender.expectMsgType[Repaint]
         initialPosition = result.info.head.position
       }
     }
@@ -44,7 +44,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
       environment ! Clock(2)
 
       "receive its new position" in {
-        val result = sender.expectMsgType[RepaintInsects]
+        val result = sender.expectMsgType[Repaint]
         newPosition = result.info.head.position
       }
       "receive no more messages" in {
@@ -64,18 +64,18 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
     val nAnts = 10
 
     "spawn multiple ants" should {
-      environment ! StartSimulation(nAnts, Seq.empty, centerSpawn = true)
+      environment ! StartSimulation(nAnts, centerSpawn = true)
       environment ! Clock(1)
 
       "receive all their positions" in {
-        val result = sender.expectMsgType[RepaintInsects]
+        val result = sender.expectMsgType[Repaint]
         assert(result.info.size == nAnts)
       }
     }
     "make them move" should {
       environment ! Clock(2)
       "receive all their new positions" in {
-        val result = sender.expectMsgType[RepaintInsects]
+        val result = sender.expectMsgType[Repaint]
         assert(result.info.size == nAnts)
       }
 
@@ -95,11 +95,11 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
     val environment = system.actorOf(Environment(EnvironmentInfo(boundary)), name = "env-actor-3")
 
     "spawn ants and make them move" should {
-      environment ! StartSimulation(nAnts, Seq(obstacle), centerSpawn = true)
+      environment ! StartSimulation(nAnts, centerSpawn = true)
       environment ! Clock(1)
     }
     "receive all their positions" in {
-      val result = sender.expectMsgType[RepaintInsects]
+      val result = sender.expectMsgType[Repaint]
       assert(result.info.size == nAnts)
     }
   }

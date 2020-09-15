@@ -6,7 +6,7 @@ import utility.Geometry.Vector2D
  * This class represents a food source.
  * */
 case class Food(override val position: Vector2D, quantity: Int)
-  extends SimpleObstacle(position, math.log10(quantity), math.log10(quantity)) {
+  extends SimpleObstacle(position, math.log(quantity)*10, math.log(quantity)*10) {
 
   /**
    * Increase food quantity.

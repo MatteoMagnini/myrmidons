@@ -8,8 +8,8 @@ import utility.Messages.Move
 import scala.util.Random
 
 object Constant {
-  val MAX_VELOCITY: Double = 0.5
-  val MIN_VELOCITY: Double = 0.1
+  val MAX_VELOCITY: Double = 5
+  val MIN_VELOCITY: Double = - 5
   val INERTIA_FACTOR: Double = 0.9
   val ENERGY_RW: Double = - 1.0
   val ENERGY_FPT: Double = - 1.5
