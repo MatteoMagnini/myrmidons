@@ -28,9 +28,9 @@ object BorderedEntityFactory {
    * @param xDim dimension on x-axis
    * @param yDim dimension on y-axis
    *
-   * @return a SimpleObstacle istance
+   * @return a SimpleObstacle instance
    * */
-  def createRandomSimpleObstacle(minPos: Double = 50, maxPos: Double = 550, xDim: Int = 100, yDim: Int = 50):SimpleObstacle = {
+  def createRandomSimpleObstacle(minPos: Double = 0, maxPos: Double = 800, xDim: Int = 30, yDim: Int = 30):SimpleObstacle = {
     val pos = RandomVector2D(minPos, maxPos)
     new SimpleObstacle(Vector2D(pos.x, pos.y), xDim, yDim)
   }
@@ -45,9 +45,8 @@ object BorderedEntityFactory {
    * @param quantity of food of this resource
    *
    * */
-  def createRandomFood(minPos: Double = 50, maxPos: Double = 550, quantity: Int = 100):Food = {
+  def createRandomFood(minPos: Double = 0, maxPos: Double = 800, quantity: Int = 1000):Food = {
     val pos = RandomVector2D(minPos, maxPos)
-    println("POS: "+pos)
     Food(Vector2D(pos.x, pos.y), quantity)
   }
 }

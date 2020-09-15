@@ -3,7 +3,7 @@ package model.insects
 import akka.actor.Actor.Receive
 import akka.actor.{ActorContext, ActorRef}
 import utility.Geometry._
-import utility.Messages.{AntTowardsAnthill, Move}
+import utility.Messages.{AntTowardsAnthill, Move, UpdateInsect}
 
 import scala.util.Random
 
@@ -42,7 +42,7 @@ object RandomWalk extends Competence {
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
 
     val data = info.updateEnergy(ENERGY_RW)
-    val delta: Vector2D = RandomVector2D(MIN_VELOCITY, MAX_VELOCITY, (info.inertia * INERTIA_FACTOR))
+    val delta: Vector2D = RandomVector2D(MIN_VELOCITY, MAX_VELOCITY, info.inertia * INERTIA_FACTOR)
     environment.tell(Move(data.position, delta),ant)
     context become behaviour(data)
   }
@@ -59,6 +59,17 @@ object GoBackToHome extends Competence {
   }
 
   override def hasPriority( info: InsectInfo ): Boolean = info.energy < 40
+}
+
+object TakeFood extends Competence {
+
+  override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
+    val newData = info.updateEnergy(ConstantInsectInfo.MAX_FOOD)
+    environment.tell(UpdateInsect(newData), ant)
+    context become behaviour(newData)
+  }
+
+  override def hasPriority(info: InsectInfo): Boolean = true
 }
 
 /**

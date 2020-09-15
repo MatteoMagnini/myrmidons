@@ -31,7 +31,7 @@ case class UiActor(panel: MyrmidonsPanel, control: ControlPane)
   import UiActor._
 
   private var stopFlag = true
-  private var currentState = 0
+  private var currentState = 1
 
 
   override def receive: Receive = defaultBehaviour

@@ -67,8 +67,7 @@ object Geometry {
       min + (max - min) * scala.util.Random.nextDouble()
   }
 
-
-  /** Random vector factory */
+  /** Oriented vector factory */
   object OrientedVector2D {
     def apply(radiant: Double, module: Double ): Vector2D =
       Vector2D(math.cos(radiant) * module, math.sin(radiant) * module)

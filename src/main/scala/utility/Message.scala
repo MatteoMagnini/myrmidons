@@ -13,7 +13,7 @@ sealed trait Message
       * @param nAnts number of ants to be created
       * @param centerSpawn whether spawn ants from center of boundaries
       */
-    case class StartSimulation(nAnts: Int, centerSpawn: Boolean = false, obstacles: Boolean = true, food: Boolean = true) extends Message
+    case class StartSimulation(nAnts: Int, centerSpawn: Boolean = false, obstacles: Option[Int] = Some(3), food: Option[Int] = Some(3)) extends Message
 
     /** Message sent from GUI to environment and from environment to ants, to do a step in simulation.
       *
@@ -65,5 +65,5 @@ sealed trait Message
      */
     case class AntTowardsAnthill(position: Vector2D, maxSpeed: Double) extends Message
 
-    case object Eat extends Message
+    case object FoodNear extends Message
   }
