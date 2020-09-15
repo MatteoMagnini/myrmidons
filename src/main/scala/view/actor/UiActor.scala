@@ -35,14 +35,15 @@ case class UiActor(panel: MyrmidonsPanel, control: ControlPane)
   private def defaultBehaviour: Receive = {
 
     case Repaint(info: Seq[Drawable]) =>
-      var antsInfo:Seq[ForagingAntInfo] = Seq.empty
-      var food:Seq[Food] = Seq.empty
-      var obstacles:Seq[SimpleObstacle] = Seq.empty
+      var antsInfo: Seq[ForagingAntInfo] = Seq.empty
+      var food: Seq[Food] = Seq.empty
+      var obstacles: Seq[SimpleObstacle] = Seq.empty
+
       info.foreach {
         case x:ForagingAntInfo => antsInfo = x +: antsInfo
         case x:Food => food = x +: food
         case x:SimpleObstacle => obstacles = x +: obstacles
-        case _ => println("ERROR")
+        case _ =>
       }
       panel.setAnts(antsInfo)
       panel.setFood(food)
