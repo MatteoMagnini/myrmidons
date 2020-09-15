@@ -36,12 +36,9 @@ case class ForagingAnt(override val info: ForagingAntInfo,
 
     case Clock(t) if t == data.time + 1 =>
       val newData = data.incTime()
-      subsumption(newData,FoodPheromoneTaxis,RandomWalk)(context, environment, self, newData, defaultBehaviour)
+      subsumption(newData,GoBackToHome,FoodPheromoneTaxis,RandomWalk)(context, environment, self, newData, defaultBehaviour)
 
     case NewPosition(p, d) =>
-      if(data.id == 0){
-        println(s"Time: ${data.time} Position: ${data.position}")
-      }
       val newData = data.updatePosition(p)
       val newData2 = newData.updateInertia(d)
       environment ! UpdateInsect(newData2)
@@ -49,8 +46,14 @@ case class ForagingAnt(override val info: ForagingAntInfo,
 
     case FoodPheromones(entities) => data match {
       case f: ForagingAntInfo => context become defaultBehaviour(f.addPheromones(entities))
-      case _ => System.err.println("Creation of foraging ant with wrong insect information");
+      case _ => System.err.println("Creation of foraging ant with wrong insect information")
     }
+
+    case Eat =>
+      val newData = data.updateEnergy(10)
+      environment ! UpdateInsect(newData)
+      log.debug("Eat")
+      context become defaultBehaviour(newData)
 
     case x => println("Should never happen, received message: " + x.getClass + " from " + sender)
 

@@ -1,6 +1,7 @@
 package model.insects
 
-import model.Placeable
+import akka.actor.ActorRef
+import model.Drawable
 import utility.Geometry._
 
 object ConstantInsectInfo {
@@ -18,12 +19,14 @@ import ConstantInsectInfo._
 /**
  * The information in common with all kind of insects.
  */
-trait InsectInfo extends Placeable{
+
+trait InsectInfo extends Drawable {
 
   def id: Int
   def inertia: Vector2D
   def energy: Double
   def time: Int
+  def anthill: ActorRef
 
   def updatePosition(newPosition: Vector2D): InsectInfo
   def updateInertia(newInertia: Vector2D): InsectInfo
@@ -31,14 +34,15 @@ trait InsectInfo extends Placeable{
   def incTime(): InsectInfo
 }
 
-case class ForagingAntInfo(override val id: Int,
+case class ForagingAntInfo(override val anthill: ActorRef,
+                           override val id: Int,
                            proximitySensor: Sensor,
                            pheromoneSensor: Sensor,
                            override val position: Vector2D,
                            override val inertia: Vector2D,
                            override val energy: Double,
                            override val time: Int,
-                           foodAmount: Int) extends InsectInfo {
+                           foodAmount: Double) extends InsectInfo {
 
   override def updatePosition(newPosition: Vector2D): InsectInfo =
     this.copy(position = newPosition)
@@ -47,10 +51,7 @@ case class ForagingAntInfo(override val id: Int,
     this.copy(inertia = newInertia)
 
   override def updateEnergy( delta: Double): InsectInfo =
-    if (energy + delta > MAX_ENERGY)
-      this.copy(energy = MAX_ENERGY)
-    else
-      this.copy(energy = energy + delta)
+    this.copy(energy = if (energy + delta > MAX_ENERGY) MAX_ENERGY else energy + delta)
 
   override def incTime(): InsectInfo =
     this.copy(time = time + 1)
@@ -61,11 +62,8 @@ case class ForagingAntInfo(override val id: Int,
   def addPheromones(pheromones: Iterable[Entity]): ForagingAntInfo =
     this.copy(pheromoneSensor = PheromoneSensor(pheromones))
 
-  def incFood(amount: Int): ForagingAntInfo =
-    if (foodAmount + amount > MAX_FOOD)
-      this.copy(foodAmount = MAX_FOOD)
-    else
-      this.copy(foodAmount = foodAmount+amount)
+  def incFood(amount: Double): ForagingAntInfo =
+    this.copy(foodAmount = if (foodAmount + amount > MAX_FOOD) MAX_FOOD else foodAmount + amount)
 
   def freeFood(): ForagingAntInfo =
     this.copy(foodAmount = STARTING_FOOD_AMOUNT)
@@ -73,8 +71,8 @@ case class ForagingAntInfo(override val id: Int,
 }
 
 object ForagingAntInfo {
-  def apply(id: Int = 0, position: Vector2D = STARTING_POSITION, energy: Double = STARTING_ENERGY, time: Int = STARTING_TIME): ForagingAntInfo =
-    new ForagingAntInfo(id, ProximitySensor(), PheromoneSensor(), position, ZeroVector2D(), energy, time, STARTING_FOOD_AMOUNT)
+  def apply(anthill: ActorRef, id: Int = 0, position: Vector2D = STARTING_POSITION, energy: Double = STARTING_ENERGY, time: Int = STARTING_TIME): ForagingAntInfo =
+    new ForagingAntInfo(anthill, id, ProximitySensor(), PheromoneSensor(), position, ZeroVector2D(), energy, time, STARTING_FOOD_AMOUNT)
 }
 
 

@@ -1,11 +1,10 @@
 package view.scene
 
-import java.awt.{Color, Graphics2D}
-import java.awt.geom.Ellipse2D
 
+import java.awt.Color
+import java.awt.geom.{Ellipse2D, Rectangle2D}
+import model.{Food, SimpleObstacle}
 import model.insects.InsectInfo
-import utility.Geometry.Vector2D
-
 import scala.swing.event.MouseClicked
 import scala.swing.{Graphics2D, Panel}
 
@@ -16,11 +15,11 @@ import scala.swing.{Graphics2D, Panel}
 case class MyrmidonsPanel() extends Panel {
 
   private val antSize = 10
-  private val obstacleSize = 50
   private var antsPosition: Seq[InsectInfo] = Seq.empty
   private var restartFlag = false
-  private var drawAnts : Seq[(Int, Int)] = Seq.empty
-
+  private var drawAnts: Seq[(Int, Int)] = Seq.empty
+  private var food: Seq[Food] = Seq.empty
+  private var obstacles: Seq[SimpleObstacle] = Seq.empty
 
   override def paintComponent(g: Graphics2D) {
 
@@ -28,14 +27,11 @@ case class MyrmidonsPanel() extends Panel {
       g.clearRect(0, 0, size.width, size.height)
     } else {
       g.clearRect(0, 0, size.width, size.height)
-
-      /**
-       * Draw first 2 obstacle.
-       * In simple-GUI version.
-       */
-      g.setColor(Color.GRAY)
-      g.fillRect(300 - obstacleSize / 2, 300 - obstacleSize / 2, obstacleSize, obstacleSize)
-      g.fillRect(600 - obstacleSize / 2, 600 - obstacleSize / 2, obstacleSize, obstacleSize)
+      g.setColor(Color.gray)
+      obstacles.foreach(x => {
+        val rect = new Rectangle2D.Double(x.position.x - (x.xDim / 2), x.position.y - (x.yDim / 2), x.xDim, x.yDim)
+        g.fill(rect)
+      })
 
       /**
        * Foreach ants draw its new position in Panel.
@@ -43,15 +39,18 @@ case class MyrmidonsPanel() extends Panel {
        */
       g.setColor(Color.black)
       antsPosition.foreach(x => {
-        val ellipse = new Ellipse2D.Double(x.position.x * antSize - (antSize / 2),
-          x.position.y * antSize - (antSize / 2), antSize, antSize)
+        val ellipse = new Ellipse2D.Double(x.position.x - (antSize / 2),
+          x.position.y - (antSize / 2), antSize, antSize)
         g.fill(ellipse)
       })
-      drawAnts.foreach(x => {
-        val ellipse = new Ellipse2D.Double(x._1/10 * antSize - (antSize / 2),
-          x._2/10 * antSize - (antSize / 2), antSize, antSize)
+
+      g.setColor(Color.red)
+      food.foreach(x => {
+        val ellipse = new Ellipse2D.Double(x.position.x - (x.xDim / 2),
+          x.position.y - (x.yDim / 2), x.xDim, x.yDim)
         g.fill(ellipse)
       })
+
     }
   }
 
@@ -72,5 +71,13 @@ case class MyrmidonsPanel() extends Panel {
 
   def setAnts(ants: Seq[InsectInfo]): Unit = {
     this.antsPosition = ants
+  }
+
+  def setFood(food: Seq[Food]): Unit = {
+    this.food = food
+  }
+
+  def setObstacles(obstacles: Seq[SimpleObstacle]): Unit = {
+    this.obstacles = obstacles
   }
 }

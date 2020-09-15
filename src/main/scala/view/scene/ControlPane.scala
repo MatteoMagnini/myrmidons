@@ -1,14 +1,12 @@
 package view.scene
 
 import akka.actor.{ActorRef, ActorSystem, Props}
-import model.SimpleObstacle
 import model.environment.{Boundary, Environment, EnvironmentInfo}
-import utility.Geometry.Vector2D
 import utility.Messages.{Clock, StartSimulation}
 import view.actor.UiActor
 import view.actor.uiMessage.{RestartSimulation, StopSimulation}
 
-import scala.swing.event.{ButtonClicked, MouseClicked}
+import scala.swing.event.ButtonClicked
 import scala.swing.{Button, FlowPanel, Label}
 
 /**
@@ -19,14 +17,13 @@ import scala.swing.{Button, FlowPanel, Label}
 case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends FlowPanel {
 
   private val system = ActorSystem("Myrmidons-system")
-  private val boundary = Boundary(0, 0, 80, 80)
-  val seqObstacle = Seq(new SimpleObstacle(Vector2D(30, 30), 6, 6),
-    new SimpleObstacle(Vector2D(60, 60), 6, 6))
+  private val boundary = Boundary(0, 0, 800, 800)
   var uiActor : ActorRef = _
   var environment : ActorRef = _
   uiActor = system.actorOf(Props(new UiActor(myrmidonsPanel, this)))
   environment = system.actorOf(Environment(EnvironmentInfo(boundary)), name = "env-actor")
   var startFlag = false
+
   var stepText = new Label("0")
   var antPopulationText = new Label("0")
   private val stepLabel = new Label("Step:")
@@ -76,7 +73,7 @@ case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends FlowPanel {
 
   }
   private def tellStart(): Unit ={
-    environment.tell(StartSimulation(1000, seqObstacle, centerSpawn = true), uiActor)
+    environment.tell(StartSimulation(1000, centerSpawn = true), uiActor)
     environment.tell(Clock(1), uiActor)
   }
 
