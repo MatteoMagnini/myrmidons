@@ -46,6 +46,12 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
         assert(result2.info.energy == 99.4)
         sender expectNoMessage
       }
+
+      "if find a food resource, eat it and register an energy increase" in {
+        ant ! FoodNear
+        val result = sender.expectMsgType[UpdateInsect]
+        assert(result.info.energy == 100)
+      }
     }
 
     "performing food pheromone taxis" should {

@@ -53,7 +53,7 @@ case class ForagingAntInfo(override val anthill: ActorRef,
   override def updateInertia(newInertia: Vector2D): InsectInfo =
     this.copy(inertia = newInertia)
 
-  override def updateEnergy( delta: Double): InsectInfo =
+  override def updateEnergy(delta: Double): InsectInfo =
     this.copy(energy = if (energy + delta > MAX_ENERGY) MAX_ENERGY else energy + delta)
 
   override def incTime(): InsectInfo =

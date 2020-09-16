@@ -3,7 +3,7 @@ package model.anthill
 import akka.actor.{Actor, ActorRef, Props}
 import model.Drawable
 import utility.Geometry.{OrientedVector2D, Vector2D}
-import utility.Messages.{AntTowardsAnthill, Clock, Move, StoreFood, TakeFood, UpdateAnthill, UpdateAnthillCondition}
+import utility.Messages._
 
 case class AnthillInfo(override val position: Vector2D,
                        radius: Double,
@@ -31,10 +31,10 @@ case class Anthill(info: AnthillInfo, environment: ActorRef) extends Actor {
     case StoreFood(delta) =>
       context become defaultBehaviour(data.incFood(delta))
 
-    case TakeFood(delta) =>
+    case EatFood(delta) =>
       val newDelta = if (data.foodAmount > delta) delta else data.foodAmount
       val newData = data.decFood(newDelta)
-      sender ! TakeFood(newDelta)
+      sender ! EatFood(newDelta)
       context become defaultBehaviour(newData)
 
     case AntTowardsAnthill(position, maxSpeed, antIsIn) =>

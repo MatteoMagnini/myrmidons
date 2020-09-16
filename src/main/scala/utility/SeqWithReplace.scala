@@ -6,5 +6,6 @@ object SeqWithReplace {
 
     def replace(elem:A, newElem:A): Seq[A] = newElem +: seq.filterNot(_ == elem)
 
+    def remove(elem:A): Seq[A] = seq.filterNot(_ == elem)
   }
 }

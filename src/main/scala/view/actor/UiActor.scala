@@ -1,5 +1,7 @@
 package view.actor
 
+
+import view.actor.uiMessage.{RestartSimulation, StopSimulation}
 import akka.actor.{Actor, ActorLogging, Props, Timers}
 import model.insects.ForagingAntInfo
 import model.{Drawable, Food, SimpleObstacle}
@@ -28,7 +30,9 @@ case class UiActor(panel: MyrmidonsPanel, control: ControlPane)
 
   import UiActor._
 
-  private var currentState = 0
+  private var stopFlag = true
+  private var currentState = 1
+
 
   override def receive: Receive = defaultBehaviour
 
@@ -52,9 +56,19 @@ case class UiActor(panel: MyrmidonsPanel, control: ControlPane)
       currentState = currentState + 1
       control.stepText.text = currentState.toString
       control.antPopulationText.text = info.size.toString
-      timers.startSingleTimer(currentState, StepOver, 30.millis)
+      if(stopFlag){
+        timers.startSingleTimer(currentState, StepOver, 30.millis)
+      }
 
     case StepOver =>
       control.environment.tell(Clock(currentState), self)
+
+    case StopSimulation(stopFlag: Boolean) =>
+      this.stopFlag = stopFlag
+      timers.cancel(currentState)
+
+    case RestartSimulation() =>
+      this.stopFlag = true
+      timers.startSingleTimer(currentState, StepOver, 30.millis)
   }
 }

@@ -3,7 +3,7 @@ package model.insects
 import akka.actor.Actor.Receive
 import akka.actor.{ActorContext, ActorRef}
 import utility.Geometry._
-import utility.Messages.{AntTowardsAnthill, Move, TakeFood}
+import utility.Messages._
 
 import scala.util.Random
 
@@ -36,9 +36,7 @@ trait Competence {
 
 }
 
-/**
- * Competence performing a random walk.
- */
+/** Competence performing a random walk. */
 object RandomWalk extends Competence {
 
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
@@ -69,7 +67,7 @@ object GoBackToHome extends Competence {
 object EatFromTheAnthill extends Competence {
 
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
-    info.anthill.tell(TakeFood(FOOD_EATEN_PER_STEP),ant)
+    info.anthill.tell(EatFood(FOOD_EATEN_PER_STEP),ant)
     val data = info.updateEnergy(ENERGY_EATING)
     if (info.energy > 70) context become behaviour(data.updateAnthillCondition(false))
     else context become behaviour(data)
@@ -79,9 +77,19 @@ object EatFromTheAnthill extends Competence {
   override def hasPriority(info: InsectInfo): Boolean = info.isInsideTheAnthill && info.energy < 80 //TODO: clearly to be parametrized
 }
 
-/**
- * Competence that enable an ant to follow the traces of the (food) pheromone.
- */
+/** Competence that enables ant to eat food when it find it */
+object TakeFood extends Competence {
+
+  override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
+    val newData = info.updateEnergy(ConstantInsectInfo.MAX_FOOD)
+    environment.tell(UpdateInsect(newData), ant)
+    context become behaviour(newData)
+  }
+
+  override def hasPriority(info: InsectInfo): Boolean = true
+}
+
+/** Competence that enable an ant to follow the traces of the (food) pheromone. */
 object FoodPheromoneTaxis extends Competence {
 
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {

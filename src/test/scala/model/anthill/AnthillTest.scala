@@ -6,7 +6,7 @@ import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import utility.Geometry.Vector2D
-import utility.Messages.{Clock, StoreFood, TakeFood, UpdateAnthill}
+import utility.Messages.{Clock, EatFood, StoreFood, UpdateAnthill}
 
 class AnthillTest extends TestKit(ActorSystem("EnvironmentTest"))
   with AnyWordSpecLike
@@ -59,8 +59,8 @@ class AnthillTest extends TestKit(ActorSystem("EnvironmentTest"))
 
         val newInfo = AnthillInfo(startingPosition, radius, foodToStore - foodToTake)
 
-        anthill ! TakeFood(foodToTake)
-        sender.expectMsg(TakeFood(foodToTake))
+        anthill ! EatFood(foodToTake)
+        sender.expectMsg(EatFood(foodToTake))
         sender.expectNoMessage()
         anthill ! Clock(2)
         sender.expectMsg(UpdateAnthill(newInfo))
@@ -72,8 +72,8 @@ class AnthillTest extends TestKit(ActorSystem("EnvironmentTest"))
 
         val newInfo = AnthillInfo(startingPosition)
 
-        anthill ! TakeFood(newFoodToTake)
-        sender.expectMsg(TakeFood(foodToStore - foodToTake))
+        anthill ! EatFood(newFoodToTake)
+        sender.expectMsg(EatFood(foodToStore - foodToTake))
         sender.expectNoMessage()
         anthill ! Clock(3)
         sender.expectMsg(UpdateAnthill(newInfo))
