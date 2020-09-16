@@ -12,14 +12,14 @@ import scala.swing.{Button, FlowPanel, Label}
 /**
  * FlowPanel which contains simulation button.
  *
- * @param myrmidonsPanel
+ * @param myrmidonsPanel Panel when all the entities will be draw.
  */
 case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends FlowPanel {
 
   private val system = ActorSystem("Myrmidons-system")
   private val boundary = Boundary(0, 0, 800, 800)
-  var uiActor : ActorRef = _
-  var environment : ActorRef = _
+  var uiActor: ActorRef = _
+  var environment: ActorRef = _
   uiActor = system.actorOf(Props(new UiActor(myrmidonsPanel, this)))
   environment = system.actorOf(Environment(EnvironmentInfo(boundary)), name = "env-actor")
   var startFlag = false
@@ -47,10 +47,10 @@ case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends FlowPanel {
       this.startButton.enabled = false
       this.stopButton.enabled = true
       this.restartButton.enabled = false
-      if(!startFlag) {
+      if (!startFlag) {
         tellStart()
-      }else{
-        uiActor.tell(RestartSimulation(),uiActor)
+      } else {
+        uiActor.tell(RestartSimulation(), uiActor)
       }
     case ButtonClicked(component) if component == stopButton =>
       this.startFlag = true
@@ -74,8 +74,9 @@ case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends FlowPanel {
       tellStart()
 
   }
-  private def tellStart(): Unit ={
-    environment.tell(StartSimulation(1000), uiActor)
+
+  private def tellStart(): Unit = {
+    environment.tell(StartSimulation(100, centerSpawn = true), uiActor)
     environment.tell(Clock(1), uiActor)
   }
 

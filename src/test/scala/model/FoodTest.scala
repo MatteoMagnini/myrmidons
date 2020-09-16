@@ -24,8 +24,8 @@ class FoodTest extends wordspec.AnyWordSpec {
       }
     }
     "exist" should {
-      "have a dimension that follow (10 * log)" in {
-        assert(f.xDim === math.log(100)*10)
+      "have a dimension that follow sqrt(100)" in {
+        assert(f.xDim === math.sqrt(100))
       }
     }
   }
