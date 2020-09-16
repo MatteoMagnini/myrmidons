@@ -20,7 +20,8 @@ case class MyrmidonsPanel() extends Panel {
   private var drawAnts: Seq[(Int, Int)] = Seq.empty
   private var food: Seq[Food] = Seq.empty
   private var obstacles: Seq[SimpleObstacle] = Seq.empty
-
+  size.height = 800
+  size.width = 800
   override def paintComponent(g: Graphics2D) {
 
     if (restartFlag) {

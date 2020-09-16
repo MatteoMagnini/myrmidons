@@ -46,10 +46,10 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
             case f:Food =>
               sender ! FoodNear
               context become defaultBehaviour(state.updateFood(f, f - ConstantInsectInfo.MAX_FOOD))
-            case _ => sender ! NewPosition(pos, delta -)
+            case _ => sender ! NewPosition(pos - delta, delta -)
           }
         }
-      } else sender ! NewPosition(pos, delta -)
+      } else sender ! NewPosition(pos - delta, delta -)
 
     case UpdateInsect(info: InsectInfo) =>
       val updatedInfo = state.updateAntsInfo(info)

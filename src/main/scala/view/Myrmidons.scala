@@ -15,15 +15,18 @@ object Myrmidons extends App {
 
   val frame = new MainFrame {
     title = "Myrmidons - Ant Simulator"
+    val myrmidonsPanel: MyrmidonsPanel = MyrmidonsPanel()
+    val controlPane: ControlPane = ControlPane(myrmidonsPanel)
+    val labelPane: LabelPane = LabelPane()
     contents = new BorderPanel {
-      val myrmidonsPanel: MyrmidonsPanel = MyrmidonsPanel()
-      val controlPane: ControlPane = ControlPane(myrmidonsPanel)
-      val labelPane: LabelPane = LabelPane()
+
       layout += controlPane -> BorderPanel.Position.North
       layout += myrmidonsPanel -> BorderPanel.Position.Center
       layout += labelPane -> BorderPanel.Position.South
     }
-    size = new Dimension(800, 800)
+    size = new Dimension(800 + 10 ,
+     800 + controlPane.size.height + labelPane.size.height + 40,
+      )
   }
   frame.visible = true
 }
