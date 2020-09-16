@@ -65,9 +65,11 @@ case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends FlowPanel {
       this.restartButton.enabled = false
       this.stopButton.enabled = true
       this.startButton.enabled = false
+
       val uiRestart: ActorRef = system.actorOf(Props(new UiActor(myrmidonsPanel, this)))
       uiActor = uiRestart
-      val environmentRestart: ActorRef = system.actorOf(Environment(EnvironmentInfo(boundary)), name = "env")
+      val environmentRestart: ActorRef = system.actorOf(Environment(EnvironmentInfo(boundary)),
+        name = s"env+${stepText.text}")
       environment = environmentRestart
       tellStart()
 

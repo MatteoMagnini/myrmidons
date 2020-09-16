@@ -55,7 +55,7 @@ case class UiActor(panel: MyrmidonsPanel, control: ControlPane)
       panel.draw()
       currentState = currentState + 1
       control.stepText.text = currentState.toString
-      control.antPopulationText.text = info.size.toString
+      control.antPopulationText.text = antsInfo.size.toString
       if(stopFlag){
         timers.startSingleTimer(currentState, StepOver, 30.millis)
       }
