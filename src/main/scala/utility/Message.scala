@@ -13,7 +13,7 @@ sealed trait Message
       * @param nAnts number of ants to be created
       * @param centerSpawn whether spawn ants from center of boundaries
       */
-    case class StartSimulation(nAnts: Int, centerSpawn: Boolean = false, obstacles: Boolean = true, food: Boolean = true) extends Message
+    case class StartSimulation(nAnts: Int, centerSpawn: Boolean = false, obstacles: Option[Int] = Some(3), food: Option[Int] = Some(3)) extends Message
 
     /** Message sent from GUI to environment and from environment to ants, to do a step in simulation.
       *
@@ -52,7 +52,7 @@ sealed trait Message
 
     case class StoreFood(delta: Double) extends Message
 
-    case class TakeFood(delta: Double) extends Message
+    case class EatFood(delta: Double) extends Message
 
     case class UpdateAnthill(info: AnthillInfo) extends Message
 
@@ -62,8 +62,15 @@ sealed trait Message
      *
      * @param position the ant position
      * @param maxSpeed ant max velocity
+     * @param antIsIn true if it is inside the anthill, false otherwise
      */
-    case class AntTowardsAnthill(position: Vector2D, maxSpeed: Double) extends Message
+    case class AntTowardsAnthill(position: Vector2D, maxSpeed: Double, antIsIn: Boolean) extends Message
 
-    case object Eat extends Message
+    case object FoodNear extends Message
+
+    /**
+      * @param antIsInsideTheAnthill true if the ant is inside, false otherwise
+      */
+    case class UpdateAnthillCondition(antIsInsideTheAnthill: Boolean) extends Message
+
   }

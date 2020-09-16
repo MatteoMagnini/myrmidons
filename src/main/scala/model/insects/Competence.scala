@@ -3,7 +3,7 @@ package model.insects
 import akka.actor.Actor.Receive
 import akka.actor.{ActorContext, ActorRef}
 import utility.Geometry._
-import utility.Messages.{AntTowardsAnthill, Move}
+import utility.Messages._
 
 import scala.util.Random
 
@@ -11,7 +11,9 @@ object Constant {
   val MAX_VELOCITY: Double = 5
   val MIN_VELOCITY: Double = - 5
   val INERTIA_FACTOR: Double = 0.9
+  val FOOD_EATEN_PER_STEP: Double = 0.5
   val ENERGY_RW: Double = - 0.3
+  val ENERGY_EATING: Double = - 0.1
   val ENERGY_FPT: Double = - 1.5
   val RANDOM: Random.type = scala.util.Random
 }
@@ -34,15 +36,13 @@ trait Competence {
 
 }
 
-/**
- * Competence performing a random walk.
- */
+/** Competence performing a random walk. */
 object RandomWalk extends Competence {
 
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
 
     val data = info.updateEnergy(ENERGY_RW)
-    val delta: Vector2D = RandomVector2D(MIN_VELOCITY, MAX_VELOCITY, (info.inertia * INERTIA_FACTOR))
+    val delta: Vector2D = RandomVector2D(MIN_VELOCITY, MAX_VELOCITY, info.inertia * INERTIA_FACTOR)
     environment.tell(Move(data.position, delta),ant)
     context become behaviour(data)
   }
@@ -50,20 +50,46 @@ object RandomWalk extends Competence {
   override def hasPriority(info: InsectInfo): Boolean = true
 }
 
+/**
+  * Competence forcing an ant to go back to the anthill when its energy is low.
+  */
 object GoBackToHome extends Competence {
 
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive ): Unit = {
     val data = info.updateEnergy(ENERGY_RW)
-    info.anthill.tell(AntTowardsAnthill(info.position, MAX_VELOCITY),ant)
+    info.anthill.tell(AntTowardsAnthill(info.position, MAX_VELOCITY, info.isInsideTheAnthill),ant)
     context become behaviour(data)
   }
 
-  override def hasPriority( info: InsectInfo ): Boolean = info.energy < 40
+  override def hasPriority( info: InsectInfo ): Boolean = info.energy < 40 //TODO: clearly to be parametrized
 }
 
-/**
- * Competence that enable an ant to follow the traces of the (food) pheromone.
- */
+object EatFromTheAnthill extends Competence {
+
+  override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
+    info.anthill.tell(EatFood(FOOD_EATEN_PER_STEP),ant)
+    val data = info.updateEnergy(ENERGY_EATING)
+    if (info.energy > 70) context become behaviour(data.updateAnthillCondition(false))
+    else context become behaviour(data)
+    //TODO: now the threshold is just 10 units lower than the one in hasPriority. It has to be lower at least by deltaFood*FactorConverter
+  }
+
+  override def hasPriority(info: InsectInfo): Boolean = info.isInsideTheAnthill && info.energy < 80 //TODO: clearly to be parametrized
+}
+
+/** Competence that enables ant to eat food when it find it */
+object TakeFood extends Competence {
+
+  override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
+    val newData = info.updateEnergy(ConstantInsectInfo.MAX_FOOD)
+    environment.tell(UpdateInsect(newData), ant)
+    context become behaviour(newData)
+  }
+
+  override def hasPriority(info: InsectInfo): Boolean = true
+}
+
+/** Competence that enable an ant to follow the traces of the (food) pheromone. */
 object FoodPheromoneTaxis extends Competence {
 
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {

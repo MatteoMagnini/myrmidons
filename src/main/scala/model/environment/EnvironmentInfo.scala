@@ -38,9 +38,6 @@ object EnvironmentInfo {
   def apply(boundary: Boundary): EnvironmentInfo =
     EnvironmentData(None, boundary, Seq.empty, Seq.empty, Seq.empty, None)
 
-  def apply(gui: Option[ActorRef], boundary: Boundary, obstacles:Seq[Bordered], ants: Seq[ActorRef] ): EnvironmentInfo =
-    EnvironmentData(gui, boundary, obstacles, ants, Seq.empty, None)
-
   def apply(gui: Option[ActorRef], boundary: Boundary, obstacles:Seq[Bordered], ants: Seq[ActorRef], anthill: Option[ActorRef] = None ): EnvironmentInfo =
     EnvironmentData(gui, boundary, obstacles, ants, Seq.empty, anthill)
 
@@ -64,7 +61,8 @@ object EnvironmentInfo {
     override def emptyAntsInfo(): EnvironmentData = this.copy(antsInfo = Seq.empty)
 
     import utility.SeqWithReplace._
-    override def updateFood(food: Food, updatedFood:Food): EnvironmentData = this.copy(obstacles = obstacles replace(food, updatedFood))
+    override def updateFood(food: Food, updatedFood: Food): EnvironmentData =
+      if (updatedFood.quantity > 0) this.copy(obstacles = obstacles replace(food, updatedFood))
+      else this.copy(obstacles = obstacles remove food)
   }
-
 }
