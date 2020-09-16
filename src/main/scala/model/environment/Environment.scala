@@ -19,7 +19,8 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   private def defaultBehaviour(state: EnvironmentInfo): Receive = {
 
     case StartSimulation(nAnts: Int, centerSpawn: Boolean, obstaclesPresence, foodPresence) =>
-      val anthill = context.actorOf(Anthill(AnthillInfo(state.boundary.center),self), name = "anthill")
+
+      val anthill = context.actorOf(Anthill(AnthillInfo(state.boundary.center, foodAmount = 1000),self), name = "anthill")
 
       val ants = if (!centerSpawn) createAntFromRandomPosition(nAnts,anthill) else createAntFromCenter(nAnts,anthill)
 
