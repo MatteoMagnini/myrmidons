@@ -3,10 +3,11 @@ package model
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
 import model.environment.{Boundary, Environment, EnvironmentInfo}
+import model.insects.ForagingAntInfo
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.Geometry.ZeroVector2D
+import utility.Geometry.{Vector2D, ZeroVector2D}
 import utility.Messages.{Clock, Repaint, StartSimulation}
 
 class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
@@ -32,8 +33,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
 
     "spawn an ant" should {
       val nAnts = 1
-      environment ! StartSimulation(nAnts, centerSpawn = true, obstacles = false, food = false)
-      sender.expectMsgType[Repaint]
+      environment ! StartSimulation(nAnts, obstacles = None, food = None)
       environment ! Clock(1)
 
       "receive its initial position" in {
@@ -54,6 +54,9 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
       "check if ant moved" in {
         assert(initialPosition != newPosition)
       }
+      "check if ant didn't go outside boundary" in {
+        assert(boundary.hasInside(newPosition))
+      }
     }
   }
 
@@ -65,46 +68,57 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
     val nAnts = 10
 
     "spawn multiple ants" should {
-      environment ! StartSimulation(nAnts, centerSpawn = true, obstacles = false, food = false)
-      sender.expectMsgType[Repaint]
+      environment ! StartSimulation(nAnts, obstacles = None, food = None)
       environment ! Clock(1)
 
       "receive all their positions" in {
         val result = sender.expectMsgType[Repaint]
-        assert(result.info.size == nAnts)
+        val positions = result.info.filter {
+          case _: ForagingAntInfo => true
+          case _ => false
+        }
+        assert(positions.size == nAnts)
       }
     }
     "make them move" should {
       environment ! Clock(2)
+      var positions: Seq[Vector2D] = Seq.empty
+
       "receive all their new positions" in {
         val result = sender.expectMsgType[Repaint]
-        assert(result.info.size == nAnts)
+        val positions = result.info.filter {
+          case _: ForagingAntInfo => true
+          case _ => false
+        }
+        assert(positions.size == nAnts)
       }
-
       "receive no more messages" in {
         sender.expectNoMessage()
+      }
+      "check that no ant went outside boundary" in {
+        assert(positions.forall(boundary.hasInside))
       }
     }
   }
 
-  "Environment with an obstacle" when {
-    import BorderedEntityFactory._
+  "Environment with obstacles and food resources" when {
     val sender = TestProbe()
     implicit val senderRef: ActorRef = sender.ref
 
     val nAnts = 10
-    val obstacle: Bordered = createRandomSimpleObstacle(topLeftCorner._1, topLeftCorner._2, width, height)
     val environment = system.actorOf(Environment(EnvironmentInfo(boundary)), name = "env-actor-3")
 
     "spawn ants and make them move" should {
-      environment ! StartSimulation(nAnts, centerSpawn = true, food = false)
+      environment ! StartSimulation(nAnts)
       environment ! Clock(1)
     }
     "receive all their positions" in {
       val result = sender.expectMsgType[Repaint]
-      //assert(result.info.size == nAnts)
+      val positions = result.info.filter {
+        case _: ForagingAntInfo => true
+        case _ => false
+      }
+      assert(positions.size == nAnts)
     }
   }
-  //TODO find a pretty way to test borders and obstacles collisions
-
 }

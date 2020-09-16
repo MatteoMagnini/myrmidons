@@ -27,14 +27,17 @@ trait InsectInfo extends Drawable {
   def energy: Double
   def time: Int
   def anthill: ActorRef
+  def isInsideTheAnthill: Boolean
 
   def updatePosition(newPosition: Vector2D): InsectInfo
   def updateInertia(newInertia: Vector2D): InsectInfo
   def updateEnergy(amount: Double): InsectInfo
   def incTime(): InsectInfo
+  def updateAnthillCondition(value: Boolean): InsectInfo
 }
 
 case class ForagingAntInfo(override val anthill: ActorRef,
+                           override val isInsideTheAnthill: Boolean,
                            override val id: Int,
                            proximitySensor: Sensor,
                            pheromoneSensor: Sensor,
@@ -50,11 +53,14 @@ case class ForagingAntInfo(override val anthill: ActorRef,
   override def updateInertia(newInertia: Vector2D): InsectInfo =
     this.copy(inertia = newInertia)
 
-  override def updateEnergy( delta: Double): InsectInfo =
+  override def updateEnergy(delta: Double): InsectInfo =
     this.copy(energy = if (energy + delta > MAX_ENERGY) MAX_ENERGY else energy + delta)
 
   override def incTime(): InsectInfo =
     this.copy(time = time + 1)
+
+  override def updateAnthillCondition(value: Boolean): InsectInfo =
+    this.copy(isInsideTheAnthill = value)
 
   def clearSensors(): ForagingAntInfo =
     this.copy(proximitySensor = ProximitySensor(), pheromoneSensor = PheromoneSensor())
@@ -72,7 +78,7 @@ case class ForagingAntInfo(override val anthill: ActorRef,
 
 object ForagingAntInfo {
   def apply(anthill: ActorRef, id: Int = 0, position: Vector2D = STARTING_POSITION, energy: Double = STARTING_ENERGY, time: Int = STARTING_TIME): ForagingAntInfo =
-    new ForagingAntInfo(anthill, id, ProximitySensor(), PheromoneSensor(), position, ZeroVector2D(), energy, time, STARTING_FOOD_AMOUNT)
+    new ForagingAntInfo(anthill, false, id, ProximitySensor(), PheromoneSensor(), position, ZeroVector2D(), energy, time, STARTING_FOOD_AMOUNT)
 }
 
 
