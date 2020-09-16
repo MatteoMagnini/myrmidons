@@ -35,6 +35,7 @@ case class ForagingAnt(override val info: ForagingAntInfo,
   private def defaultBehaviour(data: InsectInfo): Receive = {
 
     case Clock(t) if t == data.time + 1 =>
+      if (data.id == 0) println(s"Ant ${data.id} with energy ${data.energy}")
       val newData = data.incTime()
       subsumption(newData,
         EatFromTheAnthill,
@@ -57,7 +58,7 @@ case class ForagingAnt(override val info: ForagingAntInfo,
       context become defaultBehaviour(data.updateAnthillCondition(value))
 
     case TakeFood(amount) =>
-      val newData = data.updateEnergy(data.energy + amount*10) //TODO: conversion factor from food to energy to be parametrized
+      val newData = data.updateEnergy(amount*10) //TODO: conversion factor from food to energy to be parametrized
       environment ! UpdateInsect(newData)
       context become defaultBehaviour(newData)
 
@@ -65,7 +66,7 @@ case class ForagingAnt(override val info: ForagingAntInfo,
     case Eat =>
       val newData = data.updateEnergy(10)
       environment ! UpdateInsect(newData)
-      log.debug("Eat")
+      //log.debug("Eat")
       context become defaultBehaviour(newData)
 
     case x => println("Should never happen, received message: " + x.getClass + " from " + sender)

@@ -13,6 +13,7 @@ object Constant {
   val INERTIA_FACTOR: Double = 0.9
   val FOOD_EATEN_PER_STEP: Double = 0.5
   val ENERGY_RW: Double = - 0.3
+  val ENERGY_EATING: Double = - 0.1
   val ENERGY_FPT: Double = - 1.5
   val RANDOM: Random.type = scala.util.Random
 }
@@ -68,9 +69,11 @@ object GoBackToHome extends Competence {
 object EatFromTheAnthill extends Competence {
 
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
-    println(s"Ant ${info.id} eating from the anthill with energy ${info.energy}")
     info.anthill.tell(TakeFood(FOOD_EATEN_PER_STEP),ant)
-    context become behaviour(info)
+    val data = info.updateEnergy(ENERGY_EATING)
+    if (info.energy > 70) context become behaviour(data.updateAnthillCondition(false))
+    else context become behaviour(data)
+    //TODO: now the threshold is just 10 units lower than the one in hasPriority. It has to be lower at least by deltaFood*FactorConverter
   }
 
   override def hasPriority(info: InsectInfo): Boolean = info.isInsideTheAnthill && info.energy < 80 //TODO: clearly to be parametrized
