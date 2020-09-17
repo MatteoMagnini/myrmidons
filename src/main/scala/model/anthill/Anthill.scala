@@ -8,7 +8,7 @@ import utility.Messages._
 case class AnthillInfo(override val position: Vector2D,
                        radius: Double,
                        foodAmount: Double,
-                       maxFoodAmount: Double) extends Drawable{
+                       maxFoodAmount: Double) extends Drawable {
 
   def incFood(delta: Double): AnthillInfo =
     this.copy(foodAmount = if (foodAmount + delta > maxFoodAmount) maxFoodAmount else foodAmount + delta)
@@ -18,7 +18,7 @@ case class AnthillInfo(override val position: Vector2D,
 }
 
 object AnthillInfo {
-  def apply( position: Vector2D, radius: Double = 3, foodAmount: Double = 0, maxFoodAmount: Double = 1000): AnthillInfo =
+  def apply(position: Vector2D, radius: Double = 3, foodAmount: Double = 0, maxFoodAmount: Double = 1000): AnthillInfo =
     new AnthillInfo(position, radius, foodAmount, maxFoodAmount)
 }
 
