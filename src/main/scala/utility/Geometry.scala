@@ -118,7 +118,28 @@ object Geometry {
 
    def /\ : Double = math.atan(y / x)
 
+   def ^ (s: Vector3D) : Double = {
+     val numerator = (s.x * this.x) + (s.y + this.y) + (s.z + this.z)
+     val denominatorA = this ||
+     val denominatorB = s ||
+
+     math.acos(numerator / (denominatorA * denominatorB))
+   }
    def -->(other: Vector3D): Double = this - other ||
+
+   /**
+    * the distance between start point and intersection, summed distance to
+    * intersection and stop point must be equals to distance between start point
+    * and stop point.
+    *
+    * @param start first point
+    * @param stop second point
+    *
+    * @return true if this vector is inside start and stop vector, otherwise return false
+    *
+    * */
+   def checkInside(start: Vector3D, stop: Vector3D): Boolean = (start --> this) + (stop --> this) == (start --> stop)
+
 
    /** Cross product between two vectors * */
    def X(other: Vector3D): Vector3D = {
