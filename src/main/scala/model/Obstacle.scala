@@ -1,6 +1,8 @@
 package  model
 
-import utility.Geometry.{Vector2D, Vector3D}
+import utility.Geometry.{Vector2D, Vector3D, ZeroVector2D}
+import utility.Geometry.TupleOp3._
+import utility.Geometry.TupleOp._
 
 /**
  * SimpleObstacle represent a boxed obstacle.
@@ -14,6 +16,7 @@ import utility.Geometry.{Vector2D, Vector3D}
  * hasInside implementation is easiest than Obstacle class.
  * */
 class SimpleObstacle(override val position: Vector2D, val xDim: Double, val yDim: Double) extends Bordered {
+
   /**
    * function to verify if an entity has inside itself an
    * position.
@@ -21,14 +24,71 @@ class SimpleObstacle(override val position: Vector2D, val xDim: Double, val yDim
    * @param coordinate to check
    * @return true if coordinate is inside of the obstacle
    **/
-  override def hasInside(coordinate: Vector2D): Boolean = {
-    if((coordinate.x > (position.x - xDim/2))
-      && (coordinate.x < (position.x + xDim/2))
-      && (coordinate.y > (position.y - yDim/2))
-      && (coordinate.y < (position.y + yDim/2))) {
-      true
-    }
-    else false
+  override def hasInside(coordinate: Vector2D): Boolean =
+    ((coordinate.x > (position.x - xDim / 2))
+      && (coordinate.x < (position.x + xDim / 2))
+      && (coordinate.y > (position.y - yDim / 2))
+      && (coordinate.y < (position.y + yDim / 2)))
+
+  /**
+   * Find the intersection point of a segment defined by two point
+   * (oldPosition, newPosition) with an obstacle border.
+   *
+   * @param oldPosition of the object
+   * @param newPosition of the object (must be inside the obstacle)
+   *
+   * @throws IllegalArgumentException if newPosition is outside the
+   *                                  obstacle
+   *
+   * @return an instance of IntersectionResult case class with the
+   *         position of intersection and the smallest angle formed
+   *         between obstacle border line and object trajectory.
+   *         If return a zero position and an angle with value of
+   *         Double.MaxValue, then there are no valid intersection
+   *         or something wrong happened
+   * */
+  def findIntersectionPoint(oldPosition: Vector2D, newPosition: Vector2D): IntersectionResult = {
+    if (!this.hasInside(newPosition))
+      throw new IllegalArgumentException("new position must be inside the obstacle")
+
+    //form vertex definition
+    val vertex: List[Vector2D] = List(
+      (position.x - xDim / 2, position.y - yDim / 2),
+      (position.x + xDim / 2, position.y - yDim / 2),
+      (position.x + xDim / 2, position.y + yDim / 2),
+      (position.x - xDim / 2, position.y + yDim / 2)
+    )
+
+    //(start, stop, line)
+    var segments: List[(Vector3D, Vector3D, Vector3D)] = List()
+    
+    //border segment definition
+    vertex.indices foreach( i => {
+      val before = if (i == 0) vertex.length - 1 else i - 1
+      val line = vertex(before) X vertex(i)
+      segments ::= (vertex(before), vertex(i), line)
+    })
+
+    // ant path definition
+    val antPath: (Vector3D,Vector3D,Vector3D) = (oldPosition, newPosition, oldPosition X newPosition)
+
+    /*
+    * Calculate intersection between insect line and obstacle border line,
+    * then check if intersection fall inside ant segment. If this check result
+    * true, then the calculated intersection is the result with angle between
+    * form border and ant path.
+    * */
+    segments.indices foreach( i => {
+      val crossIntersection = segments(i)._3 X antPath._3
+      if (crossIntersection.z != 0.0) {
+        val intersection = crossIntersection / crossIntersection.z
+        if (intersection checkInside(segments(i)._1, segments(i)._2)) {
+          return IntersectionResult((intersection.x, intersection.y), antPath._3 ^ segments(i)._3)
+        }
+      }
+    })
+
+    IntersectionResult(ZeroVector2D(), Double.MaxValue)
   }
 
   def unapply(arg: SimpleObstacle): Option[(Vector2D, Double, Double)] = {
@@ -44,16 +104,8 @@ class SimpleObstacle(override val position: Vector2D, val xDim: Double, val yDim
  * @param points list of vertex of polygon that describe an obstacle
  * */
 case class Obstacle(points: List[Vector3D]) extends Bordered {
-  // a segments is described as a two point and a line pass through them
-  def findCentroid(l: List[Vector3D]): Vector2D = {
-    import utility.Geometry.TupleOp._
-    val centroid = (points.foldRight(Vector3D(0.0, 0.0, 0.0))(_ >> _) / points.size)
-    val normalizedCentroid = centroid / centroid.z
-    (normalizedCentroid.x, normalizedCentroid.y)
-  }
 
   override val position: Vector2D = findCentroid(points)
-
   var segments: List[(Vector3D, Vector3D, Vector3D)] = List()
 
   if (points.size < 3) {
@@ -87,5 +139,13 @@ case class Obstacle(points: List[Vector3D]) extends Bordered {
       }
     })
     (counter % 2) != 0
+  }
+
+  // a segments is described as a two point and a line pass through them
+  private def findCentroid(l: List[Vector3D]): Vector2D = {
+    import utility.Geometry.TupleOp._
+    val centroid = points.foldRight(Vector3D(0.0, 0.0, 0.0))(_ >> _) / points.size
+    val normalizedCentroid = centroid / centroid.z
+    (normalizedCentroid.x, normalizedCentroid.y)
   }
 }

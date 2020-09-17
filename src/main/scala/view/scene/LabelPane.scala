@@ -26,7 +26,7 @@ case class LabelPane() extends FlowPanel {
   ant.foreground = Color.black
   obstacle.foreground = Color.gray
   insect.foreground = Color.blue
-  anthill.foreground = Color.green
+  anthill.foreground = new Color(0f, 0.5f, 0f, 1f)
   pheromone.foreground = Color.magenta
 
   contents ++= Seq(ant, separator,

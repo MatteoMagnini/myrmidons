@@ -31,10 +31,26 @@ class ObstacleTest  extends wordspec.AnyWordSpec {
       "return true" in {
         assert(o hasInside Vector2D(50,10))
       }
+      "the path intersect" in {
+        val start = Vector2D(50, 17)
+        val stop = Vector2D(50, 10)
+        assert(o hasInside(stop))
+        val res = o findIntersectionPoint(start, stop)
+        assert(res.intersectionPoint === Vector2D(50, 15))
+        val angle = (res.angle * 100).round / 100.toDouble
+        val test = ( Math.PI/2 * 100).round / 100.toDouble
+        assert(angle == test)
+      }
     }
     "has outside a point" should {
       "return false" in{
         assert((o hasInside Vector2D(100,10)) === false)
+      }
+
+      "return IllegalArgumentException" in {
+        val start = Vector2D(50, 17)
+        val stop = Vector2D(50, 20)
+        assertThrows[IllegalArgumentException] { o findIntersectionPoint(start, stop) }
       }
     }
   }
