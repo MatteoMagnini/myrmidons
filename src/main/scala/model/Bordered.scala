@@ -50,3 +50,5 @@ object BorderedEntityFactory {
     Food(Vector2D(pos.x, pos.y), quantity)
   }
 }
+
+case class IntersectionResult(intersectionPoint: Vector2D, angle: Double)
