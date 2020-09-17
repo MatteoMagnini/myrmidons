@@ -83,7 +83,7 @@ object EatFromTheAnthill extends Competence {
 
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
     info.anthill.tell(EatFood(FOOD_EATEN_PER_STEP),ant)
-    val data = info.updateEnergy(ENERGY_EATING)
+    val data = info.updateEnergy(ENERGY_EATING).updateInertia(ZeroVector2D())
     context become behaviour(data)
   }
 

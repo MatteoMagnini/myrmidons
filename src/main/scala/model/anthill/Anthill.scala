@@ -2,7 +2,7 @@ package model.anthill
 
 import akka.actor.{Actor, ActorRef, Props}
 import model.Drawable
-import utility.Geometry.{OrientedVector2D, Vector2D}
+import utility.Geometry.{OrientedVector2D, Vector2D, ZeroVector2D}
 import utility.Messages._
 
 case class AnthillInfo(override val position: Vector2D,
@@ -39,13 +39,14 @@ case class Anthill(info: AnthillInfo, environment: ActorRef) extends Actor {
 
     case AntTowardsAnthill(position, maxSpeed, antIsIn) =>
       val dist = info.position - position
-      val rad = dist./\
-      val delta = OrientedVector2D(rad, maxSpeed)
-      environment.tell(Move(position, delta), sender)
       if (!antIsIn && dist.|| <= data.radius) {
         sender ! UpdateAnthillCondition(true)
-      } else if (antIsIn && dist.|| > data.radius)
-        sender ! UpdateAnthillCondition(false)
+        environment.tell(Move(position, ZeroVector2D()), sender)
+      } else {
+        val rad = dist./\
+        val delta = OrientedVector2D(rad, maxSpeed)
+        environment.tell(Move(position, delta), sender)
+      }
 
     case Clock(_) =>
       environment ! UpdateAnthill(data)

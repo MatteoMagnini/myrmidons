@@ -2,6 +2,10 @@ package utility
 
 object Geometry {
 
+  def ~=(x: Double, y: Double, precision: Double): Boolean = {
+    if ((x - y).abs < precision) true else false
+  }
+
   /** A vector in 2-dimensional space.
    *
    * @param x x-coordinate
@@ -30,6 +34,11 @@ object Geometry {
 
     /** Return the distance between vectors */
     def -->(other: Vector2D) : Double = this - other ||
+
+    override def equals(obj: Any): Boolean = obj match {
+      case o: Vector2D => ~=(this.x,o.x,1E-10) && ~=(this.y,o.y,1E-10)
+      case _ => false
+    }
   }
 
   /** Vector factory */
