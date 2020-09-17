@@ -24,7 +24,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       val ants = if (!centerSpawn) createAntFromRandomPosition(nAnts, anthill) else createAntFromCenter(nAnts, anthill)
 
       val obstacles = if (obstaclesPresence.isDefined) (0 until obstaclesPresence.get).map(_ =>
-        createRandomSimpleObstacle(state.boundary.topLeft.x, state.boundary.bottomRight.x)) else Seq.empty
+        createRandomSimpleObstacle(200, 600)) else Seq.empty
 
       val foods = if (foodPresence.isDefined) (0 until foodPresence.get).map(_ =>
         createRandomFood(state.boundary.topLeft.x, state.boundary.bottomRight.x)) else Seq.empty
@@ -38,11 +38,11 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
         case _ => print("Should never happen environment has no anthill")
       }
 
-    case Move(pos: Vector2D, delta: Vector2D) =>
-      val newPosition = pos >> delta
+    case Move(position: Vector2D, delta: Vector2D) =>
+      val newPosition = position >> delta
       if (state.boundary.hasInside(newPosition)) {
         if (state.obstacles.forall(!_.hasInside(newPosition)))
-          sender ! NewPosition(newPosition, newPosition - pos)
+          sender ! NewPosition(newPosition, newPosition - position)
         else {
           /* If ant is moving outside boundary or through an obstacle, invert its new position */
           val collision = state.obstacles.find(_.hasInside(newPosition)).get
@@ -50,10 +50,14 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
             case f: Food =>
               sender ! FoodNear
               context become defaultBehaviour(state.updateFood(f, f - ConstantInsectInfo.MAX_FOOD))
-            case _ => sender ! NewPosition(pos - delta, delta -)
+            case x =>
+              val intersectionAndDirection = x.findIntersectionPoint(position, newPosition)
+              //println(intersectionAndDirection)
+              val newDelta = intersectionAndDirection.intersectionPoint - newPosition
+              sender ! NewPosition(intersectionAndDirection.intersectionPoint >> newDelta, newDelta)
           }
         }
-      } else sender ! NewPosition(pos - delta, delta -)
+      } else sender ! NewPosition(position - delta, delta -)
 
     case UpdateInsect(info: InsectInfo) =>
       val updatedInfo = state.updateAntsInfo(info)

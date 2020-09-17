@@ -32,15 +32,8 @@ case class MyrmidonsPanel() extends Panel {
 
     if (restartFlag) g.clearRect(0, 0, size.width, size.height)
     else {
-      /**
-       * Foreach obstacles draw its new position in Panel.
-       */
+
       g.clearRect(0, 0, size.width, size.height)
-      g.setColor(Color.gray)
-      obstacles.foreach(x => {
-        val rect = new Rectangle2D.Double(x.position.x - (x.xDim / 2), x.position.y - (x.yDim / 2), x.xDim, x.yDim)
-        g.fill(rect)
-      })
 
       /**
        * Foreach ants draw its new position in Panel.
@@ -50,6 +43,15 @@ case class MyrmidonsPanel() extends Panel {
         val ellipse = new Ellipse2D.Double(x.position.x - (antSize / 2),
           x.position.y - (antSize / 2), antSize, antSize)
         g.fill(ellipse)
+      })
+
+      /**
+        * Foreach obstacles draw its new position in Panel.
+      */
+      g.setColor(new Color(0.5f,0.5f,0.5f,0.5f))
+      obstacles.foreach(x => {
+        val rect = new Rectangle2D.Double(x.position.x - (x.xDim / 2), x.position.y - (x.yDim / 2), x.xDim, x.yDim)
+        g.fill(rect)
       })
 
       /**

@@ -51,6 +51,21 @@ object Geometry {
     def apply(): Vector2D = Vector2D(0, 0)
   }
 
+  /** Oriented vector factory */
+  object OrientedVector2D {
+    def apply(radiant: Double, module: Double ): Vector2D =
+      Vector2D(math.cos(radiant) * module, math.sin(radiant) * module)
+  }
+
+  /** Oriented vector factory */
+  object OrientedVector2DWithNoise {
+    def apply(radiant: Double, module: Double, noise: Double ): Vector2D = {
+      val r = scala.util.Random
+      Vector2D(math.cos(radiant) * module * (1 - r.nextDouble() * noise),
+        math.sin(radiant) * module * (1 - r.nextDouble() * noise))
+    }
+  }
+
   /** Random vector factory */
   object RandomVector2D {
   import TupleOp._
@@ -74,12 +89,6 @@ object Geometry {
 
     private def doubleInRange(min: Double, max: Double): Double =
       min + (max - min) * scala.util.Random.nextDouble()
-  }
-
-  /** Oriented vector factory */
-  object OrientedVector2D {
-    def apply(radiant: Double, module: Double ): Vector2D =
-      Vector2D(math.cos(radiant) * module, math.sin(radiant) * module)
   }
 
   /** Implicit conversions for [[utility.Geometry.Vector2D]] instances

@@ -8,6 +8,7 @@ import utility.Messages._
 import scala.util.Random
 
 object Constant {
+  val NOISE = 0.2
   val MAX_VELOCITY: Double = 5
   val MIN_VELOCITY: Double = - 5
   val INERTIA_FACTOR: Double = 0.9
@@ -57,7 +58,7 @@ object GoBackToHome extends Competence {
 
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive ): Unit = {
     val data = info.updateEnergy(ENERGY_RW)
-    info.anthill.tell(AntTowardsAnthill(info.position, MAX_VELOCITY, info.isInsideTheAnthill),ant)
+    info.anthill.tell(AntTowardsAnthill(info.position, MAX_VELOCITY, NOISE, info.isInsideTheAnthill),ant)
     context become behaviour(data)
   }
 

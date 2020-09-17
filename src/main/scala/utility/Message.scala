@@ -14,7 +14,7 @@ object Messages {
    * @param nAnts       number of ants to be created
    * @param centerSpawn whether spawn ants from center of boundaries
    */
-  case class StartSimulation(nAnts: Int, centerSpawn: Boolean = false, obstacles: Option[Int] = Some(3), food: Option[Int] = Some(3)) extends Message
+  case class StartSimulation(nAnts: Int, centerSpawn: Boolean = false, obstacles: Option[Int] = Some(6), food: Option[Int] = Some(3)) extends Message
 
   /** Message sent from GUI to environment and from environment to ants, to do a step in simulation.
    *
@@ -65,7 +65,7 @@ object Messages {
    * @param maxSpeed ant max velocity
    * @param antIsIn  true if it is inside the anthill, false otherwise
    */
-  case class AntTowardsAnthill(position: Vector2D, maxSpeed: Double, antIsIn: Boolean) extends Message
+  case class AntTowardsAnthill(position: Vector2D, maxSpeed: Double, noise: Double, antIsIn: Boolean) extends Message
 
   case object FoodNear extends Message
 
