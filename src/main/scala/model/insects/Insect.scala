@@ -38,6 +38,7 @@ case class ForagingAnt(override val info: ForagingAntInfo,
       if (data.id == 0) println(s"Ant ${data.id} with energy ${data.energy}")
       val newData = data.incTime()
       subsumption(newData,
+        GoOutside,
         EatFromTheAnthill,
         GoBackToHome,
         FoodPheromoneTaxis,
