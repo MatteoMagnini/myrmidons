@@ -1,10 +1,14 @@
 package view.scene
 
+
 import java.awt.Color
-import java.awt.geom.Ellipse2D
+import java.awt.geom.{Ellipse2D, Rectangle2D}
 
-import model.insects.InsectInfo
+import model.anthill.AnthillInfo
+import model.{Drawable, Food, SimpleObstacle}
+import model.insects.{ForagingAntInfo, InsectInfo}
 
+import scala.swing.event.MouseClicked
 import scala.swing.{Graphics2D, Panel}
 
 /**
@@ -13,39 +17,104 @@ import scala.swing.{Graphics2D, Panel}
  */
 case class MyrmidonsPanel() extends Panel {
 
-  private val antSize = 10
-  private val obstacleSize = 50
-  private var antsPosition: Seq[InsectInfo] = Seq.empty
+  private val antSize = 4
+  private var restartFlag = false
+
+  private var ants: Seq[InsectInfo] = Seq.empty
+  private var food: Seq[Food] = Seq.empty
+  private var anthill: Option[AnthillInfo] = None
+  private var obstacles: Seq[SimpleObstacle] = Seq.empty
+
+  size.height = 800
+  size.width = 800
 
   override def paintComponent(g: Graphics2D) {
 
-    g.clearRect(0, 0, size.width, size.height)
+    if (restartFlag) g.clearRect(0, 0, size.width, size.height)
+    else {
 
-    /**
-     * Draw first 2 obstacle.
-     * In simple-GUI version.
-     */
-    g.setColor(Color.GRAY)
-    g.fillRect(300 - obstacleSize / 2, 300 - obstacleSize / 2, obstacleSize, obstacleSize)
-    g.fillRect(600 - obstacleSize / 2, 600 - obstacleSize / 2, obstacleSize, obstacleSize)
+      g.clearRect(0, 0, size.width, size.height)
 
-    /**
-     * Foreach ants draw its new position in Panel.
-     * Use java.awt.geom.Ellipse2D because draw with double coordinates.
-     */
-    g.setColor(Color.black)
-    antsPosition.foreach(x => {
-      val ellipse = new Ellipse2D.Double(x.position.x * antSize - (antSize / 2),
-        x.position.y * antSize - (antSize / 2), antSize, antSize)
-      g.fill(ellipse)
-    })
+      /**
+       * Foreach ants draw its new position in Panel.
+       */
+      g.setColor(Color.black)
+      ants.foreach(x => {
+        val ellipse = new Ellipse2D.Double(x.position.x - (antSize / 2),
+          x.position.y - (antSize / 2), antSize, antSize)
+        g.fill(ellipse)
+      })
+
+      /**
+        * Foreach obstacles draw its new position in Panel.
+      */
+      g.setColor(new Color(0.5f,0.5f,0.5f,0.5f))
+      obstacles.foreach(x => {
+        val rect = new Rectangle2D.Double(x.position.x - (x.xDim / 2), x.position.y - (x.yDim / 2), x.xDim, x.yDim)
+        g.fill(rect)
+      })
+
+      /**
+       * Foreach food resource draw its new position in Panel.
+       */
+      food.foreach(x => {
+        val d: Float = (x.quantity / 1000).toFloat
+        if (d < 0.4f) {
+          g.setColor(new Color(1f, 0f, 0f, 0.4f))
+        } else {
+          g.setColor(new Color(1f, 0f, 0f, d))
+        }
+        val ellipse = new Ellipse2D.Double(x.position.x - (x.xDim / 2),
+          x.position.y - (x.yDim / 2), x.xDim, x.yDim)
+        g.fill(ellipse)
+
+      })
+
+      /**
+       * Draw anthill with opacity control.
+       */
+      if (anthill.nonEmpty) {
+        val anthillOpacity: Float = (anthill.get.foodAmount / anthill.get.maxFoodAmount).toFloat
+        if (anthillOpacity < 0.4f) {
+          g.setColor(new Color(0f, 0.5f, 0f, 0.4f))
+        } else {
+          g.setColor(new Color(0f, 0.5f, 0f, anthillOpacity))
+        }
+        val ellipse = new Ellipse2D.Double(anthill.get.position.x - anthill.get.radius * 2,
+          anthill.get.position.y - anthill.get.radius * 2,
+          anthill.get.radius * 2 * 2, anthill.get.radius * 2 * 2)
+        g.fill(ellipse)
+      }
+    }
   }
 
   def draw(): Unit = {
     repaint()
   }
 
-  def setAnts(ants: Seq[InsectInfo]): Unit = {
-    this.antsPosition = ants
+  def clear(): Unit = {
+    this.restartFlag = true
   }
+
+  /**
+   * Set all new position of entities in next frame.
+   *
+   * @param info Seq of all the entities that will be draw in panel.
+   * @return number of ant.
+   */
+  def setEntities(info: Seq[Drawable]): Int = {
+    ants = Seq.empty
+    food = Seq.empty
+    obstacles = Seq.empty
+    anthill = None
+    info.foreach {
+      case x: ForagingAntInfo => ants = x +: ants
+      case x: Food => food = x +: food
+      case x: SimpleObstacle => obstacles = x +: obstacles
+      case x: AnthillInfo => anthill = Some(x)
+      case _ => println("Error match entities")
+    }
+    ants.size
+  }
+
 }
