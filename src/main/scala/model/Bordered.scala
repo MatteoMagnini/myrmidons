@@ -16,6 +16,25 @@ trait Bordered extends Drawable {
    * @return true if coordinate is inside of the obstacle
    * */
   def hasInside(coordinate: Vector2D):Boolean
+
+  /**
+    * Find the intersection point of a segment defined by two point
+    * (oldPosition, newPosition) with an obstacle border.
+    *
+    * @param oldPosition of the object
+    * @param newPosition of the object (must be inside the obstacle)
+    *
+    * @throws IllegalArgumentException if newPosition is outside the
+    *                                  obstacle
+    *
+    * @return an instance of IntersectionResult case class with the
+    *         position of intersection and the smallest angle formed
+    *         between obstacle border line and object trajectory.
+    *         If return a zero position and an angle with value of
+    *         Double.MaxValue, then there are no valid intersection
+    *         or something wrong happened
+    * */
+  def findIntersectionPoint(oldPosition: Vector2D, newPosition: Vector2D): IntersectionResult
 }
 
 object BorderedEntityFactory {
@@ -50,3 +69,5 @@ object BorderedEntityFactory {
     Food(Vector2D(pos.x, pos.y), quantity)
   }
 }
+
+case class IntersectionResult(intersectionPoint: Vector2D, angle: Double)

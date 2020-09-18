@@ -8,6 +8,7 @@ import utility.Messages._
 import scala.util.Random
 
 object Constant {
+  val NOISE = 0.2
   val MAX_VELOCITY: Double = 5
   val MIN_VELOCITY: Double = - 5
   val INERTIA_FACTOR: Double = 0.9
@@ -57,24 +58,37 @@ object GoBackToHome extends Competence {
 
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive ): Unit = {
     val data = info.updateEnergy(ENERGY_RW)
-    info.anthill.tell(AntTowardsAnthill(info.position, MAX_VELOCITY, info.isInsideTheAnthill),ant)
+    info.anthill.tell(AntTowardsAnthill(info.position, MAX_VELOCITY, NOISE, info.isInsideTheAnthill),ant)
     context become behaviour(data)
   }
 
   override def hasPriority( info: InsectInfo ): Boolean = info.energy < 40 //TODO: clearly to be parametrized
 }
 
+/**
+  * Competence forcing an insect to exit the anthill because its energy level is high.
+  */
+object GoOutside extends Competence {
+
+  override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive ): Unit = {
+    val data = info.updateEnergy(ENERGY_RW).updateAnthillCondition(false)
+    val delta: Vector2D = RandomVector2D(MIN_VELOCITY, MAX_VELOCITY, info.inertia * INERTIA_FACTOR)
+    environment.tell(Move(data.position, delta),ant)
+    context become behaviour(data)
+  }
+
+  override def hasPriority( info: InsectInfo ): Boolean = info.isInsideTheAnthill && info.energy > 80 //TODO: clearly to be parametrized
+}
+
 object EatFromTheAnthill extends Competence {
 
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
     info.anthill.tell(EatFood(FOOD_EATEN_PER_STEP),ant)
-    val data = info.updateEnergy(ENERGY_EATING)
-    if (info.energy > 70) context become behaviour(data.updateAnthillCondition(false))
-    else context become behaviour(data)
-    //TODO: now the threshold is just 10 units lower than the one in hasPriority. It has to be lower at least by deltaFood*FactorConverter
+    val data = info.updateEnergy(ENERGY_EATING).updateInertia(ZeroVector2D())
+    context become behaviour(data)
   }
 
-  override def hasPriority(info: InsectInfo): Boolean = info.isInsideTheAnthill && info.energy < 80 //TODO: clearly to be parametrized
+  override def hasPriority(info: InsectInfo): Boolean = info.isInsideTheAnthill
 }
 
 /** Competence that enables ant to eat food when it find it */

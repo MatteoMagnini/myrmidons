@@ -73,7 +73,11 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
 
       "receive all their positions" in {
         val result = sender.expectMsgType[Repaint]
-        assert(result.info.size == nAnts)
+        val positions = result.info.filter {
+          case _: ForagingAntInfo => true
+          case _ => false
+        }
+        assert(positions.size == nAnts)
       }
     }
     "make them move" should {
@@ -82,7 +86,10 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
 
       "receive all their new positions" in {
         val result = sender.expectMsgType[Repaint]
-        positions = result.info.map(_.position).toSeq
+        val positions = result.info.filter {
+          case _: ForagingAntInfo => true
+          case _ => false
+        }
         assert(positions.size == nAnts)
       }
       "receive no more messages" in {

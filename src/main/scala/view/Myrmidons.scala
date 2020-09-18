@@ -1,10 +1,6 @@
 package view
 
-import akka.actor.Props
-import model.{Bordered, SimpleObstacle}
-import utility.Geometry.Vector2D
-import view.actor.UiActor
-import view.scene.{ControlPane, LabelPane, MyrmidonsPanel}
+import view.scene.{ControlPane, InteractionPanel, LabelPane, MyrmidonsPanel}
 
 import scala.swing.{BorderPanel, Dimension, MainFrame}
 
@@ -13,17 +9,20 @@ import scala.swing.{BorderPanel, Dimension, MainFrame}
  */
 object Myrmidons extends App {
 
-  val frame = new MainFrame {
+  val frame: MainFrame = new MainFrame {
     title = "Myrmidons - Ant Simulator"
+    val myrmidonsPanel: MyrmidonsPanel = MyrmidonsPanel()
+    val controlPane: ControlPane = ControlPane(myrmidonsPanel)
+    val labelPane: LabelPane = LabelPane()
+    val interactionLabel: InteractionPanel = InteractionPanel(controlPane)
+
     contents = new BorderPanel {
-      val myrmidonsPanel: MyrmidonsPanel = MyrmidonsPanel()
-      val controlPane: ControlPane = ControlPane(myrmidonsPanel)
-      val labelPane: LabelPane = LabelPane()
       layout += controlPane -> BorderPanel.Position.North
       layout += myrmidonsPanel -> BorderPanel.Position.Center
       layout += labelPane -> BorderPanel.Position.South
+      layout += interactionLabel -> BorderPanel.Position.East
     }
-    size = new Dimension(800, 800)
+    size = new Dimension(800 + interactionLabel.size.width, 900)
   }
   frame.visible = true
 }

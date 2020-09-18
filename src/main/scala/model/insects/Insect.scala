@@ -35,9 +35,9 @@ case class ForagingAnt(override val info: ForagingAntInfo,
   private def defaultBehaviour(data: InsectInfo): Receive = {
 
     case Clock(t) if t == data.time + 1 =>
-      if (data.id == 0) println(s"Ant ${data.id} with energy ${data.energy}")
       val newData = data.incTime()
       subsumption(newData,
+        GoOutside,
         EatFromTheAnthill,
         GoBackToHome,
         FoodPheromoneTaxis,
