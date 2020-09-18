@@ -2,12 +2,11 @@ package model
 
 import scala.language.implicitConversions
 import utility.Geometry.{RandomVector2D, Vector2D}
-import utility.Geometry.TupleOp._
 
 /**
  * trait for a entity that present a border
  * */
-trait Bordered{
+trait Bordered extends Drawable {
   /**
    * function to verify if an entity has inside itself an
    * position.
@@ -19,29 +18,7 @@ trait Bordered{
   def hasInside(coordinate: Vector2D):Boolean
 }
 
-object BorderedEntityFactory{
-  /**
-   * Create an obstacle in a random position in coordinate
-   * between minPos and maxPos, with dimension xDim on x-axis
-   * and yDim on y-axis.
-   *
-   * @param minPos lowest value for position (both x and y coordinate)
-   * @param maxPos highest value for position (both x and y coordinate)
-   * @param xDim dimension on x-axis
-   * @param yDim dimension on y-axis
-   *
-   * @return an EnvObstacle in a random position
-   * */
- /* def createRandomComplexObstacle(minPos: Double = 50, maxPos: Double = 550, xDim: Double = 100, yDim: Double = 50): Obstacle = {
-    val pos = RandomVector2D(minPos, maxPos)
-    Obstacle(List(
-      (pos.x - xDim/2, pos.y - yDim/2, 1.0),
-      (pos.x + xDim/2, pos.y - yDim/2, 1.0),
-      (pos.x + xDim/2, pos.y + yDim/2, 1.0),
-      (pos.x - xDim/2, pos.y + yDim/2, 1.0)
-    ))
-  }
-*/
+object BorderedEntityFactory {
   /**
    * Create and instance of simple obstacle in a random position
    * with dimension xDim on x-axis and yDim on y-axis.
@@ -51,10 +28,10 @@ object BorderedEntityFactory{
    * @param xDim dimension on x-axis
    * @param yDim dimension on y-axis
    *
-   * @return a SimpleObstacle istance
+   * @return a SimpleObstacle instance
    * */
-  def createRandomSimpleObstacle(minPos: Double = 50, maxPos: Double = 550, xDim: Int = 100, yDim: Int = 50):SimpleObstacle = {
-    val pos= RandomVector2D(minPos, maxPos)
+  def createRandomSimpleObstacle(minPos: Double = 0, maxPos: Double = 800, xDim: Int = 30, yDim: Int = 30):SimpleObstacle = {
+    val pos = RandomVector2D(minPos, maxPos)
     new SimpleObstacle(Vector2D(pos.x, pos.y), xDim, yDim)
   }
 
@@ -68,8 +45,8 @@ object BorderedEntityFactory{
    * @param quantity of food of this resource
    *
    * */
-  def createRandomFood(minPos: Double = 50, maxPos: Double = 550, quantity: Int = 100):Food = {
-    val pos= RandomVector2D(minPos, maxPos)
+  def createRandomFood(minPos: Double = 0, maxPos: Double = 800, quantity: Int = 1000):Food = {
+    val pos = RandomVector2D(minPos, maxPos)
     Food(Vector2D(pos.x, pos.y), quantity)
   }
 }

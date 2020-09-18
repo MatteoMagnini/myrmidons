@@ -1,12 +1,18 @@
 package view
 
-import view.scene.{ControlPane, MyrmidonsPanel, LabelPane}
+import akka.actor.Props
+import model.{Bordered, SimpleObstacle}
+import utility.Geometry.Vector2D
+import view.actor.UiActor
+import view.scene.{ControlPane, LabelPane, MyrmidonsPanel}
+
 import scala.swing.{BorderPanel, Dimension, MainFrame}
 
 /**
  * Simulation entry point.
  */
 object Myrmidons extends App {
+
   val frame = new MainFrame {
     title = "Myrmidons - Ant Simulator"
     contents = new BorderPanel {

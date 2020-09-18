@@ -35,25 +35,36 @@ case class ForagingAnt(override val info: ForagingAntInfo,
   private def defaultBehaviour(data: InsectInfo): Receive = {
 
     case Clock(t) if t == data.time + 1 =>
+      if (data.id == 0) println(s"Ant ${data.id} with energy ${data.energy}")
       val newData = data.incTime()
-      subsumption(newData,FoodPheromoneTaxis,RandomWalk)(context, environment, self, newData, defaultBehaviour)
+      subsumption(newData,
+        EatFromTheAnthill,
+        GoBackToHome,
+        FoodPheromoneTaxis,
+        RandomWalk)(context, environment, self, newData, defaultBehaviour)
 
     case NewPosition(p, d) =>
-      if(data.id == 0){
-        println(s"Time: ${data.time} Position: ${data.position}")
-      }
-      val newData = data.updatePosition(p)
-      val newData2 = newData.updateInertia(d)
-      environment ! UpdateInsect(newData2)
-      context become defaultBehaviour(newData2)
+      val newData = data.updatePosition(p).updateInertia(d)
+      environment ! UpdateInsect(newData)
+      context become defaultBehaviour(newData)
 
     case FoodPheromones(entities) => data match {
       case f: ForagingAntInfo => context become defaultBehaviour(f.addPheromones(entities))
-      case _ => System.err.println("Creation of foraging ant with wrong insect information");
+      case _ => System.err.println("Creation of foraging ant with wrong insect information")
     }
 
-    case x => println("Should never happen, received message: " + x.getClass + " from " + sender)
+    case FoodNear =>
+      subsumption(data, GoBackToHome, TakeFood, FoodPheromoneTaxis, RandomWalk)(context, environment, self, data, defaultBehaviour)
 
+    case UpdateAnthillCondition(value) =>
+      context become defaultBehaviour(data.updateAnthillCondition(value))
+
+    case EatFood(amount) =>
+      val newData = data.updateEnergy(amount*10) //TODO: conversion factor from food to energy to be parametrized
+      environment ! UpdateInsect(newData)
+      context become defaultBehaviour(newData)
+
+    case x => println("Should never happen, received message: " + x + " from " + sender)
   }
 }
 

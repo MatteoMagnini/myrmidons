@@ -26,7 +26,7 @@ object Geometry {
     def || : Double = math.sqrt(x * x + y * y)
 
     /** Returns the angle of the vector */
-    def /\ : Double = math.atan(y/x)
+    def /\ : Double = math.atan2(y,x)
 
     /** Return the distance between vectors */
     def -->(other: Vector2D) : Double = this - other ||
@@ -44,32 +44,33 @@ object Geometry {
 
   /** Random vector factory */
   object RandomVector2D {
+  import TupleOp._
 
     def apply(min: Double, max: Double): Vector2D = {
       val uniformDoubleGenerator = scala.util.Random
-      val x = (uniformDoubleGenerator.nextDouble() - 0.5) * max * 2.0
-      val y = (uniformDoubleGenerator.nextDouble() - 0.5) * max * 2.0
-      bound(min,max, Vector2D(x,y))
+      val x = uniformDoubleGenerator.nextDouble() * (max - min) + min
+      val y = uniformDoubleGenerator.nextDouble() * (max - min) + min
+      (x,y)
     }
 
     def apply(min: Double, max: Double, perturbation: Vector2D): Vector2D =
-      bound(min,max, apply(min, max) >> perturbation)
+      bound(min, max, apply(min, max) >> perturbation)
 
     def apply(minX: Double, maxX: Double, minY: Double, maxY: Double ): Vector2D =
-      Vector2D(doubleInRange(minX,maxX), doubleInRange(minY,maxY))
+      Vector2D(doubleInRange(minX, maxX), doubleInRange(minY, maxY))
 
     private def bound(min: Double, max: Double, v: Vector2D): Vector2D =
-      Vector2D(if (v.x.abs < min) v.x.signum * min else if (v.x.abs > max) v.x.signum * max else v.x,
-        if (v.y.abs < min) v.y.signum * min else if (v.y.abs > max) v.y.signum * max else v.y)
+      Vector2D(if (v.x < min) min else if (v.x > max) max else v.x,
+        if (v.y < min) min else if (v.y > max) max else v.y)
 
     private def doubleInRange(min: Double, max: Double): Double =
       min + (max - min) * scala.util.Random.nextDouble()
   }
 
-  /** Random vector factory */
+  /** Oriented vector factory */
   object OrientedVector2D {
     def apply(radiant: Double, module: Double ): Vector2D =
-      Vector2D(math.sin(radiant) * module, math.cos(radiant) * module)
+      Vector2D(math.cos(radiant) * module, math.sin(radiant) * module)
   }
 
   /** Implicit conversions for [[utility.Geometry.Vector2D]] instances
