@@ -2,6 +2,10 @@ package utility
 
 object Geometry {
 
+  def ~=(x: Double, y: Double, precision: Double): Boolean = {
+    if ((x - y).abs < precision) true else false
+  }
+
   /** A vector in 2-dimensional space.
    *
    * @param x x-coordinate
@@ -26,10 +30,15 @@ object Geometry {
     def || : Double = math.sqrt(x * x + y * y)
 
     /** Returns the angle of the vector */
-    def /\ : Double = math.atan(y/x)
+    def /\ : Double = math.atan2(y,x)
 
     /** Return the distance between vectors */
     def -->(other: Vector2D) : Double = this - other ||
+
+    override def equals(obj: Any): Boolean = obj match {
+      case o: Vector2D => ~=(this.x,o.x,1E-10) && ~=(this.y,o.y,1E-10)
+      case _ => false
+    }
   }
 
   /** Vector factory */
@@ -42,34 +51,44 @@ object Geometry {
     def apply(): Vector2D = Vector2D(0, 0)
   }
 
-  /** Random vector factory */
-  object RandomVector2D {
+  /** Oriented vector factory */
+  object OrientedVector2D {
+    def apply(radiant: Double, module: Double ): Vector2D =
+      Vector2D(math.cos(radiant) * module, math.sin(radiant) * module)
+  }
 
-    def apply(min: Double, max: Double): Vector2D = {
-      val uniformDoubleGenerator = scala.util.Random
-      val x = (uniformDoubleGenerator.nextDouble() - 0.5) * max * 2.0
-      val y = (uniformDoubleGenerator.nextDouble() - 0.5) * max * 2.0
-      bound(min,max, Vector2D(x,y))
+  /** Oriented vector factory */
+  object OrientedVector2DWithNoise {
+    def apply(radiant: Double, module: Double, noise: Double ): Vector2D = {
+      val r = scala.util.Random
+      Vector2D(math.cos(radiant) * module * (1 - r.nextDouble() * noise),
+        math.sin(radiant) * module * (1 - r.nextDouble() * noise))
     }
-
-    def apply(min: Double, max: Double, perturbation: Vector2D): Vector2D =
-      bound(min,max, apply(min, max) >> perturbation)
-
-    def apply(minX: Double, maxX: Double, minY: Double, maxY: Double ): Vector2D =
-      Vector2D(doubleInRange(minX,maxX), doubleInRange(minY,maxY))
-
-    private def bound(min: Double, max: Double, v: Vector2D): Vector2D =
-      Vector2D(if (v.x.abs < min) v.x.signum * min else if (v.x.abs > max) v.x.signum * max else v.x,
-        if (v.y.abs < min) v.y.signum * min else if (v.y.abs > max) v.y.signum * max else v.y)
-
-    private def doubleInRange(min: Double, max: Double): Double =
-      min + (max - min) * scala.util.Random.nextDouble()
   }
 
   /** Random vector factory */
-  object OrientedVector2D {
-    def apply(radiant: Double, module: Double ): Vector2D =
-      Vector2D(math.sin(radiant) * module, math.cos(radiant) * module)
+  object RandomVector2D {
+  import TupleOp._
+
+    def apply(min: Double, max: Double): Vector2D = {
+      val uniformDoubleGenerator = scala.util.Random
+      val x = uniformDoubleGenerator.nextDouble() * (max - min) + min
+      val y = uniformDoubleGenerator.nextDouble() * (max - min) + min
+      (x,y)
+    }
+
+    def apply(min: Double, max: Double, perturbation: Vector2D): Vector2D =
+      bound(min, max, apply(min, max) >> perturbation)
+
+    def apply(minX: Double, maxX: Double, minY: Double, maxY: Double ): Vector2D =
+      Vector2D(doubleInRange(minX, maxX), doubleInRange(minY, maxY))
+
+    private def bound(min: Double, max: Double, v: Vector2D): Vector2D =
+      Vector2D(if (v.x < min) min else if (v.x > max) max else v.x,
+        if (v.y < min) min else if (v.y > max) max else v.y)
+
+    private def doubleInRange(min: Double, max: Double): Double =
+      min + (max - min) * scala.util.Random.nextDouble()
   }
 
   /** Implicit conversions for [[utility.Geometry.Vector2D]] instances
@@ -108,7 +127,28 @@ object Geometry {
 
    def /\ : Double = math.atan(y / x)
 
+   def ^ (s: Vector3D) : Double = {
+     val numerator = (s.x * this.x) + (s.y + this.y) + (s.z + this.z)
+     val denominatorA = this ||
+     val denominatorB = s ||
+
+     math.acos(numerator / (denominatorA * denominatorB))
+   }
    def -->(other: Vector3D): Double = this - other ||
+
+   /**
+    * the distance between start point and intersection, summed distance to
+    * intersection and stop point must be equals to distance between start point
+    * and stop point.
+    *
+    * @param start first point
+    * @param stop second point
+    *
+    * @return true if this vector is inside start and stop vector, otherwise return false
+    *
+    * */
+   def checkInside(start: Vector3D, stop: Vector3D): Boolean = (start --> this) + (stop --> this) == (start --> stop)
+
 
    /** Cross product between two vectors * */
    def X(other: Vector3D): Vector3D = {
