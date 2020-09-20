@@ -20,7 +20,7 @@ trait EnvironmentInfo {
   def obstacles: Iterable[Bordered]
 
   /** References to ant actors */
-  def ants: Iterable[ActorRef]
+  def ants: Map[Int, ActorRef]
 
   /** Ants information */
   def antsInfo: Iterable[InsectInfo]
@@ -41,7 +41,9 @@ trait EnvironmentInfo {
 
   def updateAnthillInfo(anthillInfo: AnthillInfo): EnvironmentInfo
 
-  def createAnt(antActorRef: ActorRef, antInfo: InsectInfo): EnvironmentInfo
+  def removeAnt(id: Int): EnvironmentInfo
+
+  //def createAnt(antActorRef: ActorRef, antInfo: InsectInfo): EnvironmentInfo
 
   //TODO next sprint
   //def removeAnt(antActorRef: ActorRef, antInfo: InsectInfo): EnvironmentInfo
@@ -51,10 +53,10 @@ trait EnvironmentInfo {
 object EnvironmentInfo {
 
   def apply(boundary: Boundary): EnvironmentInfo =
-    EnvironmentData(None, boundary, Seq.empty, Seq.empty, Seq.empty, None, AnthillInfo(ZeroVector2D()))
+    EnvironmentData(None, boundary, Seq.empty, Map.empty, Seq.empty, None, AnthillInfo(ZeroVector2D()))
 
   def apply(gui: Option[ActorRef], boundary: Boundary, obstacles: Seq[Bordered],
-            ants: Seq[ActorRef], anthill: ActorRef, anthillInfo: AnthillInfo): EnvironmentInfo =
+            ants: Map[Int, ActorRef], anthill: ActorRef, anthillInfo: AnthillInfo): EnvironmentInfo =
     EnvironmentData(gui, boundary, obstacles, ants, Seq.empty, Some(anthill), anthillInfo)
 
   /** Internal state of environment.
@@ -68,14 +70,14 @@ object EnvironmentInfo {
    * @param anthillInfo anthill information
    */
   private[this] case class EnvironmentData(override val gui: Option[ActorRef], override val boundary: Boundary,
-                                           override val obstacles: Seq[Bordered], override val ants: Seq[ActorRef],
+                                           override val obstacles: Seq[Bordered], override val ants: Map[Int, ActorRef],
                                            override val antsInfo: Seq[InsectInfo], override val anthill: Option[ActorRef],
                                            override val anthillInfo: AnthillInfo) extends EnvironmentInfo {
 
     /** Returns ant info, adding its ActorRef and InsectInfo */
-    override def createAnt(antActorRef: ActorRef, antInfo: InsectInfo): EnvironmentInfo = {
+  /*  override def createAnt(antActorRef: ActorRef, antInfo: InsectInfo): EnvironmentInfo = {
       this.copy(ants = antActorRef +: ants, antsInfo = antInfo +: antsInfo)
-    }
+    }*/
 
     //TODO next sprint
     /*override def removeAnt(antActorRef: ActorRef, antInfo: InsectInfo): EnvironmentInfo = {
@@ -101,6 +103,8 @@ object EnvironmentInfo {
     /** Returns  anthill info */
     override def updateAnthillInfo(anthillInfo: AnthillInfo): EnvironmentInfo =
       this.copy(anthillInfo = anthillInfo)
+
+    override def removeAnt(id: Int): EnvironmentInfo = this.copy(ants = ants - id)
   }
 
 }

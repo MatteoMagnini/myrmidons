@@ -32,7 +32,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       context become defaultBehaviour(EnvironmentInfo(Some(sender), state.boundary, foods ++ obstacles, ants, anthill, state.anthillInfo))
 
     case Clock(value: Int) =>
-      state.ants.foreach(_ ! Clock(value))
+      state.ants.values.foreach(_ ! Clock(value))
       state.anthill match {
         case Some(x) => x ! Clock(value)
         case _ => print("Should never happen environment has no anthill")
@@ -80,23 +80,27 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       val ants = createAntByUser(antInfo)
       context become defaultBehaviour(state.createAnt(ants, antInfo)) */
 
-    // TODO next sprint
-    //case KillAnt =>
+    case KillAnt(id: Int) =>
+      log.debug("Kill")
+      context.stop(state.ants(id))
+      val newData = state.removeAnt(id)
+      if (newData.ants.isEmpty) state.gui.get ! Repaint(state.obstacles ++ Seq(state.anthillInfo))
+      context become defaultBehaviour(newData)
   }
 
   /** Returns ants references, created from random position */
-  private def createAntFromRandomPosition(nAnts: Int, anthill: ActorRef): Seq[ActorRef] =
+  private def createAntFromRandomPosition(nAnts: Int, anthill: ActorRef): Map[Int, ActorRef] =
     (0 until nAnts).map(i => {
       val randomPosition = RandomVector2D(state.boundary.topLeft.x, state.boundary.topRight.x)
-      context.actorOf(ForagingAnt(ForagingAntInfo(anthill, id = i, position = randomPosition), self), s"ant-$i")
-    })
+      i -> context.actorOf(ForagingAnt(ForagingAntInfo(anthill, id = i, position = randomPosition), self), s"ant-$i")
+    }).toMap
 
   /** Returns ants references, created from the center of boundary */
-  private def createAntFromCenter(nAnts: Int, anthill: ActorRef): Seq[ActorRef] =
+  private def createAntFromCenter(nAnts: Int, anthill: ActorRef): Map[Int, ActorRef] =
     (0 until nAnts).map(i => {
       val center = state.boundary.center
-      context.actorOf(ForagingAnt(ForagingAntInfo(anthill, id = i, position = center), self), s"ant-$i")
-    })
+      i -> context.actorOf(ForagingAnt(ForagingAntInfo(anthill, id = i, position = center), self), s"ant-$i")
+    }).toMap
 
   /** Returns ants references, created from intention of user. The ant start in RandomPosition */
   private def createAntByUser(antInfo: InsectInfo): ActorRef = {

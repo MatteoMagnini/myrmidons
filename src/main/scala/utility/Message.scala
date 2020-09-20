@@ -82,7 +82,6 @@ object Messages {
    */
   case class AddRandomAnt(nAnts: Int, step: String) extends Message
 
-  // TODO next sprint
-  //case class KillAnt() extends Message
+  case class KillAnt(in: Int) extends Message
 
 }

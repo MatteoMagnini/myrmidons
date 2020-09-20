@@ -37,6 +37,7 @@ case class ForagingAnt(override val info: ForagingAntInfo,
     case Clock(t) if t == data.time + 1 =>
       val newData = data.incTime()
       subsumption(newData,
+        Die,
         GoOutside,
         EatFromTheAnthill,
         GoBackToHome,
