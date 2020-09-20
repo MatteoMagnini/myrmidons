@@ -8,6 +8,8 @@ import model.BorderedEntityFactory._
 import model.Food
 import model.anthill.{Anthill, AnthillInfo}
 
+import scala.util.Random
+
 /** Environment actor
  *
  * @param state environment internal state
@@ -37,6 +39,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
         case Some(x) => x ! Clock(value)
         case _ => print("Should never happen environment has no anthill")
       }
+      if (Random.nextDouble() < 0.01) self ! AntBirth(value)
 
     case Move(position: Vector2D, delta: Vector2D) =>
       val newPosition = position >> delta
@@ -61,7 +64,6 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
     case UpdateInsect(info: InsectInfo) =>
       val updatedInfo = state.updateAntsInfo(info)
-      println("info rec: " + updatedInfo.antsInfo.size + " ants:" + updatedInfo.ants.size)
       /* When all ants return their positions, environment send them to GUI */
       if (updatedInfo.antsInfo.size == updatedInfo.ants.size) {
         state.gui.get ! Repaint(updatedInfo.antsInfo ++ updatedInfo.obstacles ++ Seq(state.anthillInfo))
@@ -71,14 +73,13 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     case UpdateAnthill(anthillInfo: AnthillInfo) =>
       context become defaultBehaviour(state.updateAnthillInfo(anthillInfo))
 
-
-    //TODO next sprint
-    /*case AddRandomAnt(nAnts: Int, step: String) =>
-      val randomPosition = RandomVector2D(state.boundary.topLeft.x, state.boundary.topRight.x)
-      val antInfo = ForagingAntInfo(state.anthill.get,
-        time = step.toInt + nAnts, id = state.ants.size + nAnts, position = randomPosition)
-      val ants = createAntByUser(antInfo)
-      context become defaultBehaviour(state.createAnt(ants, antInfo)) */
+    case AntBirth(clock: Int) =>
+      println("Birth")
+      val antId = state.ants.size
+      val birthPosition = state.anthillInfo.position
+      val ant = context.actorOf(ForagingAnt(ForagingAntInfo(state.anthill.get, id = antId, position = birthPosition, time = clock - 1), self), s"ant-$antId")
+      ant ! Clock(clock)
+      context become defaultBehaviour(state.addAnt(antId, ant))
 
     case KillAnt(id: Int) =>
       context.stop(sender)

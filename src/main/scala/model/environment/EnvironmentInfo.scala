@@ -43,10 +43,7 @@ trait EnvironmentInfo {
 
   def removeAnt(id: Int): EnvironmentInfo
 
-  //def createAnt(antActorRef: ActorRef, antInfo: InsectInfo): EnvironmentInfo
-
-  //TODO next sprint
-  //def removeAnt(antActorRef: ActorRef, antInfo: InsectInfo): EnvironmentInfo
+  def addAnt(id: Int, ant: ActorRef): EnvironmentInfo
 }
 
 
@@ -74,19 +71,6 @@ object EnvironmentInfo {
                                            override val antsInfo: Seq[InsectInfo], override val anthill: Option[ActorRef],
                                            override val anthillInfo: AnthillInfo) extends EnvironmentInfo {
 
-    /** Returns ant info, adding its ActorRef and InsectInfo */
-  /*  override def createAnt(antActorRef: ActorRef, antInfo: InsectInfo): EnvironmentInfo = {
-      this.copy(ants = antActorRef +: ants, antsInfo = antInfo +: antsInfo)
-    }*/
-
-    //TODO next sprint
-    /*override def removeAnt(antActorRef: ActorRef, antInfo: InsectInfo): EnvironmentInfo = {
-      this.copy(
-        ants = this.ants.filter(actorRef => antActorRef != actorRef).seq,
-        antsInfo = this.antsInfo.filter(ant => antInfo != ant).seq
-      )
-    }*/
-
     /** Returns ant info, adding ant information */
     override def updateAntsInfo(antInfo: InsectInfo): EnvironmentData = this.copy(antsInfo = antInfo +: antsInfo)
 
@@ -105,6 +89,8 @@ object EnvironmentInfo {
       this.copy(anthillInfo = anthillInfo)
 
     override def removeAnt(id: Int): EnvironmentInfo = this.copy(ants = ants - id)
+
+    override def addAnt(id: Int, ant: ActorRef): EnvironmentInfo = this.copy(ants = ants + (id -> ant))
   }
 
 }

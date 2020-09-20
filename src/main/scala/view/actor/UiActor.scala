@@ -38,6 +38,7 @@ case class UiActor(panel: MyrmidonsPanel, control: ControlPane)
   private def defaultBehaviour: Receive = {
 
     case Repaint(info: Seq[Drawable]) =>
+      //log.debug("Repaint")
       val antSize = panel.setEntities(info)
       panel.draw()
       currentState = currentState + 1
