@@ -75,7 +75,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
     case AntBirth(clock: Int) =>
       println("Birth")
-      val antId = state.ants.size
+      val antId = state.ants.size + clock
       val birthPosition = state.anthillInfo.position
       val ant = context.actorOf(ForagingAnt(ForagingAntInfo(state.anthill.get, id = antId, position = birthPosition, time = clock - 1), self), s"ant-$antId")
       ant ! Clock(clock)
