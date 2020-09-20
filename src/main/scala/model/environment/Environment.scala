@@ -61,9 +61,9 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
     case UpdateInsect(info: InsectInfo) =>
       val updatedInfo = state.updateAntsInfo(info)
-
+      println("info rec: " + updatedInfo.antsInfo.size + " ants:" + updatedInfo.ants.size)
       /* When all ants return their positions, environment send them to GUI */
-      if (updatedInfo.antsInfo.size == state.ants.size) {
+      if (updatedInfo.antsInfo.size == updatedInfo.ants.size) {
         state.gui.get ! Repaint(updatedInfo.antsInfo ++ updatedInfo.obstacles ++ Seq(state.anthillInfo))
         context become defaultBehaviour(state.emptyAntsInfo())
       } else context become defaultBehaviour(updatedInfo)
@@ -81,11 +81,13 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       context become defaultBehaviour(state.createAnt(ants, antInfo)) */
 
     case KillAnt(id: Int) =>
-      log.debug("Kill")
-      context.stop(state.ants(id))
+      context.stop(sender)
       val newData = state.removeAnt(id)
       if (newData.ants.isEmpty) state.gui.get ! Repaint(state.obstacles ++ Seq(state.anthillInfo))
-      context become defaultBehaviour(newData)
+      if (newData.antsInfo.size == newData.ants.size) {
+        state.gui.get ! Repaint(newData.antsInfo ++ newData.obstacles ++ Seq(state.anthillInfo))
+        context become defaultBehaviour(newData.emptyAntsInfo())
+      } else context become defaultBehaviour(newData)
   }
 
   /** Returns ants references, created from random position */
