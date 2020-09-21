@@ -6,7 +6,7 @@ import java.awt.geom.{Ellipse2D, Rectangle2D}
 
 import model.anthill.AnthillInfo
 import model.{Drawable, Food, SimpleObstacle}
-import model.insects.{ForagingAntInfo, InsectInfo}
+import model.insects.{Enemy, EnemyInfo, ForagingAntInfo, InsectInfo}
 
 import scala.swing.event.MouseClicked
 import scala.swing.{Graphics2D, Panel}
@@ -21,6 +21,7 @@ case class MyrmidonsPanel() extends Panel {
   private var restartFlag = false
 
   private var ants: Seq[InsectInfo] = Seq.empty
+  private var enemies: Seq[InsectInfo] = Seq.empty
   private var food: Seq[Food] = Seq.empty
   private var anthill: Option[AnthillInfo] = None
   private var obstacles: Seq[SimpleObstacle] = Seq.empty
@@ -46,6 +47,16 @@ case class MyrmidonsPanel() extends Panel {
       })
 
       /**
+       * Foreach enemies draw its new position in Panel.
+       */
+      g.setColor(Color.red)
+      enemies.foreach(x => {
+        val ellipse = new Ellipse2D.Double(x.position.x - (antSize / 2),
+          x.position.y - (antSize / 2), antSize, antSize)
+        g.fill(ellipse)
+      })
+
+      /**
         * Foreach obstacles draw its new position in Panel.
       */
       g.setColor(new Color(0.5f,0.5f,0.5f,0.5f))
@@ -60,9 +71,9 @@ case class MyrmidonsPanel() extends Panel {
       food.foreach(x => {
         val d: Float = (x.quantity / 1000).toFloat
         if (d < 0.4f) {
-          g.setColor(new Color(1f, 0f, 0f, 0.4f))
+          g.setColor(new Color(0f, 0f, 1f, 0.4f))
         } else {
-          g.setColor(new Color(1f, 0f, 0f, d))
+          g.setColor(new Color(0f, 0f, 1f, d))
         }
         val ellipse = new Ellipse2D.Double(x.position.x - (x.xDim / 2),
           x.position.y - (x.yDim / 2), x.xDim, x.yDim)
@@ -104,6 +115,7 @@ case class MyrmidonsPanel() extends Panel {
    */
   def setEntities(info: Seq[Drawable]): Int = {
     ants = Seq.empty
+    enemies = Seq.empty
     food = Seq.empty
     obstacles = Seq.empty
     anthill = None
@@ -112,6 +124,7 @@ case class MyrmidonsPanel() extends Panel {
       case x: Food => food = x +: food
       case x: SimpleObstacle => obstacles = x +: obstacles
       case x: AnthillInfo => anthill = Some(x)
+      case x: EnemyInfo => enemies = x +: enemies
       case _ => println("Error match entities")
     }
     ants.size

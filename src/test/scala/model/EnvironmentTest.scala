@@ -33,7 +33,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
 
     "spawn an ant" should {
       val nAnts = 1
-      environment ! StartSimulation(nAnts, obstacles = None, food = None)
+      environment ! StartSimulation(nAnts, 0, obstacles = None, food = None)
       environment ! Clock(1)
 
       "receive its initial position" in {
@@ -68,7 +68,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
     val nAnts = 10
 
     "spawn multiple ants" should {
-      environment ! StartSimulation(nAnts, obstacles = None, food = None)
+      environment ! StartSimulation(nAnts, 0, obstacles = None, food = None)
       environment ! Clock(1)
 
       "receive all their positions" in {
@@ -109,7 +109,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
     val environment = system.actorOf(Environment(EnvironmentInfo(boundary)), name = "env-actor-3")
 
     "spawn ants and make them move" should {
-      environment ! StartSimulation(nAnts)
+      environment ! StartSimulation(nAnts, 0)
       environment ! Clock(1)
     }
     "receive all their positions" in {

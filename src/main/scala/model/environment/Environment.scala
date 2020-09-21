@@ -1,7 +1,7 @@
 package model.environment
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-import model.insects.{ConstantInsectInfo, ForagingAnt, ForagingAntInfo, InsectInfo}
+import model.insects.{ConstantInsectInfo, Enemy, EnemyInfo, ForagingAnt, ForagingAntInfo, InsectInfo}
 import utility.Geometry._
 import utility.Messages.{Clock, Move, StartSimulation, UpdateInsect, _}
 import model.BorderedEntityFactory._
@@ -18,10 +18,13 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
   private def defaultBehaviour(state: EnvironmentInfo): Receive = {
 
-    case StartSimulation(nAnts: Int, centerSpawn: Boolean, obstaclesPresence, foodPresence) =>
+    case StartSimulation(nAnts: Int, nEnemies: Int, centerSpawn: Boolean, obstaclesPresence, foodPresence) =>
 
       val anthill = context.actorOf(Anthill(AnthillInfo(state.boundary.center, 15, foodAmount = 1000), self), name = "anthill")
       val ants = if (!centerSpawn) createAntFromRandomPosition(nAnts, anthill) else createAntFromCenter(nAnts, anthill)
+
+      // anthill ref is need to permit the enemies to interact with anthill (parasite behaviour)
+      val enemies = createEnemiesFromRandomPosition(nEnemies, anthill)
 
       val obstacles = if (obstaclesPresence.isDefined) (0 until obstaclesPresence.get).map(_ =>
         createRandomSimpleObstacle(200, 600)) else Seq.empty
@@ -29,10 +32,11 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       val foods = if (foodPresence.isDefined) (0 until foodPresence.get).map(_ =>
         createRandomFood(state.boundary.topLeft.x, state.boundary.bottomRight.x)) else Seq.empty
 
-      context become defaultBehaviour(EnvironmentInfo(Some(sender), state.boundary, foods ++ obstacles, ants, anthill, state.anthillInfo))
+      context become defaultBehaviour(EnvironmentInfo(Some(sender), state.boundary, foods ++ obstacles, ants, enemies, anthill, state.anthillInfo))
 
     case Clock(value: Int) =>
       state.ants.foreach(_ ! Clock(value))
+      state.enemies.foreach(_ ! Clock(value))
       state.anthill match {
         case Some(x) => x ! Clock(value)
         case _ => print("Should never happen environment has no anthill")
@@ -60,12 +64,12 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       } else sender ! NewPosition(position - delta, delta -)
 
     case UpdateInsect(info: InsectInfo) =>
-      val updatedInfo = state.updateAntsInfo(info)
+      val updatedInfo = state.updateInsectInfo(info)
 
       /* When all ants return their positions, environment send them to GUI */
-      if (updatedInfo.antsInfo.size == state.ants.size) {
-        state.gui.get ! Repaint(updatedInfo.antsInfo ++ updatedInfo.obstacles ++ Seq(state.anthillInfo))
-        context become defaultBehaviour(state.emptyAntsInfo())
+      if ((updatedInfo.antsInfo.size + updatedInfo.enemiesInfo.size) == (state.ants.size + state.enemies.size)) {
+        state.gui.get ! Repaint(updatedInfo.antsInfo++ updatedInfo.enemiesInfo ++ updatedInfo.obstacles ++ Seq(state.anthillInfo))
+        context become defaultBehaviour(state.emptyInsectInfo())
       } else context become defaultBehaviour(updatedInfo)
 
     case UpdateAnthill(anthillInfo: AnthillInfo) =>
@@ -97,6 +101,14 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       val center = state.boundary.center
       context.actorOf(ForagingAnt(ForagingAntInfo(anthill, id = i, position = center), self), s"ant-$i")
     })
+
+  /** Returns ants references, created from random position */
+  private def createEnemiesFromRandomPosition(nEnemies: Int, anthill: ActorRef): Seq[ActorRef] =
+    if (nEnemies == 0) Seq.empty else (0 until nEnemies).map(i => {
+      val randomPosition = RandomVector2D(state.boundary.topLeft.x, state.boundary.topRight.x)
+      context.actorOf(Enemy(EnemyInfo(anthill, id = i, position = randomPosition), self), s"enemy-$i")
+    })
+
 
   /** Returns ants references, created from intention of user. The ant start in RandomPosition */
   private def createAntByUser(antInfo: InsectInfo): ActorRef = {
