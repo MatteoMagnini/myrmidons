@@ -1,6 +1,7 @@
 package utility
 
 import model.environment.Pheromone
+import SeqWithReplace._
 
 object PheromoneSeq {
 
@@ -13,19 +14,16 @@ object PheromoneSeq {
       merge(newElement,threshold)
 
     private def merge(newElement: A, threshold: Double): Seq[A] =
-      recursiveMerge(newElement, threshold, seq) match {
-        case Some(x) => x +: seq
-        case None => newElement +: seq
-      }
+      recursiveMerge(newElement, threshold, seq)
 
     @scala.annotation.tailrec
-    private def recursiveMerge(newElement: A, threshold: Double, sequence: Seq[A]): Option[A] =
+    private def recursiveMerge(newElement: A, threshold: Double, sequence: Seq[A]): Seq[A] =
       if (sequence.nonEmpty) {
         sequence.last.merge(newElement,threshold) match {
-          case Some(x) => Some(x.asInstanceOf[A])
+          case Some(x) => seq.replace(sequence.last,x.asInstanceOf[A])
           case None => recursiveMerge(newElement, threshold, sequence.take(sequence.length - 1))
         }
-      } else None
+      } else newElement +: seq
 
   }
 }
