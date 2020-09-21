@@ -1,8 +1,7 @@
-package model
+package model.environment
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
-import model.environment.{Boundary, Environment, EnvironmentInfo}
 import model.insects.ForagingAntInfo
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers

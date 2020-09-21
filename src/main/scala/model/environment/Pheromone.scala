@@ -22,7 +22,7 @@ trait Pheromone extends Drawable {
    * @param threshold the threshold under which apply the merge
    * @return Some of the new pheromone if they merge, none otherwise
    */
-  def merge(pheromone: Pheromone, threshold: Double): Option[Pheromone]
+  def merge(pheromone: Pheromone, threshold: Double = 1E-10): Option[Pheromone]
 
 }
 
@@ -33,7 +33,7 @@ case class FoodPheromone(override val position: Vector2D,
   override def decrease: Option[FoodPheromone] =
     if (intensity - DELTA <= 0) None else Some(FoodPheromone(position, DELTA, intensity - DELTA))
 
-  override def merge(pheromone: Pheromone, threshold: Double): Option[FoodPheromone] = pheromone match {
+  override def merge(pheromone: Pheromone, threshold: Double = 1E-10): Option[FoodPheromone] = pheromone match {
     case p: FoodPheromone =>
       if (position --> p.position > threshold) None
       else Some(FoodPheromone(position, DELTA, this.intensity + p.intensity))
