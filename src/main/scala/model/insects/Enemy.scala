@@ -53,7 +53,6 @@ case class EnemyInfo(override val anthill: ActorRef,
                      override val isInsideTheAnthill: Boolean,
                      override val foodPosition: Option[Vector2D],
                      override val id: Int,
-                     proximitySensor: Sensor,
                      override val position: Vector2D,
                      override val inertia: Vector2D,
                      override val energy: Double,
@@ -87,5 +86,5 @@ case class EnemyInfo(override val anthill: ActorRef,
 
 object EnemyInfo {
   def apply(anthill: ActorRef, id: Int = 0, position: Vector2D = STARTING_POSITION, energy: Double = STARTING_ENERGY, time: Int = STARTING_TIME): EnemyInfo =
-    new EnemyInfo(anthill, false, None, id, ProximitySensor(), position, ZeroVector2D(), energy, time, STARTING_FOOD_AMOUNT)
+    new EnemyInfo(anthill, false, None, id, position, ZeroVector2D(), energy, time, STARTING_FOOD_AMOUNT)
 }

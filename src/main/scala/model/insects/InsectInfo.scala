@@ -2,6 +2,7 @@ package model.insects
 
 import akka.actor.ActorRef
 import model.Drawable
+import model.environment.FoodPheromone
 import utility.Geometry._
 
 object ConstantInsectInfo {
@@ -42,13 +43,16 @@ trait InsectInfo extends Drawable {
 case class ForagingAntInfo(override val anthill: ActorRef,
                            override val isInsideTheAnthill: Boolean,
                            override val foodPosition: Option[Vector2D],
+                           foodPheromones: Seq[FoodPheromone],
                            override val id: Int,
-                           pheromoneSensor: Sensor,
                            override val position: Vector2D,
                            override val inertia: Vector2D,
                            override val energy: Double,
                            override val time: Int,
                            foodAmount: Double) extends InsectInfo {
+
+  def updateFoodPheromones(pheromones: Seq[FoodPheromone]): InsectInfo =
+    this.copy(foodPheromones = pheromones)
 
   override def updatePosition(newPosition: Vector2D): InsectInfo =
     this.copy(position = newPosition)
@@ -68,12 +72,6 @@ case class ForagingAntInfo(override val anthill: ActorRef,
   override def updateFoodPosition(position: Option[Vector2D]): InsectInfo =
     this.copy(foodPosition = position)
 
-  def clearSensors(): ForagingAntInfo =
-    this.copy(pheromoneSensor = PheromoneSensor())
-
-  def addPheromones(pheromones: Iterable[Entity]): ForagingAntInfo =
-    this.copy(pheromoneSensor = PheromoneSensor(pheromones))
-
   def incFood(amount: Double): ForagingAntInfo =
     this.copy(foodAmount = if (foodAmount + amount > MAX_FOOD) MAX_FOOD else foodAmount + amount)
 
@@ -84,7 +82,7 @@ case class ForagingAntInfo(override val anthill: ActorRef,
 
 object ForagingAntInfo {
   def apply(anthill: ActorRef, id: Int = 0, position: Vector2D = STARTING_POSITION, energy: Double = STARTING_ENERGY, time: Int = STARTING_TIME): ForagingAntInfo =
-    new ForagingAntInfo(anthill, false, None, id, PheromoneSensor(), position, ZeroVector2D(), energy, time, STARTING_FOOD_AMOUNT)
+    new ForagingAntInfo(anthill, false, None, Seq.empty, id, position, ZeroVector2D(), energy, time, STARTING_FOOD_AMOUNT)
 }
 
 

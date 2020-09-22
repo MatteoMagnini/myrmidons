@@ -2,6 +2,7 @@ package model.insects
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
+import model.environment.FoodPheromone
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
@@ -21,6 +22,9 @@ class InsectInfoTest extends TestKit(ActorSystem("InsectInfoTest"))
 
   "Foraging ant info" when {
 
+    val DELTA = 1E-10
+    val startingIntensity = 100.0
+
     "initialized" should {
 
       def checkAll(info: ForagingAntInfo,
@@ -38,7 +42,7 @@ class InsectInfoTest extends TestKit(ActorSystem("InsectInfoTest"))
           info.isInsideTheAnthill == isInsideTheAnthill &&
           info.energy == energy &&
           info.inertia == inertia &&
-          info.pheromoneSensor.entities.isEmpty == pheromoneIsEmpty &&
+          info.foodPheromones.isEmpty == pheromoneIsEmpty &&
           //info.proximitySensor.entities.isEmpty  == proximityIsEmpty &&
           info.foodAmount == foodAmount &&
           info.time == time &&
@@ -79,9 +83,9 @@ class InsectInfoTest extends TestKit(ActorSystem("InsectInfoTest"))
         assert(checkAll(info5, position = newPosition, energy = newEnergy, inertia = newInertia))
       }
 
-      val newPheromones = List(Entity(ZeroVector2D(),1))
+      val newPheromones = Seq(FoodPheromone(ZeroVector2D(), DELTA, startingIntensity))
       val pheromoneIsEmpty = false
-      val info6 = info5.addPheromones(newPheromones)
+      val info6 = info5.updateFoodPheromones(newPheromones).asInstanceOf[ForagingAntInfo]
 
       "correct update pheromones" in {
         assert(checkAll(info6, position = newPosition, energy = newEnergy, inertia = newInertia,

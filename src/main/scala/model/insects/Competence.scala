@@ -6,10 +6,10 @@ import utility.Geometry._
 import utility.Messages.{KillAnt, _}
 import ConstantInsectInfo._
 
-import scala.util.Random
 
+import scala.util.Random
 object Constant {
-  val NOISE = 0.2
+  val NOISE = 0.3
   val MAX_VELOCITY: Double = 5
   val MIN_VELOCITY: Double = - 5
   val INERTIA_FACTOR: Double = 0.9
@@ -22,6 +22,7 @@ object Constant {
 }
 
 import Constant._
+import utility.PheromoneSeq._
 
 /** A competence is the minimal building block to achieve a more complex behaviour. */
 trait Competence {
@@ -60,7 +61,10 @@ object GoBackToHome extends Competence {
     context become behaviour(data)
   }
 
-  override def hasPriority( info: InsectInfo ): Boolean = info.energy < 40 //TODO: clearly to be parametrized
+  override def hasPriority( info: InsectInfo ): Boolean = info match {
+    case i: ForagingAntInfo => i.foodAmount > 0 || i.energy < 40
+    case x => x.energy < 40 //TODO: clearly to be parametrized
+  }
 }
 
 /**
@@ -128,14 +132,17 @@ object Die extends Competence {
 object FoodPheromoneTaxis extends Competence {
 
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
-    val delta = info.asInstanceOf[ForagingAntInfo].pheromoneSensor.weightedSum
+    val delta = info match {
+      case i: ForagingAntInfo => i.foodPheromones.weightedSum
+      case _ => println("Only a foraging ant can do FoodPheromoneTaxis"); ZeroVector2D()
+    }
     val data = info.updateEnergy(ENERGY_FPT)
     environment.tell(Move(data.position, delta),ant)
-    context become behaviour(data.asInstanceOf[ForagingAntInfo].clearSensors())
+    context become behaviour(data.asInstanceOf[ForagingAntInfo].updateFoodPheromones(Seq.empty))
   }
 
   override def hasPriority(info: InsectInfo): Boolean = info match {
-    case f: ForagingAntInfo => f.pheromoneSensor.entities.nonEmpty
+    case f: ForagingAntInfo => f.foodPheromones.nonEmpty
     case _ => false
   }
 }

@@ -2,6 +2,7 @@ package utility
 
 import model.environment.Pheromone
 import SeqWithReplace._
+import utility.Geometry.{Vector2D, ZeroVector2D}
 
 object PheromoneSeq {
 
@@ -12,6 +13,12 @@ object PheromoneSeq {
 
     def add(newElement: A, threshold: Double = 1E-10): Seq[A] =
       merge(newElement,threshold)
+
+    def strongest: Option[A] =
+      if (seq.isEmpty) None else Some(seq.toStream.sortWith((e1, e2) => e1.intensity > e2.intensity).last)
+
+    def weightedSum: Vector2D =
+      if (seq.isEmpty) ZeroVector2D() else seq.toStream.map(e => e.position * e.intensity).reduce(_>>_)
 
     private def merge(newElement: A, threshold: Double): Seq[A] =
       recursiveMerge(newElement, threshold, seq)

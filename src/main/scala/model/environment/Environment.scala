@@ -43,7 +43,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
         case Some(x) => x ! Clock(value)
         case _ => print("Should never happen environment has no anthill")
       }
-      if (Random.nextDouble() < 0.01) self ! AntBirth(value)
+      //if (Random.nextDouble() < 0.01) self ! AntBirth(value)
 
     case Move(position: Vector2D, delta: Vector2D) =>
       val newPosition = position >> delta
@@ -53,15 +53,22 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
         else {
           /* If ant is moving outside boundary or through an obstacle bounces */
           val collision = state.obstacles.find(_.hasInside(newPosition)).get
+          //TODO: BUGSSSSSS!!! Ant sometimes teleporting, should smoothly bounce.
           collision match {
             case f: Food =>
               sender ! FoodNear(f.position)
+              //TODO: code replication!!!
+              val intersectionAndDirection = f.findIntersectionPoint(position, newPosition)
+              //println(intersectionAndDirection)
+              val newDelta = intersectionAndDirection.intersectionPoint - newPosition
+              sender ! NewPosition(intersectionAndDirection.intersectionPoint >> newDelta, newDelta)
             case x =>
               val intersectionAndDirection = x.findIntersectionPoint(position, newPosition)
               //println(intersectionAndDirection)
               val newDelta = intersectionAndDirection.intersectionPoint - newPosition
               sender ! NewPosition(intersectionAndDirection.intersectionPoint >> newDelta, newDelta)
           }
+
         }
       } else sender ! NewPosition(position - delta, delta -)
 
@@ -80,7 +87,6 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       context become defaultBehaviour(state.updateAnthillInfo(anthillInfo))
 
     case AntBirth(clock: Int) =>
-      println("Birth")
       val antId = state.ants.size + clock
       val birthPosition = state.anthillInfo.position
       val ant = context.actorOf(ForagingAnt(ForagingAntInfo(state.anthill.get, id = antId, position = birthPosition, time = clock - 1), self), s"ant-$antId")

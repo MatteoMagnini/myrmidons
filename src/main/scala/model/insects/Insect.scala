@@ -59,8 +59,8 @@ case class ForagingAnt(override val info: ForagingAntInfo,
     /**
      * Update food pheromones.
      */
-    case FoodPheromones(entities) => data match {
-      case f: ForagingAntInfo => context become defaultBehaviour(f.addPheromones(entities))
+    case FoodPheromones(pheromones) => data match {
+      case f: ForagingAntInfo => context become defaultBehaviour(f.updateFoodPheromones(pheromones))
       case _ => System.err.println("Creation of foraging ant with wrong insect information")
     }
 
@@ -69,8 +69,8 @@ case class ForagingAnt(override val info: ForagingAntInfo,
      */
     case FoodNear(position) =>
       val newData = data.updateFoodPosition(Some(position))
-      environment ! UpdateInsect(newData)
-      context become defaultBehaviour(data.updateFoodPosition(Some(position)))
+      //environment ! UpdateInsect(newData)
+      context become defaultBehaviour(newData)
 
     /**
      * The ant enters or exits the anthill.
