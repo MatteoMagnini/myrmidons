@@ -3,7 +3,7 @@ package model.environment
 import akka.actor.ActorRef
 import model.anthill.AnthillInfo
 import model.{Bordered, Food}
-import model.insects.InsectInfo
+import model.insects.{EnemyInfo, ForagingAntInfo, InsectInfo}
 import utility.Geometry.ZeroVector2D
 
 
@@ -25,17 +25,23 @@ trait EnvironmentInfo {
   /** Ants information */
   def antsInfo: Iterable[InsectInfo]
 
+  /** References to enemy actors */
+  def enemies: Iterable[ActorRef]
+
+  /** enemy information */
+  def enemiesInfo: Iterable[EnemyInfo]
+
   /** Anthill information */
   def anthillInfo: AnthillInfo
 
   /** Reference to anthill */
   def anthill: Option[ActorRef]
 
-  /** Returns updated ants information */
-  def updateAntsInfo(antInfo: InsectInfo): EnvironmentInfo
+  /** Returns updated insect information */
+  def updateInsectInfo(insectInfo: InsectInfo): EnvironmentInfo
 
   /** Empties ants information */
-  def emptyAntsInfo(): EnvironmentInfo
+  def emptyInsectInfo(): EnvironmentInfo
 
   def updateFood(food: Food, updatedFood: Food): EnvironmentInfo
 
@@ -50,11 +56,11 @@ trait EnvironmentInfo {
 object EnvironmentInfo {
 
   def apply(boundary: Boundary): EnvironmentInfo =
-    EnvironmentData(None, boundary, Seq.empty, Map.empty, Seq.empty, None, AnthillInfo(ZeroVector2D()))
+    EnvironmentData(None, boundary, Seq.empty, Map.empty, Seq.empty, Seq.empty, Seq.empty, None, AnthillInfo(ZeroVector2D()))
 
-  def apply(gui: Option[ActorRef], boundary: Boundary, obstacles: Seq[Bordered],
-            ants: Map[Int, ActorRef], anthill: ActorRef, anthillInfo: AnthillInfo): EnvironmentInfo =
-    EnvironmentData(gui, boundary, obstacles, ants, Seq.empty, Some(anthill), anthillInfo)
+  def apply(gui: Option[ActorRef], boundary: Boundary, obstacles: Seq[Bordered], ants: Map[Int, ActorRef],
+            enemies: Seq[ActorRef], anthill: ActorRef, anthillInfo: AnthillInfo): EnvironmentInfo =
+    EnvironmentData(gui, boundary, obstacles, ants, Seq.empty, enemies, Seq.empty, Some(anthill), anthillInfo)
 
   /** Internal state of environment.
    *
@@ -67,16 +73,21 @@ object EnvironmentInfo {
    * @param anthillInfo anthill information
    */
   private[this] case class EnvironmentData(override val gui: Option[ActorRef], override val boundary: Boundary,
+
                                            override val obstacles: Seq[Bordered], override val ants: Map[Int, ActorRef],
-                                           override val antsInfo: Seq[InsectInfo], override val anthill: Option[ActorRef],
+                                           override val antsInfo: Seq[InsectInfo], override val enemies: Seq[ActorRef],
+                                           override val enemiesInfo: Seq[EnemyInfo], override val anthill: Option[ActorRef],
                                            override val anthillInfo: AnthillInfo) extends EnvironmentInfo {
 
     /** Returns ant info, adding ant information */
-    override def updateAntsInfo(antInfo: InsectInfo): EnvironmentData = this.copy(antsInfo = antInfo +: antsInfo)
+    override def updateInsectInfo(insectInfo: InsectInfo): EnvironmentData = insectInfo match {
+      case insectInfo: ForagingAntInfo => this.copy(antsInfo = insectInfo +: antsInfo)
+      case insectInfo: EnemyInfo => this.copy(enemiesInfo = insectInfo +: enemiesInfo)
+      case _ => println("error in updateInsectInfo insect info not recognized"); this
+    }
 
     /** Returns ant info, emptying ants information */
-    override def emptyAntsInfo(): EnvironmentData = this.copy(antsInfo = Seq.empty)
-
+    override def emptyInsectInfo(): EnvironmentData = this.copy(antsInfo = Seq.empty, enemiesInfo = Seq.empty)
 
     import utility.SeqWithReplace._
 

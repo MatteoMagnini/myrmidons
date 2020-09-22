@@ -22,10 +22,10 @@ case class LabelPane() extends FlowPanel {
    * Each label refers to entities colors in simulation.
    */
   separator.background = Color.black
-  food.foreground = Color.red
+  food.foreground = Color.blue
   ant.foreground = Color.black
   obstacle.foreground = Color.gray
-  insect.foreground = Color.blue
+  insect.foreground = Color.red
   anthill.foreground = new Color(0f, 0.5f, 0f, 1f)
   pheromone.foreground = Color.magenta
 
