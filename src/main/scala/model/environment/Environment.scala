@@ -1,7 +1,7 @@
 package model.environment
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-import model.insects.{ConstantInsectInfo, Enemy, EnemyInfo, ForagingAnt, ForagingAntInfo, InsectInfo}
+import model.insects.{ConstantInsectInfo, Enemy, EnemyInfo, ForagingAnt, ForagingAntInfo, InsectInfo, PickFood}
 import utility.Geometry._
 import utility.Messages.{Clock, Move, StartSimulation, UpdateInsect, _}
 import model.BorderedEntityFactory._
@@ -26,7 +26,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       val ants = if (!centerSpawn) createAntFromRandomPosition(nAnts, anthill) else createAntFromCenter(nAnts, anthill)
 
       // anthill ref is need to permit the enemies to interact with anthill (parasite behaviour)
-      val enemies = createEnemiesFromRandomPosition(nEnemies, anthill)
+      val enemies = createEnemiesFromRandomPosition(0, anthill)
 
       val obstacles = if (obstaclesPresence.isDefined) (0 until obstaclesPresence.get).map(_ =>
         createRandomSimpleObstacle(200, 600)) else Seq.empty
@@ -51,12 +51,11 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
         if (state.obstacles.forall(!_.hasInside(newPosition)))
           sender ! NewPosition(newPosition, newPosition - position)
         else {
-          /* If ant is moving outside boundary or through an obstacle, invert its new position */
+          /* If ant is moving outside boundary or through an obstacle bounces */
           val collision = state.obstacles.find(_.hasInside(newPosition)).get
           collision match {
             case f: Food =>
-              sender ! FoodNear
-              context become defaultBehaviour(state.updateFood(f, f - ConstantInsectInfo.MAX_FOOD))
+              sender ! FoodNear(f.position)
             case x =>
               val intersectionAndDirection = x.findIntersectionPoint(position, newPosition)
               //println(intersectionAndDirection)
@@ -65,6 +64,14 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
           }
         }
       } else sender ! NewPosition(position - delta, delta -)
+
+    case TakeFood(delta, position) =>
+      state.obstacles.find(_.hasInside(position)).get match {
+        case f: Food =>
+          sender ! TakeFood(delta, position)
+          context become defaultBehaviour(state.updateFood(f, f - delta))
+        case _ => println()
+      }
 
     case UpdateInsect(info: InsectInfo) =>
       sendInfoToGUI(state.updateInsectInfo(info))

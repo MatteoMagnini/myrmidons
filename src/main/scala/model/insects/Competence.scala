@@ -4,6 +4,7 @@ import akka.actor.Actor.Receive
 import akka.actor.{ActorContext, ActorRef}
 import utility.Geometry._
 import utility.Messages.{KillAnt, _}
+import ConstantInsectInfo._
 
 import scala.util.Random
 
@@ -14,6 +15,7 @@ object Constant {
   val INERTIA_FACTOR: Double = 0.9
   val FOOD_EATEN_PER_STEP: Double = 0.5
   val ENERGY_RW: Double = - 0.3
+  val ENERGY_PF: Double = -0.2
   val ENERGY_EATING: Double = - 0.1
   val ENERGY_FPT: Double = - 1.5
   val RANDOM: Random.type = scala.util.Random
@@ -62,7 +64,7 @@ object GoBackToHome extends Competence {
 }
 
 /**
-  * Competence forcing an insect to exit the anthill because its energy level is high.
+  * Competence forcing an insect to exit the anthill when its energy level is high.
   */
 object GoOutside extends Competence {
 
@@ -76,6 +78,9 @@ object GoOutside extends Competence {
   override def hasPriority( info: InsectInfo ): Boolean = info.isInsideTheAnthill && info.energy > 80 //TODO: clearly to be parametrized
 }
 
+/**
+ * Try to eat food from the anthill when the insect is inside it.
+ */
 object EatFromTheAnthill extends Competence {
 
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
@@ -87,18 +92,30 @@ object EatFromTheAnthill extends Competence {
   override def hasPriority(info: InsectInfo): Boolean = info.isInsideTheAnthill
 }
 
-/** Competence that enables ant to eat food when it find it */
-object TakeFood extends Competence {
+/**
+ * Competence that enables ant to carry food when it find it.
+ */
+object PickFood extends Competence {
 
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
-    val newData = info.updateEnergy(ConstantInsectInfo.MAX_FOOD)
-    environment.tell(UpdateInsect(newData), ant)
-    context become behaviour(newData)
+    println(s"Ant ${info.id} picking food")
+    info match {
+      case i: ForagingAntInfo if i.foodIsNear =>
+        environment.tell(TakeFood(MAX_FOOD - i.foodAmount, i.foodPosition.get), ant)
+      case _ => println("Only a foraging ant can pick up food.")
+    }
+    context become behaviour(info.updateEnergy(ENERGY_PF))
   }
 
-  override def hasPriority(info: InsectInfo): Boolean = true
+  override def hasPriority(info: InsectInfo): Boolean = info match {
+    case i: ForagingAntInfo => i.foodIsNear && i.foodAmount < MAX_FOOD
+    case _ => false
+  }
 }
 
+/**
+ * When energy is 0 the insect dies. Must be the first competence for every insects.
+ */
 object Die extends Competence {
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
     environment.tell(KillAnt(info.id), ant)

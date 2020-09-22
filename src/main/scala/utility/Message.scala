@@ -51,6 +51,8 @@ object Messages {
    */
   case class NewPosition(position: Vector2D, inertia: Vector2D) extends Message
 
+  case class TakeFood(delta: Double, position: Vector2D) extends Message
+
   case class StoreFood(delta: Double) extends Message
 
   case class EatFood(delta: Double) extends Message
@@ -67,7 +69,7 @@ object Messages {
    */
   case class AntTowardsAnthill(position: Vector2D, maxSpeed: Double, noise: Double, antIsIn: Boolean) extends Message
 
-  case object FoodNear extends Message
+  case class FoodNear(foodPosition: Vector2D) extends Message
 
   /**
    * @param antIsInsideTheAnthill true if the ant is inside, false otherwise

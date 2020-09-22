@@ -32,7 +32,7 @@ class Enemy (override val info: EnemyInfo,
       context become defaultBehaviour(newData)
 
     case FoodNear =>
-      subsumption(data, TakeFood, RandomWalk)(context, environment, self, data, defaultBehaviour)
+      subsumption(data, PickFood, RandomWalk)(context, environment, self, data, defaultBehaviour)
 
     case UpdateAnthillCondition(value) =>
       context become defaultBehaviour(data.updateAnthillCondition(value))
@@ -51,6 +51,7 @@ object Enemy {
 }
 case class EnemyInfo(override val anthill: ActorRef,
                      override val isInsideTheAnthill: Boolean,
+                     override val foodPosition: Option[Vector2D],
                      override val id: Int,
                      proximitySensor: Sensor,
                      override val position: Vector2D,
@@ -74,6 +75,9 @@ case class EnemyInfo(override val anthill: ActorRef,
   override def updateAnthillCondition(value: Boolean): InsectInfo =
     this.copy(isInsideTheAnthill = value)
 
+  override def updateFoodPosition(position: Option[Vector2D]): InsectInfo =
+    this.copy(foodPosition = position)
+
   def incFood(amount: Double): EnemyInfo =
     this.copy(foodAmount = if (foodAmount + amount > MAX_FOOD) MAX_FOOD else foodAmount + amount)
 
@@ -83,5 +87,5 @@ case class EnemyInfo(override val anthill: ActorRef,
 
 object EnemyInfo {
   def apply(anthill: ActorRef, id: Int = 0, position: Vector2D = STARTING_POSITION, energy: Double = STARTING_ENERGY, time: Int = STARTING_TIME): EnemyInfo =
-    new EnemyInfo(anthill, false, id, ProximitySensor(), position, ZeroVector2D(), energy, time, STARTING_FOOD_AMOUNT)
+    new EnemyInfo(anthill, false, None, id, ProximitySensor(), position, ZeroVector2D(), energy, time, STARTING_FOOD_AMOUNT)
 }

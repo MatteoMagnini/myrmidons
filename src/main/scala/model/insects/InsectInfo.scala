@@ -28,18 +28,21 @@ trait InsectInfo extends Drawable {
   def time: Int
   def anthill: ActorRef
   def isInsideTheAnthill: Boolean
+  def foodPosition: Option[Vector2D]
 
   def updatePosition(newPosition: Vector2D): InsectInfo
   def updateInertia(newInertia: Vector2D): InsectInfo
   def updateEnergy(amount: Double): InsectInfo
   def incTime(): InsectInfo
   def updateAnthillCondition(value: Boolean): InsectInfo
+  def foodIsNear: Boolean = foodPosition.nonEmpty
+  def updateFoodPosition(position: Option[Vector2D]): InsectInfo
 }
 
 case class ForagingAntInfo(override val anthill: ActorRef,
                            override val isInsideTheAnthill: Boolean,
+                           override val foodPosition: Option[Vector2D],
                            override val id: Int,
-                           proximitySensor: Sensor,
                            pheromoneSensor: Sensor,
                            override val position: Vector2D,
                            override val inertia: Vector2D,
@@ -62,8 +65,11 @@ case class ForagingAntInfo(override val anthill: ActorRef,
   override def updateAnthillCondition(value: Boolean): InsectInfo =
     this.copy(isInsideTheAnthill = value)
 
+  override def updateFoodPosition(position: Option[Vector2D]): InsectInfo =
+    this.copy(foodPosition = position)
+
   def clearSensors(): ForagingAntInfo =
-    this.copy(proximitySensor = ProximitySensor(), pheromoneSensor = PheromoneSensor())
+    this.copy(pheromoneSensor = PheromoneSensor())
 
   def addPheromones(pheromones: Iterable[Entity]): ForagingAntInfo =
     this.copy(pheromoneSensor = PheromoneSensor(pheromones))
@@ -78,7 +84,7 @@ case class ForagingAntInfo(override val anthill: ActorRef,
 
 object ForagingAntInfo {
   def apply(anthill: ActorRef, id: Int = 0, position: Vector2D = STARTING_POSITION, energy: Double = STARTING_ENERGY, time: Int = STARTING_TIME): ForagingAntInfo =
-    new ForagingAntInfo(anthill, false, id, ProximitySensor(), PheromoneSensor(), position, ZeroVector2D(), energy, time, STARTING_FOOD_AMOUNT)
+    new ForagingAntInfo(anthill, false, None, id, PheromoneSensor(), position, ZeroVector2D(), energy, time, STARTING_FOOD_AMOUNT)
 }
 
 
