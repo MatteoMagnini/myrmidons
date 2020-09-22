@@ -17,6 +17,7 @@ object Constant {
   val ENERGY_RW: Double = - 0.3
   val ENERGY_PF: Double = -0.2
   val ENERGY_EATING: Double = - 0.1
+  val ENERGY_SF: Double = -0.1
   val ENERGY_FPT: Double = - 1.5
   val RANDOM: Random.type = scala.util.Random
 }
@@ -113,6 +114,28 @@ object PickFood extends Competence {
 
   override def hasPriority(info: InsectInfo): Boolean = info match {
     case i: ForagingAntInfo => i.foodIsNear && i.foodAmount < MAX_FOOD
+    case _ => false
+  }
+}
+
+object StoreFoodInAnthill extends Competence {
+
+  override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
+    println(s"Ant ${info.id} storing food in anthill")
+    val data = info match {
+      case i: ForagingAntInfo =>
+        i.anthill.tell(StoreFood(i.foodAmount),ant)
+        i.freeFood().updateEnergy(ENERGY_SF).updateAnthillCondition(false)
+
+      case x => x.updateEnergy(ENERGY_SF).updateAnthillCondition(false)
+    }
+    environment.tell(UpdateInsect(data), ant)
+    context become behaviour(data)
+  }
+
+
+  override def hasPriority(info: InsectInfo): Boolean = info match {
+    case i: ForagingAntInfo => i.isInsideTheAnthill && i.foodAmount > 0
     case _ => false
   }
 }
