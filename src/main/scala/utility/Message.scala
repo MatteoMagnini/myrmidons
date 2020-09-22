@@ -2,9 +2,11 @@ package utility
 
 import model.Drawable
 import model.anthill.AnthillInfo
-import model.environment.FoodPheromone
+
+import model.environment.{FoodPheromone, Pheromone}
 import model.insects.InsectInfo
 import utility.Geometry.Vector2D
+
 
 sealed trait Message
 
@@ -30,18 +32,7 @@ object Messages {
    */
   case class Move(start: Vector2D, delta: Vector2D) extends Message
 
-  /**
-   * The environment tells every (foraging) ant the food pheromones in the simulation.
-   * @param pheromones the sequence of food pheromones
-   */
   case class FoodPheromones(pheromones: Seq[FoodPheromone]) extends Message
-
-  /**
-   * An ant spawns a food pheromone and update the environment.
-   *
-   * @param pheromone created
-   */
-  case class AddFoodPheromones(pheromone: FoodPheromone) extends Message
 
   /** Message sent from ant to environment, to update its information.
    *
@@ -62,26 +53,10 @@ object Messages {
    */
   case class NewPosition(position: Vector2D, inertia: Vector2D) extends Message
 
-  /**
-   * An ant take food from a food source telling the enviroment the food position and the desiderata amount of food.
-   *
-   * @param delta food to take
-   * @param position of the food
-   */
   case class TakeFood(delta: Double, position: Vector2D) extends Message
 
-  /**
-   * An ant tell the anthill to store the food it is picking.
-   *
-   * @param delta food to store
-   */
   case class StoreFood(delta: Double) extends Message
 
-  /**
-   * When in anthill an ant with low energy eat some food to restore it.
-   *
-   * @param delta the food amount
-   */
   case class EatFood(delta: Double) extends Message
 
   case class UpdateAnthill(info: AnthillInfo) extends Message
@@ -96,11 +71,6 @@ object Messages {
    */
   case class AntTowardsAnthill(position: Vector2D, maxSpeed: Double, noise: Double, antIsIn: Boolean) extends Message
 
-  /**
-   * The environment tell an ant that it is near to a food source.
-   *
-   * @param foodPosition the position of the food source.
-   */
   case class FoodNear(foodPosition: Vector2D) extends Message
 
   /**

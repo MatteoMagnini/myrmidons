@@ -2,6 +2,7 @@ package model.insects
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import utility.Messages._
+import utility.PheromoneSeq._
 
 /**
  * An insect is an entity with its own behaviour.

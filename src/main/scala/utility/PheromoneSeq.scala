@@ -6,7 +6,7 @@ import utility.Geometry.{Vector2D, ZeroVector2D}
 
 object PheromoneSeq {
 
-  implicit class PheromoneSeq[A <: Pheromone](seq: Seq[A]) {
+  implicit class PheromoneSeq[A <: Pheromone](seq: Seq[A]){
 
     def tick(): Seq[A] =
       seq.toStream.map(p => p.decrease).filter(opt => opt.isDefined).map(opt => opt.get.asInstanceOf[A])

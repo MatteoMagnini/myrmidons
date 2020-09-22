@@ -1,14 +1,13 @@
 package model.environment
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-import model.insects.{ConstantInsectInfo, Enemy, EnemyInfo, ForagingAnt, ForagingAntInfo, InsectInfo, PickFood}
+import model.insects.{Enemy, EnemyInfo, ForagingAnt, ForagingAntInfo, InsectInfo}
 import utility.Geometry._
 import utility.Messages.{Clock, Move, StartSimulation, UpdateInsect, _}
 import model.BorderedEntityFactory._
 import model.Food
 import model.anthill.{Anthill, AnthillInfo}
 
-import scala.util.Random
 
 /** Environment actor
  *
@@ -34,10 +33,15 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       val foods = if (foodPresence.isDefined) (0 until foodPresence.get).map(_ =>
         createRandomFood(state.boundary.topLeft.x, state.boundary.bottomRight.x)) else Seq.empty
 
-      context become defaultBehaviour(EnvironmentInfo(Some(sender), state.boundary, foods ++ obstacles, ants, enemies, anthill, state.anthillInfo))
+      var foodPheromones = Seq[FoodPheromone]()
+      foodPheromones = FoodPheromone(RandomVector2D(100,200),0.3,5.4) +: foodPheromones
+      context become defaultBehaviour(EnvironmentInfo(Some(sender), state.boundary,
+        foods ++ obstacles, ants, enemies, anthill, state.anthillInfo, foodPheromones))
 
     case Clock(value: Int) =>
+      //state.ants.values.foreach(_ ! FoodPheromones(state.pheromones))
       state.ants.values.foreach(_ ! Clock(value))
+
       state.enemies.foreach(_ ! Clock(value))
       state.anthill match {
         case Some(x) => x ! Clock(value)
@@ -80,8 +84,6 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
         case _ => println()
       }
 
-    case AddFoodPheromones(pheromone) =>
-      //TODO: update the foodPheromone seq
 
     case UpdateInsect(info: InsectInfo) =>
       sendInfoToGUI(state.updateInsectInfo(info))
@@ -132,7 +134,8 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   private def sendInfoToGUI(info: EnvironmentInfo) = {
     /* When all insects return their positions, environment send them to GUI */
     if ((info.antsInfo.size + info.enemiesInfo.size) == (info.ants.size + info.enemies.size)) {
-      info.gui.get ! Repaint(info.antsInfo ++ info.enemiesInfo ++ info.obstacles ++ Seq(info.anthillInfo))
+      info.gui.get ! Repaint(info.antsInfo ++ info.enemiesInfo ++
+        info.obstacles ++ Seq(info.anthillInfo) ++ info.pheromones)
       context become defaultBehaviour(info.emptyInsectInfo())
     } else context become defaultBehaviour(info)
   }

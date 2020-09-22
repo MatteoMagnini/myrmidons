@@ -5,6 +5,7 @@ import java.awt.Color
 import java.awt.geom.{Ellipse2D, Rectangle2D}
 
 import model.anthill.AnthillInfo
+import model.environment.FoodPheromone
 import model.{Drawable, Food, SimpleObstacle}
 import model.insects.{Enemy, EnemyInfo, ForagingAntInfo, InsectInfo}
 
@@ -25,6 +26,7 @@ case class MyrmidonsPanel() extends Panel {
   private var food: Seq[Food] = Seq.empty
   private var anthill: Option[AnthillInfo] = None
   private var obstacles: Seq[SimpleObstacle] = Seq.empty
+  private var pheromones: Seq[FoodPheromone] = Seq.empty
 
   size.height = 800
   size.width = 800
@@ -96,6 +98,17 @@ case class MyrmidonsPanel() extends Panel {
           anthill.get.radius * 2 * 2, anthill.get.radius * 2 * 2)
         g.fill(ellipse)
       }
+
+
+      /**
+       *
+       */
+      this.pheromones.foreach(x => {
+        g.setColor(Color.pink)
+      val ellipse = new Ellipse2D.Double(x.position.x - (10 / 2),
+        x.position.y - (10 / 2), 5, 5)
+      g.fill(ellipse)
+      })
     }
   }
 
@@ -125,6 +138,7 @@ case class MyrmidonsPanel() extends Panel {
       case x: SimpleObstacle => obstacles = x +: obstacles
       case x: AnthillInfo => anthill = Some(x)
       case x: EnemyInfo => enemies = x +: enemies
+      case x: FoodPheromone => pheromones = x +: pheromones
       case _ => println("Error match entities")
     }
     ants.size
