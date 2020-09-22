@@ -34,31 +34,64 @@ case class ForagingAnt(override val info: ForagingAntInfo,
 
   private def defaultBehaviour(data: InsectInfo): Receive = {
 
+    /**
+     * Time is passing.
+     */
     case Clock(t) if t == data.time + 1 =>
       val newData = data.incTime()
       subsumption(newData,
+        Die,
         GoOutside,
         EatFromTheAnthill,
         GoBackToHome,
+        PickFood,
         FoodPheromoneTaxis,
         RandomWalk)(context, environment, self, newData, defaultBehaviour)
 
+    /**
+     * The environment confirms the new position.
+     */
     case NewPosition(p, d) =>
       val newData = data.updatePosition(p).updateInertia(d)
       environment ! UpdateInsect(newData)
       context become defaultBehaviour(newData)
 
-    case FoodPheromones(entities) => data match {
-      case f: ForagingAntInfo => context become defaultBehaviour(f.addPheromones(entities))
+    /**
+     * Update food pheromones.
+     */
+    case FoodPheromones(pheromones) => data match {
+      case f: ForagingAntInfo => context become defaultBehaviour(f.updateFoodPheromones(pheromones))
       case _ => System.err.println("Creation of foraging ant with wrong insect information")
     }
 
-    case FoodNear =>
-      subsumption(data, GoBackToHome, TakeFood, FoodPheromoneTaxis, RandomWalk)(context, environment, self, data, defaultBehaviour)
+    /**
+     * The ant perceive food in its proximity.
+     */
+    case FoodNear(position) =>
+      val newData = data.updateFoodPosition(Some(position))
+      //environment ! UpdateInsect(newData)
+      context become defaultBehaviour(newData)
 
+    /**
+     * The ant enters or exits the anthill.
+     */
     case UpdateAnthillCondition(value) =>
       context become defaultBehaviour(data.updateAnthillCondition(value))
 
+    /**
+     * Take food from a food source in the environment.
+     */
+    case TakeFood(delta,_) =>
+      val newData = data match {
+        case d: ForagingAntInfo => d.incFood(delta).updateFoodPosition(None)
+        case x => x
+      }
+      environment ! UpdateInsect(newData)
+      context become defaultBehaviour(newData)
+
+    /**
+     * Eat food from the environment.
+     */
     case EatFood(amount) =>
       val newData = data.updateEnergy(amount*10) //TODO: conversion factor from food to energy to be parametrized
       environment ! UpdateInsect(newData)

@@ -73,7 +73,7 @@ case class MyrmidonsPanel() extends Panel {
         if (d < 0.4f) {
           g.setColor(new Color(0f, 0f, 1f, 0.4f))
         } else {
-          g.setColor(new Color(0f, 0f, 1f, d))
+          g.setColor(new Color(0f, 0f, 1f, 0.4f))//d
         }
         val ellipse = new Ellipse2D.Double(x.position.x - (x.xDim / 2),
           x.position.y - (x.yDim / 2), x.xDim, x.yDim)

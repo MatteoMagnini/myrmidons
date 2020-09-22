@@ -2,7 +2,8 @@ package utility
 
 import model.Drawable
 import model.anthill.AnthillInfo
-import model.insects.{Entity, InsectInfo}
+import model.environment.{FoodPheromone, Pheromone}
+import model.insects.InsectInfo
 import utility.Geometry.Vector2D
 
 sealed trait Message
@@ -14,7 +15,7 @@ object Messages {
    * @param nAnts       number of ants to be created
    * @param centerSpawn whether spawn ants from center of boundaries
    */
-  case class StartSimulation(nAnts: Int,  nEnemies: Int, centerSpawn: Boolean = false, obstacles: Option[Int] = Some(6), food: Option[Int] = Some(3)) extends Message
+  case class StartSimulation(nAnts: Int,  nEnemies: Int, centerSpawn: Boolean = false, obstacles: Option[Int] = Some(6), food: Option[Int] = Some(6)) extends Message
 
   /** Message sent from GUI to environment and from environment to ants, to do a step in simulation.
    *
@@ -29,8 +30,7 @@ object Messages {
    */
   case class Move(start: Vector2D, delta: Vector2D) extends Message
 
-  //TODO: next sprint
-  case class FoodPheromones(entities: Iterable[Entity]) extends Message
+  case class FoodPheromones(pheromones: Seq[FoodPheromone]) extends Message
 
   /** Message sent from ant to environment, to update its information.
    *
@@ -51,6 +51,8 @@ object Messages {
    */
   case class NewPosition(position: Vector2D, inertia: Vector2D) extends Message
 
+  case class TakeFood(delta: Double, position: Vector2D) extends Message
+
   case class StoreFood(delta: Double) extends Message
 
   case class EatFood(delta: Double) extends Message
@@ -67,7 +69,7 @@ object Messages {
    */
   case class AntTowardsAnthill(position: Vector2D, maxSpeed: Double, noise: Double, antIsIn: Boolean) extends Message
 
-  case object FoodNear extends Message
+  case class FoodNear(foodPosition: Vector2D) extends Message
 
   /**
    * @param antIsInsideTheAnthill true if the ant is inside, false otherwise
@@ -82,7 +84,8 @@ object Messages {
    */
   case class AddRandomAnt(nAnts: Int, step: String) extends Message
 
-  // TODO next sprint
-  //case class KillAnt() extends Message
+  case class AntBirth(clock: Int)
+
+  case class KillAnt(id: Int) extends Message
 
 }
