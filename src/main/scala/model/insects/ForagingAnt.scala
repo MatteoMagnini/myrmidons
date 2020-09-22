@@ -1,19 +1,9 @@
 package model.insects
 
-import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import akka.actor.{ActorRef, Props}
+import model.insects.ConstantInsectInfo._
+import utility.Geometry.{Vector2D, ZeroVector2D}
 import utility.Messages._
-
-/**
- * An insect is an entity with its own behaviour.
- * For this reason it extends Actor, it has its own control flow and is reactive to inputs (messages).
- * It also holds the information (state) of the insect.
- */
-
-trait Insect extends Actor with ActorLogging {
-
-  def info: InsectInfo
-  def environment: ActorRef
-}
 
 /**
  * Ant that performs foraging.
@@ -72,4 +62,50 @@ case class ForagingAnt(override val info: ForagingAntInfo,
 object ForagingAnt {
   def apply(info: InsectInfo, environment: ActorRef): Props =
     Props(classOf[ForagingAnt], info, environment)
+}
+
+
+case class ForagingAntInfo(override val anthill: ActorRef,
+                           override val isInsideTheAnthill: Boolean,
+                           override val id: Int,
+                           proximitySensor: Sensor,
+                           pheromoneSensor: Sensor,
+                           override val position: Vector2D,
+                           override val inertia: Vector2D,
+                           override val energy: Double,
+                           override val time: Int,
+                           foodAmount: Double) extends InsectInfo {
+
+  override def updatePosition(newPosition: Vector2D): InsectInfo =
+    this.copy(position = newPosition)
+
+  override def updateInertia(newInertia: Vector2D): InsectInfo =
+    this.copy(inertia = newInertia)
+
+  override def updateEnergy(delta: Double): InsectInfo =
+    this.copy(energy = if (energy + delta > MAX_ENERGY) MAX_ENERGY else energy + delta)
+
+  override def incTime(): InsectInfo =
+    this.copy(time = time + 1)
+
+  override def updateAnthillCondition(value: Boolean): InsectInfo =
+    this.copy(isInsideTheAnthill = value)
+
+  def clearSensors(): ForagingAntInfo =
+    this.copy(proximitySensor = ProximitySensor(), pheromoneSensor = PheromoneSensor())
+
+  def addPheromones(pheromones: Iterable[Entity]): ForagingAntInfo =
+    this.copy(pheromoneSensor = PheromoneSensor(pheromones))
+
+  def incFood(amount: Double): ForagingAntInfo =
+    this.copy(foodAmount = if (foodAmount + amount > MAX_FOOD) MAX_FOOD else foodAmount + amount)
+
+  def freeFood(): ForagingAntInfo =
+    this.copy(foodAmount = STARTING_FOOD_AMOUNT)
+
+}
+
+object ForagingAntInfo {
+  def apply(anthill: ActorRef, id: Int = 0, position: Vector2D = STARTING_POSITION, energy: Double = STARTING_ENERGY, time: Int = STARTING_TIME): ForagingAntInfo =
+    new ForagingAntInfo(anthill, false, id, ProximitySensor(), PheromoneSensor(), position, ZeroVector2D(), energy, time, STARTING_FOOD_AMOUNT)
 }

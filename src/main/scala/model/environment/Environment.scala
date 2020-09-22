@@ -1,7 +1,7 @@
 package model.environment
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-import model.insects.{ConstantInsectInfo, Enemy, EnemyInfo, ForagingAnt, ForagingAntInfo, InsectInfo}
+import model.insects._
 import utility.Geometry._
 import utility.Messages.{Clock, Move, StartSimulation, UpdateInsect, _}
 import model.BorderedEntityFactory._
@@ -37,8 +37,9 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       context become defaultBehaviour(EnvironmentInfo(Some(sender), state.boundary, foods ++ obstacles, ants, enemies, anthill, state.anthillInfo))
 
     case Clock(value: Int) =>
+      log.debug("ants: " + state.ants.size + " enemies: " + state.enemies.size)
       state.ants.values.foreach(_ ! Clock(value))
-      state.enemies.foreach(_ ! Clock(value))
+      state.enemies.values.foreach(_ ! Clock(value))
       state.anthill match {
         case Some(x) => x ! Clock(value)
         case _ => print("Should never happen environment has no anthill")
@@ -73,10 +74,9 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       context become defaultBehaviour(state.updateAnthillInfo(anthillInfo))
 
     case AntBirth(clock: Int) =>
-      println("Birth")
-      val antId = state.ants.size + clock
+      val antId = state.ants.size
       val birthPosition = state.anthillInfo.position
-      val ant = context.actorOf(ForagingAnt(ForagingAntInfo(state.anthill.get, id = antId, position = birthPosition, time = clock - 1), self), s"ant-$antId")
+      val ant = context.actorOf(ForagingAnt(ForagingAntInfo(state.anthill.get, id = antId, position = birthPosition, time = clock - 1), self), s"ant-${antId + clock}")
       ant ! Clock(clock)
       context become defaultBehaviour(state.addAnt(antId, ant))
 
@@ -102,11 +102,11 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     }).toMap
 
   /** Returns ants references, created from random position */
-  private def createEnemiesFromRandomPosition(nEnemies: Int, anthill: ActorRef): Seq[ActorRef] =
-    if (nEnemies == 0) Seq.empty else (0 until nEnemies).map(i => {
+  private def createEnemiesFromRandomPosition(nEnemies: Int, anthill: ActorRef): Map[Int, ActorRef] =
+    (0 until nEnemies).map(i => {
       val randomPosition = RandomVector2D(state.boundary.topLeft.x, state.boundary.topRight.x)
-      context.actorOf(Enemy(EnemyInfo(anthill, id = i, position = randomPosition), self), s"enemy-$i")
-    })
+      i -> context.actorOf(Enemy(EnemyInfo(anthill, id = i, position = randomPosition), self), s"enemy-$i")
+    }).toMap
 
   /** Returns ants references, created from intention of user. The ant start in RandomPosition */
   private def createAntByUser(antInfo: InsectInfo): ActorRef = {
@@ -119,11 +119,13 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       val fights = checkFights(info.antsInfo, info.enemiesInfo)
       var updatedInfo = info
       for (fight <- fights) {
-        val ant = fight._1
-        val enemy = fight._2
-        if (ant.energy > enemy.energy) {
-          context.stop(info.ants(ant.id))
-          updatedInfo = info.removeAnt(ant.id)
+        fight.looser match {
+          case x:ForagingAntInfo =>
+            context.stop(info.ants(x.id))
+            updatedInfo = updatedInfo.removeAnt(x.id)
+          case x:EnemyInfo =>
+            context.stop(info.enemies(x.id))
+            updatedInfo = updatedInfo.removeEnemy(x.id)
         }
       }
       info.gui.get ! Repaint(updatedInfo.antsInfo ++ updatedInfo.enemiesInfo ++ updatedInfo.obstacles ++ Seq(updatedInfo.anthillInfo))
@@ -131,12 +133,12 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     } else context become defaultBehaviour(info)
   }
 
-  private def checkFights(antsInfo: Iterable[InsectInfo], enemiesInfo: Iterable[InsectInfo]): Iterable[(InsectInfo, InsectInfo)] =
+  private def checkFights(antsInfo: Iterable[InsectInfo], enemiesInfo: Iterable[InsectInfo]): Iterable[Fight[InsectInfo]] =
     for {
       ant <- antsInfo
       enemy <- enemiesInfo
       if ant.position ~~ enemy.position
-    } yield (ant, enemy)
+    } yield InsectFight(ant, enemy)
 }
 
 object Environment {
