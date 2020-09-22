@@ -67,13 +67,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       } else sender ! NewPosition(position - delta, delta -)
 
     case UpdateInsect(info: InsectInfo) =>
-      val updatedInfo = state.updateInsectInfo(info)
-
-      /* When all ants return their positions, environment send them to GUI */
-      if ((updatedInfo.antsInfo.size + updatedInfo.enemiesInfo.size) == (state.ants.size + state.enemies.size)) {
-        state.gui.get ! Repaint(updatedInfo.antsInfo++ updatedInfo.enemiesInfo ++ updatedInfo.obstacles ++ Seq(state.anthillInfo))
-        context become defaultBehaviour(state.emptyInsectInfo())
-      } else context become defaultBehaviour(updatedInfo)
+      sendInfoToGUI(state.updateInsectInfo(info))
 
     case UpdateAnthill(anthillInfo: AnthillInfo) =>
       context become defaultBehaviour(state.updateAnthillInfo(anthillInfo))
@@ -90,10 +84,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       context.stop(sender)
       val newData = state.removeAnt(id)
       if (newData.ants.isEmpty) state.gui.get ! Repaint(state.obstacles ++ Seq(state.anthillInfo))
-      if (newData.antsInfo.size == newData.ants.size) {
-        state.gui.get ! Repaint(newData.antsInfo ++ newData.obstacles ++ Seq(state.anthillInfo))
-        context become defaultBehaviour(newData.emptyInsectInfo())
-      } else context become defaultBehaviour(newData)
+      sendInfoToGUI(newData)
   }
 
   /** Returns ants references, created from random position */
@@ -117,10 +108,17 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       context.actorOf(Enemy(EnemyInfo(anthill, id = i, position = randomPosition), self), s"enemy-$i")
     })
 
-
   /** Returns ants references, created from intention of user. The ant start in RandomPosition */
   private def createAntByUser(antInfo: InsectInfo): ActorRef = {
     context.actorOf(ForagingAnt(antInfo, self), s"ant-${antInfo.id}")
+  }
+
+  private def sendInfoToGUI(info: EnvironmentInfo) = {
+    /* When all insects return their positions, environment send them to GUI */
+    if ((info.antsInfo.size + info.enemiesInfo.size) == (info.ants.size + info.enemies.size)) {
+      info.gui.get ! Repaint(info.antsInfo ++ info.enemiesInfo ++ info.obstacles ++ Seq(info.anthillInfo))
+      context become defaultBehaviour(info.emptyInsectInfo())
+    } else context become defaultBehaviour(info)
   }
 }
 
