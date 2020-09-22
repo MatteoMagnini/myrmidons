@@ -102,7 +102,6 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
         assert(result1.info.energy == finalEnergy)
         sender expectNoMessage
       }
-
     }
 
 
@@ -139,6 +138,17 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
         val result2 = sender.expectMsgType[UpdateInsect]
         assert(result2.info.position == Vector2D(7.5,0))
         assert(result2.info.energy == 100 + 2 * c.ENERGY_FPT)
+        sender expectNoMessage
+      }
+    }
+  }
+
+  "Foraging ant" when {
+    val ant = system.actorOf(ForagingAnt(ForagingAntInfo(senderRef, energy = 0),senderRef), "ant-3")
+    "has no more energy" should {
+      "die" in {
+        ant ! Clock(1)
+        sender.expectMsgType[KillAnt]
         sender expectNoMessage
       }
     }

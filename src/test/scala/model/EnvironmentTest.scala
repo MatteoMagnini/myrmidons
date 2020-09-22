@@ -8,7 +8,7 @@ import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import utility.Geometry.{Vector2D, ZeroVector2D}
-import utility.Messages.{Clock, Repaint, StartSimulation}
+import utility.Messages.{AntBirth, Clock, Repaint, StartSimulation}
 
 class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
   with AnyWordSpecLike
@@ -73,16 +73,16 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
 
       "receive all their positions" in {
         val result = sender.expectMsgType[Repaint]
-        val positions = result.info.filter {
+        val positionsCount = result.info.count {
           case _: ForagingAntInfo => true
           case _ => false
         }
-        assert(positions.size == nAnts)
+        assert(positionsCount == nAnts)
       }
     }
     "make them move" should {
       environment ! Clock(2)
-      var positions: Seq[Vector2D] = Seq.empty
+      val positions: Seq[Vector2D] = Seq.empty
 
       "receive all their new positions" in {
         val result = sender.expectMsgType[Repaint]
@@ -114,11 +114,42 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
     }
     "receive all their positions" in {
       val result = sender.expectMsgType[Repaint]
-      val positions = result.info.filter {
+      val positionsCount = result.info.count {
         case _: ForagingAntInfo => true
         case _ => false
       }
-      assert(positions.size == nAnts)
+      assert(positionsCount == nAnts)
+    }
+  }
+
+  "Environment with an ant" when {
+    val sender = TestProbe()
+    implicit val senderRef: ActorRef = sender.ref
+
+    val nAnts = 1
+    val environment = system.actorOf(Environment(EnvironmentInfo(boundary)), name = "env-actor-4")
+    var nAntsPreBirth = 0
+    var nAntsPostBirth = 0
+
+    "other ants born" should {
+      environment ! StartSimulation(nAnts, 0)
+      environment ! Clock(1)
+      val result = sender.expectMsgType[Repaint]
+      nAntsPreBirth = result.info.count {
+        case _: ForagingAntInfo => true
+        case _ => false
+      }
+      environment ! AntBirth(1)
+      environment ! Clock(2)
+      val result2 = sender.expectMsgType[Repaint]
+      nAntsPostBirth = result2.info.count {
+        case _: ForagingAntInfo => true
+        case _ => false
+      }
+
+      "see ants number increased" in {
+        assert(nAntsPostBirth > nAntsPreBirth)
+      }
     }
   }
 }
