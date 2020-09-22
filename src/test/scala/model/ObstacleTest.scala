@@ -36,8 +36,8 @@ class ObstacleTest  extends wordspec.AnyWordSpec {
         val stop = Vector2D(50, 10)
         assert(o hasInside(stop))
         val res = o findIntersectionPoint(start, stop)
-        assert(res.intersectionPoint === Vector2D(50, 15))
-        val angle = (res.angle * 100).round / 100.toDouble
+        assert(res.get.intersectionPoint === Vector2D(50, 15))
+        val angle = (res.get.angle * 100).round / 100.toDouble
         val test = ( Math.PI/2 * 100).round / 100.toDouble
         assert(angle == test)
       }
@@ -45,12 +45,6 @@ class ObstacleTest  extends wordspec.AnyWordSpec {
     "has outside a point" should {
       "return false" in{
         assert((o hasInside Vector2D(100,10)) === false)
-      }
-
-      "return IllegalArgumentException" in {
-        val start = Vector2D(50, 17)
-        val stop = Vector2D(50, 20)
-        assertThrows[IllegalArgumentException] { o findIntersectionPoint(start, stop) }
       }
     }
   }
@@ -70,6 +64,16 @@ class ObstacleTest  extends wordspec.AnyWordSpec {
       val points: List[Vector3D] = List((1,1,1), (1,2,1), (2,2,1), (2,1,1))
       val o = Obstacle(points)
       assert(o.hasInside((2.5,0.5)) === false)
+    }
+  }
+
+  "a path that no have intersection with a obstacle" must {
+    "return Option.empty" in{
+      val o = new SimpleObstacle(Vector2D(50.0, 10.0), 20, 10)
+      val start = Vector2D(50, 17)
+      val stop = Vector2D(50, 16)
+      val res = o findIntersectionPoint(start, stop)
+      assert(res === Option.empty)
     }
   }
 }

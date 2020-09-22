@@ -34,7 +34,7 @@ trait Bordered extends Drawable {
     *         Double.MaxValue, then there are no valid intersection
     *         or something wrong happened
     * */
-  def findIntersectionPoint(oldPosition: Vector2D, newPosition: Vector2D): IntersectionResult
+  def findIntersectionPoint(oldPosition: Vector2D, newPosition: Vector2D): Option[IntersectionResult]
 }
 
 object BorderedEntityFactory {

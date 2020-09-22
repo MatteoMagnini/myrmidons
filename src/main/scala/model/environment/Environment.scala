@@ -55,7 +55,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
               sender ! FoodNear
               context become defaultBehaviour(state.updateFood(f, f - ConstantInsectInfo.MAX_FOOD))
             case x =>
-              val intersectionAndDirection = x.findIntersectionPoint(position, newPosition)
+              val intersectionAndDirection = x.findIntersectionPoint(position, newPosition).get
               //println(intersectionAndDirection)
               val newDelta = intersectionAndDirection.intersectionPoint - newPosition
               sender ! NewPosition(intersectionAndDirection.intersectionPoint >> newDelta, newDelta)
