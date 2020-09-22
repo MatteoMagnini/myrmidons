@@ -37,14 +37,13 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       context become defaultBehaviour(EnvironmentInfo(Some(sender), state.boundary, foods ++ obstacles, ants, enemies, anthill, state.anthillInfo))
 
     case Clock(value: Int) =>
-      log.debug("ants: " + state.ants.size + " enemies: " + state.enemies.size)
+      if (Random.nextDouble() < 0.01) self ! AntBirth(value)
       state.ants.values.foreach(_ ! Clock(value))
       state.enemies.values.foreach(_ ! Clock(value))
       state.anthill match {
         case Some(x) => x ! Clock(value)
         case _ => print("Should never happen environment has no anthill")
       }
-      if (Random.nextDouble() < 0.01) self ! AntBirth(value)
 
     case Move(position: Vector2D, delta: Vector2D) =>
       val newPosition = position >> delta
@@ -74,9 +73,9 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       context become defaultBehaviour(state.updateAnthillInfo(anthillInfo))
 
     case AntBirth(clock: Int) =>
-      val antId = state.ants.size
+      val antId = state.ants.size + clock
       val birthPosition = state.anthillInfo.position
-      val ant = context.actorOf(ForagingAnt(ForagingAntInfo(state.anthill.get, id = antId, position = birthPosition, time = clock - 1), self), s"ant-${antId + clock}")
+      val ant = context.actorOf(ForagingAnt(ForagingAntInfo(state.anthill.get, id = antId, position = birthPosition, time = clock - 1), self), s"ant-$antId")
       ant ! Clock(clock)
       context become defaultBehaviour(state.addAnt(antId, ant))
 
