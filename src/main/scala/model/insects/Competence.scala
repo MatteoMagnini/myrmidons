@@ -3,7 +3,7 @@ package model.insects
 import akka.actor.Actor.Receive
 import akka.actor.{ActorContext, ActorRef}
 import utility.Geometry._
-import utility.Messages._
+import utility.Messages.{KillAnt, _}
 
 import scala.util.Random
 
@@ -21,9 +21,7 @@ object Constant {
 
 import Constant._
 
-/**
- * A competence is the minimal building block to achieve a more complex behaviour.
- */
+/** A competence is the minimal building block to achieve a more complex behaviour. */
 trait Competence {
 
   def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit
@@ -51,9 +49,7 @@ object RandomWalk extends Competence {
   override def hasPriority(info: InsectInfo): Boolean = true
 }
 
-/**
-  * Competence forcing an ant to go back to the anthill when its energy is low.
-  */
+/** Competence forcing an ant to go back to the anthill when its energy is low. */
 object GoBackToHome extends Competence {
 
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive ): Unit = {
@@ -101,6 +97,14 @@ object TakeFood extends Competence {
   }
 
   override def hasPriority(info: InsectInfo): Boolean = true
+}
+
+object Die extends Competence {
+  override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
+    environment.tell(KillAnt(info.id), ant)
+  }
+
+  override def hasPriority(info: InsectInfo): Boolean = info.energy <= 0
 }
 
 /** Competence that enable an ant to follow the traces of the (food) pheromone. */

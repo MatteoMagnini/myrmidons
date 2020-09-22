@@ -14,7 +14,7 @@ object Messages {
    * @param nAnts       number of ants to be created
    * @param centerSpawn whether spawn ants from center of boundaries
    */
-  case class StartSimulation(nAnts: Int, centerSpawn: Boolean = false, obstacles: Option[Int] = Some(6), food: Option[Int] = Some(3)) extends Message
+  case class StartSimulation(nAnts: Int,  nEnemies: Int, centerSpawn: Boolean = false, obstacles: Option[Int] = Some(6), food: Option[Int] = Some(3)) extends Message
 
   /** Message sent from GUI to environment and from environment to ants, to do a step in simulation.
    *
@@ -82,7 +82,8 @@ object Messages {
    */
   case class AddRandomAnt(nAnts: Int, step: String) extends Message
 
-  // TODO next sprint
-  //case class KillAnt() extends Message
+  case class AntBirth(clock: Int)
+
+  case class KillAnt(id: Int) extends Message
 
 }
