@@ -11,7 +11,7 @@ class Enemy (override val info: EnemyInfo,
   /**
    * Use of the subsumption architecture to model the final emerging behaviour.
    * @param competences a set of competences that the ant is able to perform.
-   * @return the competence with heist priority.
+   * @return the competence with highest priority.
    */
   private def subsumption(data: InsectInfo, competences: Competence*): Competence = competences.filter(c => c.hasPriority(data)).take(1).last
 

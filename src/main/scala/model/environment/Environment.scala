@@ -113,13 +113,30 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     context.actorOf(ForagingAnt(antInfo, self), s"ant-${antInfo.id}")
   }
 
-  private def sendInfoToGUI(info: EnvironmentInfo) = {
+  private def sendInfoToGUI(info: EnvironmentInfo): Unit = {
     /* When all insects return their positions, environment send them to GUI */
     if ((info.antsInfo.size + info.enemiesInfo.size) == (info.ants.size + info.enemies.size)) {
-      info.gui.get ! Repaint(info.antsInfo ++ info.enemiesInfo ++ info.obstacles ++ Seq(info.anthillInfo))
-      context become defaultBehaviour(info.emptyInsectInfo())
+      val fights = checkFights(info.antsInfo, info.enemiesInfo)
+      var updatedInfo = info
+      for (fight <- fights) {
+        val ant = fight._1
+        val enemy = fight._2
+        if (ant.energy > enemy.energy) {
+          context.stop(info.ants(ant.id))
+          updatedInfo = info.removeAnt(ant.id)
+        }
+      }
+      info.gui.get ! Repaint(updatedInfo.antsInfo ++ updatedInfo.enemiesInfo ++ updatedInfo.obstacles ++ Seq(updatedInfo.anthillInfo))
+      context become defaultBehaviour(updatedInfo.emptyInsectInfo())
     } else context become defaultBehaviour(info)
   }
+
+  private def checkFights(antsInfo: Iterable[InsectInfo], enemiesInfo: Iterable[InsectInfo]): Iterable[(InsectInfo, InsectInfo)] =
+    for {
+      ant <- antsInfo
+      enemy <- enemiesInfo
+      if ant.position ~~ enemy.position
+    } yield (ant, enemy)
 }
 
 object Environment {
