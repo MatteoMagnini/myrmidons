@@ -166,7 +166,8 @@ object FoodPheromoneTaxis extends Competence {
 
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
     val delta = info match {
-      case i: ForagingAntInfo => i.foodPheromones.toStream.filter(p => p.position --> i.position < FOOD_PHEROMONE_THRESHOLD ).weightedSum
+      case i: ForagingAntInfo =>
+        i.foodPheromones.toStream.filter(p => p.position --> i.position < FOOD_PHEROMONE_THRESHOLD ).weightedSum(i.position)
       case _ => println("Only a foraging ant can do FoodPheromoneTaxis"); ZeroVector2D()
     }
     val data = info.updateEnergy(ENERGY_FPT)
@@ -175,7 +176,7 @@ object FoodPheromoneTaxis extends Competence {
   }
 
   override def hasPriority(info: InsectInfo): Boolean = info match {
-    case f: ForagingAntInfo => f.foodPheromones.nonEmpty
+    case i: ForagingAntInfo => i.foodPheromones.toStream.exists(p => p.position --> i.position < FOOD_PHEROMONE_THRESHOLD)
     case _ => false
   }
 }
