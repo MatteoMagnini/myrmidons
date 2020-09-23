@@ -29,7 +29,6 @@ case class Anthill(info: AnthillInfo, environment: ActorRef) extends Actor {
   def defaultBehaviour(data: AnthillInfo): Receive = {
 
     case StoreFood(delta) =>
-      println("Anthill: " + data.foodAmount)
       context become defaultBehaviour(data.incFood(delta))
 
     case EatFood(delta) =>

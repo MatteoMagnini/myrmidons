@@ -86,7 +86,6 @@ case class ForagingAnt(override val info: ForagingAntInfo,
      * Take food from a food source in the environment.
      */
     case TakeFood(delta, _) =>
-      println("Insect - take food arrived")
       val newData = data match {
         case d: ForagingAntInfo => d.incFood(delta).updateFoodPosition(None)
         case x => x

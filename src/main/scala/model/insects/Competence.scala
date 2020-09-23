@@ -109,7 +109,6 @@ object EatFromTheAnthill extends Competence {
 object PickFood extends Competence {
 
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
-    println(s"Ant ${info.id} picking food")
     info match {
       case i: ForagingAntInfo if i.foodIsNear =>
         environment.tell(TakeFood(MAX_FOOD - i.foodAmount, i.foodPosition.get), ant)

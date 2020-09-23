@@ -42,9 +42,10 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
     case AddFoodPheromones(pheromone: FoodPheromone) =>
       context become defaultBehaviour(state.addPheromone(pheromone))
+
+
     case Clock(value: Int) =>
       state.ants.values.foreach(_ ! FoodPheromones(state.pheromones))
-      //state.ants.values.foreach(_ ! FoodPheromones(state.pheromones))
       state.ants.values.foreach(_ ! Clock(value))
 
       state.enemies.foreach(_ ! Clock(value))
@@ -84,7 +85,6 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
     case TakeFood(delta, position) =>
       // TODO Split list obstacle in food and obstacle and check only food
-      println("Env - take food arrived")
       state.obstacles.find(_.hasInside(position)) match {
         case Some(x) => x match {
           case f: Food =>
