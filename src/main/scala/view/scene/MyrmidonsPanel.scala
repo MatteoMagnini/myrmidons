@@ -1,15 +1,11 @@
 package view.scene
 
-
 import java.awt.Color
 import java.awt.geom.{Ellipse2D, Rectangle2D}
-
 import model.anthill.AnthillInfo
 import model.environment.FoodPheromone
 import model.{Drawable, Food, SimpleObstacle}
-import model.insects.{Enemy, EnemyInfo, ForagingAntInfo, InsectInfo}
-
-import scala.swing.event.MouseClicked
+import model.insects.{EnemyInfo, ForagingAntInfo, InsectInfo}
 import scala.swing.{Graphics2D, Panel}
 
 /**
@@ -39,6 +35,26 @@ case class MyrmidonsPanel() extends Panel {
       g.clearRect(0, 0, size.width, size.height)
 
       /**
+       * Foreach pheromones draw its new position in Panel.
+       */
+      this.pheromones.foreach(x => {
+        val d: Float = (x.intensity / 1000).toFloat
+        if (d < 0.1f) {
+          g.setColor(new Color(1f, 0.8f, 0.02f, 0.1f))
+        } else if (d < 0.2f) {
+          g.setColor(new Color(1f, 0.6f, 0.04f, 0.2f))
+        } else if (d < 0.4f) {
+          g.setColor(new Color(1f, 0.4f, 0.06f, 0.4f))
+        }
+        else if (d < 0.6f) {
+          g.setColor(new Color(1f, 0.2f, 0.08f, 0.6f))
+        }
+        val ellipse = new Ellipse2D.Double(x.position.x - (10 / 2),
+          x.position.y - (10 / 2), 5, 5)
+        g.fill(ellipse)
+      })
+
+      /**
        * Foreach ants draw its new position in Panel.
        */
       g.setColor(Color.black)
@@ -59,9 +75,9 @@ case class MyrmidonsPanel() extends Panel {
       })
 
       /**
-        * Foreach obstacles draw its new position in Panel.
-      */
-      g.setColor(new Color(0.5f,0.5f,0.5f,0.5f))
+       * Foreach obstacles draw its new position in Panel.
+       */
+      g.setColor(new Color(0.5f, 0.5f, 0.5f, 0.5f))
       obstacles.foreach(x => {
         val rect = new Rectangle2D.Double(x.position.x - (x.xDim / 2), x.position.y - (x.yDim / 2), x.xDim, x.yDim)
         g.fill(rect)
@@ -75,7 +91,7 @@ case class MyrmidonsPanel() extends Panel {
         if (d < 0.4f) {
           g.setColor(new Color(0f, 0f, 1f, 0.4f))
         } else {
-          g.setColor(new Color(0f, 0f, 1f, 0.4f))//d
+          g.setColor(new Color(0f, 0f, 1f, 0.4f)) //d
         }
         val ellipse = new Ellipse2D.Double(x.position.x - (x.xDim / 2),
           x.position.y - (x.yDim / 2), x.xDim, x.yDim)
@@ -100,15 +116,6 @@ case class MyrmidonsPanel() extends Panel {
       }
 
 
-      /**
-       *
-       */
-      this.pheromones.foreach(x => {
-        g.setColor(Color.pink)
-      val ellipse = new Ellipse2D.Double(x.position.x - (10 / 2),
-        x.position.y - (10 / 2), 5, 5)
-      g.fill(ellipse)
-      })
     }
   }
 
@@ -132,6 +139,7 @@ case class MyrmidonsPanel() extends Panel {
     food = Seq.empty
     obstacles = Seq.empty
     anthill = None
+    pheromones = Seq.empty
     info.foreach {
       case x: ForagingAntInfo => ants = x +: ants
       case x: Food => food = x +: food

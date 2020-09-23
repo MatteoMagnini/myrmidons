@@ -5,11 +5,12 @@ import model.insects.ConstantInsectInfo.{MAX_ENERGY, MAX_FOOD, STARTING_ENERGY, 
 import utility.Geometry.{Vector2D, ZeroVector2D}
 import utility.Messages.{Clock, EatFood, FoodNear, NewPosition, UpdateAnthillCondition, UpdateInsect}
 
-class Enemy (override val info: EnemyInfo,
-             override val environment: ActorRef) extends Insect {
+class Enemy(override val info: EnemyInfo,
+            override val environment: ActorRef) extends Insect {
 
   /**
    * Use of the subsumption architecture to model the final emerging behaviour.
+   *
    * @param competences a set of competences that the ant is able to perform.
    * @return the competence with heist priority.
    */
@@ -31,7 +32,7 @@ class Enemy (override val info: EnemyInfo,
       environment ! UpdateInsect(newData)
       context become defaultBehaviour(newData)
 
-    case FoodNear =>
+    case FoodNear(_) =>
       subsumption(data, PickFood, RandomWalk)(context, environment, self, data, defaultBehaviour)
 
     case UpdateAnthillCondition(value) =>
@@ -42,13 +43,15 @@ class Enemy (override val info: EnemyInfo,
       environment ! UpdateInsect(newData)
       context become defaultBehaviour(newData)
 
-    case x => println("Should never happen, received message: " + x + " from " + sender)
+    case x => println("Enemies: Should never happen, received message: " + x + " from " + sender)
   }
 }
+
 object Enemy {
   def apply(info: InsectInfo, environment: ActorRef): Props =
     Props(classOf[Enemy], info, environment)
 }
+
 case class EnemyInfo(override val anthill: ActorRef,
                      override val isInsideTheAnthill: Boolean,
                      override val foodPosition: Option[Vector2D],
@@ -57,7 +60,7 @@ case class EnemyInfo(override val anthill: ActorRef,
                      override val inertia: Vector2D,
                      override val energy: Double,
                      override val time: Int,
-                     foodAmount: Double) extends InsectInfo{
+                     foodAmount: Double) extends InsectInfo {
 
   override def updatePosition(newPosition: Vector2D): InsectInfo =
     this.copy(position = newPosition)

@@ -18,6 +18,7 @@ trait Pheromone extends Drawable {
 
   /**
    * Attempt to merge two pheromones if they are very close and are of the same type
+   *
    * @param pheromone the second pheromone
    * @param threshold the threshold under which apply the merge
    * @return Some of the new pheromone if they merge, none otherwise
@@ -28,9 +29,11 @@ trait Pheromone extends Drawable {
 
 object FoodPheromoneInfo {
 
-  def DELTA: Double = 1.0
+  def DELTA: Double = 0.8
 
   def STARTING_INTENSITY: Double = 100.0
+
+  def MAX_INTENSITY: Double = 1000.0
 
   def INTENSITY_FACTOR: Double = 3.0
 
@@ -55,6 +58,8 @@ case class FoodPheromone(override val position: Vector2D,
 
 object FoodPheromone {
 
+  import FoodPheromoneInfo.MAX_INTENSITY
+
   def apply(position: Vector2D, DELTA: Double, intensity: Double): FoodPheromone =
-    new FoodPheromone(position, DELTA, intensity)
+    new FoodPheromone(position, DELTA, if (intensity > MAX_INTENSITY) MAX_INTENSITY else intensity)
 }
