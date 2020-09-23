@@ -114,7 +114,7 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
       val ant = system.actorOf(ForagingAnt(ForagingAntInfo(senderRef, id = 2),senderRef), "ant-2")
 
       "perform food pheromone taxis" in {
-        val pheromones = Seq(FoodPheromone(Vector2D(10,0), DELTA,startingIntensity ))
+        val pheromones = Seq(FoodPheromone(Vector2D(5,0), DELTA,startingIntensity ))
         ant ! FoodPheromones(pheromones)
         ant ! Clock(1)
         val result1 = sender.expectMsgType[Move]
@@ -126,7 +126,7 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
       }
 
       "multiple times" in {
-        val pheromones = Seq(FoodPheromone(Vector2D(5,0),DELTA, startingIntensity))
+        val pheromones = Seq(FoodPheromone(Vector2D(2,0),DELTA, startingIntensity))
         ant ! FoodPheromones(pheromones)
         ant ! Clock(2)
         val result1 = sender.expectMsgType[Move]
