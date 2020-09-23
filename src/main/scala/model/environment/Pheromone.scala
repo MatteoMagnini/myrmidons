@@ -26,6 +26,16 @@ trait Pheromone extends Drawable {
 
 }
 
+object FoodPheromoneInfo {
+
+  def DELTA: Double = 1.0
+
+  def STARTING_INTENSITY: Double = 100.0
+
+  def INTENSITY_FACTOR: Double = 3.0
+
+}
+
 case class FoodPheromone(override val position: Vector2D,
                          override val DELTA: Double,
                          override val intensity: Double) extends Pheromone {

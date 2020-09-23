@@ -80,6 +80,9 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
         case _ => println()
       }
 
+    case AddFoodPheromones(pheromone) =>
+      //TODO: update the foodPheromone seq
+
     case UpdateInsect(info: InsectInfo) =>
       sendInfoToGUI(state.updateInsectInfo(info))
 

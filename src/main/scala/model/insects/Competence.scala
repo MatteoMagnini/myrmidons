@@ -5,11 +5,13 @@ import akka.actor.{ActorContext, ActorRef}
 import utility.Geometry._
 import utility.Messages.{KillAnt, _}
 import ConstantInsectInfo._
-
+import model.environment.FoodPheromone
+import model.insects
 
 import scala.util.Random
 object Constant {
   val NOISE = 0.3
+  val FOOD_PHEROMONE_THRESHOLD: Double = 10.0
   val MAX_VELOCITY: Double = 5
   val MIN_VELOCITY: Double = - 5
   val INERTIA_FACTOR: Double = 0.9
@@ -80,7 +82,10 @@ object GoOutside extends Competence {
     context become behaviour(data)
   }
 
-  override def hasPriority( info: InsectInfo ): Boolean = info.isInsideTheAnthill && info.energy > 80 //TODO: clearly to be parametrized
+  override def hasPriority( info: InsectInfo ): Boolean = info match {
+    case i: insects.ForagingAntInfo => i.isInsideTheAnthill && i.energy > 80 && i.foodAmount == 0//TODO: clearly to be parametrized
+    case x => x.isInsideTheAnthill && x.energy > 80
+  }
 }
 
 /**
@@ -118,6 +123,9 @@ object PickFood extends Competence {
   }
 }
 
+/**
+ * An ant leaves the food in the anthill.
+ */
 object StoreFoodInAnthill extends Competence {
 
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
@@ -125,9 +133,9 @@ object StoreFoodInAnthill extends Competence {
     val data = info match {
       case i: ForagingAntInfo =>
         i.anthill.tell(StoreFood(i.foodAmount),ant)
-        i.freeFood().updateEnergy(ENERGY_SF).updateAnthillCondition(false)
+        i.freeFood().updateEnergy(ENERGY_SF)
 
-      case x => x.updateEnergy(ENERGY_SF).updateAnthillCondition(false)
+      case x => x.updateEnergy(ENERGY_SF)
     }
     environment.tell(UpdateInsect(data), ant)
     context become behaviour(data)
@@ -151,21 +159,40 @@ object Die extends Competence {
   override def hasPriority(info: InsectInfo): Boolean = info.energy <= 0
 }
 
-/** Competence that enable an ant to follow the traces of the (food) pheromone. */
+/**
+ *  Competence that enable an ant to follow the traces of the (food) pheromone.
+ */
 object FoodPheromoneTaxis extends Competence {
 
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
     val delta = info match {
-      case i: ForagingAntInfo => i.foodPheromones.weightedSum
+      case i: ForagingAntInfo => i.foodPheromones.toStream.filter(p => p.position --> i.position < FOOD_PHEROMONE_THRESHOLD ).weightedSum
       case _ => println("Only a foraging ant can do FoodPheromoneTaxis"); ZeroVector2D()
     }
     val data = info.updateEnergy(ENERGY_FPT)
-    environment.tell(Move(data.position, delta),ant)
-    context become behaviour(data.asInstanceOf[ForagingAntInfo].updateFoodPheromones(Seq.empty))
+    environment.tell(Move(data.position, OrientedVector2DWithNoise(delta./\, MAX_VELOCITY, NOISE)),ant)
+    context become behaviour(data.asInstanceOf[ForagingAntInfo].updateFoodPheromones(Seq.empty)) //TODO: should be correct also data without update
   }
 
   override def hasPriority(info: InsectInfo): Boolean = info match {
     case f: ForagingAntInfo => f.foodPheromones.nonEmpty
+    case _ => false
+  }
+}
+
+import model.environment.FoodPheromoneInfo._
+
+object DropFoodPheromone extends Competence {
+
+  override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
+    environment.tell(AddFoodPheromones(FoodPheromone(info.position, DELTA, info.energy * INTENSITY_FACTOR)),ant)
+    val data = info.updateEnergy(ENERGY_RW)
+    environment.tell(UpdateInsect(data), ant)
+    context become behaviour(data)
+  }
+
+  override def hasPriority(info: InsectInfo): Boolean = info match {
+    case i: ForagingAntInfo => i.foodAmount > 0 && Random.nextDouble() < Math.pow(i.energy/MAX_ENERGY,2)
     case _ => false
   }
 }
