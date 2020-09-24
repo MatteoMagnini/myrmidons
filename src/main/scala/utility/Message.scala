@@ -34,7 +34,7 @@ object Messages {
 
   case class FoodPheromones(pheromones: Seq[FoodPheromone]) extends Message
 
-  case class AddFoodPheromones(foodPheromone: FoodPheromone) extends Message
+  case class AddFoodPheromone(foodPheromone: FoodPheromone, threshold: Double) extends Message
 
   /** Message sent from ant to environment, to update its information.
    *

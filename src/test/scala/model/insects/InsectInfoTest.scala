@@ -55,7 +55,7 @@ class InsectInfoTest extends TestKit(ActorSystem("InsectInfoTest"))
         assert(checkAll(info1))
       }
 
-      val newPosition = RandomVector2D(0.2,1.5)
+      val newPosition = RandomVector2DInSquare(0.2,1.5)
       val info2 = info1.updatePosition(newPosition).asInstanceOf[ForagingAntInfo]
 
       "correct update position" in {
@@ -76,7 +76,7 @@ class InsectInfoTest extends TestKit(ActorSystem("InsectInfoTest"))
         assert(checkAll(info4, position = newPosition, energy = newEnergy))
       }
 
-      val newInertia = RandomVector2D(0.2,1.5)
+      val newInertia = RandomVector2DInSquare(0.2,1.5)
       val info5 = info4.updateInertia(newInertia).asInstanceOf[ForagingAntInfo]
 
       "correct update inertia" in {

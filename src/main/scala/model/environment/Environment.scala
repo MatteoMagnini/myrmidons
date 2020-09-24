@@ -36,12 +36,12 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
         createRandomFood(state.boundary.topLeft.x, state.boundary.bottomRight.x)) else Seq.empty
 
       var foodPheromones = Seq[FoodPheromone]()
-      foodPheromones = FoodPheromone(RandomVector2D(100, 200), 0.3, 5.4) +: foodPheromones
+      foodPheromones = FoodPheromone(RandomVector2DInSquare(100, 200), 0.3, 5.4) +: foodPheromones
       context become defaultBehaviour(EnvironmentInfo(Some(sender), state.boundary,
         foods ++ obstacles, ants, enemies, anthill, state.anthillInfo, foodPheromones))
 
-    case AddFoodPheromones(pheromone: FoodPheromone) =>
-      context become defaultBehaviour(state.addPheromone(pheromone))
+    case AddFoodPheromone(pheromone: FoodPheromone, threshold: Double) =>
+      context become defaultBehaviour(state.addPheromone(pheromone, threshold))
 
 
     case Clock(value: Int) =>
@@ -54,7 +54,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
         case _ => print("Should never happen environment has no anthill")
       }
       context become defaultBehaviour(state.updatePheromones(state.pheromones.tick()))
-      if (Random.nextDouble() < 0.01) self ! AntBirth(value)
+      if (Random.nextDouble() < 0.002) self ! AntBirth(value)
 
     case Move(position: Vector2D, delta: Vector2D) =>
       val newPosition = position >> delta
@@ -93,7 +93,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
           case _ => println("ERROR")
         }
         // TODO Food finished but ant want take food but it doesn't know
-        case None => sender ! NewPosition(position, ZeroVector2D())
+        case None => sender !TakeFood(0, position)
       }
 
 
@@ -120,7 +120,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   /** Returns ants references, created from random position */
   private def createAntFromRandomPosition(nAnts: Int, anthill: ActorRef): Map[Int, ActorRef] =
     (0 until nAnts).map(i => {
-      val randomPosition = RandomVector2D(state.boundary.topLeft.x, state.boundary.topRight.x)
+      val randomPosition = RandomVector2DInSquare(state.boundary.topLeft.x, state.boundary.topRight.x)
       i -> context.actorOf(ForagingAnt(ForagingAntInfo(anthill, id = i, position = randomPosition), self), s"ant-$i")
     }).toMap
 
@@ -134,7 +134,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   /** Returns ants references, created from random position */
   private def createEnemiesFromRandomPosition(nEnemies: Int, anthill: ActorRef): Seq[ActorRef] =
     if (nEnemies == 0) Seq.empty else (0 until nEnemies).map(i => {
-      val randomPosition = RandomVector2D(state.boundary.topLeft.x, state.boundary.topRight.x)
+      val randomPosition = RandomVector2DInSquare(state.boundary.topLeft.x, state.boundary.topRight.x)
       context.actorOf(Enemy(EnemyInfo(anthill, id = i, position = randomPosition), self), s"enemy-$i")
     })
 

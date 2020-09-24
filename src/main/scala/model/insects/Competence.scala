@@ -10,10 +10,11 @@ import model.insects
 import scala.util.Random
 
 object Constant {
-  val NOISE = 0.3
-  val FOOD_PHEROMONE_THRESHOLD: Double = 10.0
+  val NOISE = 0.1
+  val FOOD_PHEROMONE_THRESHOLD: Double = 5.0
+  val ANT_PHEROMONE_THRESHOLD: Double = 10.0
   val MAX_VELOCITY: Double = 5
-  val MIN_VELOCITY: Double = -5
+  val MIN_VELOCITY: Double = 2
   val INERTIA_FACTOR: Double = 0.9
   val FOOD_EATEN_PER_STEP: Double = 0.5
   val ENERGY_RW: Double = -0.3
@@ -48,8 +49,9 @@ object RandomWalk extends Competence {
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
 
     val data = info.updateEnergy(ENERGY_RW)
-    val delta: Vector2D = RandomVector2D(MIN_VELOCITY, MAX_VELOCITY, info.inertia * INERTIA_FACTOR)
-    environment.tell(Move(data.position, delta), ant)
+    val delta: Vector2D = RandomVector2DInCircle(MIN_VELOCITY, MAX_VELOCITY)
+    val deltaWithInertia = OrientedVector2D((delta >> (info.inertia * INERTIA_FACTOR))./\, doubleInRange(MIN_VELOCITY, MAX_VELOCITY))
+    environment.tell(Move(data.position, deltaWithInertia), ant)
     context become behaviour(data)
   }
 
@@ -78,8 +80,9 @@ object GoOutside extends Competence {
 
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
     val data = info.updateEnergy(ENERGY_RW).updateAnthillCondition(false)
-    val delta: Vector2D = RandomVector2D(MIN_VELOCITY, MAX_VELOCITY, info.inertia * INERTIA_FACTOR)
-    environment.tell(Move(data.position, delta), ant)
+    val delta: Vector2D = RandomVector2DInCircle(MIN_VELOCITY, MAX_VELOCITY)
+    val deltaWithInertia = OrientedVector2D((delta >> (info.inertia * INERTIA_FACTOR))./\, doubleInRange(MIN_VELOCITY, MAX_VELOCITY))
+    environment.tell(Move(data.position, deltaWithInertia), ant)
     context become behaviour(data)
   }
 
@@ -168,7 +171,7 @@ object FoodPheromoneTaxis extends Competence {
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
     val delta = info match {
       case i: ForagingAntInfo =>
-        i.foodPheromones.toStream.filter(p => p.position --> i.position < FOOD_PHEROMONE_THRESHOLD).weightedSum(i.position)
+        i.foodPheromones.toStream.filter(p => p.position --> i.position < ANT_PHEROMONE_THRESHOLD).weightedSum(i.position)
       case _ => println("Only a foraging ant can do FoodPheromoneTaxis"); ZeroVector2D()
     }
     val data = info.updateEnergy(ENERGY_FPT)
@@ -179,7 +182,7 @@ object FoodPheromoneTaxis extends Competence {
   }
 
   override def hasPriority(info: InsectInfo): Boolean = info match {
-    case i: ForagingAntInfo => i.foodPheromones.toStream.exists(p => p.position --> i.position < FOOD_PHEROMONE_THRESHOLD)
+    case i: ForagingAntInfo => i.foodPheromones.toStream.exists(p => p.position --> i.position < ANT_PHEROMONE_THRESHOLD)
     case _ => false
   }
 }
@@ -189,7 +192,8 @@ import model.environment.FoodPheromoneInfo._
 object DropFoodPheromone extends Competence {
 
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
-    environment.tell(AddFoodPheromones(FoodPheromone(info.position, DELTA, STARTING_INTENSITY)), ant)
+    println(s"Ant ${info.id} with energy ${info.energy} drop pheromone")
+    environment.tell(AddFoodPheromone(FoodPheromone(info.position, DELTA, info.energy), FOOD_PHEROMONE_THRESHOLD), ant)
     val data = info.updateEnergy(ENERGY_RW)
     environment.tell(UpdateInsect(data), ant)
     context become behaviour(data)

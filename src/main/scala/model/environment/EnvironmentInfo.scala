@@ -41,7 +41,7 @@ trait EnvironmentInfo {
   /** */
   def updatePheromones(foodPheromone: Seq[FoodPheromone]): EnvironmentInfo
 
-  def addPheromone(food: FoodPheromone): EnvironmentInfo
+  def addPheromone(food: FoodPheromone, threshold: Double): EnvironmentInfo
 
   /** Reference to anthill */
   def anthill: Option[ActorRef]
@@ -119,8 +119,8 @@ object EnvironmentInfo {
     override def updatePheromones(foodPheromones: Seq[FoodPheromone]): EnvironmentInfo =
       this.copy(pheromones = foodPheromones)
 
-    override def addPheromone(food: FoodPheromone): EnvironmentInfo =
-      this.copy(pheromones = pheromones.add(food, 5.0))
+    override def addPheromone(food: FoodPheromone, threshold: Double): EnvironmentInfo =
+      this.copy(pheromones = pheromones.add(food, threshold))
   }
 
 }

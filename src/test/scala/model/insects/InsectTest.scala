@@ -83,6 +83,7 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
         val finalEnergy = startingEnergy + c.ENERGY_RW + c.ENERGY_RW
         val result2 = sender.expectMsgType[UpdateInsect]
         //assert(result2.info.position == finalPosition)
+        println("ANT POSITION: " + result2.info.position)
         assert(result2.info.inertia == result1.delta)
         assert(result2.info.energy == finalEnergy)
         sender expectNoMessage

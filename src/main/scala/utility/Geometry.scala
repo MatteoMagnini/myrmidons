@@ -21,7 +21,7 @@ object Geometry {
     def >> (delta: Vector2D): Vector2D = (x + delta.x, y + delta.y)
 
     /** Returns a vector subtraction */
-    def - (delta: Vector2D): Vector2D = this >> (delta -)
+    def - (delta: Vector2D): Vector2D = this >> delta.-
 
     /** Returns a vector multiplied by a constant */
     def * (s: Double): Vector2D = (s * x, s * y)
@@ -33,7 +33,7 @@ object Geometry {
     def /\ : Double = math.atan2(y,x)
 
     /** Return the distance between vectors */
-    def -->(other: Vector2D) : Double = this - other ||
+    def -->(other: Vector2D) : Double = (this - other).||
 
     override def equals(obj: Any): Boolean = obj match {
       case o: Vector2D => ~=(this.x,o.x,1E-10) && ~=(this.y,o.y,1E-10)
@@ -60,36 +60,72 @@ object Geometry {
   /** Oriented vector factory */
   object OrientedVector2DWithNoise {
     def apply(radiant: Double, module: Double, noise: Double ): Vector2D = {
-      val r = scala.util.Random
-      Vector2D(math.cos(radiant) * module * (1 - r.nextDouble() * noise),
-        math.sin(radiant) * module * (1 - r.nextDouble() * noise))
+      assert(noise <= 1 && noise >= 0)
+      val newRadiant = doubleInRange(radiant - noise * radiant, radiant + noise *radiant)
+      OrientedVector2D(newRadiant, doubleInRange(module * (1 - noise), module))
     }
   }
 
-  /** Random vector factory */
-  object RandomVector2D {
-  import TupleOp._
+  object RandomVector2DInCircle {
 
+    def apply( minRadius: Double = 0.0, maxRadius: Double = 1.0, center: Vector2D = ZeroVector2D()): Vector2D = {
+      assert(minRadius >= 0)
+      assert(maxRadius > 0)
+      OrientedVector2D(scala.util.Random.nextDouble() * 2 * Math.PI, doubleInRange(minRadius, maxRadius)) >> center
+    }
+
+  }
+
+  /** Random vector factory inside a square or rectangle*/
+  object RandomVector2DInSquare {
+    import TupleOp._
+
+    /**
+     * @param min value of a dimension
+     * @param max value of a dimension
+     * @return a vector inside the square with uniform distribution
+     *         A  B
+     *         C  D
+     *         where:
+     *         A = (min,max),
+     *         B = (max,max),
+     *         C = (min,min),
+     *         D = (max,min)
+     */
     def apply(min: Double, max: Double): Vector2D = {
-      val uniformDoubleGenerator = scala.util.Random
-      val x = uniformDoubleGenerator.nextDouble() * (max - min) + min
-      val y = uniformDoubleGenerator.nextDouble() * (max - min) + min
+      val x = doubleInRange(min, max)
+      val y = doubleInRange(min, max)
       (x,y)
     }
 
+    /**
+     * Similar as the constructor without perturbation.
+     * @param min value of a dimension
+     * @param max value of a dimension
+     * @param perturbation a vector to influence the uniform distribution inside the square
+     * @return a vector inside the square
+     */
     def apply(min: Double, max: Double, perturbation: Vector2D): Vector2D =
       bound(min, max, apply(min, max) >> perturbation)
 
+    /**
+     * Create a random vector in a rectangle.
+     * @param minX for first dimension
+     * @param maxX for first dimension
+     * @param minY for second dimension
+     * @param maxY for second dimension
+     * @return a vector inside the rectangle with uniform distribution
+     */
     def apply(minX: Double, maxX: Double, minY: Double, maxY: Double ): Vector2D =
       Vector2D(doubleInRange(minX, maxX), doubleInRange(minY, maxY))
-
-    private def bound(min: Double, max: Double, v: Vector2D): Vector2D =
-      Vector2D(if (v.x < min) min else if (v.x > max) max else v.x,
-        if (v.y < min) min else if (v.y > max) max else v.y)
-
-    private def doubleInRange(min: Double, max: Double): Double =
-      min + (max - min) * scala.util.Random.nextDouble()
   }
+
+  private def bound(min: Double, max: Double, v: Vector2D): Vector2D =
+    Vector2D(if (v.x < min) min else if (v.x > max) max else v.x,
+      if (v.y < min) min else if (v.y > max) max else v.y)
+
+  def doubleInRange(min: Double, max: Double): Double =
+    min + (max - min) * scala.util.Random.nextDouble()
 
   /** Implicit conversions for [[utility.Geometry.Vector2D]] instances
    *
@@ -129,12 +165,12 @@ object Geometry {
 
    def ^ (s: Vector3D) : Double = {
      val numerator = (s.x * this.x) + (s.y + this.y) + (s.z + this.z)
-     val denominatorA = this ||
-     val denominatorB = s ||
+     val denominatorA = this.||
+     val denominatorB = s.||
 
      math.acos(numerator / (denominatorA * denominatorB))
    }
-   def -->(other: Vector3D): Double = this - other ||
+   def -->(other: Vector3D): Double = (this - other).||
 
    /**
     * the distance between start point and intersection, summed distance to
