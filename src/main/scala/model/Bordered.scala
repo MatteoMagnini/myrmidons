@@ -47,9 +47,12 @@ object BorderedEntityFactory {
    * @param xDim   dimension on x-axis
    * @param yDim   dimension on y-axis
    * @return a SimpleObstacle instance
-   **/
-  def createRandomSimpleObstacle(minPos: Double = 0, maxPos: Double = 800, xDim: Int = 30, yDim: Int = 30): SimpleObstacle = {
-    val pos = RandomVector2D(minPos, maxPos)
+   * */
+  def createRandomSimpleObstacle(minPos: Double = 0, maxPos: Double = 800, xDim: Int = 30, yDim: Int = 30):SimpleObstacle = {
+    var pos = RandomVector2D(minPos, maxPos)
+    if (pos --> Vector2D(400,400) < 50)
+      pos = pos >> Vector2D(if(pos.x < 400) -50 else 50,0)
+
     new SimpleObstacle(Vector2D(pos.x, pos.y), xDim, yDim)
   }
 

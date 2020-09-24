@@ -69,15 +69,20 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
             case f: Food =>
               sender ! FoodNear(f.position)
               //TODO: code replication!!!
-              val intersectionAndDirection = f.findIntersectionPoint(position, newPosition)
+              val intersectionAndDirection = f.findIntersectionPoint(position, newPosition).head
               //println(intersectionAndDirection)
               val newDelta = intersectionAndDirection.intersectionPoint - newPosition
               sender ! NewPosition(intersectionAndDirection.intersectionPoint >> newDelta, newDelta)
             case x =>
-              val intersectionAndDirection = x.findIntersectionPoint(position, newPosition).get
-              //println(intersectionAndDirection)
+              val intersectionAndDirection = x.findIntersectionPoint(position, newPosition).head
+              val angletest = math.Pi - (intersectionAndDirection.angle * 2);
+
               val newDelta = intersectionAndDirection.intersectionPoint - newPosition
-              sender ! NewPosition(intersectionAndDirection.intersectionPoint >> newDelta, newDelta)
+              val test = Vector2D(
+                (math.cos(angletest) * newDelta.x) - (math.sin(angletest) * newDelta.y),
+                (math.sin(angletest) * newDelta.x) + (math.cos(angletest) * newDelta.y))
+
+              sender ! NewPosition(intersectionAndDirection.intersectionPoint >> test, test)
           }
 
         }

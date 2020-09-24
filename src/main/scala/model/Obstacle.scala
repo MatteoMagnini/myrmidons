@@ -1,5 +1,6 @@
 package  model
 
+import utility.Geometry
 import utility.Geometry.{Vector2D, Vector3D, ZeroVector2D}
 import utility.Geometry.TupleOp3._
 import utility.Geometry.TupleOp._
@@ -75,7 +76,7 @@ class SimpleObstacle(override val position: Vector2D, val xDim: Double, val yDim
     * */
     segments.indices foreach( i => {
       val crossIntersection = segments(i)._3 X antPath._3
-      if (crossIntersection.z != 0.0) {
+      if (!(Geometry ~= (crossIntersection.z, 0.0, 1E-7))) {
         val intersection = crossIntersection / crossIntersection.z
         if ((intersection checkInside(segments(i)._1, segments(i)._2))
           && (intersection checkInside(oldPosition, newPosition))) {
@@ -83,10 +84,16 @@ class SimpleObstacle(override val position: Vector2D, val xDim: Double, val yDim
         }
       }
     })
-    if (intersections.size <= 0)
+    if (intersections.size <= 0) {
+      println(s"${this.position} || $oldPosition || $newPosition")
       Option.empty
+    }
     else
-      Some(intersections.sortWith((a,b) => a.intersectionPoint-->oldPosition < b.intersectionPoint --> oldPosition).head)
+      Some(intersections.sortWith(
+        (a,b) =>
+          (a.intersectionPoint --> oldPosition) < (b.intersectionPoint --> oldPosition)
+        ).head
+      )
   }
 
   def unapply(arg: SimpleObstacle): Option[(Vector2D, Double, Double)] = {

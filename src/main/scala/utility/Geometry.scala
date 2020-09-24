@@ -147,7 +147,9 @@ object Geometry {
     * @return true if this vector is inside start and stop vector, otherwise return false
     *
     * */
-   def checkInside(start: Vector3D, stop: Vector3D): Boolean = (start --> this) + (stop --> this) == (start --> stop)
+   def checkInside(start: Vector3D, stop: Vector3D): Boolean = {
+    ~=((start --> this) + (stop --> this) - (start --> stop), 0.0, 1E-6)
+   }
 
 
    /** Cross product between two vectors * */
