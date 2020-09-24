@@ -5,10 +5,10 @@ import java.awt.Color
 import java.awt.geom.{Ellipse2D, Rectangle2D}
 
 import model.anthill.AnthillInfo
+import model.Fights.Fight
 import model.{Drawable, Food, SimpleObstacle}
-import model.insects.{Enemy, EnemyInfo, ForagingAntInfo, InsectInfo}
+import model.insects.{EnemyInfo, ForagingAntInfo, InsectInfo}
 
-import scala.swing.event.MouseClicked
 import scala.swing.{Graphics2D, Panel}
 
 /**
@@ -25,6 +25,7 @@ case class MyrmidonsPanel() extends Panel {
   private var food: Seq[Food] = Seq.empty
   private var anthill: Option[AnthillInfo] = None
   private var obstacles: Seq[SimpleObstacle] = Seq.empty
+  private var fights: Seq[Fight[InsectInfo]] = Seq.empty
 
   size.height = 800
   size.width = 800
@@ -81,6 +82,13 @@ case class MyrmidonsPanel() extends Panel {
 
       })
 
+      fights.foreach(x => {
+        val p = x.position
+        g.setColor(Color.yellow)
+        val ellipse = new Ellipse2D.Double(p.x,p.y, 20, 20)
+        g.fill(ellipse)
+      })
+
       /**
        * Draw anthill with opacity control.
        */
@@ -118,13 +126,16 @@ case class MyrmidonsPanel() extends Panel {
     enemies = Seq.empty
     food = Seq.empty
     obstacles = Seq.empty
+    fights = Seq.empty
     anthill = None
+
     info.foreach {
       case x: ForagingAntInfo => ants = x +: ants
       case x: Food => food = x +: food
       case x: SimpleObstacle => obstacles = x +: obstacles
       case x: AnthillInfo => anthill = Some(x)
       case x: EnemyInfo => enemies = x +: enemies
+      case x: Fight[InsectInfo] => fights = x +: fights
       case _ => println("Error match entities")
     }
     ants.size

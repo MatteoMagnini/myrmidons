@@ -7,6 +7,7 @@ import utility.Messages.{Clock, Move, StartSimulation, UpdateInsect, _}
 import model.BorderedEntityFactory._
 import model.Food
 import model.anthill.{Anthill, AnthillInfo}
+import model.Fights.Fight
 
 import scala.util.Random
 
@@ -37,6 +38,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       context become defaultBehaviour(EnvironmentInfo(Some(sender), state.boundary, foods ++ obstacles, ants, enemies, anthill, state.anthillInfo))
 
     case Clock(value: Int) =>
+      /* Random birth of ants */
       if (Random.nextDouble() < 0.01) self ! AntBirth(value)
       state.ants.values.foreach(_ ! Clock(value))
       state.enemies.values.foreach(_ ! Clock(value))
@@ -113,37 +115,35 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   }
 
   private def sendInfoToGUI(info: EnvironmentInfo): Unit = {
-    import Fight._
-    import Fight.InsectFight._
+    import model.Fights._
+    import model.Fights.InsectFight._
 
     /* When all insects return their positions, environment send them to GUI */
     if ((info.antsInfo.size + info.enemiesInfo.size) == (info.ants.size + info.enemies.size)) {
       var updatedInfo = info
 
-      val insectLosers = losers(checkFights(info.antsInfo, info.enemiesInfo))
-      for (loser <- insectLosers) {
+      val fights = checkFights(info.antsInfo, info.enemiesInfo)
+      for (loser <- losers(fights)) {
         loser match {
           case x:ForagingAntInfo =>
-            println("Ant died")
             context.stop(info.ants(x.id))
             updatedInfo = updatedInfo.removeAnt(x.id)
           case x:EnemyInfo =>
-            println("Insect died")
             context.stop(info.enemies(x.id))
             updatedInfo = updatedInfo.removeEnemy(x.id)
         }
       }
-      info.gui.get ! Repaint(updatedInfo.antsInfo ++ updatedInfo.enemiesInfo ++ updatedInfo.obstacles ++ Seq(updatedInfo.anthillInfo))
+      info.gui.get ! Repaint(updatedInfo.antsInfo ++ updatedInfo.enemiesInfo ++ updatedInfo.obstacles ++ Seq(updatedInfo.anthillInfo) ++ fights)
       context become defaultBehaviour(updatedInfo.emptyInsectInfo())
     } else context become defaultBehaviour(info)
   }
 
-  private def checkFights(antsInfo: Iterable[InsectInfo], enemiesInfo: Iterable[InsectInfo]): Iterable[(InsectInfo, InsectInfo)] =
+  private def checkFights(antsInfo: Iterable[InsectInfo], enemiesInfo: Iterable[InsectInfo]): Iterable[Fight[InsectInfo]] =
     for {
       ant <- antsInfo
       enemy <- enemiesInfo
       if ant.position ~~ enemy.position
-    } yield (ant, enemy)
+    } yield Fight(ant, enemy, ant.position)
 }
 
 object Environment {

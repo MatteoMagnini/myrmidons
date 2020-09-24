@@ -76,8 +76,7 @@ case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends FlowPanel {
   }
 
   private def tellStart(): Unit = {
-    environment.tell(StartSimulation(100, 100, centerSpawn = true), uiActor)
-
+    environment.tell(StartSimulation(10, 10, centerSpawn = true), uiActor)
     environment.tell(Clock(1), uiActor)
   }
 

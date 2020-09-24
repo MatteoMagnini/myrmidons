@@ -16,7 +16,7 @@ object ConstantInsectInfo {
 
 
 /** The information in common with all kind of insects. */
-trait InsectInfo extends Drawable {
+trait InsectInfo extends Drawable with Product with Serializable {
 
   def id: Int
   def inertia: Vector2D
