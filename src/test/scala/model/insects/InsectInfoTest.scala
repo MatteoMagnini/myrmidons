@@ -2,6 +2,7 @@ package model.insects
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
+import model.environment.FoodPheromone
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
@@ -21,6 +22,9 @@ class InsectInfoTest extends TestKit(ActorSystem("InsectInfoTest"))
 
   "Foraging ant info" when {
 
+    val DELTA = 1E-10
+    val startingIntensity = 100.0
+
     "initialized" should {
 
       def checkAll(info: ForagingAntInfo,
@@ -38,8 +42,8 @@ class InsectInfoTest extends TestKit(ActorSystem("InsectInfoTest"))
           info.isInsideTheAnthill == isInsideTheAnthill &&
           info.energy == energy &&
           info.inertia == inertia &&
-          info.pheromoneSensor.entities.isEmpty == pheromoneIsEmpty &&
-          info.proximitySensor.entities.isEmpty  == proximityIsEmpty &&
+          info.foodPheromones.isEmpty == pheromoneIsEmpty &&
+          //info.proximitySensor.entities.isEmpty  == proximityIsEmpty &&
           info.foodAmount == foodAmount &&
           info.time == time &&
           info.id == id
@@ -51,7 +55,7 @@ class InsectInfoTest extends TestKit(ActorSystem("InsectInfoTest"))
         assert(checkAll(info1))
       }
 
-      val newPosition = RandomVector2D(0.2,1.5)
+      val newPosition = RandomVector2DInSquare(0.2,1.5)
       val info2 = info1.updatePosition(newPosition).asInstanceOf[ForagingAntInfo]
 
       "correct update position" in {
@@ -72,16 +76,16 @@ class InsectInfoTest extends TestKit(ActorSystem("InsectInfoTest"))
         assert(checkAll(info4, position = newPosition, energy = newEnergy))
       }
 
-      val newInertia = RandomVector2D(0.2,1.5)
+      val newInertia = RandomVector2DInSquare(0.2,1.5)
       val info5 = info4.updateInertia(newInertia).asInstanceOf[ForagingAntInfo]
 
       "correct update inertia" in {
         assert(checkAll(info5, position = newPosition, energy = newEnergy, inertia = newInertia))
       }
 
-      val newPheromones = List(Entity(ZeroVector2D(),1))
+      val newPheromones = Seq(FoodPheromone(ZeroVector2D(), DELTA, startingIntensity))
       val pheromoneIsEmpty = false
-      val info6 = info5.addPheromones(newPheromones)
+      val info6 = info5.updateFoodPheromones(newPheromones).asInstanceOf[ForagingAntInfo]
 
       "correct update pheromones" in {
         assert(checkAll(info6, position = newPosition, energy = newEnergy, inertia = newInertia,

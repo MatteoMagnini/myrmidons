@@ -48,13 +48,6 @@ class EnemyTest extends TestKit(ActorSystem("InsectTest"))
         assert(result2.info.energy == 100 + c.ENERGY_RW * 2)
         sender expectNoMessage
       }
-
-      //TODO: this will change
-      "if find a food resource, eat it and register an energy increase" in {
-        enemy ! FoodNear
-        val result = sender.expectMsgType[UpdateInsect]
-        assert(result.info.energy == 100)
-      }
     }
 
   }

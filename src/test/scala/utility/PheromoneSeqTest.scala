@@ -13,7 +13,7 @@ class PheromoneSeqTest extends AnyWordSpecLike with BeforeAndAfter {
 
     val threshold = 1.0
     val DELTA = 1.0
-    val startingIntensity = 100.0
+    val startingIntensity = 10.0
 
     "created" should {
 
@@ -74,6 +74,31 @@ class PheromoneSeqTest extends AnyWordSpecLike with BeforeAndAfter {
       "after a lot of time pheromones evaporate" in {
         assert(seq7.isEmpty)
       }
+    }
+
+    "full of pheromones" should {
+
+      val p1 = FoodPheromone(Vector2D(3,3), DELTA, startingIntensity)
+      val p2 = FoodPheromone(Vector2D(-3,3), DELTA, startingIntensity)
+      val p3 = FoodPheromone(Vector2D(0,-10), DELTA, startingIntensity)
+      val zero = ZeroVector2D()
+      val finalVector = ((p1.position - zero) * (startingIntensity / (p1.position --> zero))) >>
+        ((p2.position - zero) * (startingIntensity / (p2.position --> zero))) >>
+        ((p3.position - zero) * (startingIntensity / (p3.position --> zero)))
+
+      val seq1 = Seq[FoodPheromone](p1, p2, p3)
+
+      "calculate the weighted sum" in {
+        assert(seq1.weightedSum(zero) == finalVector)
+      }
+
+      val p4 = FoodPheromone(Vector2D(0,-10), DELTA, startingIntensity)
+      val seq2 = Seq(p1, p2, p3, p4)
+
+      "return the pheromone with the strongest intensity" in {
+        assert(seq2.strongest.get == p4)
+      }
+
     }
   }
 }

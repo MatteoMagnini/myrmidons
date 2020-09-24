@@ -1,7 +1,6 @@
 package model.insects
 
-import akka.actor.{Actor, ActorLogging, ActorRef}
-
+import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 /**
   * An insect is an entity with its own behaviour.
   * For this reason it extends Actor, it has its own control flow and is reactive to inputs (messages).
@@ -11,5 +10,6 @@ import akka.actor.{Actor, ActorLogging, ActorRef}
 trait Insect extends Actor with ActorLogging {
 
   def info: InsectInfo
+
   def environment: ActorRef
 }

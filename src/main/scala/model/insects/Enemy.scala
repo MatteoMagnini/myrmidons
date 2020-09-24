@@ -3,13 +3,14 @@ package model.insects
 import akka.actor.{ActorRef, Props}
 import model.insects.ConstantInsectInfo.{MAX_ENERGY, MAX_FOOD, STARTING_ENERGY, STARTING_FOOD_AMOUNT, STARTING_POSITION, STARTING_TIME}
 import utility.Geometry.{Vector2D, ZeroVector2D}
-import utility.Messages.{Clock, EatFood, FoodNear, NewPosition, UpdateAnthillCondition, UpdateInsect}
+import utility.Messages.{Clock, FoodNear, NewPosition, UpdateInsect}
 
-class Enemy (override val info: EnemyInfo,
-             override val environment: ActorRef) extends Insect {
+class Enemy(override val info: EnemyInfo,
+            override val environment: ActorRef) extends Insect {
 
   /**
    * Use of the subsumption architecture to model the final emerging behaviour.
+   *
    * @param competences a set of competences that the ant is able to perform.
    * @return the competence with highest priority.
    */
@@ -22,7 +23,7 @@ class Enemy (override val info: EnemyInfo,
     case Clock(t) if t == data.time + 1 =>
       val newData = data.incTime()
       subsumption(newData,
-        EatFromTheAnthill, // if inside anthill it's behaviour became like parasite
+        //EatFromTheAnthill, // if inside anthill it's behaviour became like parasite
         RandomWalk)(context, environment, self, newData, defaultBehaviour)
 
     case NewPosition(p, d) =>
@@ -30,33 +31,29 @@ class Enemy (override val info: EnemyInfo,
       environment ! UpdateInsect(newData)
       context become defaultBehaviour(newData)
 
-    case FoodNear =>
-      subsumption(data, TakeFood, RandomWalk)(context, environment, self, data, defaultBehaviour)
-
-    case UpdateAnthillCondition(value) =>
-      context become defaultBehaviour(data.updateAnthillCondition(value))
-
-    case EatFood(amount) =>
-      val newData = data.updateEnergy(amount * 10) //TODO: conversion factor from food to energy to be parametrized
-      environment ! UpdateInsect(newData)
+    case FoodNear(position) =>
+      val newData = data.updateFoodPosition(Some(position))
+      //environment ! UpdateInsect(newData)
       context become defaultBehaviour(newData)
 
-    case x => println("Should never happen, received message: " + x + " from " + sender)
+    case x => println("Enemies: Should never happen, received message: " + x + " from " + sender)
   }
 }
+
 object Enemy {
   def apply(info: InsectInfo, environment: ActorRef): Props =
     Props(classOf[Enemy], info, environment)
 }
+
 case class EnemyInfo(override val anthill: ActorRef,
                      override val isInsideTheAnthill: Boolean,
+                     override val foodPosition: Option[Vector2D],
                      override val id: Int,
-                     proximitySensor: Sensor,
                      override val position: Vector2D,
                      override val inertia: Vector2D,
                      override val energy: Double,
                      override val time: Int,
-                     foodAmount: Double) extends InsectInfo{
+                     foodAmount: Double) extends InsectInfo {
 
   override def updatePosition(newPosition: Vector2D): InsectInfo =
     this.copy(position = newPosition)
@@ -73,6 +70,9 @@ case class EnemyInfo(override val anthill: ActorRef,
   override def updateAnthillCondition(value: Boolean): InsectInfo =
     this.copy(isInsideTheAnthill = value)
 
+  override def updateFoodPosition(position: Option[Vector2D]): InsectInfo =
+    this.copy(foodPosition = position)
+
   def incFood(amount: Double): EnemyInfo =
     this.copy(foodAmount = if (foodAmount + amount > MAX_FOOD) MAX_FOOD else foodAmount + amount)
 
@@ -82,5 +82,5 @@ case class EnemyInfo(override val anthill: ActorRef,
 
 object EnemyInfo {
   def apply(anthill: ActorRef, id: Int = 0, position: Vector2D = STARTING_POSITION, energy: Double = STARTING_ENERGY, time: Int = STARTING_TIME): EnemyInfo =
-    new EnemyInfo(anthill, false, id, ProximitySensor(), position, ZeroVector2D(), energy, time, STARTING_FOOD_AMOUNT)
+    new EnemyInfo(anthill, false, None, id, position, ZeroVector2D(), energy, time, STARTING_FOOD_AMOUNT)
 }
