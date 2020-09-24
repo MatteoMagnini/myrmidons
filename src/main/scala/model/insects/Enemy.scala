@@ -15,7 +15,6 @@ class Enemy (override val info: EnemyInfo,
    */
   private def subsumption(data: InsectInfo, competences: Competence*): Competence = competences.filter(c => c.hasPriority(data)).take(1).last
 
-
   override def receive: Receive = defaultBehaviour(info)
 
   private def defaultBehaviour(data: InsectInfo): Receive = {

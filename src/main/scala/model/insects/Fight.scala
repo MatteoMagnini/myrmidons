@@ -1,18 +1,25 @@
 package model.insects
 
-trait Fight[A] {
+object Fight {
 
-  def fighters: (A, A)
-  def looser: A
+  /** A fight outcome */
+  trait FightOutcome[A] {
+    def loser(x: A, y: A): A
+  }
 
-}
+  /** Given a collection of fights, returns losers of each
+    *
+    * @param fighters collection of fighters
+    * @return losers among provided fighters
+    */
+  def losers[T: FightOutcome](fighters: Iterable[(T, T)]): Iterable[T] = {
+    fighters.map(x => implicitly[FightOutcome[T]].loser(x._1, x._2))
+  }
 
-object InsectFight {
+  object InsectFight {
 
-  def apply(fighters: (InsectInfo, InsectInfo)): Fight[InsectInfo] = new FightImpl(fighters)
-
-  private[this] class FightImpl(override val fighters: (InsectInfo, InsectInfo)) extends Fight[InsectInfo] {
-
-    override def looser: InsectInfo = if (fighters._1.energy > fighters._2.energy) fighters._2 else fighters._1
+    /** An implementation of [[FightOutcome]], in the case of a fight between insects. */
+    implicit val insectFight: FightOutcome[InsectInfo] = (x: InsectInfo, y: InsectInfo) => if (x.energy < y.energy) x else y
   }
 }
+

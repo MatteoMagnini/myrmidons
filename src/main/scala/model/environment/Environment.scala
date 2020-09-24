@@ -113,16 +113,22 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   }
 
   private def sendInfoToGUI(info: EnvironmentInfo): Unit = {
+    import Fight._
+    import Fight.InsectFight._
+
     /* When all insects return their positions, environment send them to GUI */
     if ((info.antsInfo.size + info.enemiesInfo.size) == (info.ants.size + info.enemies.size)) {
-      val fights = checkFights(info.antsInfo, info.enemiesInfo)
       var updatedInfo = info
-      for (fight <- fights) {
-        fight.looser match {
+
+      val insectLosers = losers(checkFights(info.antsInfo, info.enemiesInfo))
+      for (loser <- insectLosers) {
+        loser match {
           case x:ForagingAntInfo =>
+            println("Ant died")
             context.stop(info.ants(x.id))
             updatedInfo = updatedInfo.removeAnt(x.id)
           case x:EnemyInfo =>
+            println("Insect died")
             context.stop(info.enemies(x.id))
             updatedInfo = updatedInfo.removeEnemy(x.id)
         }
@@ -132,12 +138,12 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     } else context become defaultBehaviour(info)
   }
 
-  private def checkFights(antsInfo: Iterable[InsectInfo], enemiesInfo: Iterable[InsectInfo]): Iterable[Fight[InsectInfo]] =
+  private def checkFights(antsInfo: Iterable[InsectInfo], enemiesInfo: Iterable[InsectInfo]): Iterable[(InsectInfo, InsectInfo)] =
     for {
       ant <- antsInfo
       enemy <- enemiesInfo
       if ant.position ~~ enemy.position
-    } yield InsectFight(ant, enemy)
+    } yield (ant, enemy)
 }
 
 object Environment {
