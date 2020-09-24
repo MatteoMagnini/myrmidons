@@ -6,7 +6,7 @@ import utility.Geometry.{Vector2D, ZeroVector2D}
 
 object PheromoneSeq {
 
-  implicit class PheromoneSeq[A <: Pheromone](seq: Seq[A]) {
+  implicit class PheromoneSeq[A <: Pheromone](seq: Seq[A]){
 
     def tick(): Seq[A] =
       seq.toStream.map(p => p.decrease).filter(opt => opt.isDefined).map(opt => opt.get.asInstanceOf[A])
@@ -17,8 +17,9 @@ object PheromoneSeq {
     def strongest: Option[A] =
       if (seq.isEmpty) None else Some(seq.toStream.sortWith((e1, e2) => e1.intensity > e2.intensity).last)
 
-    def weightedSum: Vector2D =
-      if (seq.isEmpty) ZeroVector2D() else seq.toStream.map(e => e.position * e.intensity).reduce(_>>_)
+    def weightedSum(position: Vector2D): Vector2D =
+      if (seq.isEmpty) ZeroVector2D()
+      else seq.toStream.map(e => (e.position - position) * (e.intensity / (e.position --> position))).reduce(_>>_)
 
     private def merge(newElement: A, threshold: Double): Seq[A] =
       recursiveMerge(newElement, threshold, seq)

@@ -1,12 +1,13 @@
 package model.environment
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-import model.insects.{ConstantInsectInfo, Enemy, EnemyInfo, ForagingAnt, ForagingAntInfo, InsectInfo, PickFood}
+import model.insects.{Enemy, EnemyInfo, ForagingAnt, ForagingAntInfo, InsectInfo}
 import utility.Geometry._
 import utility.Messages.{Clock, Move, StartSimulation, UpdateInsect, _}
 import model.BorderedEntityFactory._
 import model.Food
 import model.anthill.{Anthill, AnthillInfo}
+import utility.PheromoneSeq._
 
 import scala.util.Random
 
@@ -22,11 +23,11 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
     case StartSimulation(nAnts: Int, nEnemies: Int, centerSpawn: Boolean, obstaclesPresence, foodPresence) =>
 
-      val anthill = context.actorOf(Anthill(AnthillInfo(state.boundary.center, 15, foodAmount = 1000), self), name = "anthill")
+      val anthill = context.actorOf(Anthill(AnthillInfo(state.boundary.center, 15, foodAmount = 5000), self), name = "anthill")
       val ants = if (!centerSpawn) createAntFromRandomPosition(nAnts, anthill) else createAntFromCenter(nAnts, anthill)
 
       // anthill ref is need to permit the enemies to interact with anthill (parasite behaviour)
-      val enemies = createEnemiesFromRandomPosition(0, anthill)
+      val enemies = createEnemiesFromRandomPosition(nEnemies, anthill)
 
       val obstacles = if (obstaclesPresence.isDefined) (0 until obstaclesPresence.get).map(_ =>
         createRandomSimpleObstacle(200, 600)) else Seq.empty
@@ -34,16 +35,26 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       val foods = if (foodPresence.isDefined) (0 until foodPresence.get).map(_ =>
         createRandomFood(state.boundary.topLeft.x, state.boundary.bottomRight.x)) else Seq.empty
 
-      context become defaultBehaviour(EnvironmentInfo(Some(sender), state.boundary, foods ++ obstacles, ants, enemies, anthill, state.anthillInfo))
+      var foodPheromones = Seq[FoodPheromone]()
+      foodPheromones = FoodPheromone(RandomVector2D(100, 200), 0.3, 5.4) +: foodPheromones
+      context become defaultBehaviour(EnvironmentInfo(Some(sender), state.boundary,
+        foods ++ obstacles, ants, enemies, anthill, state.anthillInfo, foodPheromones))
+
+    case AddFoodPheromones(pheromone: FoodPheromone) =>
+      context become defaultBehaviour(state.addPheromone(pheromone))
+
 
     case Clock(value: Int) =>
+      state.ants.values.foreach(_ ! FoodPheromones(state.pheromones))
       state.ants.values.foreach(_ ! Clock(value))
+
       state.enemies.foreach(_ ! Clock(value))
       state.anthill match {
         case Some(x) => x ! Clock(value)
         case _ => print("Should never happen environment has no anthill")
       }
-      //if (Random.nextDouble() < 0.01) self ! AntBirth(value)
+      context become defaultBehaviour(state.updatePheromones(state.pheromones.tick()))
+      if (Random.nextDouble() < 0.01) self ! AntBirth(value)
 
     case Move(position: Vector2D, delta: Vector2D) =>
       val newPosition = position >> delta
@@ -73,12 +84,18 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       } else sender ! NewPosition(position - delta, delta -)
 
     case TakeFood(delta, position) =>
-      state.obstacles.find(_.hasInside(position)).get match {
-        case f: Food =>
-          sender ! TakeFood(delta, position)
-          context become defaultBehaviour(state.updateFood(f, f - delta))
-        case _ => println()
+      // TODO Split list obstacle in food and obstacle and check only food
+      state.obstacles.find(_.hasInside(position)) match {
+        case Some(x) => x match {
+          case f: Food =>
+            sender ! TakeFood(delta, position)
+            context become defaultBehaviour(state.updateFood(f, f - delta))
+          case _ => println("ERROR")
+        }
+        // TODO Food finished but ant want take food but it doesn't know
+        case None => sender ! NewPosition(position, ZeroVector2D())
       }
+
 
     case UpdateInsect(info: InsectInfo) =>
       sendInfoToGUI(state.updateInsectInfo(info))
@@ -126,11 +143,13 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     context.actorOf(ForagingAnt(antInfo, self), s"ant-${antInfo.id}")
   }
 
-  private def sendInfoToGUI(info: EnvironmentInfo) = {
+  private def sendInfoToGUI(info: EnvironmentInfo): Unit = {
     /* When all insects return their positions, environment send them to GUI */
-    if ((info.antsInfo.size + info.enemiesInfo.size) == (info.ants.size + info.enemies.size)) {
-      info.gui.get ! Repaint(info.antsInfo ++ info.enemiesInfo ++ info.obstacles ++ Seq(info.anthillInfo))
-      context become defaultBehaviour(info.emptyInsectInfo())
+    if ((info.antsInfo.size == info.ants.size) && (info.enemiesInfo.size == info.enemies.size)) {
+      info.gui.get ! Repaint(info.antsInfo ++ info.enemiesInfo ++
+        info.obstacles ++ Seq(info.anthillInfo) ++ info.pheromones)
+
+    context become defaultBehaviour(info.emptyInsectInfo())
     } else context become defaultBehaviour(info)
   }
 }

@@ -2,7 +2,7 @@ package model.anthill
 
 import akka.actor.{Actor, ActorRef, Props}
 import model.Drawable
-import utility.Geometry.{OrientedVector2D, OrientedVector2DWithNoise, Vector2D, ZeroVector2D}
+import utility.Geometry.{OrientedVector2DWithNoise, Vector2D, ZeroVector2D}
 import utility.Messages._
 
 case class AnthillInfo(override val position: Vector2D,
@@ -18,7 +18,7 @@ case class AnthillInfo(override val position: Vector2D,
 }
 
 object AnthillInfo {
-  def apply(position: Vector2D, radius: Double = 3, foodAmount: Double = 0, maxFoodAmount: Double = 1000): AnthillInfo =
+  def apply(position: Vector2D, radius: Double = 3, foodAmount: Double = 0, maxFoodAmount: Double = 10000): AnthillInfo =
     new AnthillInfo(position, radius, foodAmount, maxFoodAmount)
 }
 

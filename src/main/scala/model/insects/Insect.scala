@@ -2,7 +2,6 @@ package model.insects
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import utility.Messages._
-
 /**
  * An insect is an entity with its own behaviour.
  * For this reason it extends Actor, it has its own control flow and is reactive to inputs (messages).
@@ -12,12 +11,14 @@ import utility.Messages._
 trait Insect extends Actor with ActorLogging {
 
   def info: InsectInfo
+
   def environment: ActorRef
 }
 
 /**
  * Ant that performs foraging.
- * @param info its state.
+ *
+ * @param info        its state.
  * @param environment the environment where it performs actions.
  */
 case class ForagingAnt(override val info: ForagingAntInfo,
@@ -25,6 +26,7 @@ case class ForagingAnt(override val info: ForagingAntInfo,
 
   /**
    * Use of the subsumption architecture to model the final emerging behaviour.
+   *
    * @param competences a set of competences that the ant is able to perform.
    * @return the competence with heist priority.
    */
@@ -42,7 +44,9 @@ case class ForagingAnt(override val info: ForagingAntInfo,
       subsumption(newData,
         Die,
         GoOutside,
+        StoreFoodInAnthill,
         EatFromTheAnthill,
+        DropFoodPheromone,
         GoBackToHome,
         PickFood,
         FoodPheromoneTaxis,
@@ -81,7 +85,7 @@ case class ForagingAnt(override val info: ForagingAntInfo,
     /**
      * Take food from a food source in the environment.
      */
-    case TakeFood(delta,_) =>
+    case TakeFood(delta, _) =>
       val newData = data match {
         case d: ForagingAntInfo => d.incFood(delta).updateFoodPosition(None)
         case x => x
@@ -93,11 +97,11 @@ case class ForagingAnt(override val info: ForagingAntInfo,
      * Eat food from the environment.
      */
     case EatFood(amount) =>
-      val newData = data.updateEnergy(amount*10) //TODO: conversion factor from food to energy to be parametrized
+      val newData = data.updateEnergy(amount * 10) //TODO: conversion factor from food to energy to be parametrized
       environment ! UpdateInsect(newData)
       context become defaultBehaviour(newData)
 
-    case x => println("Should never happen, received message: " + x + " from " + sender)
+    case x => println("Insect: Should never happen, received message: " + x + " from " + sender)
   }
 }
 
