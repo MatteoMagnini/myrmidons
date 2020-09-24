@@ -14,7 +14,8 @@ import scala.swing.{Graphics2D, Panel}
  */
 case class MyrmidonsPanel() extends Panel {
 
-  private val antSize = 4
+  private val antSize = 5
+  private val pheromoneSize = 4
   private var restartFlag = false
 
   private var ants: Seq[InsectInfo] = Seq.empty
@@ -38,19 +39,15 @@ case class MyrmidonsPanel() extends Panel {
        * Foreach pheromones draw its new position in Panel.
        */
       this.pheromones.foreach(x => {
-        val d: Float = (x.intensity / 1000).toFloat
-        if (d < 0.1f) {
-          g.setColor(new Color(1f, 0.8f, 0.02f, 0.1f))
-        } else if (d < 0.2f) {
-          g.setColor(new Color(1f, 0.6f, 0.04f, 0.2f))
-        } else if (d < 0.4f) {
-          g.setColor(new Color(1f, 0.4f, 0.06f, 0.4f))
+        val pheromoneIntensity: Float = (x.intensity / 1000).toFloat
+        pheromoneIntensity match {
+          case intensity if intensity < 0.2f => g.setColor(new Color(1f, 0.1f, 0.02f, 0.2f))
+          case intensity if intensity < 0.4f => g.setColor(new Color(1f, 0.2f, 0.04f, 0.4f))
+          case intensity if intensity < 0.6f => g.setColor(new Color(1f, 0.3f, 0.06f, 0.6f))
+          case _ => g.setColor(new Color(1f, 0.4f, 0.08f, 1f))
         }
-        else if (d < 0.6f) {
-          g.setColor(new Color(1f, 0.2f, 0.08f, 0.6f))
-        }
-        val ellipse = new Ellipse2D.Double(x.position.x - (10 / 2),
-          x.position.y - (10 / 2), 5, 5)
+        val ellipse = new Ellipse2D.Double(x.position.x - (pheromoneSize / 2),
+          x.position.y - (pheromoneSize / 2), pheromoneSize, pheromoneSize)
         g.fill(ellipse)
       })
 
@@ -87,11 +84,13 @@ case class MyrmidonsPanel() extends Panel {
        * Foreach food resource draw its new position in Panel.
        */
       food.foreach(x => {
-        val d: Float = (x.quantity / 1000).toFloat
-        if (d < 0.4f) {
-          g.setColor(new Color(0f, 0f, 1f, 0.4f))
-        } else {
-          g.setColor(new Color(0f, 0f, 1f, 0.4f)) //d
+        val foodQuantity: Float = (x.quantity / 1000).toFloat
+        foodQuantity match {
+          case quantity if quantity < 0.2f => g.setColor(new Color(0f, 0f, 1f, 0.2f))
+          case quantity if quantity < 0.4f => g.setColor(new Color(0f, 0f, 1f, 0.4f))
+          case quantity if quantity < 0.6f => g.setColor(new Color(0f, 0f, 1f, 0.6f))
+          case quantity if quantity < 0.8f => g.setColor(new Color(0f, 0f, 1f, 0.8f))
+          case _ => g.setColor(new Color(0f, 0f, 1f, foodQuantity))
         }
         val ellipse = new Ellipse2D.Double(x.position.x - (x.xDim / 2),
           x.position.y - (x.yDim / 2), x.xDim, x.yDim)
@@ -103,12 +102,15 @@ case class MyrmidonsPanel() extends Panel {
        * Draw anthill with opacity control.
        */
       if (anthill.nonEmpty) {
-        val anthillOpacity: Float = (anthill.get.foodAmount / anthill.get.maxFoodAmount).toFloat
-        if (anthillOpacity < 0.4f) {
-          g.setColor(new Color(0f, 0.5f, 0f, 0.4f))
-        } else {
-          g.setColor(new Color(0f, 0.5f, 0f, anthillOpacity))
+        val anthillFood: Float = (anthill.get.foodAmount / anthill.get.maxFoodAmount).toFloat
+        anthillFood match {
+          case food if food < 0.2f => g.setColor(new Color(0f, 0.5f, 0f, 0.2f))
+          case food if food < 0.4f => g.setColor(new Color(0f, 0.5f, 0f, 0.4f))
+          case food if food < 0.6f => g.setColor(new Color(0f, 0.5f, 0f, 0.6f))
+          case food if food < 0.8f => g.setColor(new Color(0f, 0.5f, 0f, 0.8f))
+          case _ => g.setColor(new Color(0f, 0.5f, 0f, anthillFood))
         }
+
         val ellipse = new Ellipse2D.Double(anthill.get.position.x - anthill.get.radius * 2,
           anthill.get.position.y - anthill.get.radius * 2,
           anthill.get.radius * 2 * 2, anthill.get.radius * 2 * 2)
@@ -133,7 +135,7 @@ case class MyrmidonsPanel() extends Panel {
    * @param info Seq of all the entities that will be draw in panel.
    * @return number of ant.
    */
-  def setEntities(info: Seq[Drawable]): Int = {
+  def setEntities(info: Seq[Drawable]): (Int,Int) = {
     ants = Seq.empty
     enemies = Seq.empty
     food = Seq.empty
@@ -141,15 +143,15 @@ case class MyrmidonsPanel() extends Panel {
     anthill = None
     pheromones = Seq.empty
     info.foreach {
-      case x: ForagingAntInfo => ants = x +: ants
-      case x: Food => food = x +: food
-      case x: SimpleObstacle => obstacles = x +: obstacles
-      case x: AnthillInfo => anthill = Some(x)
-      case x: EnemyInfo => enemies = x +: enemies
-      case x: FoodPheromone => pheromones = x +: pheromones
+      case entity: ForagingAntInfo => ants = entity +: ants
+      case entity: Food => food = entity +: food
+      case entity: SimpleObstacle => obstacles = entity +: obstacles
+      case entity: AnthillInfo => anthill = Some(entity)
+      case entity: EnemyInfo => enemies = entity +: enemies
+      case entity: FoodPheromone => pheromones = entity +: pheromones
       case _ => println("Error match entities")
     }
-    ants.size
+    (ants.size, anthill.get.foodAmount.toInt)
   }
 
 }

@@ -5,9 +5,8 @@ import model.environment.{Boundary, Environment, EnvironmentInfo}
 import utility.Messages.{Clock, StartSimulation}
 import view.actor.UiActor
 import view.actor.uiMessage.{RestartSimulation, StopSimulation}
-
 import scala.swing.event.ButtonClicked
-import scala.swing.{Button, FlowPanel, Label}
+import scala.swing.{Button, FlowPanel, Label, Separator}
 
 /**
  * FlowPanel which contains simulation button.
@@ -26,14 +25,17 @@ case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends FlowPanel {
 
   var stepText = new Label("0")
   var antPopulationText = new Label("0")
+  var anthillFoodAmount = new Label("0")
   private val stepLabel = new Label("Step:")
   private val populationLabel = new Label("Ants number:")
+  private val anthillFoodAmountLabel = new Label("Anthill Food:")
   private val startButton = new Button("Start")
   private val stopButton = new Button("Stop")
   private val restartButton = new Button("Restart")
   this.stopButton.enabled = false
   this.restartButton.enabled = false
-  contents ++= Seq(startButton, stopButton, restartButton, stepLabel, stepText, populationLabel, antPopulationText)
+  contents ++= Seq(startButton, stopButton, restartButton, stepLabel,
+    stepText, new Separator(), populationLabel, antPopulationText, new Separator(), anthillFoodAmountLabel, anthillFoodAmount)
 
   listenTo(startButton, stopButton, restartButton)
   /**
@@ -43,7 +45,6 @@ case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends FlowPanel {
 
   reactions += {
     case ButtonClicked(component) if component == startButton =>
-
       this.startButton.enabled = false
       this.stopButton.enabled = true
       this.restartButton.enabled = false
@@ -76,7 +77,7 @@ case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends FlowPanel {
   }
 
   private def tellStart(): Unit = {
-    environment.tell(StartSimulation(100, 0,  centerSpawn = true, obstacles = None), uiActor)
+    environment.tell(StartSimulation(200, 0, centerSpawn = true, obstacles = None), uiActor)
     environment.tell(Clock(1), uiActor)
   }
 
