@@ -189,7 +189,7 @@ import model.environment.FoodPheromoneInfo._
 object DropFoodPheromone extends Competence {
 
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: InsectInfo, behaviour: InsectInfo => Receive): Unit = {
-    environment.tell(AddFoodPheromones(FoodPheromone(info.position, DELTA, info.energy * INTENSITY_FACTOR)), ant)
+    environment.tell(AddFoodPheromones(FoodPheromone(info.position, DELTA, STARTING_INTENSITY)), ant)
     val data = info.updateEnergy(ENERGY_RW)
     environment.tell(UpdateInsect(data), ant)
     context become behaviour(data)
