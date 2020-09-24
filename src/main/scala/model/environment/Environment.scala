@@ -38,7 +38,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       var foodPheromones = Seq[FoodPheromone]()
       foodPheromones = FoodPheromone(RandomVector2DInSquare(100, 200), 0.3, 5.4) +: foodPheromones
       context become defaultBehaviour(EnvironmentInfo(Some(sender), state.boundary,
-        foods ++ obstacles, ants, enemies, anthill, state.anthillInfo, foodPheromones))
+         obstacles, foods,  ants, enemies, anthill, state.anthillInfo, foodPheromones))
 
     case AddFoodPheromone(pheromone: FoodPheromone, threshold: Double) =>
       context become defaultBehaviour(state.addPheromone(pheromone, threshold))
@@ -59,43 +59,37 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     case Move(position: Vector2D, delta: Vector2D) =>
       val newPosition = position >> delta
       if (state.boundary.hasInside(newPosition)) {
-        if (state.obstacles.forall(!_.hasInside(newPosition)))
-          sender ! NewPosition(newPosition, newPosition - position)
-        else {
-          /* If ant is moving outside boundary or through an obstacle bounces */
-          val collision = state.obstacles.find(_.hasInside(newPosition)).get
-          //TODO: BUGSSSSSS!!! Ant sometimes teleporting, should smoothly bounce.
-          collision match {
-            case f: Food =>
-              sender ! FoodNear(f.position)
-              //TODO: code replication!!!
-              val intersectionAndDirection = f.findIntersectionPoint(position, newPosition)
-              //println(intersectionAndDirection)
-              val newDelta = intersectionAndDirection.intersectionPoint - newPosition
-              sender ! NewPosition(intersectionAndDirection.intersectionPoint >> newDelta, newDelta)
-            case x =>
-              val intersectionAndDirection = x.findIntersectionPoint(position, newPosition)
-              //println(intersectionAndDirection)
-              val newDelta = intersectionAndDirection.intersectionPoint - newPosition
-              sender ! NewPosition(intersectionAndDirection.intersectionPoint >> newDelta, newDelta)
+        val obstacle = state.obstacles.find(_.hasInside(newPosition))
+        if (obstacle.isDefined) {
+
+          val intersectionAndDirection = obstacle.get.findIntersectionPoint(position, newPosition)
+          //println(intersectionAndDirection)
+          val newDelta = intersectionAndDirection.intersectionPoint - newPosition
+          sender ! NewPosition(intersectionAndDirection.intersectionPoint >> newDelta, newDelta)
+        } else {
+          val food = state.foods.find(_.hasInside(newPosition))
+          if (food.isDefined) {
+            sender ! FoodNear(food.get.position)
+            //TODO: code replication!!!
+            val intersectionAndDirection = food.get.findIntersectionPoint(position, newPosition)
+            //println(intersectionAndDirection)
+            val newDelta = intersectionAndDirection.intersectionPoint - newPosition
+            sender ! NewPosition(intersectionAndDirection.intersectionPoint >> newDelta, newDelta)
+          } else {
+            sender ! NewPosition(newPosition, newPosition - position)
           }
 
         }
       } else sender ! NewPosition(position - delta, delta -)
 
     case TakeFood(delta, position) =>
-      // TODO Split list obstacle in food and obstacle and check only food
-      state.obstacles.find(_.hasInside(position)) match {
-        case Some(x) => x match {
-          case f: Food =>
-            sender ! TakeFood(delta, position)
-            context become defaultBehaviour(state.updateFood(f, f - delta))
-          case _ => println("ERROR")
-        }
-        // TODO Food finished but ant want take food but it doesn't know
-        case None => sender !TakeFood(0, position)
+      val food = state.foods.find(_.hasInside(position))
+      if (food.nonEmpty) {
+        sender ! TakeFood(delta, position)
+        context become defaultBehaviour(state.updateFood(food.get, food.get - delta))
+      } else {
+        sender ! TakeFood(0, position)
       }
-
 
     case UpdateInsect(info: InsectInfo) =>
       sendInfoToGUI(state.updateInsectInfo(info))
@@ -113,7 +107,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     case KillAnt(id: Int) =>
       context.stop(sender)
       val newData = state.removeAnt(id)
-      if (newData.ants.isEmpty) state.gui.get ! Repaint(state.obstacles ++ Seq(state.anthillInfo))
+      if (newData.ants.isEmpty) state.gui.get ! Repaint(state.obstacles ++ state.foods ++ Seq(state.anthillInfo))
       sendInfoToGUI(newData)
   }
 
@@ -147,9 +141,9 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     /* When all insects return their positions, environment send them to GUI */
     if ((info.antsInfo.size == info.ants.size) && (info.enemiesInfo.size == info.enemies.size)) {
       info.gui.get ! Repaint(info.antsInfo ++ info.enemiesInfo ++
-        info.obstacles ++ Seq(info.anthillInfo) ++ info.pheromones)
+        info.obstacles ++ info.foods ++ Seq(info.anthillInfo) ++ info.pheromones)
 
-    context become defaultBehaviour(info.emptyInsectInfo())
+      context become defaultBehaviour(info.emptyInsectInfo())
     } else context become defaultBehaviour(info)
   }
 }
