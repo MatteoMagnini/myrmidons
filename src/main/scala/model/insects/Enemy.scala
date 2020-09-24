@@ -24,7 +24,7 @@ class Enemy(override val info: EnemyInfo,
     case Clock(t) if t == data.time + 1 =>
       val newData = data.incTime()
       subsumption(newData,
-        EatFromTheAnthill, // if inside anthill it's behaviour became like parasite
+        //EatFromTheAnthill, // if inside anthill it's behaviour became like parasite
         RandomWalk)(context, environment, self, newData, defaultBehaviour)
 
     case NewPosition(p, d) =>
@@ -32,15 +32,9 @@ class Enemy(override val info: EnemyInfo,
       environment ! UpdateInsect(newData)
       context become defaultBehaviour(newData)
 
-    case FoodNear(_) =>
-      subsumption(data, PickFood, RandomWalk)(context, environment, self, data, defaultBehaviour)
-
-    case UpdateAnthillCondition(value) =>
-      context become defaultBehaviour(data.updateAnthillCondition(value))
-
-    case EatFood(amount) =>
-      val newData = data.updateEnergy(amount * 10) //TODO: conversion factor from food to energy to be parametrized
-      environment ! UpdateInsect(newData)
+    case FoodNear(position) =>
+      val newData = data.updateFoodPosition(Some(position))
+      //environment ! UpdateInsect(newData)
       context become defaultBehaviour(newData)
 
     case x => println("Enemies: Should never happen, received message: " + x + " from " + sender)

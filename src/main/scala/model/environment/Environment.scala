@@ -27,7 +27,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       val ants = if (!centerSpawn) createAntFromRandomPosition(nAnts, anthill) else createAntFromCenter(nAnts, anthill)
 
       // anthill ref is need to permit the enemies to interact with anthill (parasite behaviour)
-      val enemies = createEnemiesFromRandomPosition(0, anthill)
+      val enemies = createEnemiesFromRandomPosition(nEnemies, anthill)
 
       val obstacles = if (obstaclesPresence.isDefined) (0 until obstaclesPresence.get).map(_ =>
         createRandomSimpleObstacle(200, 600)) else Seq.empty
@@ -145,10 +145,11 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
   private def sendInfoToGUI(info: EnvironmentInfo): Unit = {
     /* When all insects return their positions, environment send them to GUI */
-    if ((info.antsInfo.size + info.enemiesInfo.size) == (info.ants.size + info.enemies.size)) {
+    if ((info.antsInfo.size == info.ants.size) && (info.enemiesInfo.size == info.enemies.size)) {
       info.gui.get ! Repaint(info.antsInfo ++ info.enemiesInfo ++
         info.obstacles ++ Seq(info.anthillInfo) ++ info.pheromones)
-      context become defaultBehaviour(info.emptyInsectInfo())
+
+    context become defaultBehaviour(info.emptyInsectInfo())
     } else context become defaultBehaviour(info)
   }
 }

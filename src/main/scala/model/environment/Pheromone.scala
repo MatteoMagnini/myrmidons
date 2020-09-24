@@ -29,7 +29,7 @@ trait Pheromone extends Drawable {
 
 object FoodPheromoneInfo {
 
-  def DELTA: Double = 0.8
+  def DELTA: Double = 0.5
 
   def STARTING_INTENSITY: Double = 100.0
 
