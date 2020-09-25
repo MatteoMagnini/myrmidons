@@ -63,7 +63,7 @@ class Vector2DTest extends AnyWordSpecLike with BeforeAndAfter {
     "created in range" should {
       val min = 0.3
       val max = 1.4
-      val r = RandomVector2D(min, max)
+      val r = RandomVector2DInSquare(min, max)
       println(r)
 
       "have its dimensions inside the range" in {
@@ -76,7 +76,7 @@ class Vector2DTest extends AnyWordSpecLike with BeforeAndAfter {
       val min = 0.3
       val max = 1.4
       val perturbation = (-0.5, 0.93)
-      val r = RandomVector2D(min, max, perturbation)
+      val r = RandomVector2DInSquare(min, max, perturbation)
 
       "have its dimensions inside the range" in {
         assert(r.x >= min && r.x <= max && r.y >= min && r.y <= max )
