@@ -1,7 +1,5 @@
 package utility
 
-import utility.Geometry.Vector2D
-
 object Geometry {
 
   /** A vector in 2-dimensional space.
@@ -33,7 +31,7 @@ object Geometry {
     /** Return the distance between vectors */
     def -->(other: Vector2D) : Double = this - other ||
 
-    def ~~(other: Vector2D): Boolean = ~=(x, other.x,1) && ~=(y, other.y,1)
+    def ~~(other: Vector2D): Boolean = ~=(x, other.x,2) && ~=(y, other.y,2)
 
     override def equals(obj: Any): Boolean = obj match {
       case o: Vector2D => ~=(x, o.x,1E-10) && ~=(y, o.y,1E-10)
@@ -212,10 +210,4 @@ object Geometry {
      implicit def intToVec3D(value: (Int, Int, Int)): Vector3D = Vector3D(value._1.toDouble, value._2.toDouble, value._3.toDouble)
      implicit def vec2DToVec3D(value: Vector2D): Vector3D = Vector3D(value.x, value.y, 1.0)
    }
-}
-
-object Main extends App {
-  val v = Vector2D(2.0, 1.0)
-  val v2 = Vector2D(1.1, 1.1)
-  println(v == v2)
 }

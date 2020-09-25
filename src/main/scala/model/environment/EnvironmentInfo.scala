@@ -7,7 +7,6 @@ import model.insects.{EnemyInfo, ForagingAntInfo, InsectInfo}
 import utility.Geometry.ZeroVector2D
 import utility.PheromoneSeq._
 
-
 /** Internal state of environment. */
 trait EnvironmentInfo {
 
@@ -88,7 +87,6 @@ object EnvironmentInfo {
    * @param anthillInfo anthill information
    */
   private[this] case class EnvironmentData(override val gui: Option[ActorRef], override val boundary: Boundary,
-
                                            override val obstacles: Seq[SimpleObstacle],
                                            override val foods: Seq[Food],
                                            override val ants: Map[Int, ActorRef],

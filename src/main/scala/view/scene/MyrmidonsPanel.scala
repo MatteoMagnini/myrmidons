@@ -102,12 +102,17 @@ case class MyrmidonsPanel() extends Panel {
 
       })
 
-      fights.foreach(x => {
-        val p = x.position
-        g.setColor(Color.yellow)
-        val ellipse = new Ellipse2D.Double(p.x,p.y, 20, 20)
+      import model.Fights._
+      import model.Fights.InsectFight._
+
+      for((pos, loser) <- fights.map(_.position) zip losers(fights)) {
+        loser match {
+          case _:ForagingAntInfo => g.setColor(Color.black);print("ant")
+          case _ => g.setColor(Color.red);print("ins")
+        }
+        val ellipse = new Ellipse2D.Double(pos.x,pos.y, 20, 20)
         g.fill(ellipse)
-      })
+      }
 
       /**
        * Draw anthill with opacity control.
@@ -115,10 +120,10 @@ case class MyrmidonsPanel() extends Panel {
       if (anthill.nonEmpty) {
         val anthillFood: Float = (anthill.get.foodAmount / anthill.get.maxFoodAmount).toFloat
         anthillFood match {
-          case food if food < 0.2f => g.setColor(new Color(0f, 0.5f, 0f, 0.2f))
-          case food if food < 0.4f => g.setColor(new Color(0f, 0.5f, 0f, 0.4f))
-          case food if food < 0.6f => g.setColor(new Color(0f, 0.5f, 0f, 0.6f))
-          case food if food < 0.8f => g.setColor(new Color(0f, 0.5f, 0f, 0.8f))
+          case f if f < 0.2f => g.setColor(new Color(0f, 0.5f, 0f, 0.2f))
+          case f if f < 0.4f => g.setColor(new Color(0f, 0.5f, 0f, 0.4f))
+          case f if f < 0.6f => g.setColor(new Color(0f, 0.5f, 0f, 0.6f))
+          case f if f < 0.8f => g.setColor(new Color(0f, 0.5f, 0f, 0.8f))
           case _ => g.setColor(new Color(0f, 0.5f, 0f, anthillFood))
         }
 
@@ -162,7 +167,7 @@ case class MyrmidonsPanel() extends Panel {
       case entity: AnthillInfo => anthill = Some(entity)
       case entity: EnemyInfo => enemies = entity +: enemies
       case entity: FoodPheromone => pheromones = entity +: pheromones
-      case entity: Fight[InsectInfo] => fights = entity +: fights
+      case entity: Fight[_] => fights = entity.asInstanceOf[Fight[InsectInfo]] +: fights
       case _ => println("Error match entities")
     }
     (ants.size, anthill.get.foodAmount.toInt)

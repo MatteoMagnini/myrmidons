@@ -35,8 +35,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       val foods = if (foodPresence.isDefined) (0 until foodPresence.get).map(_ =>
         createRandomFood(state.boundary.topLeft.x, state.boundary.bottomRight.x)) else Seq.empty
 
-      var foodPheromones = Seq[FoodPheromone]()
-      foodPheromones = FoodPheromone(RandomVector2DInSquare(100, 200), 0.3, 5.4) +: foodPheromones
+      val foodPheromones = Seq(FoodPheromone(RandomVector2DInSquare(100, 200), 0.3, 5.4))
       context become defaultBehaviour(EnvironmentInfo(Some(sender), state.boundary,
          obstacles, foods,  ants, enemies, anthill, state.anthillInfo, foodPheromones))
 
@@ -125,8 +124,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       i -> context.actorOf(ForagingAnt(ForagingAntInfo(anthill, id = i, position = center), self), s"ant-$i")
     }).toMap
 
-  /** Returns ants references, created from random position */
-
+  /** Returns enemies references, created from random position */
   private def createEnemiesFromRandomPosition(nEnemies: Int, anthill: ActorRef): Map[Int, ActorRef] =
     (0 until nEnemies).map(i => {
       val randomPosition = RandomVector2DInSquare(state.boundary.topLeft.x, state.boundary.topRight.x)
@@ -147,7 +145,6 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       var updatedInfo = info
       val fights = checkFights(info.antsInfo, info.enemiesInfo)
       for (loser <- losers(fights)) {
-        print("Fight")
         loser match {
           case x:ForagingAntInfo =>
             context.stop(info.ants(x.id))
