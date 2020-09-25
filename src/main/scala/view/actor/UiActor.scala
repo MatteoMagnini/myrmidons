@@ -38,12 +38,14 @@ case class UiActor(panel: MyrmidonsPanel, control: ControlPane)
   private def defaultBehaviour: Receive = {
 
     case Repaint(info: Seq[Drawable]) =>
-      //log.debug("Repaint")
-      val antSize = panel.setEntities(info)
+
+      val entitiesProperties = panel.setEntities(info)
       panel.draw()
       currentState = currentState + 1
       control.stepText.text = currentState.toString
-      control.antPopulationText.text = antSize.toString
+      control.antPopulationText.text = entitiesProperties._1.toString
+      control.anthillFoodAmount.text = entitiesProperties._2.toString
+
       if (stopFlag) {
         timers.startSingleTimer(currentState, StepOver, 30.millis)
       }
