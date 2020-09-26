@@ -4,7 +4,7 @@ import akka.actor.Actor.Receive
 import akka.actor.{ActorContext, ActorRef}
 import utility.Geometry._
 import utility.Messages.{KillAnt, _}
-import ConstantInsectInfo._
+import ForagingAntConstant._
 import model.environment.FoodPheromone
 import model.insects
 import scala.util.Random

@@ -2,6 +2,8 @@ package model.insects
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
+import model.Food
+import utility.Geometry.TupleOp._
 import model.anthill.{Anthill, AnthillInfo}
 import model.environment.FoodPheromone
 import org.scalatest.BeforeAndAfterAll
@@ -9,6 +11,9 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import utility.Geometry._
 import utility.Messages._
+import model.insects.ForagingAntConstant._
+import model.insects.Constant._
+import utility.Message
 
 class InsectTest extends TestKit(ActorSystem("InsectTest"))
   with AnyWordSpecLike
@@ -19,7 +24,6 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
     TestKit.shutdownActorSystem(system)
   }
 
-  val c = Constant
   val sender: TestProbe = TestProbe()
   implicit val senderRef: ActorRef = sender.ref
 
@@ -28,7 +32,6 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
     val startingInfo = ForagingAntInfo(senderRef)
     val ant = system.actorOf(ForagingAnt(startingInfo,senderRef), "ant-0")
     val DELTA = 1E-10
-    val startingIntensity = 100.0
 
     "performing random walk" should {
 
@@ -38,7 +41,7 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
         ant ! NewPosition(result1.start >> result1.delta, result1.delta)
         val result2 = sender.expectMsgType[UpdateInsect]
         assert(result2.info.position != ZeroVector2D())
-        assert(result2.info.energy == 100 + c.ENERGY_RW)
+        assert(result2.info.energy == STARTING_ENERGY + ENERGY_RW)
         sender expectNoMessage
       }
 
@@ -48,7 +51,7 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
         ant ! NewPosition(result1.start >> result1.delta, result1.delta)
         val result2 = sender.expectMsgType[UpdateInsect]
         assert(result2.info.position != ZeroVector2D())
-        assert(result2.info.energy == 100 + c.ENERGY_RW * 2)
+        assert(result2.info.energy == STARTING_ENERGY + ENERGY_RW * 2)
         sender expectNoMessage
       }
     }
@@ -66,10 +69,9 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
         ant ! Clock(1)
         val result1 = sender.expectMsgType[Move]
         ant ! NewPosition(result1.start >> result1.delta, result1.delta)
-        val finalPosition = Vector2D(3.2 - c.MAX_VELOCITY,0)
-        val finalEnergy = startingEnergy + c.ENERGY_RW
+        val finalEnergy = startingEnergy + ENERGY_RW
         val result2 = sender.expectMsgType[UpdateInsect]
-        //assert(result2.info.position == finalPosition)
+        assert(anthillInfo.position --> result2.info.position < anthillInfo.radius)
         assert(result2.info.inertia == result1.delta)
         assert(result2.info.energy == finalEnergy)
         sender expectNoMessage
@@ -79,11 +81,9 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
         ant ! Clock(2)
         val result1 = sender.expectMsgType[Move]
         ant ! NewPosition(result1.start >> result1.delta, result1.delta)
-        val finalPosition = Vector2D(3.2 - c.MAX_VELOCITY,0)
-        val finalEnergy = startingEnergy + c.ENERGY_RW + c.ENERGY_RW
+        val finalEnergy = startingEnergy + ENERGY_RW + ENERGY_RW
         val result2 = sender.expectMsgType[UpdateInsect]
-        //assert(result2.info.position == finalPosition)
-        println("ANT POSITION: " + result2.info.position)
+        assert(anthillInfo.position --> result2.info.position < anthillInfo.radius)
         assert(result2.info.inertia == result1.delta)
         assert(result2.info.energy == finalEnergy)
         sender expectNoMessage
@@ -91,20 +91,19 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
 
       "eat the reserve inside the anthill" in {
         ant ! Clock(3)
-        val finalPosition = Vector2D(3.2 - c.MAX_VELOCITY,0)
-        val finalEnergy = startingEnergy + c.ENERGY_RW + c.ENERGY_RW + c.ENERGY_EATING + 5
+        val finalEnergy = startingEnergy + ENERGY_RW + ENERGY_RW + ENERGY_EATING + FOOD_ENERGY_CONVERSION * FOOD_EATEN_PER_STEP
         val result1 = sender.expectMsgType[UpdateInsect]
-        //assert(result1.info.position == finalPosition)
+        assert(anthillInfo.position --> result1.info.position < anthillInfo.radius)
         assert(result1.info.inertia == ZeroVector2D())
         assert(result1.info.energy == finalEnergy)
         sender expectNoMessage
       }
     }
 
-
     "performing food pheromone taxis" should {
       val info = ForagingAntInfo(senderRef)
-      val pheromones = Seq(FoodPheromone(ZeroVector2D(), DELTA, startingIntensity))
+      val startingPheromoneIntensity = 10.0
+      val pheromones = Seq(FoodPheromone(ZeroVector2D(), DELTA, startingPheromoneIntensity))
 
       "update the sensor in presence of pheromones" in {
         assert(info.foodPheromones.isEmpty)
@@ -115,34 +114,37 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
       val ant = system.actorOf(ForagingAnt(ForagingAntInfo(senderRef, id = 2),senderRef), "ant-2")
 
       "perform food pheromone taxis" in {
-        val pheromones = Seq(FoodPheromone(Vector2D(5,0), DELTA,startingIntensity ))
+        val pheromones = Seq(FoodPheromone(Vector2D(5,0), DELTA,startingPheromoneIntensity ))
         ant ! FoodPheromones(pheromones)
         ant ! Clock(1)
         val result1 = sender.expectMsgType[Move]
         ant ! NewPosition(result1.start >> result1.delta, result1.delta)
         val result2 = sender.expectMsgType[UpdateInsect]
-        //assert(result2.info.position == Vector2D(5,0))
-        assert(result2.info.energy == 100 + c.ENERGY_FPT)
+        assert(result2.info.position --> pheromones.last.position < result1.start --> pheromones.last.position)
+        assert(result2.info.energy == STARTING_ENERGY + ENERGY_FPT)
         sender expectNoMessage
       }
 
       "multiple times" in {
-        val pheromones = Seq(FoodPheromone(Vector2D(2,0),DELTA, startingIntensity))
+        val pheromones = Seq(FoodPheromone(Vector2D(8,1),DELTA, startingPheromoneIntensity))
         ant ! FoodPheromones(pheromones)
         ant ! Clock(2)
         val result1 = sender.expectMsgType[Move]
         ant ! NewPosition(result1.start >> result1.delta, result1.delta)
         val result2 = sender.expectMsgType[UpdateInsect]
-        //assert(result2.info.position == Vector2D(7.5,0))
-        assert(result2.info.energy == 100 + 2 * c.ENERGY_FPT)
+        assert(result2.info.position --> pheromones.last.position < result1.start --> pheromones.last.position)
+        assert(result2.info.energy == STARTING_ENERGY + 2 * ENERGY_FPT)
         sender expectNoMessage
       }
     }
   }
 
   "Foraging ant" when {
+
     val ant = system.actorOf(ForagingAnt(ForagingAntInfo(senderRef, energy = 0),senderRef), "ant-3")
+
     "has no more energy" should {
+
       "die" in {
         ant ! Clock(1)
         sender.expectMsgType[KillAnt]
@@ -150,4 +152,77 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
       }
     }
   }
+
+  "Foraging ant" when {
+
+    val food = Food((2.0,2.0), MAX_FOOD * 2)
+    val anthillInfo = AnthillInfo(ZeroVector2D())
+    val anthill = system.actorOf(Anthill(anthillInfo,senderRef), "anthill2")
+    val startingAntPosition = (1,3)
+    val startingEnergy = 80
+    val ant = system.actorOf(ForagingAnt(ForagingAntInfo(anthill, position = startingAntPosition, energy = startingEnergy),senderRef), "ant-4")
+
+    "touching food" should {
+
+      "be aware of it" in {
+        ant ! Clock(1)
+        sender.expectMsgType[Move]
+        ant ! FoodNear(food.position)
+        ant ! NewPosition(startingAntPosition,ZeroVector2D())
+        val result1 = sender.expectMsgType[UpdateInsect]
+        assert(result1.info.foodIsNear)
+        sender expectNoMessage
+      }
+
+      "pick some food" in {
+        ant ! Clock(2)
+        val result1 = sender.expectMsgType[TakeFood]
+        assert(result1.delta == MAX_FOOD)
+        assert(result1.position == food.position)
+        ant ! TakeFood(MAX_FOOD, food.position)
+        val result2 = sender.expectMsgType[UpdateInsect]
+        assert(result2.info.asInstanceOf[ForagingAntInfo].foodAmount == MAX_FOOD)
+        sender expectNoMessage
+      }
+
+      "return to anthill or drop pheromone" in {
+        ant ! Clock(3)
+        val result1 = sender.expectMsgType[Message]
+        result1 match {
+          case m: Move =>
+            ant ! NewPosition(m.start >> m.delta, m.delta)
+            val result2 = sender.expectMsgType[UpdateInsect]
+            assert(anthillInfo.position --> result2.info.position < anthillInfo.radius)
+
+          case d: AddFoodPheromone =>
+            assert(d.foodPheromone.position equals startingAntPosition)
+            sender.expectMsgType[UpdateInsect]
+        }
+        sender expectNoMessage
+      }
+    }
+
+    "near anthill while carrying food" should {
+
+      "store food into the anthill" in {
+        ant.tell(UpdateAnthillCondition(true),anthill)
+        ant ! Clock(4)
+        val result1 = sender.expectMsgType[UpdateInsect]
+        assert(result1.info.asInstanceOf[ForagingAntInfo].foodAmount == 0)
+        sender expectNoMessage
+      }
+
+      "anthill has received the food" in {
+        anthill ! Clock(5)
+        val result1 = sender.expectMsgType[UpdateAnthill]
+        assert(result1.info.foodAmount == MAX_FOOD)
+        sender expectNoMessage
+      }
+
+    }
+
+  }
+
+
+
 }
