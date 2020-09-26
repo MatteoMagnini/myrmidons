@@ -31,15 +31,16 @@ object Geometry {
     /** Return the distance between vectors */
     def -->(other: Vector2D) : Double = this - other ||
 
-    def ~~(other: Vector2D): Boolean = ~=(x, other.x,2) && ~=(y, other.y,2)
+    def ~~(other: Vector2D, precision: Double = 2): Boolean = ~=(x, other.x,precision) && ~=(y, other.y,precision)
 
     override def equals(obj: Any): Boolean = obj match {
-      case o: Vector2D => ~=(x, o.x,1E-10) && ~=(y, o.y,1E-10)
+      case o: Vector2D => ~=(x, o.x) && ~=(y, o.y)
+      case t: (Int, Int) => ~=(x, t._1.toDouble) && ~=(y, t._2.toDouble)
+      case t: (Double, Double) => ~=(x, t._1) && ~= (y, t._2)
       case _ => false
     }
 
-    def ~=(x: Double, y: Double, precision: Double): Boolean = (x - y).abs < precision
-
+    def ~=(x: Double, y: Double, precision: Double = 1E-10): Boolean = (x - y).abs < precision
 
   }
 

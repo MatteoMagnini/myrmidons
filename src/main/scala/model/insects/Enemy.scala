@@ -1,7 +1,7 @@
 package model.insects
 
 import akka.actor.{ActorRef, Props}
-import model.insects.ConstantInsectInfo.{MAX_ENERGY, MAX_FOOD, STARTING_ENERGY, STARTING_FOOD_AMOUNT, STARTING_POSITION, STARTING_TIME}
+import model.insects.ForagingAntConstant.{MAX_ENERGY, MAX_FOOD, STARTING_ENERGY, STARTING_FOOD_AMOUNT, STARTING_POSITION, STARTING_TIME}
 import utility.Geometry.{Vector2D, ZeroVector2D}
 import utility.Messages.{Clock, FoodNear, NewPosition, UpdateInsect}
 

@@ -2,13 +2,11 @@ package utility
 
 import model.Drawable
 import model.anthill.AnthillInfo
-
-import model.environment.{FoodPheromone, Pheromone}
+import model.environment.FoodPheromone
 import model.insects.InsectInfo
 import utility.Geometry.Vector2D
 
-
-sealed trait Message
+trait Message
 
 object Messages {
 

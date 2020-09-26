@@ -5,6 +5,25 @@ import model.environment.FoodPheromone
 import utility.Geometry.{Vector2D, ZeroVector2D}
 import utility.Messages._
 
+object ForagingAntConstant {
+
+  def MAX_ENERGY = 100
+
+  def MAX_FOOD = 10
+
+  def FOOD_ENERGY_CONVERSION = 10
+
+  def STARTING_ENERGY = 100
+
+  def STARTING_TIME = 0
+
+  def STARTING_FOOD_AMOUNT = 0
+
+  def STARTING_POSITION: Vector2D = ZeroVector2D()
+}
+
+import ForagingAntConstant._
+
 /**
   * Ant that performs foraging.
   *
@@ -55,7 +74,7 @@ case class ForagingAnt(override val info: ForagingAntInfo,
       */
     case FoodPheromones(pheromones) => data match {
       case f: ForagingAntInfo => context become defaultBehaviour(f.updateFoodPheromones(pheromones))
-      case _ => System.err.println("Creation of foraging ant with wrong insect information")
+      case _ => System.err.println(s"ForagingAnt ${info.id}: general error while receiving FoodPheromones message (should never happen)")
     }
 
     /**
@@ -63,7 +82,6 @@ case class ForagingAnt(override val info: ForagingAntInfo,
       */
     case FoodNear(position) =>
       val newData = data.updateFoodPosition(Some(position))
-      //environment ! UpdateInsect(newData)
       context become defaultBehaviour(newData)
 
     /**
@@ -87,11 +105,11 @@ case class ForagingAnt(override val info: ForagingAntInfo,
       * Eat food from the environment.
       */
     case EatFood(amount) =>
-      val newData = data.updateEnergy(amount * 10) //TODO: conversion factor from food to energy to be parametrized
+      val newData = data.updateEnergy(amount * FOOD_ENERGY_CONVERSION)
       environment ! UpdateInsect(newData)
       context become defaultBehaviour(newData)
 
-    case x => println("Insect: Should never happen, received message: " + x + " from " + sender)
+    case x => System.err.println(s"ForagingAnt ${info.id}: received unhandled message $x from $sender")
   }
 }
 
@@ -100,7 +118,8 @@ object ForagingAnt {
     Props(classOf[ForagingAnt], info, environment)
 }
 
-import ConstantInsectInfo._
+import ForagingAntConstant._
+
 case class ForagingAntInfo(override val anthill: ActorRef,
                            override val isInsideTheAnthill: Boolean,
                            override val foodPosition: Option[Vector2D],
