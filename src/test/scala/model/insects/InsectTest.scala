@@ -193,12 +193,30 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
             ant ! NewPosition(m.start >> m.delta, m.delta)
             val result2 = sender.expectMsgType[UpdateInsect]
             assert(anthillInfo.position --> result2.info.position < anthillInfo.radius)
-            sender expectNoMessage
 
           case d: AddFoodPheromone =>
             assert(d.foodPheromone.position equals startingAntPosition)
+            sender.expectMsgType[UpdateInsect]
         }
+        sender expectNoMessage
+      }
+    }
 
+    "near anthill while carrying food" should {
+
+      "store food into the anthill" in {
+        ant.tell(UpdateAnthillCondition(true),anthill)
+        ant ! Clock(4)
+        val result1 = sender.expectMsgType[UpdateInsect]
+        assert(result1.info.asInstanceOf[ForagingAntInfo].foodAmount == 0)
+        sender expectNoMessage
+      }
+
+      "anthill has received the food" in {
+        anthill ! Clock(5)
+        val result1 = sender.expectMsgType[UpdateAnthill]
+        assert(result1.info.foodAmount == MAX_FOOD)
+        sender expectNoMessage
       }
 
     }
