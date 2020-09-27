@@ -17,21 +17,24 @@ trait Bordered extends Drawable {
   def hasInside(coordinate: Vector2D): Boolean
 
   /**
-   * Find the intersection point of a segment defined by two point
-   * (oldPosition, newPosition) with an obstacle border.
-   *
-   * @param oldPosition of the object
-   * @param newPosition of the object (must be inside the obstacle)
-   * @throws IllegalArgumentException if newPosition is outside the
-   *                                  obstacle
-   * @return an instance of IntersectionResult case class with the
-   *         position of intersection and the smallest angle formed
-   *         between obstacle border line and object trajectory.
-   *         If return a zero position and an angle with value of
-   *         Double.MaxValue, then there are no valid intersection
-   *         or something wrong happened
-   **/
-  def findIntersectionPoint(oldPosition: Vector2D, newPosition: Vector2D): IntersectionResult
+<<<<<<< HEAD
+    * Find the intersection point of a segment defined by two point
+    * (oldPosition, newPosition) with an obstacle border.
+    *
+    * @param oldPosition of the object
+    * @param newPosition of the object (must be inside the obstacle)
+    *
+    * @throws IllegalArgumentException if newPosition is outside the
+    *                                  obstacle
+    *
+    * @return an instance of IntersectionResult case class with the
+    *         position of intersection and the smallest angle formed
+    *         between obstacle border line and object trajectory.
+    *         If return a zero position and an angle with value of
+    *         Double.MaxValue, then there are no valid intersection
+    *         or something wrong happened
+    * */
+  def findIntersectionPoint(oldPosition: Vector2D, newPosition: Vector2D): Option[IntersectionResult]
 }
 
 object BorderedEntityFactory {
@@ -44,9 +47,12 @@ object BorderedEntityFactory {
    * @param xDim   dimension on x-axis
    * @param yDim   dimension on y-axis
    * @return a SimpleObstacle instance
-   **/
-  def createRandomSimpleObstacle(minPos: Double = 0, maxPos: Double = 800, xDim: Int = 30, yDim: Int = 30): SimpleObstacle = {
-    val pos = RandomVector2DInSquare(minPos, maxPos)
+   */
+  def createRandomSimpleObstacle(minPos: Double = 0, maxPos: Double = 800, xDim: Int = 30, yDim: Int = 30):SimpleObstacle = {
+    var pos = RandomVector2DInSquare(minPos, maxPos)
+    if (pos --> Vector2D(400,400) < 50)
+      pos = pos >> Vector2D(if(pos.x < 400) -50 else 50,0)
+
     new SimpleObstacle(Vector2D(pos.x, pos.y), xDim, yDim)
   }
 

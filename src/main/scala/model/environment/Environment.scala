@@ -4,10 +4,11 @@ import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import model.Fights.Fight
 import model.anthill.{Anthill, AnthillInfo}
 import model.insects._
-import utility.Geometry.{RandomVector2DInSquare, Vector2D}
+import utility.Geometry._
 import utility.Messages._
 import utility.PheromoneSeq._
 import model.BorderedEntityFactory._
+import utility.Geometry
 
 import scala.util.Random
 
@@ -60,20 +61,22 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       if (state.boundary.hasInside(newPosition)) {
         val obstacle = state.obstacles.find(_.hasInside(newPosition))
         if (obstacle.isDefined) {
-
-          val intersectionAndDirection = obstacle.get.findIntersectionPoint(position, newPosition)
-          //println(intersectionAndDirection)
+          val intersectionAndDirection = obstacle.get.findIntersectionPoint(position, newPosition).head
+          val angletest = if (intersectionAndDirection.angle < math.Pi / 2) {
+            math.Pi - (intersectionAndDirection.angle * 2)
+          }else {
+            - ((2 * intersectionAndDirection.angle) - math.Pi)
+          }
           val newDelta = intersectionAndDirection.intersectionPoint - newPosition
-          sender ! NewPosition(intersectionAndDirection.intersectionPoint >> newDelta, newDelta)
+          val orientedDelta = Vector2D(
+            (math.cos(angletest) * newDelta.x) - (math.sin(angletest) * newDelta.y),
+            (math.sin(angletest) * newDelta.x) + (math.cos(angletest) * newDelta.y))
+          sender ! NewPosition(intersectionAndDirection.intersectionPoint >> orientedDelta, orientedDelta)
         } else {
           val food = state.foods.find(_.hasInside(newPosition))
           if (food.isDefined) {
             sender ! FoodNear(food.get.position)
-            //TODO: code replication!!!
-            val intersectionAndDirection = food.get.findIntersectionPoint(position, newPosition)
-            //println(intersectionAndDirection)
-            val newDelta = intersectionAndDirection.intersectionPoint - newPosition
-            sender ! NewPosition(intersectionAndDirection.intersectionPoint >> newDelta, newDelta)
+            sender ! NewPosition(position , ZeroVector2D())
           } else {
             sender ! NewPosition(newPosition, newPosition - position)
           }

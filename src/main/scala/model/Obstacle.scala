@@ -1,6 +1,7 @@
 package  model
 
-import utility.Geometry.{Vector2D, Vector3D, ZeroVector2D}
+import utility.Geometry
+import utility.Geometry.{Vector2D, Vector3D}
 import utility.Geometry.TupleOp3._
 import utility.Geometry.TupleOp._
 
@@ -37,19 +38,13 @@ class SimpleObstacle(override val position: Vector2D, val xDim: Double, val yDim
    * @param oldPosition of the object
    * @param newPosition of the object (must be inside the obstacle)
    *
-   * @throws IllegalArgumentException if newPosition is outside the
-   *                                  obstacle
    *
    * @return an instance of IntersectionResult case class with the
    *         position of intersection and the smallest angle formed
    *         between obstacle border line and object trajectory.
-   *         If return a zero position and an angle with value of
-   *         Double.MaxValue, then there are no valid intersection
-   *         or something wrong happened
+   *         If any border intersection are found it's return an Option.empty
    * */
-  override def findIntersectionPoint(oldPosition: Vector2D, newPosition: Vector2D): IntersectionResult = {
-    if (!this.hasInside(newPosition))
-      throw new IllegalArgumentException("new position must be inside the obstacle")
+  override def findIntersectionPoint(oldPosition: Vector2D, newPosition: Vector2D): Option[IntersectionResult] = {
 
     //form vertex definition
     val vertex: List[Vector2D] = List(
@@ -70,7 +65,9 @@ class SimpleObstacle(override val position: Vector2D, val xDim: Double, val yDim
     })
 
     // ant path definition
-    val antPath: (Vector3D,Vector3D,Vector3D) = (oldPosition, newPosition, oldPosition X newPosition)
+    val antPath: (Vector2D,Vector2D,Vector3D) = (oldPosition, newPosition, oldPosition X newPosition)
+    val antVect: Vector2D = newPosition - oldPosition
+    var intersections: List[IntersectionResult] = List()
 
     /*
     * Calculate intersection between insect line and obstacle border line,
@@ -80,15 +77,25 @@ class SimpleObstacle(override val position: Vector2D, val xDim: Double, val yDim
     * */
     segments.indices foreach( i => {
       val crossIntersection = segments(i)._3 X antPath._3
-      if (crossIntersection.z != 0.0) {
+      if (!(Geometry ~= (crossIntersection.z, 0.0, 1E-7))) {
         val intersection = crossIntersection / crossIntersection.z
-        if (intersection checkInside(segments(i)._1, segments(i)._2)) {
-          return IntersectionResult((intersection.x, intersection.y), antPath._3 ^ segments(i)._3)
+        if ((intersection checkInside(segments(i)._1, segments(i)._2))
+          && (intersection checkInside(oldPosition, newPosition))) {
+          val segVector: Vector2D =  vec3DToVec2D(segments(i)._2) - vec3DToVec2D(segments(i)._1)
+          val segVectorNorm = segVector / (segVector ||)
+          intersections = IntersectionResult((intersection.x, intersection.y), antVect ^ segVectorNorm) +: intersections
         }
       }
     })
 
-    IntersectionResult(ZeroVector2D(), Double.MaxValue)
+    if (intersections.size <= 0) {
+      Option.empty
+    }
+    else Some(intersections.sortWith(
+      (a,b) =>
+        (a.intersectionPoint --> oldPosition) < (b.intersectionPoint --> oldPosition)
+      ).head
+    )
   }
 
   def unapply(arg: SimpleObstacle): Option[(Vector2D, Double, Double)] = {
@@ -158,7 +165,7 @@ case class Obstacle(points: List[Vector3D]) extends Bordered {
     *         Double.MaxValue, then there are no valid intersection
     *         or something wrong happened
     * */
-  override def findIntersectionPoint(oldPosition: Vector2D, newPosition: Vector2D): IntersectionResult = ???
+  override def findIntersectionPoint(oldPosition: Vector2D, newPosition: Vector2D): Option[IntersectionResult] = ???
 
   // a segments is described as a two point and a line pass through them
   private def findCentroid(l: List[Vector3D]): Vector2D = {

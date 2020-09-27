@@ -1,11 +1,15 @@
 package model
 
 import utility.Geometry.Vector2D
-
+import utility.Geometry.TupleOp3._
 /** A food source. */
 case class Food(override val position: Vector2D, quantity: Double)
   extends SimpleObstacle(position, if (math.sqrt(quantity) < 20) 20 else math.sqrt(quantity),
     if (math.sqrt(quantity) < 20) 20 else math.sqrt(quantity)) {
+
+//  override def hasInside(coordinate: Vector2D): Boolean = {
+//    math.pow(coordinate.x - position.x, 2) + math.pow(coordinate.y - position.y, 2) <  quantity/4
+//  }
 
   /** Increase food quantity.
    *
