@@ -76,7 +76,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
           case _: ForagingAntInfo => true
           case _ => false
         }
-        assert(positionsCount == nAnts)
+        assert(positionsCount >= nAnts)
       }
     }
     "make them move" should {
@@ -89,7 +89,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
           case _: ForagingAntInfo => true
           case _ => false
         }
-        assert(positions.size == nAnts)
+        assert(positions.size >= nAnts)
       }
       "receive no more messages" in {
         sender.expectNoMessage()
@@ -117,7 +117,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
         case _: ForagingAntInfo => true
         case _ => false
       }
-      assert(positionsCount == nAnts)
+      assert(positionsCount >= nAnts)
     }
   }
 
