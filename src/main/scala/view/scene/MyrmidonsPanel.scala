@@ -50,7 +50,7 @@ case class MyrmidonsPanel() extends Panel {
           g.setColor(new Color(1f, 0.2f, 0.08f, 0.6f))
         }
         val ellipse = new Ellipse2D.Double(x.position.x - (10 / 2),
-          x.position.y - (10 / 2), 5, 5)
+          size.height - x.position.y - (10 / 2), 5, 5)
         g.fill(ellipse)
       })
 
@@ -60,7 +60,7 @@ case class MyrmidonsPanel() extends Panel {
       g.setColor(Color.black)
       ants.foreach(x => {
         val ellipse = new Ellipse2D.Double(x.position.x - (antSize / 2),
-          x.position.y - (antSize / 2), antSize, antSize)
+          size.height - x.position.y - (antSize / 2), antSize, antSize)
         g.fill(ellipse)
       })
 
@@ -70,7 +70,7 @@ case class MyrmidonsPanel() extends Panel {
       g.setColor(Color.red)
       enemies.foreach(x => {
         val ellipse = new Ellipse2D.Double(x.position.x - (antSize / 2),
-          x.position.y - (antSize / 2), antSize, antSize)
+          size.height - x.position.y - (antSize / 2), antSize, antSize)
         g.fill(ellipse)
       })
 
@@ -79,7 +79,7 @@ case class MyrmidonsPanel() extends Panel {
        */
       g.setColor(new Color(0.5f, 0.5f, 0.5f, 0.5f))
       obstacles.foreach(x => {
-        val rect = new Rectangle2D.Double(x.position.x - (x.xDim / 2), x.position.y - (x.yDim / 2), x.xDim, x.yDim)
+        val rect = new Rectangle2D.Double(x.position.x - (x.xDim / 2), size.height - x.position.y - (x.yDim / 2), x.xDim, x.yDim)
         g.fill(rect)
       })
 
@@ -94,7 +94,7 @@ case class MyrmidonsPanel() extends Panel {
           g.setColor(new Color(0f, 0f, 1f, 0.4f)) //d
         }
         val ellipse = new Ellipse2D.Double(x.position.x - (x.xDim / 2),
-          x.position.y - (x.yDim / 2), x.xDim, x.yDim)
+          size.height - x.position.y - (x.yDim / 2), x.xDim, x.yDim)
         g.fill(ellipse)
 
       })
@@ -110,7 +110,7 @@ case class MyrmidonsPanel() extends Panel {
           g.setColor(new Color(0f, 0.5f, 0f, anthillOpacity))
         }
         val ellipse = new Ellipse2D.Double(anthill.get.position.x - anthill.get.radius * 2,
-          anthill.get.position.y - anthill.get.radius * 2,
+          size.height - anthill.get.position.y - anthill.get.radius * 2,
           anthill.get.radius * 2 * 2, anthill.get.radius * 2 * 2)
         g.fill(ellipse)
       }

@@ -32,6 +32,13 @@ object Geometry {
     /** Returns the angle of the vector */
     def /\ : Double = math.atan2(y,x)
 
+    def ^ (s: Vector2D) : Double = {
+      val numeratorCos = (s.x * this.x) + (s.y * this.y)
+      val denominator = (this ||) * (s ||)
+      math.acos(numeratorCos / denominator)
+    }
+
+
     /** Return the distance between vectors */
     def -->(other: Vector2D) : Double = this - other ||
 
@@ -101,6 +108,7 @@ object Geometry {
   object TupleOp {
     implicit def toVec2D(value: (Double, Double)): Vector2D = Vector2D(value._1, value._2)
     implicit def intToVec2D(value: (Int, Int)): Vector2D = Vector2D(value._1.toDouble, value._2.toDouble)
+    implicit def vec3DToVec2D(value: Vector3D): Vector2D = Vector2D(value.x / value.z, value.y / value.z)
   }
 
 
@@ -128,12 +136,11 @@ object Geometry {
    def /\ : Double = math.atan(y / x)
 
    def ^ (s: Vector3D) : Double = {
-     val numerator = (s.x * this.x) + (s.y + this.y) + (s.z + this.z)
-     val denominatorA = this ||
-     val denominatorB = s ||
-
-     math.acos(numerator / (denominatorA * denominatorB))
+     val numeratorCos = (s.x * this.x) + (s.y * this.y) + (s.z * this.z)
+     val denominator = (this ||) * (s ||)
+     math.acos(numeratorCos / denominator)
    }
+
    def -->(other: Vector3D): Double = this - other ||
 
    /**

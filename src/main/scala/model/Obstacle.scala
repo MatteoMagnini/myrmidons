@@ -1,7 +1,7 @@
 package  model
 
 import utility.Geometry
-import utility.Geometry.{Vector2D, Vector3D, ZeroVector2D}
+import utility.Geometry.{Vector2D, Vector3D}
 import utility.Geometry.TupleOp3._
 import utility.Geometry.TupleOp._
 
@@ -65,9 +65,10 @@ class SimpleObstacle(override val position: Vector2D, val xDim: Double, val yDim
     })
 
     // ant path definition
-    val antPath: (Vector3D,Vector3D,Vector3D) = (oldPosition, newPosition, oldPosition X newPosition)
-
+    val antPath: (Vector2D,Vector2D,Vector3D) = (oldPosition, newPosition, oldPosition X newPosition)
+    val antVect: Vector2D = newPosition - oldPosition
     var intersections: List[IntersectionResult] = List()
+
     /*
     * Calculate intersection between insect line and obstacle border line,
     * then check if intersection fall inside ant segment. If this check result
@@ -80,20 +81,21 @@ class SimpleObstacle(override val position: Vector2D, val xDim: Double, val yDim
         val intersection = crossIntersection / crossIntersection.z
         if ((intersection checkInside(segments(i)._1, segments(i)._2))
           && (intersection checkInside(oldPosition, newPosition))) {
-          intersections = IntersectionResult((intersection.x, intersection.y), antPath._3 ^ segments(i)._3) +: intersections
+          val segVector: Vector2D =  vec3DToVec2D(segments(i)._2) - vec3DToVec2D(segments(i)._1)
+          val segVectorNorm = segVector / (segVector ||)
+          intersections = IntersectionResult((intersection.x, intersection.y), antVect ^ segVectorNorm) +: intersections
         }
       }
     })
+
     if (intersections.size <= 0) {
-      println(s"${this.position} || $oldPosition || $newPosition")
       Option.empty
     }
-    else
-      Some(intersections.sortWith(
-        (a,b) =>
-          (a.intersectionPoint --> oldPosition) < (b.intersectionPoint --> oldPosition)
-        ).head
-      )
+    else Some(intersections.sortWith(
+      (a,b) =>
+        (a.intersectionPoint --> oldPosition) < (b.intersectionPoint --> oldPosition)
+      ).head
+    )
   }
 
   def unapply(arg: SimpleObstacle): Option[(Vector2D, Double, Double)] = {

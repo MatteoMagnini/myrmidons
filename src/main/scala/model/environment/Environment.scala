@@ -62,7 +62,6 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
         if (state.obstacles.forall(!_.hasInside(newPosition)))
           sender ! NewPosition(newPosition, newPosition - position)
         else {
-          /* If ant is moving outside boundary or through an obstacle bounces */
           val collision = state.obstacles.find(_.hasInside(newPosition)).get
           //TODO: BUGSSSSSS!!! Ant sometimes teleporting, should smoothly bounce.
           collision match {
@@ -70,19 +69,20 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
               sender ! FoodNear(f.position)
               //TODO: code replication!!!
               val intersectionAndDirection = f.findIntersectionPoint(position, newPosition).head
-              //println(intersectionAndDirection)
               val newDelta = intersectionAndDirection.intersectionPoint - newPosition
               sender ! NewPosition(intersectionAndDirection.intersectionPoint >> newDelta, newDelta)
             case x =>
               val intersectionAndDirection = x.findIntersectionPoint(position, newPosition).head
-              val angletest = math.Pi - (intersectionAndDirection.angle * 2);
-
+              val angletest = if (intersectionAndDirection.angle < math.Pi / 2) {
+                math.Pi - (intersectionAndDirection.angle * 2)
+              }else {
+                - ((2 * intersectionAndDirection.angle) - math.Pi)
+              }
               val newDelta = intersectionAndDirection.intersectionPoint - newPosition
-              val test = Vector2D(
+              val orientedDelta = Vector2D(
                 (math.cos(angletest) * newDelta.x) - (math.sin(angletest) * newDelta.y),
                 (math.sin(angletest) * newDelta.x) + (math.cos(angletest) * newDelta.y))
-
-              sender ! NewPosition(intersectionAndDirection.intersectionPoint >> test, test)
+              sender ! NewPosition(intersectionAndDirection.intersectionPoint >> orientedDelta, orientedDelta)
           }
 
         }
