@@ -63,14 +63,10 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
           sender ! NewPosition(newPosition, newPosition - position)
         else {
           val collision = state.obstacles.find(_.hasInside(newPosition)).get
-          //TODO: BUGSSSSSS!!! Ant sometimes teleporting, should smoothly bounce.
           collision match {
             case f: Food =>
               sender ! FoodNear(f.position)
-              //TODO: code replication!!!
-              val intersectionAndDirection = f.findIntersectionPoint(position, newPosition).head
-              val newDelta = intersectionAndDirection.intersectionPoint - newPosition
-              sender ! NewPosition(intersectionAndDirection.intersectionPoint >> newDelta, newDelta)
+              sender ! NewPosition(position , ZeroVector2D())
             case x =>
               val intersectionAndDirection = x.findIntersectionPoint(position, newPosition).head
               val angletest = if (intersectionAndDirection.angle < math.Pi / 2) {
