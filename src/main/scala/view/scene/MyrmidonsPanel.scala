@@ -51,7 +51,7 @@ case class MyrmidonsPanel() extends Panel {
           case _ => g.setColor(new Color(1f, 0.4f, 0.08f, 1f))
         }
         val ellipse = new Ellipse2D.Double(x.position.x - (pheromoneSize / 2),
-          x.position.y - (pheromoneSize / 2), pheromoneSize, pheromoneSize)
+          size.height - x.position.y - (pheromoneSize / 2), pheromoneSize, pheromoneSize)
         g.fill(ellipse)
       })
 
@@ -61,7 +61,7 @@ case class MyrmidonsPanel() extends Panel {
       g.setColor(Color.black)
       ants.foreach(x => {
         val ellipse = new Ellipse2D.Double(x.position.x - (antSize / 2),
-          x.position.y - (antSize / 2), antSize, antSize)
+          size.height - x.position.y - (antSize / 2), antSize, antSize)
         g.fill(ellipse)
       })
 
@@ -71,7 +71,7 @@ case class MyrmidonsPanel() extends Panel {
       g.setColor(Color.red)
       enemies.foreach(x => {
         val ellipse = new Ellipse2D.Double(x.position.x - (antSize / 2),
-          x.position.y - (antSize / 2), antSize, antSize)
+          size.height - x.position.y - (antSize / 2), antSize, antSize)
         g.fill(ellipse)
       })
 
@@ -80,7 +80,7 @@ case class MyrmidonsPanel() extends Panel {
        */
       g.setColor(new Color(0.5f, 0.5f, 0.5f, 0.5f))
       obstacles.foreach(x => {
-        val rect = new Rectangle2D.Double(x.position.x - (x.xDim / 2), x.position.y - (x.yDim / 2), x.xDim, x.yDim)
+        val rect = new Rectangle2D.Double(x.position.x - (x.xDim / 2), size.height - x.position.y - (x.yDim / 2), x.xDim, x.yDim)
         g.fill(rect)
       })
 
@@ -97,7 +97,7 @@ case class MyrmidonsPanel() extends Panel {
           case _ => g.setColor(new Color(0f, 0f, 1f, foodQuantity))
         }
         val ellipse = new Ellipse2D.Double(x.position.x - (x.xDim / 2),
-          x.position.y - (x.yDim / 2), x.xDim, x.yDim)
+          size.height - x.position.y - (x.yDim / 2), x.xDim, x.yDim)
         g.fill(ellipse)
 
       })
@@ -110,7 +110,7 @@ case class MyrmidonsPanel() extends Panel {
           case _:ForagingAntInfo => g.setColor(Color.black);print("ant")
           case _ => g.setColor(Color.red);print("ins")
         }
-        val ellipse = new Ellipse2D.Double(pos.x,pos.y, 20, 20)
+        val ellipse = new Ellipse2D.Double(pos.x, size.height - pos.y, 20, 20)
         g.fill(ellipse)
       }
 
@@ -128,7 +128,7 @@ case class MyrmidonsPanel() extends Panel {
         }
 
         val ellipse = new Ellipse2D.Double(anthill.get.position.x - anthill.get.radius * 2,
-          anthill.get.position.y - anthill.get.radius * 2,
+          size.height - anthill.get.position.y - anthill.get.radius * 2,
           anthill.get.radius * 2 * 2, anthill.get.radius * 2 * 2)
         g.fill(ellipse)
       }

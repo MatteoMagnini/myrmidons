@@ -2,6 +2,17 @@ package utility
 
 object Geometry {
 
+  /**
+   * Double equivalence check.
+   *
+   * @param x defoult value
+   * @param y value to check
+   * @param precision to consider in number matching
+   *
+   * @return true if the value are similar, otherwise return false
+   * */
+  def ~=(x: Double, y: Double, precision: Double = 1E-10): Boolean = (x - y).abs < precision
+
   /** A vector in 2-dimensional space.
    *
    * @param x x-coordinate
@@ -28,19 +39,24 @@ object Geometry {
     /** Returns the angle of the vector */
     def /\ : Double = math.atan2(y,x)
 
+    def ^ (s: Vector2D) : Double = {
+      val numeratorCos = (s.x * this.x) + (s.y * this.y)
+      val denominator = (this ||) * (s ||)
+      math.acos(numeratorCos / denominator)
+    }
+
+
     /** Return the distance between vectors */
     def -->(other: Vector2D) : Double = this - other ||
 
-    def ~~(other: Vector2D, precision: Double = 2): Boolean = ~=(x, other.x,precision) && ~=(y, other.y,precision)
+    def ~~(other: Vector2D, precision: Double = 3): Boolean = ~=(x, other.x,precision) && ~=(y, other.y,precision)
 
     override def equals(obj: Any): Boolean = obj match {
       case o: Vector2D => ~=(x, o.x) && ~=(y, o.y)
       case t: (Int, Int) => ~=(x, t._1.toDouble) && ~=(y, t._2.toDouble)
-      case t: (Double, Double) => ~=(x, t._1) && ~= (y, t._2)
+      case t: (Double, Double) => ~=(x, t._1) && ~=(y, t._2)
       case _ => false
     }
-
-    def ~=(x: Double, y: Double, precision: Double = 1E-10): Boolean = (x - y).abs < precision
 
   }
 
@@ -140,6 +156,7 @@ object Geometry {
   object TupleOp {
     implicit def toVec2D(value: (Double, Double)): Vector2D = Vector2D(value._1, value._2)
     implicit def intToVec2D(value: (Int, Int)): Vector2D = Vector2D(value._1.toDouble, value._2.toDouble)
+    implicit def vec3DToVec2D(value: Vector3D): Vector2D = Vector2D(value.x / value.z, value.y / value.z)
   }
 
 
@@ -167,12 +184,11 @@ object Geometry {
    def /\ : Double = math.atan(y / x)
 
    def ^ (s: Vector3D) : Double = {
-     val numerator = (s.x * x) + (s.y + y) + (s.z + this.z)
-     val denominatorA = this ||
-     val denominatorB = s ||
-
-     math.acos(numerator / (denominatorA * denominatorB))
+     val numeratorCos = (s.x * this.x) + (s.y * this.y) + (s.z * this.z)
+     val denominator = (this ||) * (s ||)
+     math.acos(numeratorCos / denominator)
    }
+
    def -->(other: Vector3D): Double = this - other ||
 
    /**
@@ -186,7 +202,9 @@ object Geometry {
     * @return true if this vector is inside start and stop vector, otherwise return false
     *
     * */
-   def checkInside(start: Vector3D, stop: Vector3D): Boolean = (start --> this) + (stop --> this) == (start --> stop)
+   def checkInside(start: Vector3D, stop: Vector3D): Boolean = {
+    ~=((start --> this) + (stop --> this) - (start --> stop), 0.0, 1E-6)
+   }
 
 
    /** Cross product between two vectors * */
