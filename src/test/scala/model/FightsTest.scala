@@ -1,12 +1,13 @@
 package model
 
 import model.Fights.Fight
-import model.insects.{EnemyInfo, ForagingAntInfo, InsectInfo}
+import model.insects.{EnemyInfo, ForagingAntInfo}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import utility.Geometry.ZeroVector2D
 
 import scala.util.Random
+
 
 class FightsTest extends AnyWordSpecLike with Matchers {
 
@@ -15,7 +16,7 @@ class FightsTest extends AnyWordSpecLike with Matchers {
     val ant = ForagingAntInfo(null, energy = antEnergy)
     val insectEnergy = 10
     val insect = EnemyInfo(null, energy = insectEnergy)
-    val fight: Fight[InsectInfo] = Fight(ant, insect, ZeroVector2D())
+    val fight: Fight[ForagingAntInfo, EnemyInfo] = Fight(ant, insect, ZeroVector2D())
 
     "happens" should {
 
@@ -23,7 +24,10 @@ class FightsTest extends AnyWordSpecLike with Matchers {
         import Fights._
         import Fights.InsectFight._
 
-        assert(loser(fight).energy == (antEnergy min insectEnergy))
+        assert(loser(fight) match {
+          case Left(x) => x.energy == (antEnergy min insectEnergy)
+          case Right(x) => x.energy == (antEnergy min insectEnergy)
+        })
       }
     }
   }
@@ -34,12 +38,12 @@ class FightsTest extends AnyWordSpecLike with Matchers {
 
     val nFights = 5
     val maxEnergy = 100
-    val fights: Iterable[Fight[InsectInfo]] = for {
+    val fights: Iterable[Fight[ForagingAntInfo, EnemyInfo]] = for {
       _ <- 0 to nFights
       antEnergy = Random.nextInt(maxEnergy)
-      ant: InsectInfo = ForagingAntInfo(null, energy = antEnergy)
+      ant: ForagingAntInfo = ForagingAntInfo(null, energy = antEnergy)
       insectEnergy = Random.nextInt(maxEnergy)
-      enemy: InsectInfo = EnemyInfo(null, energy = insectEnergy)
+      enemy: EnemyInfo = EnemyInfo(null, energy = insectEnergy)
     } yield Fight(ant, enemy, ZeroVector2D())
 
     "happens" should {
@@ -48,9 +52,13 @@ class FightsTest extends AnyWordSpecLike with Matchers {
         val minEnergies = fights.map(x => x.firstFighter.energy min x.secondFighter.energy)
         val insectLosers = losers(fights)
         for ((energy, loser) <- minEnergies zip insectLosers) {
-          assert(energy == loser.energy)
+          assert(loser match {
+            case Left(x) => x.energy == energy
+            case Right(x) => x.energy == energy
+          })
         }
       }
     }
   }
+
 }

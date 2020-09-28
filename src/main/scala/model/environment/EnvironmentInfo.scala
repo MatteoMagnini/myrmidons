@@ -2,7 +2,7 @@ package model.environment
 
 import akka.actor.ActorRef
 import model.anthill.AnthillInfo
-import model.{Bordered, Food, Obstacle, SimpleObstacle}
+import model.{Food, Obstacle}
 import model.insects.{EnemyInfo, ForagingAntInfo, InsectInfo}
 import utility.Geometry.ZeroVector2D
 import utility.PheromoneSeq._
@@ -17,7 +17,7 @@ trait EnvironmentInfo {
   def boundary: Boundary
 
   /** Obstacles in environment */
-  def obstacles: Iterable[SimpleObstacle]
+  def obstacles: Iterable[Obstacle]
 
   def foods: Iterable[Food]
 
@@ -25,7 +25,7 @@ trait EnvironmentInfo {
   def ants: Map[Int, ActorRef]
 
   /** Ants information */
-  def antsInfo: Iterable[InsectInfo]
+  def antsInfo: Iterable[ForagingAntInfo]
 
   /** References to enemy actors */
   def enemies: Map[Int, ActorRef]
@@ -71,7 +71,7 @@ object EnvironmentInfo {
 
     EnvironmentData(None, boundary, Seq.empty, Seq.empty, Map.empty, Seq.empty, Map.empty, Seq.empty, None, AnthillInfo(ZeroVector2D()), Seq[FoodPheromone]())
 
-  def apply(gui: Option[ActorRef], boundary: Boundary, obstacles: Seq[SimpleObstacle], foods: Seq[Food], ants: Map[Int, ActorRef],
+  def apply(gui: Option[ActorRef], boundary: Boundary, obstacles: Seq[Obstacle], foods: Seq[Food], ants: Map[Int, ActorRef],
             enemies: Map[Int, ActorRef], anthill: ActorRef, anthillInfo: AnthillInfo, foodPheromone: Seq[FoodPheromone]): EnvironmentInfo =
     EnvironmentData(gui, boundary, obstacles, foods,  ants, Seq.empty, enemies, Seq.empty, Some(anthill), anthillInfo, foodPheromone)
 
@@ -87,10 +87,10 @@ object EnvironmentInfo {
    * @param anthillInfo anthill information
    */
   private[this] case class EnvironmentData(override val gui: Option[ActorRef], override val boundary: Boundary,
-                                           override val obstacles: Seq[SimpleObstacle],
+                                           override val obstacles: Seq[Obstacle],
                                            override val foods: Seq[Food],
                                            override val ants: Map[Int, ActorRef],
-                                           override val antsInfo: Seq[InsectInfo], override val enemies: Map[Int, ActorRef],
+                                           override val antsInfo: Seq[ForagingAntInfo], override val enemies: Map[Int, ActorRef],
                                            override val enemiesInfo: Seq[EnemyInfo], override val anthill: Option[ActorRef],
                                            override val anthillInfo: AnthillInfo,
                                            override val pheromones: Seq[FoodPheromone]) extends EnvironmentInfo {
