@@ -6,7 +6,7 @@ import java.awt.geom.{Ellipse2D, Rectangle2D}
 import model.Fights.Fight
 import model.anthill.AnthillInfo
 import model.environment.FoodPheromone
-import model.{Drawable, Food, SimpleObstacle}
+import model.{Drawable, Food, Obstacle}
 import model.insects.{EnemyInfo, ForagingAntInfo, InsectInfo}
 
 import scala.swing.{Graphics2D, Panel}
@@ -25,8 +25,8 @@ case class MyrmidonsPanel() extends Panel {
   private var enemies: Seq[InsectInfo] = Seq.empty
   private var food: Seq[Food] = Seq.empty
   private var anthill: Option[AnthillInfo] = None
-  private var obstacles: Seq[SimpleObstacle] = Seq.empty
-  private var fights: Seq[Fight[InsectInfo]] = Seq.empty
+  private var obstacles: Seq[Obstacle] = Seq.empty
+  private var fights: Seq[Fight[ForagingAntInfo, EnemyInfo]] = Seq.empty
   private var pheromones: Seq[FoodPheromone] = Seq.empty
 
   size.height = 800
@@ -80,7 +80,7 @@ case class MyrmidonsPanel() extends Panel {
        */
       g.setColor(new Color(0.5f, 0.5f, 0.5f, 0.5f))
       obstacles.foreach(x => {
-        val rect = new Rectangle2D.Double(x.position.x - (x.xDim / 2), size.height - x.position.y - (x.yDim / 2), x.xDim, x.yDim)
+        val rect = new Rectangle2D.Double(x.position.x , size.height - x.position.y , 20, 20)
         g.fill(rect)
       })
 
@@ -96,9 +96,13 @@ case class MyrmidonsPanel() extends Panel {
           case quantity if quantity < 0.8f => g.setColor(new Color(0f, 0f, 1f, 0.8f))
           case _ => g.setColor(new Color(0f, 0f, 1f, foodQuantity))
         }
-        val ellipse = new Ellipse2D.Double(x.position.x - (x.xDim / 2),
-          size.height - x.position.y - (x.yDim / 2), x.xDim, x.yDim)
+        val ellipse = new Ellipse2D.Double(x.position.x - x.radius * 2,
+          size.height - x.position.y - x.radius * 2, x.radius * 2, x.radius * 2)
         g.fill(ellipse)
+
+       /* val ellipse = new Ellipse2D.Double(x.position.x - (x.xDim / 2),
+          size.height - x.position.y - (x.yDim / 2), x.xDim, x.yDim)
+        g.fill(ellipse)*/
 
       })
 
@@ -107,7 +111,7 @@ case class MyrmidonsPanel() extends Panel {
 
       for((pos, loser) <- fights.map(_.position) zip losers(fights)) {
         loser match {
-          case _:ForagingAntInfo => g.setColor(Color.black);print("ant")
+          case Left(_) => g.setColor(Color.black);print("ant")
           case _ => g.setColor(Color.red);print("ins")
         }
         val ellipse = new Ellipse2D.Double(pos.x, size.height - pos.y, 20, 20)
@@ -129,7 +133,7 @@ case class MyrmidonsPanel() extends Panel {
 
         val ellipse = new Ellipse2D.Double(anthill.get.position.x - anthill.get.radius * 2,
           size.height - anthill.get.position.y - anthill.get.radius * 2,
-          anthill.get.radius * 2 * 2, anthill.get.radius * 2 * 2)
+          anthill.get.radius * 4, anthill.get.radius * 4)
         g.fill(ellipse)
       }
 
@@ -163,11 +167,11 @@ case class MyrmidonsPanel() extends Panel {
     info.foreach {
       case entity: ForagingAntInfo => ants = entity +: ants
       case entity: Food => food = entity +: food
-      case entity: SimpleObstacle => obstacles = entity +: obstacles
+      case entity: Obstacle => obstacles = entity +: obstacles
       case entity: AnthillInfo => anthill = Some(entity)
       case entity: EnemyInfo => enemies = entity +: enemies
       case entity: FoodPheromone => pheromones = entity +: pheromones
-      case entity: Fight[_] => fights = entity.asInstanceOf[Fight[InsectInfo]] +: fights
+      case entity: Fight[_,_] => fights = entity.asInstanceOf[Fight[ForagingAntInfo, EnemyInfo]] +: fights
       case _ => println("Error match entities")
     }
     (ants.size, anthill.get.foodAmount.toInt)

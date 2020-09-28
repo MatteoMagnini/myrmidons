@@ -17,7 +17,6 @@ trait Bordered extends Drawable {
   def hasInside(coordinate: Vector2D): Boolean
 
   /**
-<<<<<<< HEAD
     * Find the intersection point of a segment defined by two point
     * (oldPosition, newPosition) with an obstacle border.
     *
@@ -48,13 +47,13 @@ object BorderedEntityFactory {
    * @param yDim   dimension on y-axis
    * @return a SimpleObstacle instance
    */
-  def createRandomSimpleObstacle(minPos: Double = 0, maxPos: Double = 800, xDim: Int = 30, yDim: Int = 30):SimpleObstacle = {
+/*  def createRandomSimpleObstacle(minPos: Double = 0, maxPos: Double = 800, xDim: Int = 30, yDim: Int = 30):Obstacle = {
     var pos = RandomVector2DInSquare(minPos, maxPos)
     if (pos --> Vector2D(400,400) < 50)
       pos = pos >> Vector2D(if(pos.x < 400) -50 else 50,0)
 
-    new SimpleObstacle(Vector2D(pos.x, pos.y), xDim, yDim)
-  }
+    new Obstacle(Vector2D(pos.x, pos.y), xDim, yDim)
+  }*/
 
 
   /**

@@ -1,17 +1,19 @@
 package utility
 
+import utility.Geometry.Vector2D
+
 object Geometry {
 
   /**
    * Double equivalence check.
    *
-   * @param x defoult value
+   * @param x default value
    * @param y value to check
    * @param precision to consider in number matching
    *
    * @return true if the value are similar, otherwise return false
    * */
-  def ~=(x: Double, y: Double, precision: Double = 1E-10): Boolean = (x - y).abs < precision
+  def ~=(x: Double, y: Double, precision: Double = 1E-1): Boolean = (x - y).abs < precision
 
   /** A vector in 2-dimensional space.
    *
@@ -43,18 +45,17 @@ object Geometry {
       val numeratorCos = (s.x * this.x) + (s.y * this.y)
       val denominator = (this ||) * (s ||)
       math.acos(numeratorCos / denominator)
-    }
 
+    }
 
     /** Return the distance between vectors */
     def -->(other: Vector2D) : Double = this - other ||
 
     def ~~(other: Vector2D, precision: Double = 3): Boolean = ~=(x, other.x,precision) && ~=(y, other.y,precision)
 
+
     override def equals(obj: Any): Boolean = obj match {
       case o: Vector2D => ~=(x, o.x) && ~=(y, o.y)
-      case t: (Int, Int) => ~=(x, t._1.toDouble) && ~=(y, t._2.toDouble)
-      case t: (Double, Double) => ~=(x, t._1) && ~=(y, t._2)
       case _ => false
     }
 
@@ -229,4 +230,12 @@ object Geometry {
      implicit def intToVec3D(value: (Int, Int, Int)): Vector3D = Vector3D(value._1.toDouble, value._2.toDouble, value._3.toDouble)
      implicit def vec2DToVec3D(value: Vector2D): Vector3D = Vector3D(value.x, value.y, 1.0)
    }
+}
+
+object Prova extends App {
+  val v1 = Vector2D(3.000,3.000)
+  val v3 = Vector2D(3.0001,3.0001)
+  val v2 = (3,3)
+  import utility.Geometry.TupleOp._
+  print(v2.equals(v1))
 }

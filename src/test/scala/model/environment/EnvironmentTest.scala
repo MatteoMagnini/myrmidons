@@ -54,7 +54,8 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
         assert(initialPosition != newPosition)
       }
       "check if ant didn't go outside boundary" in {
-        assert(boundary.hasInside(newPosition))
+        import model.EnvironmentElements.BoundaryHasInside
+        assert(model.EnvironmentElements.checkHasInside(boundary, newPosition))
       }
     }
   }
@@ -95,7 +96,8 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
         sender.expectNoMessage()
       }
       "check that no ant went outside boundary" in {
-        assert(positions.forall(boundary.hasInside))
+        import model.EnvironmentElements.BoundaryHasInside
+        assert(positions.forall(x => model.EnvironmentElements.checkHasInside(boundary, x)))
       }
     }
   }

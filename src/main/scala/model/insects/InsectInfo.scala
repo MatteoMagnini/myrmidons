@@ -5,7 +5,7 @@ import model.Drawable
 import utility.Geometry._
 
 /** The information in common with all kind of insects. */
-trait InsectInfo extends Drawable with Product with Serializable {
+trait InsectInfo extends Drawable {
 
   def id: Int
 

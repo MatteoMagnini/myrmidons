@@ -21,10 +21,10 @@ trait Boundary {
   def center: Vector2D = (left + width / 2, top + height / 2)
 
   /** Returns whether a vector is inside boundaries */
-  def hasInside(pos: Vector2D): Boolean = {
+/*  def hasInside(pos: Vector2D): Boolean = {
     (pos.x >= topLeft.x) && (pos.x <= topRight.x) &&
       (pos.y >= topLeft.y) && (pos.y <= bottomLeft.y)
-  }
+  }*/
 }
 
 object Boundary {

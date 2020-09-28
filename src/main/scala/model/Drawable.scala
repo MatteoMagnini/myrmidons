@@ -8,4 +8,5 @@ import utility.Geometry.Vector2D
  */
 trait Drawable {
   val position: Vector2D
+  //type Position
 }

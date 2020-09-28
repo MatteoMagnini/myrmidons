@@ -16,7 +16,7 @@ import utility.Geometry.TupleOp._
  *
  * hasInside implementation is easiest than Obstacle class.
  * */
-class SimpleObstacle(override val position: Vector2D, val xDim: Double, val yDim: Double) extends Bordered {
+/*class SimpleObstacle(override val position: Vector2D, val xDim: Double, val yDim: Double) extends Bordered {
 
   /**
    * function to verify if an entity has inside itself an
@@ -101,7 +101,7 @@ class SimpleObstacle(override val position: Vector2D, val xDim: Double, val yDim
   def unapply(arg: SimpleObstacle): Option[(Vector2D, Double, Double)] = {
     Some(position, xDim, yDim)
   }
-}
+}*/
 
 /**
  * An implementation of bordered obstacle.
@@ -110,7 +110,7 @@ class SimpleObstacle(override val position: Vector2D, val xDim: Double, val yDim
  *
  * @param points list of vertex of polygon that describe an obstacle
  * */
-case class Obstacle(points: List[Vector3D]) extends Bordered {
+case class Obstacle(points: List[Vector3D]) extends Drawable {
 
   override val position: Vector2D = findCentroid(points)
   var segments: List[(Vector3D, Vector3D, Vector3D)] = List()
@@ -120,33 +120,11 @@ case class Obstacle(points: List[Vector3D]) extends Bordered {
   }
   //get a line given two points
   points.indices foreach (i => {
-    var before = if (i == 0) points.length - 1 else i - 1
+    val before = if (i == 0) points.length - 1 else i - 1
     val product = points(before) X points(i)
     val line = product / product.z
     segments ::= (points(before), points(i), line)
   })
-
-  override def hasInside(coordinate: Vector2D): Boolean = {
-    import utility.Geometry.TupleOp3._
-    var maxX = points.sortWith((a, b) => a.x > b.x) head
-    //track an ray in right version
-    val ray = coordinate X Vector3D(maxX.x + 1, coordinate.y, 1)
-    var counter = 0
-    //find intersection between polygon segment and ray
-    segments.indices foreach (i => {
-      val crossIntersection = segments(i)._3 X ray
-      // intersection at ideal point (parallel line)
-      if (crossIntersection.z != 0.0) {
-        val intersection = crossIntersection / crossIntersection.z
-        if ((((segments(i)._1.x >= intersection.x) && (segments(i)._2.x <= intersection.x))
-          || ((segments(i)._1.x <= intersection.x) && (segments(i)._2.x >= intersection.x)))
-          && intersection.x >= coordinate.x) {
-          counter += 1
-        }
-      }
-    })
-    (counter % 2) != 0
-  }
 
   /**
     * Find the intersection point of a segment defined by two point
@@ -165,7 +143,7 @@ case class Obstacle(points: List[Vector3D]) extends Bordered {
     *         Double.MaxValue, then there are no valid intersection
     *         or something wrong happened
     * */
-  override def findIntersectionPoint(oldPosition: Vector2D, newPosition: Vector2D): Option[IntersectionResult] = ???
+  def findIntersectionPoint(oldPosition: Vector2D, newPosition: Vector2D): Option[IntersectionResult] = ???
 
   // a segments is described as a two point and a line pass through them
   private def findCentroid(l: List[Vector3D]): Vector2D = {
