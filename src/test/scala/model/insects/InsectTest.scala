@@ -195,7 +195,7 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
             assert(anthillInfo.position --> result2.info.position < anthillInfo.radius)
 
           case d: AddFoodPheromone =>
-            assert(d.foodPheromone.position equals startingAntPosition)
+            assert(d.foodPheromone.position equals implicitly[Vector2D](startingAntPosition))
             sender.expectMsgType[UpdateInsect]
         }
         sender expectNoMessage
