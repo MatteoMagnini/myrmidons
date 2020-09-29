@@ -1,7 +1,7 @@
 package model.environment
 
 import model.Drawable
-import utility.Geometry.Vector2D
+import utility.geometry.Vector2D
 
 /**
  * Abstraction for a real pheromone.

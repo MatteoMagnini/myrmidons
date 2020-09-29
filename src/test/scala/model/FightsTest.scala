@@ -4,7 +4,7 @@ import model.Fights.Fight
 import model.insects.{EnemyInfo, ForagingAntInfo}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.Geometry.ZeroVector2D
+import utility.geometry.ZeroVector2D
 
 import scala.util.Random
 

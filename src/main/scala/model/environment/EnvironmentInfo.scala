@@ -4,7 +4,7 @@ import akka.actor.ActorRef
 import model.anthill.AnthillInfo
 import model.environment.elements.{Food, Obstacle}
 import model.insects.{EnemyInfo, ForagingAntInfo, InsectInfo}
-import utility.Geometry.ZeroVector2D
+import utility.geometry.ZeroVector2D
 import utility.PheromoneSeq._
 
 /** Internal state of environment. */

@@ -1,7 +1,7 @@
 package model.environment.elements
 
 import model.Drawable
-import utility.Geometry.{RandomVector2DInSquare, Vector2D}
+import utility.geometry.{RandomVector2DInSquare, Vector2D}
 
 /**A food source.
   *

@@ -2,14 +2,14 @@ package model.insects
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
-import utility.Geometry.TupleOp2._
+import utility.geometry.TupleOp2._
 import model.anthill.{Anthill, AnthillInfo}
 import model.environment.FoodPheromone
 import model.environment.elements.Food
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.Geometry._
+import utility.geometry._
 import utility.Messages._
 import model.insects.ForagingAntConstant._
 import model.insects.Constant._

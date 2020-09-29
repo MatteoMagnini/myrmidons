@@ -2,7 +2,7 @@ package model.insects
 
 import akka.actor.Actor.Receive
 import akka.actor.{ActorContext, ActorRef}
-import utility.Geometry._
+import utility.geometry._
 import utility.Messages.{KillAnt, _}
 import ForagingAntConstant._
 import model.environment.FoodPheromone

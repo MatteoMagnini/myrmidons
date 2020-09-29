@@ -1,10 +1,10 @@
 package model.environment
 
-import utility.Geometry.Vector2D
+import utility.geometry.Vector2D
 
 /**Environment boundary */
 trait Boundary {
-  import utility.Geometry.TupleOp2._
+  import utility.geometry.TupleOp2._
 
   def top: Double
   def left: Double

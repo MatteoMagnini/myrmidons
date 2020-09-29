@@ -6,7 +6,7 @@ import model.anthill.{Anthill, AnthillInfo}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.Geometry.{Vector2D, ZeroVector2D}
+import utility.geometry.{Vector2D, ZeroVector2D}
 import utility.Messages.{Clock, FoodNear, FoodPheromones, Move, NewPosition, UpdateInsect}
 
 class EnemyTest extends TestKit(ActorSystem("InsectTest"))

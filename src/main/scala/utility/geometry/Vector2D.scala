@@ -1,4 +1,4 @@
-package utility.Geometry
+package utility.geometry
 
   import Vectors._
 
@@ -134,7 +134,7 @@ package utility.Geometry
   }
 
 
-  /** Implicit conversions for [[utility.Geometry.Vector2D]] instances
+  /** Implicit conversions for [[utility.geometry.Vector2D]] instances
     *
     * {{{
     * import TupleOp._

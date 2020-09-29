@@ -1,10 +1,9 @@
-package model
+package model.environment.elements
 
-import model.environment.elements.Obstacle
 import org.scalatest._
-import utility.Geometry.Vector3D
-import utility.Geometry.TupleOp3._
-import utility.Geometry.TupleOp2._
+import utility.geometry.TupleOp2._
+import utility.geometry.TupleOp3._
+import utility.geometry.Vector3D
 
 class ObstacleTest  extends wordspec.AnyWordSpec {
   "An obstacle" when {

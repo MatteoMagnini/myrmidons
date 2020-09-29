@@ -1,4 +1,4 @@
-package utility.Geometry
+package utility.geometry
 
 object Vectors {
 
@@ -22,7 +22,7 @@ object Vectors {
 
 }
 
-/** Implicit conversions from [[utility.Geometry.Vector2D]] to [[utility.Geometry.Vector3D]] and vice versa. */
+/** Implicit conversions from [[utility.geometry.Vector2D]] to [[utility.geometry.Vector3D]] and vice versa. */
 object VectorsImplicits {
   implicit def vec3DToVec2D(value: Vector3D): Vector2D = Vector2D(value.x / value.z, value.y / value.z)
 

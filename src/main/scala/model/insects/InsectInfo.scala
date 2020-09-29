@@ -2,7 +2,7 @@ package model.insects
 
 import akka.actor.ActorRef
 import model.Drawable
-import utility.Geometry._
+import utility.geometry._
 
 /** The information in common with all kind of insects. */
 trait InsectInfo extends Drawable {

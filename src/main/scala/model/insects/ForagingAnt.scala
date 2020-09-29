@@ -2,7 +2,7 @@ package model.insects
 
 import akka.actor.{ActorRef, Props}
 import model.environment.FoodPheromone
-import utility.Geometry.{Vector2D, ZeroVector2D}
+import utility.geometry.{Vector2D, ZeroVector2D}
 import utility.Messages._
 
 object ForagingAntConstant {

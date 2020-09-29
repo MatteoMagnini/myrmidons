@@ -7,7 +7,7 @@ import model.insects.ForagingAntInfo
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.Geometry.{Vector2D, ZeroVector2D}
+import utility.geometry.{Vector2D, ZeroVector2D}
 import utility.Messages.{AntBirth, Clock, Repaint, StartSimulation}
 
 class EnvironmentTest extends TestKit(ActorSystem("environment-test"))

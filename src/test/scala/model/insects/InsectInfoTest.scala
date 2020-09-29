@@ -6,7 +6,7 @@ import model.environment.FoodPheromone
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.Geometry._
+import utility.geometry._
 
 class InsectInfoTest extends TestKit(ActorSystem("InsectInfoTest"))
   with AnyWordSpecLike

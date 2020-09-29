@@ -2,7 +2,7 @@ package model.anthill
 
 import akka.actor.{Actor, ActorRef, Props}
 import model.Drawable
-import utility.Geometry.{OrientedVector2DWithNoise, Vector2D, ZeroVector2D}
+import utility.geometry.{OrientedVector2DWithNoise, Vector2D, ZeroVector2D}
 import utility.Messages._
 
 case class AnthillInfo(override val position: Vector2D,

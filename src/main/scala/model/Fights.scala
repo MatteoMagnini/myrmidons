@@ -1,7 +1,7 @@
 package model
 
 import model.insects.{EnemyInfo, ForagingAntInfo, InsectInfo}
-import utility.Geometry.Vector2D
+import utility.geometry.Vector2D
 
 object Fights {
 

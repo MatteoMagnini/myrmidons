@@ -1,4 +1,4 @@
-package utility.Geometry
+package utility.geometry
 import Vectors._
 
 /** A vector in 3-dimensional space.
@@ -57,7 +57,7 @@ case class Vector3D(x: Double, y: Double, z: Double) {
   }
 }
 
-/** Implicit conversion to convert [[utility.Geometry.Vector3D]] instances
+/** Implicit conversion to convert [[utility.geometry.Vector3D]] instances
   *
   * {{{
   * import TupleOp3._

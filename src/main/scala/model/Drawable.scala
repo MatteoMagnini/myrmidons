@@ -1,6 +1,6 @@
 package model
 
-import utility.Geometry.Vector2D
+import utility.geometry.Vector2D
 
 /**
  * All entities that can be displayed have a state that extends the Drawable state.

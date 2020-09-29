@@ -2,7 +2,7 @@ package model.environment
 
 import org.scalatest.BeforeAndAfter
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.Geometry.{Vector2D, ZeroVector2D}
+import utility.geometry.{Vector2D, ZeroVector2D}
 
 class PheromoneTest extends AnyWordSpecLike with BeforeAndAfter {
 

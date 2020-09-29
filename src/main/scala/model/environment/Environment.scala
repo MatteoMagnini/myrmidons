@@ -4,7 +4,7 @@ import akka.actor.{Actor, ActorContext, ActorLogging, ActorRef, Props}
 import model.Fights.Fight
 import model.anthill.{Anthill, AnthillInfo}
 import model.insects._
-import utility.Geometry._
+import utility.geometry._
 import utility.Messages._
 import utility.PheromoneSeq._
 import model.environment.elements.{EnvironmentElements, Food, Obstacle}
