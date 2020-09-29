@@ -2,11 +2,13 @@ package model.insects
 
 import akka.actor.Actor.Receive
 import akka.actor.{ActorContext, ActorRef}
-import utility.geometry._
+import utility.geometry.Vectors._
 import utility.Messages.{KillAnt, _}
 import ForagingAntConstant._
 import model.environment.FoodPheromone
 import model.insects
+import utility.geometry._
+
 import scala.util.Random
 
 object Constant {

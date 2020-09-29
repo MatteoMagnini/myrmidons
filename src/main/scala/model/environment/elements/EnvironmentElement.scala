@@ -49,7 +49,8 @@ object EnvironmentElements {
   /**How to check positions in [[model.environment.elements.Obstacle]] */
   implicit object ObstacleHasInside extends EnvironmentElement[Obstacle] {
     override def hasInside(element: Obstacle, coordinate: Vector2D): Boolean = {
-      import utility.geometry.TupleOp3._
+      import utility.geometry.VectorsImplicits._
+
       val maxX = element.points.sortWith((a, b) => a.x > b.x) head
       //track an ray in right version
       val ray = coordinate X Vector3D(maxX.x + 1, coordinate.y, 1)
