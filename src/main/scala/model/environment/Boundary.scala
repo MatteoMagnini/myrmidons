@@ -4,7 +4,7 @@ import utility.Geometry.Vector2D
 
 /**Environment boundary */
 trait Boundary {
-  import utility.Geometry.TupleOp._
+  import utility.Geometry.TupleOp2._
 
   def top: Double
   def left: Double

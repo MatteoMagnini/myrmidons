@@ -156,7 +156,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       (math.cos(angleTest) * newDelta.x) - (math.sin(angleTest) * newDelta.y),
       (math.sin(angleTest) * newDelta.x) + (math.cos(angleTest) * newDelta.y)
     )
-    import TupleOp._
+    import TupleOp2._
     (intersectionAndDirection.intersectionPoint >> orientedDelta, orientedDelta)
 
   }

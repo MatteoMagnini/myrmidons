@@ -45,7 +45,7 @@ case class Obstacle(points: List[Vector3D]) extends Drawable {
 
   // a segments is described as a two point and a line pass through them
   private def findCentroid(l: List[Vector3D]): Vector2D = {
-    import utility.Geometry.TupleOp._
+    import utility.Geometry.TupleOp2._
     val centroid = points.foldRight(Vector3D(0.0, 0.0, 0.0))(_ >> _) / points.size
     val normalizedCentroid = centroid / centroid.z
     (normalizedCentroid.x, normalizedCentroid.y)

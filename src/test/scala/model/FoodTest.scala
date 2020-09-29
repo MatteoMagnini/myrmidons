@@ -2,7 +2,7 @@ package model
 
 import model.environment.elements.Food
 import org.scalatest.wordspec
-import utility.Geometry.TupleOp._
+import utility.Geometry.TupleOp2._
 
 class FoodTest extends wordspec.AnyWordSpec {
   "A food" when {
