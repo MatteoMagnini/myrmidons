@@ -4,10 +4,12 @@ import akka.actor.{Actor, ActorContext, ActorLogging, ActorRef, Props}
 import model.Fights.Fight
 import model.anthill.{Anthill, AnthillInfo}
 import model.insects._
+import model.insects.info._
 import utility.Geometry._
 import utility.Messages._
 import utility.PheromoneSeq._
 import model.BorderedEntityFactory._
+import model.insects.info.SpecificInsectInfo
 
 import scala.util.Random
 
@@ -104,7 +106,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
         sender ! TakeFood(0, position)
       }
 
-    case UpdateInsect(info: InsectInfo) =>
+    case UpdateInsect(info: SpecificInsectInfo[x]) =>
       sendInfoToGUI(state.updateInsectInfo(info))
 
     case UpdateAnthill(anthillInfo: AnthillInfo) =>
@@ -146,13 +148,13 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   private def createEnemiesFromRandomPosition(nEnemies: Int, anthill: ActorRef): Map[Int, ActorRef] =
     (0 until nEnemies).map(i => {
       val randomPosition = RandomVector2DInSquare(state.boundary.topLeft.x, state.boundary.topRight.x)
-      i -> context.actorOf(Enemy(EnemyInfo(anthill, id = i, position = randomPosition), self), s"enemy-$i")
+      i -> context.actorOf(Enemy(EnemyInfo(id = i, position = randomPosition), self), s"enemy-$i")
     }).toMap
 
-  /** Returns ants references, created from intention of user. The ant start in RandomPosition */
+  /** Returns ants references, created from intention of user. The ant start in RandomPosition
   private def createAntByUser(antInfo: InsectInfo): ActorRef = {
     context.actorOf(ForagingAnt(antInfo, self), s"ant-${antInfo.id}")
-  }
+  }*/
 
   private def sendInfoToGUI(info: EnvironmentInfo): Unit = {
     import model.Fights._

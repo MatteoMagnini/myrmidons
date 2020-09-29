@@ -2,12 +2,12 @@ package model.insects
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
-import model.anthill.{Anthill, AnthillInfo}
+import model.insects.info.EnemyInfo
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.Geometry.{Vector2D, ZeroVector2D}
-import utility.Messages.{Clock, FoodNear, FoodPheromones, Move, NewPosition, UpdateInsect}
+import utility.Geometry.ZeroVector2D
+import utility.Messages.{Clock, Move, NewPosition, UpdateInsect}
 
 class EnemyTest extends TestKit(ActorSystem("InsectTest"))
   with AnyWordSpecLike
@@ -24,7 +24,7 @@ class EnemyTest extends TestKit(ActorSystem("InsectTest"))
 
   "an enemy" when {
 
-    val startingInfo = EnemyInfo(senderRef)
+    val startingInfo = EnemyInfo()
     val enemy = system.actorOf(Enemy(startingInfo,senderRef), "enemy-0")
 
     "performing random walk" should {

@@ -1,28 +1,9 @@
 package model.insects
 
 import akka.actor.{ActorRef, Props}
-import model.environment.FoodPheromone
-import utility.Geometry.{Vector2D, ZeroVector2D}
+import model.insects.info.ForagingAntInfo
 import utility.Messages._
-
-object ForagingAntConstant {
-
-  def MAX_ENERGY = 100
-
-  def MAX_FOOD = 10
-
-  def FOOD_ENERGY_CONVERSION = 10
-
-  def STARTING_ENERGY = 100
-
-  def STARTING_TIME = 0
-
-  def STARTING_FOOD_AMOUNT = 0
-
-  def STARTING_POSITION: Vector2D = ZeroVector2D()
-}
-
-import ForagingAntConstant._
+import utility.Parameters.ForagingAntConstant._
 
 /**
   * Ant that performs foraging.
@@ -31,19 +12,13 @@ import ForagingAntConstant._
   * @param environment the environment where it performs actions.
   */
 case class ForagingAnt(override val info: ForagingAntInfo,
-                       override val environment: ActorRef) extends Insect {
+                       override val environment: ActorRef) extends Insect[ForagingAntInfo] {
 
-  /**
-    * Use of the subsumption architecture to model the final emerging behaviour.
-    *
-    * @param competences a set of competences that the ant is able to perform.
-    * @return the competence with heist priority.
-    */
-  private def subsumption(data: InsectInfo, competences: Competence*): Competence = competences.filter(c => c.hasPriority(data)).take(1).last
+
 
   override def receive: Receive = defaultBehaviour(info)
 
-  private def defaultBehaviour(data: InsectInfo): Receive = {
+  private def defaultBehaviour(data: ForagingAntInfo): Receive = {
 
     /**
       * Time is passing.
@@ -51,15 +26,16 @@ case class ForagingAnt(override val info: ForagingAntInfo,
     case Clock(t) if t == data.time + 1 =>
       val newData = data.incTime()
       subsumption(newData,
-        Die,
-        GoOutside,
-        StoreFoodInAnthill,
-        EatFromTheAnthill,
-        DropFoodPheromone,
-        GoBackToHome,
-        PickFood,
-        FoodPheromoneTaxis,
-        RandomWalk)(context, environment, self, newData, defaultBehaviour)
+        Die[ForagingAntInfo](),
+        GoOutside[ForagingAntInfo](),
+        StoreFoodInAnthill(),
+        EatFromTheAnthill[ForagingAntInfo](),
+        DropFoodPheromone(),
+        CarryFoodToHome(),
+        GoBackToHome[ForagingAntInfo](),
+        PickFood(),
+        FoodPheromoneTaxis(),
+        RandomWalk[ForagingAntInfo]())(context, environment, self, newData, defaultBehaviour)
 
     /**
       * The environment confirms the new position.
@@ -114,53 +90,6 @@ case class ForagingAnt(override val info: ForagingAntInfo,
 }
 
 object ForagingAnt {
-  def apply(info: InsectInfo, environment: ActorRef): Props =
+  def apply(info: ForagingAntInfo, environment: ActorRef): Props =
     Props(classOf[ForagingAnt], info, environment)
-}
-
-import ForagingAntConstant._
-
-case class ForagingAntInfo(override val anthill: ActorRef,
-                           override val isInsideTheAnthill: Boolean,
-                           override val foodPosition: Option[Vector2D],
-                           foodPheromones: Seq[FoodPheromone],
-                           override val id: Int,
-                           override val position: Vector2D,
-                           override val inertia: Vector2D,
-                           override val energy: Double,
-                           override val time: Int,
-                           foodAmount: Double) extends InsectInfo {
-
-  def updateFoodPheromones(pheromones: Seq[FoodPheromone]): InsectInfo =
-    this.copy(foodPheromones = pheromones)
-
-  override def updatePosition(newPosition: Vector2D): InsectInfo =
-    this.copy(position = newPosition)
-
-  override def updateInertia(newInertia: Vector2D): InsectInfo =
-    this.copy(inertia = newInertia)
-
-  override def updateEnergy(delta: Double): InsectInfo =
-    this.copy(energy = if (energy + delta > MAX_ENERGY) MAX_ENERGY else energy + delta)
-
-  override def incTime(): InsectInfo =
-    this.copy(time = time + 1)
-
-  override def updateAnthillCondition(value: Boolean): InsectInfo =
-    this.copy(isInsideTheAnthill = value)
-
-  override def updateFoodPosition(position: Option[Vector2D]): InsectInfo =
-    this.copy(foodPosition = position)
-
-  def incFood(amount: Double): ForagingAntInfo =
-    this.copy(foodAmount = if (foodAmount + amount > MAX_FOOD) MAX_FOOD else foodAmount + amount)
-
-  def freeFood(): ForagingAntInfo =
-    this.copy(foodAmount = STARTING_FOOD_AMOUNT)
-
-}
-
-object ForagingAntInfo {
-  def apply(anthill: ActorRef, id: Int = 0, position: Vector2D = STARTING_POSITION, energy: Double = STARTING_ENERGY, time: Int = STARTING_TIME): ForagingAntInfo =
-    new ForagingAntInfo(anthill, false, None, Seq.empty, id, position, ZeroVector2D(), energy, time, STARTING_FOOD_AMOUNT)
 }

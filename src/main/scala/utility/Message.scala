@@ -3,7 +3,7 @@ package utility
 import model.Drawable
 import model.anthill.AnthillInfo
 import model.environment.FoodPheromone
-import model.insects.InsectInfo
+import model.insects.info.InsectInfo
 import utility.Geometry.Vector2D
 
 trait Message

@@ -6,8 +6,8 @@ import java.awt.geom.{Ellipse2D, Rectangle2D}
 import model.Fights.Fight
 import model.anthill.AnthillInfo
 import model.environment.FoodPheromone
+import model.insects.info.{EnemyInfo, ForagingAntInfo}
 import model.{Drawable, Food, Obstacle}
-import model.insects.{EnemyInfo, ForagingAntInfo, InsectInfo}
 
 import scala.swing.{Graphics2D, Panel}
 
@@ -21,8 +21,8 @@ case class MyrmidonsPanel() extends Panel {
   private val pheromoneSize = 4
   private var restartFlag = false
 
-  private var ants: Seq[InsectInfo] = Seq.empty
-  private var enemies: Seq[InsectInfo] = Seq.empty
+  private var ants: Seq[ForagingAntInfo] = Seq.empty
+  private var enemies: Seq[EnemyInfo] = Seq.empty
   private var food: Seq[Food] = Seq.empty
   private var anthill: Option[AnthillInfo] = None
   private var obstacles: Seq[Obstacle] = Seq.empty
