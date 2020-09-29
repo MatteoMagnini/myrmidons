@@ -3,7 +3,7 @@ package model.environment.elements
 import model.environment.Boundary
 import utility.geometry.{Vector2D, Vector3D}
 
-  /**A strategy to define whether a position in inside an environment element
+  /** A strategy to define whether a position in inside an environment element
     *
     * @tparam A type of element
     */
