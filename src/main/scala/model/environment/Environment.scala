@@ -3,12 +3,14 @@ package model.environment
 import akka.actor.{Actor, ActorContext, ActorLogging, ActorRef, Props}
 import model.Fights.Fight
 import model.anthill.{Anthill, AnthillInfo}
+import model.environment.elements.{Food, Obstacle}
 import model.insects._
-import utility.geometry._
+import model.insects.info._
 import utility.Messages._
 import utility.PheromoneSeq._
-import model.environment.elements.{EnvironmentElements, Food, Obstacle}
-import EnvironmentElements._
+import model.insects.info.SpecificInsectInfo
+import utility.geometry.{RandomVector2DInSquare, Vector2D, ZeroVector2D}
+import model.environment.elements.EnvironmentElements._
 
 import scala.util.Random
 
@@ -62,7 +64,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       if (checkHasInside(state.boundary, newPosition)) {
 
         /*Checking obstacles*/
-        import EnvironmentElements.ObstacleHasInside
+        import model.environment.elements.EnvironmentElements.ObstacleHasInside
         val obstacle = checkHaveInside(state.obstacles, newPosition)
         if (obstacle.isDefined) {
           // TODO: better name
@@ -72,7 +74,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
         } else {
 
           /*Checking food sources*/
-          import EnvironmentElements.FoodHasInside
+          import model.environment.elements.EnvironmentElements.FoodHasInside
           val food = checkHaveInside(state.foods, newPosition)
           if (food.isDefined) {
             sender ! FoodNear(food.get.position)
@@ -84,7 +86,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       } else sender ! NewPosition(position - delta, delta -)
 
     case TakeFood(delta, position) =>
-      import EnvironmentElements.FoodHasInside
+      import model.environment.elements.EnvironmentElements.FoodHasInside
       val food = checkHaveInside(state.foods, position)
       if (food.isDefined) {
         sender ! TakeFood(delta, position)
@@ -93,7 +95,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
         sender ! TakeFood(0, position)
       }
 
-    case UpdateInsect(info: InsectInfo) =>
+    case UpdateInsect(info: SpecificInsectInfo[x]) =>
       sendInfoToGUI(state.updateInsectInfo(info))
 
     case UpdateAnthill(anthillInfo: AnthillInfo) =>
@@ -131,7 +133,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
     val enemies = (0 until nEnemies).map(i => {
       val randomPosition = RandomVector2DInSquare(state.boundary.topLeft.x, state.boundary.topRight.x)
-      i -> context.actorOf(Enemy(EnemyInfo(anthill, id = i, position = randomPosition), self), s"enemy-$i")
+      i -> context.actorOf(Enemy(EnemyInfo(id = i, position = randomPosition), self), s"enemy-$i")
     }).toMap
 
     (ants, enemies)
@@ -144,7 +146,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     }).toMap
     val enemies = (0 until nEnemies).map(i => {
       val randomPosition = RandomVector2DInSquare(state.boundary.topLeft.x, state.boundary.topRight.x)
-      i -> context.actorOf(Enemy(EnemyInfo(anthill, id = i, position = randomPosition), self), s"enemy-$i")
+      i -> context.actorOf(Enemy(EnemyInfo(id = i, position = randomPosition), self), s"enemy-$i")
     }).toMap
     (ants, enemies)
   }
@@ -158,9 +160,10 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       (math.cos(angleTest) * newDelta.x) - (math.sin(angleTest) * newDelta.y),
       (math.sin(angleTest) * newDelta.x) + (math.cos(angleTest) * newDelta.y)
     )
-    import TupleOp2._
+    import utility.geometry.TupleOp2._
     (intersectionAndDirection.intersectionPoint >> orientedDelta, orientedDelta)
   }
+
 
   private def sendInfoToGUI(info: EnvironmentInfo): Unit = {
     /* When all insects return their positions, environment send them to GUI */
@@ -174,6 +177,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   }
 
   private def findFights(antsInfo: Iterable[ForagingAntInfo], enemiesInfo: Iterable[EnemyInfo]): Iterable[Fight[ForagingAntInfo, EnemyInfo]] =
+
     for {
       ant <- antsInfo
       enemy <- enemiesInfo

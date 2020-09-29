@@ -3,8 +3,8 @@ package utility
 import model.Drawable
 import model.anthill.AnthillInfo
 import model.environment.FoodPheromone
-import model.insects.InsectInfo
 import utility.geometry.Vector2D
+import model.insects.info.InsectInfo
 
 trait Message
 
@@ -13,9 +13,9 @@ object Messages {
   /** Message sent from GUI to environment, to start simulation.
    *
    * @param nAnts       number of ants to be created
-   * @param centerSpawn whether spawn ants from center of boundaries
+   * @param spawnFromAnthill whether spawn ants from anthill
    */
-  case class StartSimulation(nAnts: Int, nEnemies: Int, centerSpawn: Boolean = false, obstacles: Option[Int] = Some(6), food: Option[Int] = Some(6)) extends Message
+  case class StartSimulation(nAnts: Int, nEnemies: Int, spawnFromAnthill: Boolean = false, obstacles: Option[Int] = Some(6), food: Option[Int] = Some(6)) extends Message
 
   /** Message sent from GUI to environment and from environment to ants, to do a step in simulation.
    *

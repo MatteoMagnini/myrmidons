@@ -3,7 +3,7 @@ package model.environment
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
 import model.environment.elements.EnvironmentElements
-import model.insects.ForagingAntInfo
+import model.insects.info.ForagingAntInfo
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
@@ -38,7 +38,10 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
 
       "receive its initial position" in {
         val result = sender.expectMsgType[Repaint]
-        initialPosition = result.info.head.position
+        initialPosition = result.info.filter {
+          case _: ForagingAntInfo => true
+          case _ => false
+        }.head.position
       }
     }
     "make ant move" should {
@@ -46,7 +49,10 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
 
       "receive its new position" in {
         val result = sender.expectMsgType[Repaint]
-        newPosition = result.info.head.position
+        newPosition = result.info.filter {
+          case _: ForagingAntInfo => true
+          case _ => false
+        }.head.position
       }
       "receive no more messages" in {
         sender.expectNoMessage()
