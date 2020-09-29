@@ -2,6 +2,7 @@ package model.environment
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
+import model.environment.elements.EnvironmentElements
 import model.insects.ForagingAntInfo
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
@@ -54,8 +55,8 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
         assert(initialPosition != newPosition)
       }
       "check if ant didn't go outside boundary" in {
-        import model.EnvironmentElements.BoundaryHasInside
-        assert(model.EnvironmentElements.checkHasInside(boundary, newPosition))
+        import model.environment.elements.EnvironmentElements.BoundaryHasInside
+        assert(EnvironmentElements.checkHasInside(boundary, newPosition))
       }
     }
   }
@@ -96,8 +97,8 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
         sender.expectNoMessage()
       }
       "check that no ant went outside boundary" in {
-        import model.EnvironmentElements.BoundaryHasInside
-        assert(positions.forall(x => model.EnvironmentElements.checkHasInside(boundary, x)))
+        import EnvironmentElements.BoundaryHasInside
+        assert(positions.forall(x => elements.EnvironmentElements.checkHasInside(boundary, x)))
       }
     }
   }

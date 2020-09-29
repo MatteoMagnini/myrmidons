@@ -7,8 +7,8 @@ import model.insects._
 import utility.Geometry._
 import utility.Messages._
 import utility.PheromoneSeq._
-import model.BorderedEntityFactory._
-
+import model.environment.elements.{EnvironmentElements, Food, Obstacle}
+import EnvironmentElements._
 import scala.util.Random
 
 /** Environment actor
@@ -34,14 +34,14 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
         createRandomSimpleObstacle(200, 600)) else Seq.empty*/
 
       val foods = if (foodPresence.isDefined) (0 until foodPresence.get).map(_ =>
-        createRandomFood(state.boundary.topLeft.x, state.boundary.bottomRight.x)) else Seq.empty
+        Food.createRandomFood(state.boundary.topLeft.x, state.boundary.bottomRight.x)) else Seq.empty
 
       val foodPheromones = Seq(FoodPheromone(RandomVector2DInSquare(100, 200), 0.3, 5.4))
-      context become defaultBehaviour(EnvironmentInfo(Some(sender), state.boundary,
+      context >>> defaultBehaviour(EnvironmentInfo(Some(sender), state.boundary,
          obstacles, foods,  ants, enemies, anthill, state.anthillInfo, foodPheromones))
 
     case AddFoodPheromone(pheromone: FoodPheromone, threshold: Double) =>
-      context become defaultBehaviour(state.addPheromone(pheromone, threshold))
+      context >>> defaultBehaviour(state.addPheromone(pheromone, threshold))
 
 
     case Clock(value: Int) =>
@@ -54,34 +54,28 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
         case Some(x) => x ! Clock(value)
         case _ => print("Should never happen environment has no anthill")
       }
-      context become defaultBehaviour(state.updatePheromones(state.pheromones.tick()))
+      context >>> defaultBehaviour(state.updatePheromones(state.pheromones.tick()))
 
 
     case Move(position: Vector2D, delta: Vector2D) =>
       val newPosition = position >> delta
 
-      import model.EnvironmentElements.BoundaryHasInside
-      if (model.EnvironmentElements.checkHasInside(state.boundary, newPosition)) {
-        import model.EnvironmentElements.checkHaveInside
-        import model.EnvironmentElements.ObstacleHasInside
+      import model.environment.elements.EnvironmentElements.BoundaryHasInside
 
+      /*Checking boundary*/
+      if (checkHasInside(state.boundary, newPosition)) {
+
+        /*Checking obstacles*/
+        import EnvironmentElements.ObstacleHasInside
         val obstacle = checkHaveInside(state.obstacles, newPosition)
         if (obstacle.isDefined) {
-          val intersectionAndDirection = obstacle.get.findIntersectionPoint(position, newPosition).head
-          val angletest = if (intersectionAndDirection.angle < math.Pi / 2) {
-            math.Pi - (intersectionAndDirection.angle * 2)
-          } else {
-            - ((2 * intersectionAndDirection.angle) - math.Pi)
-          }
-          val newDelta = intersectionAndDirection.intersectionPoint - newPosition
-          val orientedDelta = Vector2D(
-            (math.cos(angletest) * newDelta.x) - (math.sin(angletest) * newDelta.y),
-            (math.sin(angletest) * newDelta.x) + (math.cos(angletest) * newDelta.y))
-          sender ! NewPosition(intersectionAndDirection.intersectionPoint >> orientedDelta, orientedDelta)
-        } else {
-          import model.EnvironmentElements.checkHaveInside
-          import model.EnvironmentElements.FoodHasInside
+          val intersection = handleObstacleIntersection(obstacle.get, position, newPosition)
+          sender ! NewPosition(intersection._1, intersection._2)
 
+        } else {
+
+          /*Checking food sources*/
+          import EnvironmentElements.FoodHasInside
           val food = checkHaveInside(state.foods, newPosition)
           if (food.isDefined) {
             sender ! FoodNear(food.get.position)
@@ -93,13 +87,11 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       } else sender ! NewPosition(position - delta, delta -)
 
     case TakeFood(delta, position) =>
-      import model.EnvironmentElements.checkHaveInside
-      import model.EnvironmentElements.FoodHasInside
-
+      import EnvironmentElements.FoodHasInside
       val food = checkHaveInside(state.foods, position)
-      if (food.nonEmpty) {
+      if (food.isDefined) {
         sender ! TakeFood(delta, position)
-        context become defaultBehaviour(state.updateFood(food.get, food.get - delta))
+        context >>> defaultBehaviour(state.updateFood(food.get, food.get - delta))
       } else {
         sender ! TakeFood(0, position)
       }
@@ -108,9 +100,10 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       sendInfoToGUI(state.updateInsectInfo(info))
 
     case UpdateAnthill(anthillInfo: AnthillInfo) =>
-      context become defaultBehaviour(state.updateAnthillInfo(anthillInfo))
+      context >>> defaultBehaviour(state.updateAnthillInfo(anthillInfo))
 
     case AntBirth(clock: Int) =>
+      /*Generate an id that doesn't exist for sure to avoid name conflicts*/
       val antId = state.ants.size + clock
       val birthPosition = state.anthillInfo.position
       val ant = context.actorOf(ForagingAnt(ForagingAntInfo(state.anthill.get, id = antId, position = birthPosition, time = clock - 1), self), s"ant-$antId")
@@ -154,6 +147,19 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     context.actorOf(ForagingAnt(antInfo, self), s"ant-${antInfo.id}")
   }
 
+  private def handleObstacleIntersection(obstacle: Obstacle, position: Vector2D, newPosition: Vector2D): (Vector2D, Vector2D) = {
+    val intersectionAndDirection = obstacle.findIntersectionPoint(position, newPosition).head
+    val angleTest = if (intersectionAndDirection.angle < math.Pi / 2) math.Pi - (intersectionAndDirection.angle * 2)
+    else - ((2 * intersectionAndDirection.angle) - math.Pi)
+    val newDelta = intersectionAndDirection.intersectionPoint - newPosition
+    val orientedDelta = (
+      (math.cos(angleTest) * newDelta.x) - (math.sin(angleTest) * newDelta.y),
+      (math.sin(angleTest) * newDelta.x) + (math.cos(angleTest) * newDelta.y)
+    )
+    import TupleOp._
+    (intersectionAndDirection.intersectionPoint >> orientedDelta, orientedDelta)
+
+  }
   private def sendInfoToGUI(info: EnvironmentInfo): Unit = {
     import model.Fights._
     import model.Fights.InsectFight._
@@ -174,8 +180,8 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       }
       info.gui.get ! Repaint(info.antsInfo ++ info.enemiesInfo ++
         info.obstacles ++ info.foods ++ Seq(info.anthillInfo) ++ info.pheromones ++ fights)
-      context become defaultBehaviour(updatedInfo.emptyInsectInfo())
-    } else context become defaultBehaviour(info)
+      context >>> defaultBehaviour(updatedInfo.emptyInsectInfo())
+    } else context >>> defaultBehaviour(info)
   }
 
   private def checkFights(antsInfo: Iterable[ForagingAntInfo], enemiesInfo: Iterable[EnemyInfo]): Iterable[Fight[ForagingAntInfo, EnemyInfo]] =

@@ -2,10 +2,10 @@ package model.insects
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
-import model.Food
 import utility.Geometry.TupleOp._
 import model.anthill.{Anthill, AnthillInfo}
 import model.environment.FoodPheromone
+import model.environment.elements.Food
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike

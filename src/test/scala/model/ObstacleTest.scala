@@ -1,5 +1,6 @@
 package model
 
+import model.environment.elements.Obstacle
 import org.scalatest._
 import utility.Geometry.{Vector2D, Vector3D}
 import utility.Geometry.TupleOp3._
@@ -19,7 +20,7 @@ class ObstacleTest  extends wordspec.AnyWordSpec {
         val points: List[Vector3D] = List((1,1,1), (2,1,1), (3.0,1.5,1.0), (2,2,1), (3.0,2.5,1.0), (1,3,1))
         val o = Obstacle(points)
 
-        import model.EnvironmentElements.checkHasInside
+        import model.environment.elements.EnvironmentElements.checkHasInside
         assert(checkHasInside(o, (1.5,2.25)))
         assert(checkHasInside(o, (2.5,2.0)) === false)
       }

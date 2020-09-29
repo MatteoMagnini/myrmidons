@@ -6,7 +6,8 @@ import java.awt.geom.{Ellipse2D, Rectangle2D}
 import model.Fights.Fight
 import model.anthill.AnthillInfo
 import model.environment.FoodPheromone
-import model.{Drawable, Food, Obstacle}
+import model.environment.elements.{Food, Obstacle}
+import model.Drawable
 import model.insects.{EnemyInfo, ForagingAntInfo, InsectInfo}
 
 import scala.swing.{Graphics2D, Panel}

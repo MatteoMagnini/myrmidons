@@ -1,6 +1,6 @@
 package utility
 
-import model.Obstacle
+import model.environment.elements.Obstacle
 import org.scalatest.BeforeAndAfter
 import org.scalatest.wordspec.AnyWordSpecLike
 import utility.Geometry.{Vector2D, Vector3D}

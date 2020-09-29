@@ -1,5 +1,6 @@
 package model
 
+import model.environment.elements.Food
 import org.scalatest.wordspec
 import utility.Geometry.TupleOp._
 
