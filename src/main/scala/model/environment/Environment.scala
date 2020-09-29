@@ -78,7 +78,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
           val food = checkHaveInside(state.foods, newPosition)
           if (food.isDefined) {
             sender ! FoodNear(food.get.position)
-            sender ! NewPosition(position , ZeroVector2D())
+            sender ! NewPosition(position , ZeroVector2D()) // TODO: should bounce also on food!
           } else {
             sender ! NewPosition(newPosition, newPosition - position)
           }

@@ -65,7 +65,7 @@ case class GoBackToHome[A <: AntInfo[A]]() extends Competence[A] {
 
   override def apply(context: ActorContext, environment: ActorRef, ant: ActorRef, info: A, behaviour: A => Receive): Unit = {
     val data = info.updateEnergy(ENERGY_RW)
-    info.anthill.tell(AntTowardsAnthill(info.position, MAX_VELOCITY, NOISE, info.isInsideTheAnthill), ant)
+    data.anthill.tell(AntTowardsAnthill(data.position, MAX_VELOCITY, data.inertia, NOISE, info.isInsideTheAnthill), ant)
     context become behaviour(data)
   }
 
