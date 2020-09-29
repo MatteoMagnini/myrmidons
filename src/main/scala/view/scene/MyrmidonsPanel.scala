@@ -111,8 +111,8 @@ case class MyrmidonsPanel() extends Panel {
 
       for((pos, loser) <- fights.map(_.position) zip losers(fights)) {
         loser match {
-          case Left(_) => g.setColor(Color.black);print("ant")
-          case _ => g.setColor(Color.red);print("ins")
+          case Left(_) => g.setColor(Color.black)
+          case Right(_) => g.setColor(Color.red)
         }
         val ellipse = new Ellipse2D.Double(pos.x, size.height - pos.y, 20, 20)
         g.fill(ellipse)

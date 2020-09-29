@@ -15,7 +15,7 @@ class Enemy(override val info: EnemyInfo,
       val newData = data.incTime()
       subsumption(newData,
         //EatFromTheAnthill, // if inside anthill it's behaviour became like parasite
-        Die[EnemyInfo](),
+        //Die[EnemyInfo](),
         RandomWalk[EnemyInfo]())(context, environment, self, newData, defaultBehaviour)
 
     case NewPosition(p, d) =>
@@ -23,7 +23,7 @@ class Enemy(override val info: EnemyInfo,
       environment ! UpdateInsect(newData)
       context become defaultBehaviour(newData)
 
-    case FoodNear(_) => //DO NOTHING
+    case FoodNear(_) => println(s"Enemy ${info.id} near food")//DO NOTHING
 
     case x => println("Enemies: Should never happen, received message: " + x + " from " + sender)
   }
