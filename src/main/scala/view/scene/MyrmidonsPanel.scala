@@ -97,13 +97,10 @@ case class MyrmidonsPanel() extends Panel {
           case quantity if quantity < 0.8f => g.setColor(new Color(0f, 0f, 1f, 0.8f))
           case _ => g.setColor(new Color(0f, 0f, 1f, foodQuantity))
         }
-        val ellipse = new Ellipse2D.Double(x.position.x - x.radius * 2,
-          size.height - x.position.y - x.radius * 2, x.radius * 2, x.radius * 2)
+        val ellipse = new Ellipse2D.Double(x.position.x - x.radius ,
+          size.height - x.position.y - x.radius, x.radius * 2 , x.radius * 2 )
         g.fill(ellipse)
 
-       /* val ellipse = new Ellipse2D.Double(x.position.x - (x.xDim / 2),
-          size.height - x.position.y - (x.yDim / 2), x.xDim, x.yDim)
-        g.fill(ellipse)*/
 
       })
 
@@ -112,8 +109,8 @@ case class MyrmidonsPanel() extends Panel {
 
       for((pos, loser) <- fights.map(_.position) zip losers(fights)) {
         loser match {
-          case Left(_) => g.setColor(Color.black);print("ant")
-          case _ => g.setColor(Color.red);print("ins")
+          case Left(_) => g.setColor(Color.black)
+          case _ => g.setColor(Color.red)
         }
         val ellipse = new Ellipse2D.Double(pos.x, size.height - pos.y, 20, 20)
         g.fill(ellipse)

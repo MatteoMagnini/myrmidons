@@ -5,7 +5,6 @@ import model.environment.{Boundary, Environment, EnvironmentInfo}
 import utility.Messages.{Clock, StartSimulation}
 import view.actor.UiActor
 import view.actor.uiMessage.{RestartSimulation, StopSimulation}
-
 import scala.swing.event.ButtonClicked
 import scala.swing.{Button, FlowPanel, Label, Separator}
 
@@ -74,7 +73,6 @@ case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends FlowPanel {
         name = s"env+${stepText.text}")
       environment = environmentRestart
       tellStart()
-
   }
 
   private def tellStart(): Unit = {

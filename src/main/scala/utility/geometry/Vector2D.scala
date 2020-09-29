@@ -36,7 +36,7 @@ package utility.geometry
     }
 
     /** Return the distance between vectors */
-    def -->(other: Vector2D): Double = this - other ||
+    def -->(other: Vector2D): Double = (this - other) ||
 
     /** Returns vectors equality using a default precision value */
     def ~~(other: Vector2D, precision: Double = 3): Boolean = ~=(x, other.x, precision) && ~=(y, other.y, precision)

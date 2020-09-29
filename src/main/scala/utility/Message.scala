@@ -44,7 +44,7 @@ object Messages {
    *
    * @param info ants information
    */
-  case class Repaint(info: Iterable[Drawable]) extends Message
+  case class Repaint(info: Seq[Drawable]) extends Message
 
   /** Message sent from environment to ant, to share its new position.
    *

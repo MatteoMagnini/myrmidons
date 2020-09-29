@@ -32,7 +32,6 @@ case class UiActor(panel: MyrmidonsPanel, control: ControlPane)
   private var stopFlag = true
   private var currentState = 1
 
-
   override def receive: Receive = defaultBehaviour
 
   private def defaultBehaviour: Receive = {
@@ -42,9 +41,11 @@ case class UiActor(panel: MyrmidonsPanel, control: ControlPane)
       val entitiesProperties = panel.setEntities(info)
       panel.draw()
       currentState = currentState + 1
-      control.stepText.text = currentState.toString
-      control.antPopulationText.text = entitiesProperties._1.toString
-      control.anthillFoodAmount.text = entitiesProperties._2.toString
+
+      import ImplicitConversion._
+      control.stepText.text = currentState
+      control.antPopulationText.text = entitiesProperties._1
+      control.anthillFoodAmount.text = entitiesProperties._2
 
       if (stopFlag) {
         timers.startSingleTimer(currentState, StepOver, 30.millis)
@@ -61,4 +62,8 @@ case class UiActor(panel: MyrmidonsPanel, control: ControlPane)
       this.stopFlag = true
       timers.startSingleTimer(currentState, StepOver, 30.millis)
   }
+}
+
+object ImplicitConversion {
+  implicit def intToString(value: Int): String = value.toString
 }
