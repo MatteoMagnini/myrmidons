@@ -39,7 +39,7 @@ case class UiActor(panel: MyrmidonsPanel, control: ControlPane)
     case Repaint(info: Seq[Drawable]) =>
 
       val entitiesProperties = panel.setEntities(info)
-      panel.draw()
+      panel.draw_()
       currentState = currentState + 1
 
       import ImplicitConversion._
