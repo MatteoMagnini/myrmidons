@@ -152,7 +152,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   }
 
   private def handleObstacleIntersection(obstacle: Obstacle, position: Vector2D, newPosition: Vector2D): (Vector2D, Vector2D) = {
-    val intersectionAndDirection = obstacle.findIntersectionPoint(position, newPosition).head
+    val intersectionAndDirection = obstacle.findIntersectionInformation(position, newPosition).head
     val angleTest = if (intersectionAndDirection.angle < math.Pi / 2) math.Pi - (intersectionAndDirection.angle * 2)
     else - ((2 * intersectionAndDirection.angle) - math.Pi)
     val newDelta = intersectionAndDirection.intersectionPoint - newPosition
