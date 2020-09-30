@@ -9,8 +9,9 @@ import model.insects.info._
 import utility.Messages._
 import utility.PheromoneSeq._
 import model.insects.info.SpecificInsectInfo
-import utility.geometry.{RandomVector2DInSquare, Vector2D, ZeroVector2D}
+import utility.geometry.{RandomVector2DInCircle, RandomVector2DInSquare, Vector2D, ZeroVector2D}
 import model.environment.elements.EnvironmentElements._
+import model.environment.elements.Obstacle
 
 import scala.util.Random
 
@@ -31,9 +32,8 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       val entities = if (!spawnFromAnthill) createEntitiesFromRandomPosition(nAnts, nEnemies, anthill)
                      else createAntFromAnthill(nAnts, nEnemies, anthill, anthillInfo.position)
 
-      val obstacles = Seq.empty
-        /*if (obstaclesPresence.isDefined) (0 until obstaclesPresence.get).map(_ =>
-        createRandomSimpleObstacle(200, 600)) else Seq.empty*/
+      val obstacles = if (obstaclesPresence.isDefined) (0 until obstaclesPresence.get).map(_ =>
+        Obstacle.Square(RandomVector2DInCircle(550,750))) else Seq.empty
 
       val foods = if (foodPresence.isDefined) (0 until foodPresence.get).map(_ =>
         Food.createRandomFood(anthillInfo.position, 100, 150)) else Seq.empty

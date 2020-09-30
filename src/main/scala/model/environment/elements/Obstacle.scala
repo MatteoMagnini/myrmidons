@@ -73,7 +73,9 @@ case class Obstacle(points: List[Vector2D]) extends Drawable {
 
   // a segments is described as a two point and a line pass through them
   private def findCentroid(l: List[Vector2D]): Vector2D = {
-    points.foldRight(Vector2D(0.0, 0.0))(_ >> _) / points.size
+    val t = l.foldRight(Vector2D(0.0, 0.0))(_ >> _) / l.size
+    //println(s"Pos: ${l(0)}")
+    t / l.size
   }
 }
 
@@ -91,7 +93,8 @@ object Obstacle{
    * */
   def apply(position: Vector2D, radius: Double = 10, nSides: Int): Obstacle = {
     val angle = for (i <- 0 until nSides)
-      yield (2 * Math.PI) / i
+      yield (2 * Math.PI) / (i + 1)
+
     val vertex = for (a <- angle)
       yield Vector2D(math.cos(a) * radius, math.sin(a) * radius) >> position
     Obstacle(vertex.toList)
