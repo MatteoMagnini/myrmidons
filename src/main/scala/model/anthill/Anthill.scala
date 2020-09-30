@@ -5,7 +5,7 @@ import model.Drawable
 import utility.geometry.{OrientedVector2D, OrientedVector2DWithNoise, Vector2D, ZeroVector2D}
 import utility.Messages._
 import utility.geometry.Vectors.doubleInRange
-import model.insects.Constant._
+import utility.Parameters.Competence._
 
 case class AnthillInfo(override val position: Vector2D,
                        radius: Double,

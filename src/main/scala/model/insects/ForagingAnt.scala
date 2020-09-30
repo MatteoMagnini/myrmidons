@@ -1,20 +1,19 @@
 package model.insects
 
 import akka.actor.{ActorRef, Props}
+import model.insects.competences.{CarryFoodToHome, Die, DropFoodPheromone, EatFromTheAnthill, FoodPheromoneTaxis, GoBackToHome, GoOutside, PickFood, RandomWalk, StoreFoodInAnthill}
 import model.insects.info.ForagingAntInfo
 import utility.Messages._
-import utility.Parameters.ForagingAntConstant._
+import utility.Parameters.ForagingAnt._
 
 /**
   * Ant that performs foraging.
   *
-  * @param info        its state.
+  * @param info its state.
   * @param environment the environment where it performs actions.
   */
 case class ForagingAnt(override val info: ForagingAntInfo,
                        override val environment: ActorRef) extends Insect[ForagingAntInfo] {
-
-
 
   override def receive: Receive = defaultBehaviour(info)
 
