@@ -33,7 +33,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
                      else createAntFromAnthill(nAnts, nEnemies, anthill, anthillInfo.position)
 
       val obstacles = if (obstaclesPresence.isDefined) (0 until obstaclesPresence.get).map(_ =>
-        Obstacle.Square(RandomVector2DInCircle(550,750))) else Seq.empty
+        Obstacle.Square(RandomVector2DInCircle(50,90, anthillInfo.position), radius = 20)) else Seq.empty
 
       val foods = if (foodPresence.isDefined) (0 until foodPresence.get).map(_ =>
         Food.createRandomFood(anthillInfo.position, 100, 150)) else Seq.empty
@@ -153,14 +153,29 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
   private def handleObstacleIntersection(obstacle: Obstacle, position: Vector2D, newPosition: Vector2D): (Vector2D, Vector2D) = {
     val intersectionAndDirection = obstacle.findIntersectionInformation(position, newPosition).head
-    val angleTest = if (intersectionAndDirection.angle < math.Pi / 2) math.Pi - (intersectionAndDirection.angle * 2)
-    else - ((2 * intersectionAndDirection.angle) - math.Pi)
+    println(s"AntPos: $position")
+    println(s"newPosition: $newPosition")
+    println(s"intersection: ${intersectionAndDirection.intersectionPoint}")
+
+    val angleTest = if (intersectionAndDirection.angle < math.Pi / 2)
+      math.Pi - (intersectionAndDirection.angle * 2)
+    else
+      - ((2 * intersectionAndDirection.angle) - math.Pi)
     val newDelta = intersectionAndDirection.intersectionPoint - newPosition
+    println(s"Angle: ${intersectionAndDirection.angle * 180 / math.Pi}")
+    println(s"rotationAngle: ${angleTest * 180 / math.Pi}")
+    println(s"Delta: $newDelta")
     val orientedDelta = (
       (math.cos(angleTest) * newDelta.x) - (math.sin(angleTest) * newDelta.y),
       (math.sin(angleTest) * newDelta.x) + (math.cos(angleTest) * newDelta.y)
     )
+    println(s"oriented: $orientedDelta")
+
     import utility.geometry.TupleOp2._
+    val t: Vector2D = intersectionAndDirection.intersectionPoint >> orientedDelta
+    println(s"calculated position: $t")
+    println(s"-------------------------------------------------")
+    Console.flush()
     (intersectionAndDirection.intersectionPoint >> orientedDelta, orientedDelta)
   }
 

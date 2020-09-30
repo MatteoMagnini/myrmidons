@@ -54,7 +54,7 @@ object EnvironmentElements {
       val maxX = element.points.sortWith((a, b) => a.x > b.x) head
       val stopCheckRay = Vector3D(maxX.x + 1, coordinate.y, 1)
       //track an ray in right version
-      val ray: (Vector3D, Vector3D, Vector3D)= (coordinate, stopCheckRay, coordinate X stopCheckRay)
+      val ray: (Vector2D, Vector2D, Vector3D)= (coordinate, stopCheckRay, coordinate X stopCheckRay)
       var counter = 0
       //find intersection between polygon segment and ray
       val segments = element.segments

@@ -12,7 +12,7 @@ case class Obstacle(points: List[Vector2D]) extends Drawable {
 
   override val position: Vector2D = findCentroid(points)
 
-  var segments: List[(Vector3D, Vector3D, Vector3D)] = List()
+  var segments: List[(Vector2D, Vector2D, Vector3D)] = List()
 
   if (points.size < 3) {
     throw new IllegalArgumentException("points list must have more than 2 elements")
@@ -43,8 +43,10 @@ case class Obstacle(points: List[Vector2D]) extends Drawable {
     *         or something wrong happened
     * */
   def findIntersectionInformation(oldPosition: Vector2D, newPosition: Vector2D): Option[IntersectionResult] = {
+
+    println(s"Obstacle position: $position")
     // ant path definition
-    val antPath: (Vector3D,Vector3D,Vector3D) = (oldPosition, newPosition, oldPosition X newPosition)
+    val antPath: (Vector2D,Vector2D,Vector3D) = (oldPosition, newPosition, oldPosition X newPosition)
     var intersections: List[IntersectionResult] = List()
 
     /*
@@ -73,9 +75,7 @@ case class Obstacle(points: List[Vector2D]) extends Drawable {
 
   // a segments is described as a two point and a line pass through them
   private def findCentroid(l: List[Vector2D]): Vector2D = {
-    val t = l.foldRight(Vector2D(0.0, 0.0))(_ >> _) / l.size
-    //println(s"Pos: ${l(0)}")
-    t / l.size
+    l.foldRight(Vector2D(0.0, 0.0))(_ >> _) / l.size
   }
 }
 
@@ -96,7 +96,8 @@ object Obstacle{
       yield (2 * Math.PI) / (i + 1)
 
     val vertex = for (a <- angle)
-      yield Vector2D(math.cos(a) * radius, math.sin(a) * radius) >> position
+      yield (Vector2D(math.cos(a) * radius, math.sin(a) * radius) >> position)
+
     Obstacle(vertex.toList)
   }
 
