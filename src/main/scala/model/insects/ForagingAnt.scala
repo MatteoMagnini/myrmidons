@@ -57,13 +57,13 @@ case class ForagingAnt(override val info: ForagingAntInfo,
       */
     case FoodNear(position) =>
       val newData = data.updateFoodPosition(Some(position))
-      context become defaultBehaviour(newData)
+      context >>> defaultBehaviour(newData)
 
     /**
       * The ant enters or exits the anthill.
       */
     case UpdateAnthillCondition(value) =>
-      context become defaultBehaviour(data.updateAnthillCondition(value))
+      context >>> defaultBehaviour(data.updateAnthillCondition(value))
 
     /**
       * Take food from a food source in the environment.
@@ -74,7 +74,7 @@ case class ForagingAnt(override val info: ForagingAntInfo,
         case x => x
       }
       environment ! UpdateInsect(newData)
-      context become defaultBehaviour(newData)
+      context >>> defaultBehaviour(newData)
 
     /**
       * Eat food from the environment.
@@ -82,7 +82,9 @@ case class ForagingAnt(override val info: ForagingAntInfo,
     case EatFood(amount) =>
       val newData = data.updateEnergy(amount * FOOD_ENERGY_CONVERSION)
       environment ! UpdateInsect(newData)
-      context become defaultBehaviour(newData)
+      context >>> defaultBehaviour(newData)
+
+    case Context(_) => sender ! Context(Some(context))
 
     case x => System.err.println(s"ForagingAnt ${info.id}: received unhandled message $x from $sender")
   }
