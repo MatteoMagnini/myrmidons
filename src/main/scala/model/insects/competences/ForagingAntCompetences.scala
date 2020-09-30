@@ -35,7 +35,7 @@ case class PickFood() extends ForagingAntCompetences {
 
   override def apply(context: ActorContext, environment: ActorRef, insect: ActorRef, info: ForagingAntInfo, behaviour: ForagingAntInfo => Receive): Unit = {
     environment.tell(TakeFood(MAX_FOOD - info.foodAmount, info.foodPosition.get), insect)
-    context become behaviour(info.updateEnergy(ENERGY_PF))
+    context >>> behaviour(info.updateEnergy(ENERGY_PF))
   }
 
   override def hasPriority(info: ForagingAntInfo): Boolean = info.foodIsNear && info.foodAmount < MAX_FOOD
@@ -51,7 +51,7 @@ case class StoreFoodInAnthill() extends ForagingAntCompetences {
     info.anthill.tell(StoreFood(info.foodAmount), insect)
     val data = info.freeFood().updateEnergy(ENERGY_SF)
     environment.tell(UpdateInsect(data), insect)
-    context become behaviour(data)
+    context >>> behaviour(data)
   }
 
   override def hasPriority(info: ForagingAntInfo): Boolean = info.isInsideTheAnthill && info.foodAmount > 0
@@ -68,7 +68,7 @@ case class FoodPheromoneTaxis() extends ForagingAntCompetences {
     val newDelta = OrientedVector2DWithNoise(delta./\, MAX_VELOCITY, NOISE) >> (data.inertia * 2)
     val newDelta2 = OrientedVector2D(newDelta./\, MAX_VELOCITY)
     environment.tell(Move(data.position, newDelta2), insect)
-    context become behaviour(data.asInstanceOf[ForagingAntInfo].updateFoodPheromones(Seq.empty)) //TODO: should be correct also data without update
+    context >>> behaviour(data.updateFoodPheromones(Seq.empty)) //TODO: should be correct also data without update
   }
 
   override def hasPriority(info: ForagingAntInfo): Boolean =
@@ -84,7 +84,7 @@ case class DropFoodPheromone() extends ForagingAntCompetences {
     environment.tell(AddFoodPheromone(FoodPheromone(info.position, DELTA, info.energy), FOOD_PHEROMONE_THRESHOLD), insect)
     val data = info.updateEnergy(ENERGY_RW)
     environment.tell(UpdateInsect(data), insect)
-    context become behaviour(data)
+    context >>> behaviour(data)
   }
 
   override def hasPriority(info: ForagingAntInfo): Boolean =
