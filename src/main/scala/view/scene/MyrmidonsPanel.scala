@@ -24,7 +24,7 @@ object MemoHelper {
 
 object singletonList {
   private val memoized: Any => Seq[Any] = memoize(x => {
-    println(s" Calling singleton with input $x")
+   // if(x.isInstanceOf[AnthillInfo])println(s" Calling singleton with input $x")
     Seq(x)
   })
 
@@ -69,8 +69,9 @@ case class MyrmidonsPanel() extends Panel {
 
         case entity: Fight[ForagingAntInfo, EnemyInfo] => draw(entity, g, size)
 
-        case entity: List[Food] => println("BAH")
+        case _ => println("Error matching enemies")
       }
+      infoEntities = Seq.empty
     }
   }
 
@@ -90,10 +91,10 @@ case class MyrmidonsPanel() extends Panel {
    */
   def setEntities(info: Seq[Drawable]): (Int, Int) = {
 
-    infoEntities = Seq.empty
+    //infoEntities = Seq.empty
     //infoEntities = info
     //TODO NON FUNZIONA NON DISEGNA SE NON FACCIO RIGA SOPRA
-    info.foreach(x => infoEntities = singletonList(x) +:infoEntities)
+    info.foreach( x => infoEntities = singletonList(x).head +:infoEntities)
 
     var antsEntities: Seq[ForagingAntInfo] = Seq.empty
     var anthillEntity: Option[AnthillInfo] = None
@@ -103,8 +104,7 @@ case class MyrmidonsPanel() extends Panel {
       case entity: AnthillInfo => anthillEntity = Some(entity)
       case _ =>
     }
-    (antsEntities.size,5)
-     // anthillEntity.get.foodAmount.toInt)
+    (antsEntities.size,anthillEntity.get.foodAmount.toInt)
   }
 
   /*def addWithCache(data: Drawable): Drawable = {

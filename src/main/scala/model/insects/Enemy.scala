@@ -24,7 +24,7 @@ class Enemy(override val info: EnemyInfo,
       environment ! UpdateInsect(newData)
       context become defaultBehaviour(newData)
 
-    case FoodNear(_) => println(s"Enemy ${info.id} near food")//DO NOTHING
+    case FoodNear(_) => // println(s"Enemy ${info.id} near food")//DO NOTHING
 
     case Context(_) => sender ! Context(Some(context))
 
