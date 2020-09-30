@@ -1,6 +1,7 @@
 package model.insects
 
 import akka.actor.{ActorRef, Props}
+import model.insects.competences.RandomWalk
 import model.insects.info.EnemyInfo
 import utility.Messages.{Clock, FoodNear, NewPosition, UpdateInsect}
 

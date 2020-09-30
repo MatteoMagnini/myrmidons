@@ -11,10 +11,10 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import utility.geometry._
 import utility.Messages._
-import model.insects.Constant._
+import utility.Parameters.Competence._
 import model.insects.info.ForagingAntInfo
 import utility.Message
-import utility.Parameters.ForagingAntConstant._
+import utility.Parameters.ForagingAnt._
 
 class InsectTest extends TestKit(ActorSystem("InsectTest"))
   with AnyWordSpecLike
@@ -108,7 +108,7 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
 
       "update the sensor in presence of pheromones" in {
         assert(info.foodPheromones.isEmpty)
-        val info2 = info.updateFoodPheromones(pheromones).asInstanceOf[ForagingAntInfo]
+        val info2 = info.updateFoodPheromones(pheromones)
         assert(info2.foodPheromones.nonEmpty)
       }
 

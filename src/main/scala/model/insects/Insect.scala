@@ -1,13 +1,16 @@
 package model.insects
 
 import akka.actor.{Actor, ActorLogging, ActorRef}
+import model.insects.competences.InsectCompetences
 import model.insects.info.SpecificInsectInfo
 
 /**
-  * An insect is an entity with its own behaviour.
-  * For this reason it extends Actor, it has its own control flow and is reactive to inputs (messages).
-  * It also holds the information (state) of the insect.
-  */
+ * An insect is an entity with its own behaviour.
+ * For this reason it extends Actor, it has its own control flow and is reactive to inputs (messages).
+ * It also holds the information (state) of the insect.
+ *
+ * @tparam A the type of the insect
+ */
 
 trait Insect[A <: SpecificInsectInfo[A]] extends Actor with ActorLogging {
 
@@ -18,9 +21,10 @@ trait Insect[A <: SpecificInsectInfo[A]] extends Actor with ActorLogging {
   /**
    * Use of the subsumption architecture to model the final emerging behaviour by selecting one competence per clock.
    *
-   * @param competences a set of competences that the ant is able to perform.
+   * @param info the insect's state
+   * @param competences a set of competences that the ant is able to perform
    * @return the competence with heist priority.
    */
-  def subsumption(data: A, competences: Competence[A]*): Competence[A] =
-    competences.filter(c => c.hasPriority(data)).head
+  def subsumption(info: A, competences: InsectCompetences[A]*): InsectCompetences[A] =
+    competences.filter(c => c.hasPriority(info)).head
 }
