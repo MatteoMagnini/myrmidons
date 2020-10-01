@@ -13,6 +13,7 @@ import utility.geometry.{RandomVector2DInCircle, RandomVector2DInSquare, Vector2
 import model.environment.elements.EnvironmentElements._
 import model.environment.elements.Obstacle
 
+import scala.annotation.tailrec
 import scala.util.Random
 
 /** Environment actor
@@ -62,13 +63,12 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
       /*Checking boundary*/
       if (checkHasInside(state.boundary, newPosition)) {
-
         /*Checking obstacles*/
         import model.environment.elements.EnvironmentElements.ObstacleHasInside
         val obstacle = checkHaveInside(state.obstacles, newPosition)
         if (obstacle.isDefined) {
           // TODO: better name
-          val intersection = handleObstacleIntersection(obstacle.get, position, newPosition)
+          val intersection = recursionCheck(obstacle.get, position, newPosition)
           sender ! NewPosition(intersection._1, intersection._2)
 
         } else {
@@ -151,10 +151,23 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     (ants, enemies)
   }
 
+  private def recursionCheck(obstacle: Obstacle, position: Vector2D, newPosition: Vector2D):(Vector2D, Vector2D) = {
+    val res = handleObstacleIntersection(obstacle, position, newPosition)
+    val intersection = res._1
+    val delta = res._2
+
+    val bouncedPos = intersection >> delta
+
+    val o = checkHaveInside(state.obstacles, bouncedPos)
+    if (o.isEmpty) {
+      println("empty")
+      (bouncedPos, delta)
+    } else
+      recursionCheck(o.get, intersection, bouncedPos)
+  }
+
   private def handleObstacleIntersection(obstacle: Obstacle, position: Vector2D, newPosition: Vector2D): (Vector2D, Vector2D) = {
     val intersectionAndDirection = obstacle.findIntersectionInformation(position, newPosition).head
-    println(s"AntPos: $position")
-    println(s"newPosition: $newPosition")
     println(s"intersection: ${intersectionAndDirection.intersectionPoint}")
 
     val angleTest = if (intersectionAndDirection.angle < math.Pi / 2)
@@ -174,9 +187,10 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     import utility.geometry.TupleOp2._
     val t: Vector2D = intersectionAndDirection.intersectionPoint >> orientedDelta
     println(s"calculated position: $t")
+    println(checkHasInside(obstacle, intersectionAndDirection.intersectionPoint >> orientedDelta))
     println(s"-------------------------------------------------")
     Console.flush()
-    (intersectionAndDirection.intersectionPoint >> orientedDelta, orientedDelta)
+    (intersectionAndDirection.intersectionPoint, orientedDelta)
   }
 
 

@@ -31,8 +31,8 @@ object Vectors {
    * @return an Option[Vector2D] if the intersection point of
    *         the two segment are found, otherwise return None
    * */
-  def findIntersectionPoint(seg1: (Vector3D, Vector3D, Vector3D),
-                                    seg2: (Vector3D, Vector3D, Vector3D)): Option[Vector2D] = {
+  def findIntersectionPoint(seg1: (Vector2D, Vector2D, Vector3D),
+                                    seg2: (Vector2D, Vector2D, Vector3D)): Option[Vector2D] = {
     val crossIntersection = seg1._3 X seg2._3
     if (!(Vectors ~= (crossIntersection.z, 0.0, 1E-7))) {
       val intersection = crossIntersection / crossIntersection.z
@@ -53,11 +53,10 @@ object Vectors {
    *
    * @return angle
    * */
-  def findIntersectionAngle(seg1: (Vector3D, Vector3D, Vector3D),
-                                    seg2: (Vector3D, Vector3D, Vector3D)): Double = {
+  def findIntersectionAngle(seg1: (Vector2D, Vector2D, Vector3D),
+                                    seg2: (Vector2D, Vector2D, Vector3D)): Double = {
     val seg1Vector: Vector2D =  seg1._2 - seg1._1
     val seg2Vector: Vector2D =  seg2._2 - seg2._1
-
     seg2Vector ^ seg1Vector
   }
 

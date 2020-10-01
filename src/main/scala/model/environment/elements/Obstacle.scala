@@ -43,8 +43,10 @@ case class Obstacle(points: List[Vector2D]) extends Drawable {
     *         or something wrong happened
     * */
   def findIntersectionInformation(oldPosition: Vector2D, newPosition: Vector2D): Option[IntersectionResult] = {
-
-    println(s"Obstacle position: $position")
+    println(s"Obstacle: $position" )
+    println(s"AntPos: $oldPosition")
+    println(s"newPosition: $newPosition")
+    //segments foreach( _ => println(_))
     // ant path definition
     val antPath: (Vector2D,Vector2D,Vector3D) = (oldPosition, newPosition, oldPosition X newPosition)
     var intersections: List[IntersectionResult] = List()
@@ -92,11 +94,14 @@ object Obstacle{
    * Obstacle by position and number of sides
    * */
   def apply(position: Vector2D, radius: Double = 10, nSides: Int): Obstacle = {
-    val angle = for (i <- 0 until nSides)
-      yield (2 * Math.PI) / (i + 1)
 
-    val vertex = for (a <- angle)
-      yield (Vector2D(math.cos(a) * radius, math.sin(a) * radius) >> position)
+    val angle = 2 * math.Pi / nSides
+
+    val vertex = for {
+      a <- 0 until nSides
+      //test <- angle * a
+    }
+    yield (Vector2D(math.cos(angle * a) * radius, math.sin(angle * a) * radius) >> position)
 
     Obstacle(vertex.toList)
   }
