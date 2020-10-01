@@ -29,6 +29,7 @@ case class UiActor(panel: MyrmidonsPanel, control: ControlPane)
 
   import UiActor._
 
+  // TODO use context and not variable into actor
   private var stopFlag = true
   private var currentState = 1
 

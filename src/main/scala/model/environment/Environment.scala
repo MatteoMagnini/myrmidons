@@ -11,9 +11,6 @@ import utility.PheromoneSeq._
 import model.insects.info.SpecificInsectInfo
 import utility.geometry.{RandomVector2DInCircle, RandomVector2DInSquare, Vector2D, ZeroVector2D}
 import model.environment.elements.EnvironmentElements._
-import model.environment.elements.Obstacle
-
-import scala.annotation.tailrec
 import scala.util.Random
 
 /** Environment actor
@@ -31,16 +28,21 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       val anthillInfo = AnthillInfo(state.boundary.center, 15, foodAmount = 5000)
       val anthill = context.actorOf(Anthill(anthillInfo, self), name = "anthill")
       val entities = if (!spawnFromAnthill) createEntitiesFromRandomPosition(nAnts, nEnemies, anthill)
-                     else createAntFromAnthill(nAnts, nEnemies, anthill, anthillInfo.position)
+      else createAntFromAnthill(nAnts, nEnemies, anthill, anthillInfo.position)
 
-      val obstacles = if (obstaclesPresence.isDefined) (0 until obstaclesPresence.get).map(_ =>
-        Obstacle.Square(RandomVector2DInCircle(50,90, anthillInfo.position), radius = 20)) else Seq.empty
+      val obstacles = if (obstaclesPresence.isDefined) for {_ <- 0 until obstaclesPresence.get
+                                                            random = Obstacle.randomValid
+                                                            obstacle = Obstacle(RandomVector2DInCircle(50, 350,
+                                                              anthillInfo.position), 20, random)
+                                                            } yield obstacle
+      else Seq.empty
+
 
       val foods = if (foodPresence.isDefined) (0 until foodPresence.get).map(_ =>
         Food.createRandomFood(anthillInfo.position, 100, 150)) else Seq.empty
 
       context >>> defaultBehaviour(EnvironmentInfo(Some(sender), state.boundary,
-         obstacles, foods, entities._1, entities._2, anthill, Some(anthillInfo)))
+        obstacles, foods, entities._1, entities._2, anthill, Some(anthillInfo)))
 
 
     case Clock(value: Int) =>
@@ -78,7 +80,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
           val food = checkHaveInside(state.foods, newPosition)
           if (food.isDefined) {
             sender ! FoodNear(food.get.position)
-            sender ! NewPosition(position , ZeroVector2D()) // TODO: should bounce also on food!
+            sender ! NewPosition(position, ZeroVector2D()) // TODO: should bounce also on food!
           } else {
             sender ! NewPosition(newPosition, newPosition - position)
           }
@@ -140,7 +142,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   }
 
   /** Returns ants and enemies references, creating ants from the center of boundary */
-  private def createAntFromAnthill(nAnts: Int, nEnemies:Int, anthill: ActorRef, anthillCenter: Vector2D): (Map[Int, ActorRef], Map[Int, ActorRef]) = {
+  private def createAntFromAnthill(nAnts: Int, nEnemies: Int, anthill: ActorRef, anthillCenter: Vector2D): (Map[Int, ActorRef], Map[Int, ActorRef]) = {
     val ants = (0 until nAnts).map(i => {
       i -> context.actorOf(ForagingAnt(ForagingAntInfo(anthill, id = i, position = anthillCenter), self), s"ant-$i")
     }).toMap
@@ -151,7 +153,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     (ants, enemies)
   }
 
-  private def recursionCheck(obstacle: Obstacle, position: Vector2D, newPosition: Vector2D):(Vector2D, Vector2D) = {
+  private def recursionCheck(obstacle: Obstacle, position: Vector2D, newPosition: Vector2D): (Vector2D, Vector2D) = {
     val res = handleObstacleIntersection(obstacle, position, newPosition)
     val intersection = res._1
     val delta = res._2
@@ -173,7 +175,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     val angleTest = if (intersectionAndDirection.angle < math.Pi / 2)
       math.Pi - (intersectionAndDirection.angle * 2)
     else
-      - ((2 * intersectionAndDirection.angle) - math.Pi)
+      -((2 * intersectionAndDirection.angle) - math.Pi)
     val newDelta = intersectionAndDirection.intersectionPoint - newPosition
     println(s"Angle: ${intersectionAndDirection.angle * 180 / math.Pi}")
     println(s"rotationAngle: ${angleTest * 180 / math.Pi}")
@@ -213,7 +215,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       if ant.position ~~ enemy.position
     } yield Fight(ant, enemy, ant.position)
 
-  private def handleFights(info: EnvironmentInfo, fights: Iterable[Fight[ForagingAntInfo, EnemyInfo]]): EnvironmentInfo  = {
+  private def handleFights(info: EnvironmentInfo, fights: Iterable[Fight[ForagingAntInfo, EnemyInfo]]): EnvironmentInfo = {
 
     import model.Fights._
     import model.Fights.InsectFight._

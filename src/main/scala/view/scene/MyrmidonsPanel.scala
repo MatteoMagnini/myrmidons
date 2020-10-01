@@ -1,12 +1,13 @@
 package view.scene
 
+
 import model.Drawable
 import model.Fights.Fight
 import model.anthill.AnthillInfo
 import model.environment.FoodPheromone
 import model.environment.elements.{Food, Obstacle}
 import model.insects.info.{EnemyInfo, ForagingAntInfo}
-import view.scene.MemoHelper.memoize
+import view.drawLogic.singletonList
 
 import scala.swing.{Graphics2D, Panel}
 
@@ -16,31 +17,10 @@ import scala.swing.{Graphics2D, Panel}
  * and its view behaviours.
  */
 
-object MemoHelper {
-  def memoize[I, O](f: I => O): I => O = new collection.mutable.HashMap[I, O]() {
-    override def apply(key: I): O = getOrElseUpdate(key, f(key))
-  }
-}
-
-object singletonList {
-  private val memoized: Any => Seq[Any] = memoize(x => {
-   // if(x.isInstanceOf[AnthillInfo])println(s" Calling singleton with input $x")
-    Seq(x)
-  })
-
-  def apply[A](a: A): Seq[A] = {
-    memoized(a).asInstanceOf[Seq[A]]
-  }
-}
 
 case class MyrmidonsPanel() extends Panel {
 
   private var restartFlag = false
-
-  import scala.ref.WeakReference
-
-
-  private val flyweightData = new scala.collection.mutable.WeakHashMap[Drawable, WeakReference[Drawable]]()
   private var infoEntities: Seq[Object] = Seq.empty
   size.height = 800
   size.width = 800
@@ -91,11 +71,8 @@ case class MyrmidonsPanel() extends Panel {
    */
   def setEntities(info: Seq[Drawable]): (Int, Int) = {
 
-    //infoEntities = Seq.empty
-    //infoEntities = info
-    //TODO NON FUNZIONA NON DISEGNA SE NON FACCIO RIGA SOPRA
-    info.foreach( x => infoEntities = singletonList(x).head +:infoEntities)
 
+    info.foreach(x => infoEntities = singletonList(x).head +: infoEntities)
     var antsEntities: Seq[ForagingAntInfo] = Seq.empty
     var anthillEntity: Option[AnthillInfo] = None
 
@@ -104,13 +81,7 @@ case class MyrmidonsPanel() extends Panel {
       case entity: AnthillInfo => anthillEntity = Some(entity)
       case _ =>
     }
-    (antsEntities.size,anthillEntity.get.foodAmount.toInt)
+    (antsEntities.size, anthillEntity.get.foodAmount.toInt)
   }
 
-  /*def addWithCache(data: Drawable): Drawable = {
-    import scala.ref.WeakReference
-    if (!flyweightData.contains(data)) flyweightData.put(data, new WeakReference[Drawable](data))
-    // return the single immutable copy with the given values
-    flyweightData(data).get.get
-  }*/
 }

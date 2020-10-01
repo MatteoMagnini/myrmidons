@@ -1,8 +1,7 @@
 package view.drawLogic
 
-import java.awt.Color
-import java.awt.geom.{Ellipse2D, Rectangle2D}
-
+import java.awt.{Color, Polygon}
+import java.awt.geom.Ellipse2D
 import model.Fights.Fight
 import model.anthill.AnthillInfo
 import model.environment.FoodPheromone
@@ -15,7 +14,6 @@ import scala.swing.{Dimension, Graphics2D}
 trait DrawableEntity[A] {
   def draw(elem: A, g: Graphics2D, size: Dimension)
 }
-
 
 object DrawableEntities {
 
@@ -66,10 +64,12 @@ object DrawableEntities {
   implicit object drawObstacle extends DrawableEntity[Obstacle] {
     override def draw(elem: Obstacle, g: Graphics2D, size: Dimension): Unit = {
       g.setColor(OBSTACLE_COLOR)
-      val rect = new Rectangle2D.Double(elem.position.x, size.height - elem.position.y,
-        OBSTACLE_SIZE, OBSTACLE_SIZE)
-      g.fill(rect)
-
+      val vertex = for (seg <- elem.segments) yield seg._1
+      val xCoordinates = for (v <- vertex) yield Math.round(v.x).toInt
+      val yCoordination = for (v <- vertex) yield Math.round(size.height - v.y).toInt
+      val p: Polygon = new Polygon(xCoordinates.toArray, yCoordination.toArray, vertex.size)
+      g.drawPolygon(p)
+      g.fillPolygon(p)
     }
   }
 

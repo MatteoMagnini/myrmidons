@@ -6,10 +6,9 @@ object Colors {
 
   def ANT_COLOR: Color = Color.BLACK
 
-  def OBSTACLE_COLOR: Color = new Color(0.5f, 0.5f, 0.5f, 0.5f) // Color.Grey?? Too dark?
+  def OBSTACLE_COLOR: Color = new Color(0.5f, 0.5f, 0.5f, 0.5f)
 
   def ENEMIES_COLOR: Color = Color.RED
-
 
   private def ANTHILL_COLOR_COMPONENT: (Float, Float, Float) = (0f, 0.5f, 0f)
 
