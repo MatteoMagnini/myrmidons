@@ -1,7 +1,7 @@
 package model.environment.elements
 
 import model.environment.Boundary
-import utility.geometry.{Vector2D, Vector3D}
+import utility.geometry.{Vector2D, Vector3D, Vectors}
 
   /**A strategy to define whether a position in inside an environment element
     *
@@ -52,21 +52,16 @@ object EnvironmentElements {
       import utility.geometry.VectorsImplicits._
 
       val maxX = element.points.sortWith((a, b) => a.x > b.x) head
+      val stopCheckRay = Vector3D(maxX.x + 1, coordinate.y, 1)
       //track an ray in right version
-      val ray = coordinate X Vector3D(maxX.x + 1, coordinate.y, 1)
+      val ray: (Vector2D, Vector2D, Vector3D)= (coordinate, stopCheckRay, coordinate X stopCheckRay)
       var counter = 0
       //find intersection between polygon segment and ray
       val segments = element.segments
       segments.indices foreach (i => {
-        val crossIntersection = segments(i)._3 X ray
-        // intersection at ideal point (parallel line)
-        if (crossIntersection.z != 0.0) {
-          val intersection = crossIntersection / crossIntersection.z
-          if ((((segments(i)._1.x >= intersection.x) && (segments(i)._2.x <= intersection.x))
-            || ((segments(i)._1.x <= intersection.x) && (segments(i)._2.x >= intersection.x)))
-            && intersection.x >= coordinate.x) {
-            counter += 1
-          }
+        val crossIntersection = Vectors.findIntersectionPoint(segments(i), ray)
+        if(crossIntersection != Option.empty){
+          counter += 1
         }
       })
       (counter % 2) != 0

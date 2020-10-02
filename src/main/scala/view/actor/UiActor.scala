@@ -29,6 +29,7 @@ case class UiActor(panel: MyrmidonsPanel, control: ControlPane)
 
   import UiActor._
 
+  // TODO use context and not variable into actor
   private var stopFlag = true
   private var currentState = 1
 
@@ -39,7 +40,7 @@ case class UiActor(panel: MyrmidonsPanel, control: ControlPane)
     case Repaint(info: Seq[Drawable]) =>
 
       val entitiesProperties = panel.setEntities(info)
-      panel.draw()
+      panel.draw_()
       currentState = currentState + 1
 
       import ImplicitConversion._

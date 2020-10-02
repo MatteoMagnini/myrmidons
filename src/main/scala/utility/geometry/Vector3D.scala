@@ -44,7 +44,7 @@ case class Vector3D(x: Double, y: Double, z: Double) {
     *
     * */
   def checkInside(start: Vector3D, stop: Vector3D): Boolean = {
-    ~=((start --> this) + (stop --> this) - (start --> stop), 0.0, 1E-6)
+    ~=((start --> this) + (stop --> this) - (start --> stop), 0.0, 1E-7)
   }
 
 
