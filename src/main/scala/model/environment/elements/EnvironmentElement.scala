@@ -20,8 +20,8 @@ object EnvironmentElements {
     * @tparam T context bound
     * @return if exists, element that have position inside of it
     */
-  def checkHaveInside[T: EnvironmentElement](elements: Iterable[T], position: Vector2D): Option[T] =
-    elements.find(x => implicitly[EnvironmentElement[T]].hasInside(x, position))
+  def checkHaveInside[T: EnvironmentElement](elements: Iterable[T], position: Vector2D): Iterable[T] =
+    elements.filter(x => implicitly[EnvironmentElement[T]].hasInside(x, position))
 
   /**Returns whether element has inside a position
     *
