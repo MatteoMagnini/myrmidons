@@ -10,23 +10,20 @@ class Enemy(override val info: EnemyInfo,
 
   override def receive: Receive = defaultBehaviour(info)
 
+  private val competences = List(RandomWalk[EnemyInfo]())
+
   private def defaultBehaviour(data: EnemyInfo): Receive = {
 
     case Clock(t) if t == data.time + 1 =>
       val newData = data.incTime()
-      subsumption(newData,
-        //EatFromTheAnthill, // if inside anthill it's behaviour became like parasite
-        //Die[EnemyInfo](),
-        RandomWalk[EnemyInfo]())(context, environment, self, newData, defaultBehaviour)
+      subsumption(newData,competences)(context, environment, self, newData, defaultBehaviour)
 
     case NewPosition(p, d) =>
       val newData = data.updatePosition(p).updateInertia(d)
       environment ! UpdateInsect(newData)
       context become defaultBehaviour(newData)
 
-    case FoodNear(_) => // println(s"Enemy ${info.id} near food")//DO NOTHING
-
-    case Context(_) => sender ! Context(Some(context))
+    case FoodNear(_) => // println(s"Enemy ${info.id} near food")//TODO: MUST NOT RECEIVE THIS MESSAGE
 
     case Context(_) => sender ! Context(Some(context))
 

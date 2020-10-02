@@ -42,8 +42,7 @@ case class GoOutside[A <: AntInfo[A]]() extends AntCompetences[A] {
     context >>> behaviour(data)
   }
 
-  override def hasPriority(info: A): Boolean = info.isInsideTheAnthill && info.energy > 80
-  // info.isInsideTheAnthill && Random.nextDouble() * MAX_ENERGY < info.energy  //TODO: what if carrying food?
+  override def hasPriority(info: A): Boolean = info.isInsideTheAnthill && info.energy > 80 //TODO: try something with probability
 }
 
 /**

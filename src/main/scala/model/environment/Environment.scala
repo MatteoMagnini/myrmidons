@@ -162,7 +162,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
     val o = checkHaveInside(state.obstacles, bouncedPos)
     if (o.isEmpty) {
-      println("empty")
+      //println("empty")
       (bouncedPos, delta)
     } else
       recursionCheck(o.get, intersection, bouncedPos)
@@ -170,27 +170,27 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
   private def handleObstacleIntersection(obstacle: Obstacle, position: Vector2D, newPosition: Vector2D): (Vector2D, Vector2D) = {
     val intersectionAndDirection = obstacle.findIntersectionInformation(position, newPosition).head
-    println(s"intersection: ${intersectionAndDirection.intersectionPoint}")
+    //println(s"intersection: ${intersectionAndDirection.intersectionPoint}")
 
     val angleTest = if (intersectionAndDirection.angle < math.Pi / 2)
       math.Pi - (intersectionAndDirection.angle * 2)
     else
       -((2 * intersectionAndDirection.angle) - math.Pi)
     val newDelta = intersectionAndDirection.intersectionPoint - newPosition
-    println(s"Angle: ${intersectionAndDirection.angle * 180 / math.Pi}")
-    println(s"rotationAngle: ${angleTest * 180 / math.Pi}")
-    println(s"Delta: $newDelta")
+    //println(s"Angle: ${intersectionAndDirection.angle * 180 / math.Pi}")
+    //println(s"rotationAngle: ${angleTest * 180 / math.Pi}")
+    //println(s"Delta: $newDelta")
     val orientedDelta = (
       (math.cos(angleTest) * newDelta.x) - (math.sin(angleTest) * newDelta.y),
       (math.sin(angleTest) * newDelta.x) + (math.cos(angleTest) * newDelta.y)
     )
-    println(s"oriented: $orientedDelta")
+    //println(s"oriented: $orientedDelta")
 
     import utility.geometry.TupleOp2._
     val t: Vector2D = intersectionAndDirection.intersectionPoint >> orientedDelta
-    println(s"calculated position: $t")
-    println(checkHasInside(obstacle, intersectionAndDirection.intersectionPoint >> orientedDelta))
-    println(s"-------------------------------------------------")
+    //println(s"calculated position: $t")
+    //println(checkHasInside(obstacle, intersectionAndDirection.intersectionPoint >> orientedDelta))
+    //println(s"-------------------------------------------------")
     Console.flush()
     (intersectionAndDirection.intersectionPoint, orientedDelta)
   }

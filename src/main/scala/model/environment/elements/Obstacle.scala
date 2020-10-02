@@ -45,9 +45,9 @@ case class Obstacle(points: List[Vector2D]) extends Drawable {
    *         or something wrong happened
    **/
   def findIntersectionInformation(oldPosition: Vector2D, newPosition: Vector2D): Option[IntersectionResult] = {
-    println(s"Obstacle: $position")
-    println(s"AntPos: $oldPosition")
-    println(s"newPosition: $newPosition")
+    //println(s"Obstacle: $position")
+    //println(s"AntPos: $oldPosition")
+    //println(s"newPosition: $newPosition")
     //segments foreach( _ => println(_))
     // ant path definition
     val antPath: (Vector2D, Vector2D, Vector3D) = (oldPosition, newPosition, oldPosition X newPosition)
