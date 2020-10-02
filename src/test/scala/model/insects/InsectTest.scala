@@ -2,18 +2,19 @@ package model.insects
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
-import model.Food
-import utility.Geometry.TupleOp._
+import utility.geometry.TupleOp2._
 import model.anthill.{Anthill, AnthillInfo}
 import model.environment.FoodPheromone
+import model.environment.elements.Food
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.Geometry._
+import utility.geometry._
 import utility.Messages._
-import model.insects.ForagingAntConstant._
-import model.insects.Constant._
+import utility.Parameters.Competence._
+import model.insects.info.ForagingAntInfo
 import utility.Message
+import utility.Parameters.ForagingAnt._
 
 class InsectTest extends TestKit(ActorSystem("InsectTest"))
   with AnyWordSpecLike
@@ -107,7 +108,7 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
 
       "update the sensor in presence of pheromones" in {
         assert(info.foodPheromones.isEmpty)
-        val info2 = info.updateFoodPheromones(pheromones).asInstanceOf[ForagingAntInfo]
+        val info2 = info.updateFoodPheromones(pheromones)
         assert(info2.foodPheromones.nonEmpty)
       }
 
@@ -170,7 +171,7 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
         ant ! FoodNear(food.position)
         ant ! NewPosition(startingAntPosition,ZeroVector2D())
         val result1 = sender.expectMsgType[UpdateInsect]
-        assert(result1.info.foodIsNear)
+        assert(result1.info.asInstanceOf[ForagingAntInfo].foodIsNear)
         sender expectNoMessage
       }
 

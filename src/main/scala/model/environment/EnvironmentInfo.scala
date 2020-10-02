@@ -2,9 +2,8 @@ package model.environment
 
 import akka.actor.ActorRef
 import model.anthill.AnthillInfo
-import model.{Food, Obstacle}
-import model.insects.{EnemyInfo, ForagingAntInfo, InsectInfo}
-import utility.Geometry.ZeroVector2D
+import model.environment.elements.{Food, Obstacle}
+import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo}
 import utility.PheromoneSeq._
 
 /** Internal state of environment. */
@@ -34,7 +33,7 @@ trait EnvironmentInfo {
   def enemiesInfo: Iterable[EnemyInfo]
 
   /** Anthill information */
-  def anthillInfo: AnthillInfo
+  def anthillInfo: Option[AnthillInfo]
 
   /** */
   def pheromones: Seq[FoodPheromone]
@@ -55,7 +54,7 @@ trait EnvironmentInfo {
 
   def updateFood(food: Food, updatedFood: Food): EnvironmentInfo
 
-  def updateAnthillInfo(anthillInfo: AnthillInfo): EnvironmentInfo
+  def updateAnthillInfo(anthillInfo: Option[AnthillInfo]): EnvironmentInfo
 
   def removeAnt(id: Int): EnvironmentInfo
 
@@ -69,11 +68,11 @@ object EnvironmentInfo {
 
   def apply(boundary: Boundary): EnvironmentInfo =
 
-    EnvironmentData(None, boundary, Seq.empty, Seq.empty, Map.empty, Seq.empty, Map.empty, Seq.empty, None, AnthillInfo(ZeroVector2D()), Seq[FoodPheromone]())
+    EnvironmentData(None, boundary, Seq.empty, Seq.empty, Map.empty, Seq.empty, Map.empty, Seq.empty, None, None, Seq[FoodPheromone]())
 
   def apply(gui: Option[ActorRef], boundary: Boundary, obstacles: Seq[Obstacle], foods: Seq[Food], ants: Map[Int, ActorRef],
-            enemies: Map[Int, ActorRef], anthill: ActorRef, anthillInfo: AnthillInfo, foodPheromone: Seq[FoodPheromone]): EnvironmentInfo =
-    EnvironmentData(gui, boundary, obstacles, foods,  ants, Seq.empty, enemies, Seq.empty, Some(anthill), anthillInfo, foodPheromone)
+            enemies: Map[Int, ActorRef], anthill: ActorRef, anthillInfo: Option[AnthillInfo]): EnvironmentInfo =
+    EnvironmentData(gui, boundary, obstacles, foods,  ants, Seq.empty, enemies, Seq.empty, Some(anthill), anthillInfo, Seq.empty)
 
 
   /** Internal state of environment.
@@ -92,7 +91,7 @@ object EnvironmentInfo {
                                            override val ants: Map[Int, ActorRef],
                                            override val antsInfo: Seq[ForagingAntInfo], override val enemies: Map[Int, ActorRef],
                                            override val enemiesInfo: Seq[EnemyInfo], override val anthill: Option[ActorRef],
-                                           override val anthillInfo: AnthillInfo,
+                                           override val anthillInfo: Option[AnthillInfo],
                                            override val pheromones: Seq[FoodPheromone]) extends EnvironmentInfo {
 
     /** Returns ant info, adding ant information */
@@ -112,7 +111,7 @@ object EnvironmentInfo {
       else this.copy(foods = foods remove food)
 
     /** Returns  anthill info */
-    override def updateAnthillInfo(anthillInfo: AnthillInfo): EnvironmentInfo =
+    override def updateAnthillInfo(anthillInfo: Option[AnthillInfo]): EnvironmentInfo =
       this.copy(anthillInfo = anthillInfo)
 
     override def removeAnt(id: Int): EnvironmentInfo = this.copy(ants = ants - id)

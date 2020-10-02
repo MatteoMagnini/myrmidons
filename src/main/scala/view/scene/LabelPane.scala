@@ -1,9 +1,7 @@
 package view.scene
 
-
 import java.awt.Color
 import scala.swing.{FlowPanel, Label, Separator}
-
 
 /**
  * FlowPanel with short legend to understand color entities.

@@ -2,7 +2,6 @@ package view.scene
 
 import scala.swing.event.ButtonClicked
 import scala.swing.{Button, GridPanel}
-import utility.Messages.AddRandomAnt
 
 case class InteractionPanel(controlPane: ControlPane) extends GridPanel(10, 1) {
 

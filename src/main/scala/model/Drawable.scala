@@ -1,6 +1,6 @@
 package model
 
-import utility.Geometry.Vector2D
+import utility.geometry.Vector2D
 
 /**
  * All entities that can be displayed have a state that extends the Drawable state.
@@ -10,3 +10,7 @@ trait Drawable {
   val position: Vector2D
   //type Position
 }
+
+/*trait SpecificDrawable[A <: SpecificDrawable[A]] extends Drawable {
+  def getType : A
+}*/
