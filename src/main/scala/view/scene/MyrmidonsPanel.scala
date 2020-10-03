@@ -6,7 +6,7 @@ import model.Fights.Fight
 import model.anthill.AnthillInfo
 import model.environment.FoodPheromone
 import model.environment.elements.{Food, Obstacle}
-import model.insects.info.{EnemyInfo, ForagingAntInfo}
+import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
 import view.drawLogic.singletonList
 
 import scala.swing.{Graphics2D, Panel}
@@ -16,7 +16,6 @@ import scala.swing.{Graphics2D, Panel}
  * Panel that will be contain simulation entities
  * and its view behaviours.
  */
-
 
 case class MyrmidonsPanel() extends Panel {
 
@@ -36,6 +35,8 @@ case class MyrmidonsPanel() extends Panel {
       infoEntities.foreach {
 
         case entity: ForagingAntInfo => draw(entity, g, size)
+
+        case entity: PatrollingAntInfo => draw(entity, g, size)
 
         case entity: Food => draw(entity, g, size)
 
@@ -69,8 +70,8 @@ case class MyrmidonsPanel() extends Panel {
    * @param info Seq of all the entities that will be draw in panel.
    * @return number of ant.
    */
-  def setEntities(info: Seq[Drawable]): (Int, Int) = {
 
+  def setEntities(info: Seq[Drawable]): (Int, Int) = {
 
     info.foreach(x => infoEntities = singletonList(x).head +: infoEntities)
     var antsEntities: Seq[ForagingAntInfo] = Seq.empty
@@ -78,6 +79,7 @@ case class MyrmidonsPanel() extends Panel {
 
     infoEntities.foreach {
       case entity: ForagingAntInfo => antsEntities = entity +: antsEntities
+      //TODO: PatrollingAnts have to be added?
       case entity: AnthillInfo => anthillEntity = Some(entity)
       case _ =>
     }

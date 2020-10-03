@@ -2,13 +2,15 @@ package view.drawLogic
 
 import java.awt.{Color, Polygon}
 import java.awt.geom.Ellipse2D
+
 import model.Fights.Fight
 import model.anthill.AnthillInfo
 import model.environment.FoodPheromone
 import model.environment.elements.{Food, Obstacle}
-import model.insects.info.{EnemyInfo, ForagingAntInfo}
+import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
 import utility.Parameters.GUIConstant._
 import view.ColorUtility.Colors._
+
 import scala.swing.{Dimension, Graphics2D}
 
 trait DrawableEntity[A] {
@@ -52,9 +54,18 @@ object DrawableEntities {
     }
   }
 
-  implicit object drawAnt extends DrawableEntity[ForagingAntInfo] {
+  implicit object drawForagingAnt extends DrawableEntity[ForagingAntInfo] {
     override def draw(elem: ForagingAntInfo, g: Graphics2D, size: Dimension): Unit = {
       g.setColor(ANT_COLOR)
+      drawEllipse(elem.position.x - (ANT_SIZE / SET_TO_CENTER),
+        size.height - elem.position.y - (ANT_SIZE / SET_TO_CENTER),
+        ANT_SIZE, ANT_SIZE, g)
+    }
+  }
+
+  implicit object drawPatrollingAnt extends DrawableEntity[PatrollingAntInfo] {
+    override def draw(elem: PatrollingAntInfo, g: Graphics2D, size: Dimension): Unit = {
+      g.setColor(Color.BLUE)
       drawEllipse(elem.position.x - (ANT_SIZE / SET_TO_CENTER),
         size.height - elem.position.y - (ANT_SIZE / SET_TO_CENTER),
         ANT_SIZE, ANT_SIZE, g)

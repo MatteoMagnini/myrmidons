@@ -45,7 +45,7 @@ case class Anthill(info: AnthillInfo, environment: ActorRef) extends Actor {
         sender ! UpdateAnthillCondition(true)
         environment.tell(Move(position, ZeroVector2D()), sender)
       } else {
-        val rad = dist./\
+        val rad = dist /\
         val delta = OrientedVector2DWithNoise(rad, maxSpeed, noise)
         val delta2 = OrientedVector2D((delta >> (inertia * INERTIA_FACTOR))./\, doubleInRange(MIN_VELOCITY, MAX_VELOCITY))
         environment.tell(Move(position, delta2), sender)
