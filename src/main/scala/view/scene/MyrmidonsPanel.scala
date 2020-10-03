@@ -8,7 +8,7 @@ import model.Fights.Fight
 import model.anthill.AnthillInfo
 import model.environment.FoodPheromone
 import model.environment.elements.{Food, Obstacle}
-import model.insects.info.{EnemyInfo, ForagingAntInfo}
+import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
 
 import scala.swing.{Graphics2D, Panel}
 
@@ -23,6 +23,7 @@ case class MyrmidonsPanel() extends Panel {
   private var restartFlag = false
 
   private var ants: Seq[ForagingAntInfo] = Seq.empty
+  private var pAnts: Seq[PatrollingAntInfo] = Seq.empty
   private var enemies: Seq[EnemyInfo] = Seq.empty
   private var food: Seq[Food] = Seq.empty
   private var anthill: Option[AnthillInfo] = None
@@ -65,6 +66,14 @@ case class MyrmidonsPanel() extends Panel {
           size.height - x.position.y - (antSize / 2), antSize, antSize)
         g.fill(ellipse)
       })
+
+      g.setColor(Color.blue)
+      pAnts.foreach(x => {
+        val ellipse = new Ellipse2D.Double(x.position.x - (antSize / 2),
+          size.height - x.position.y - (antSize / 2), antSize, antSize)
+        g.fill(ellipse)
+      })
+
 
       /**
        * Foreach enemies draw its new position in Panel.
@@ -155,6 +164,7 @@ case class MyrmidonsPanel() extends Panel {
    */
   def setEntities(info: Seq[Drawable]): (Int,Int) = {
     ants = Seq.empty
+    pAnts = Seq.empty
     enemies = Seq.empty
     food = Seq.empty
     obstacles = Seq.empty
@@ -164,6 +174,7 @@ case class MyrmidonsPanel() extends Panel {
 
     info.foreach {
       case entity: ForagingAntInfo => ants = entity +: ants
+      case entity: PatrollingAntInfo => pAnts = entity +: pAnts
       case entity: Food => food = entity +: food
       case entity: Obstacle => obstacles = entity +: obstacles
       case entity: AnthillInfo => anthill = Some(entity)

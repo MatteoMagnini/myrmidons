@@ -3,7 +3,7 @@ package model.environment
 import akka.actor.{Actor, ActorContext, ActorLogging, ActorRef, Props}
 import model.Fights.Fight
 import model.anthill.{Anthill, AnthillInfo}
-import model.environment.elements.{Food, IntersectionResult, Obstacle}
+import model.environment.elements.{Food, Obstacle}
 import model.insects._
 import model.insects.info._
 import utility.Messages._
@@ -40,14 +40,15 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
         Food.createRandomFood(anthillInfo.position, 100, 150)) else Seq.empty
 
       context >>> defaultBehaviour(EnvironmentInfo(Some(sender), state.boundary,
-         obstacles, foods, entities._1, entities._2, anthill, Some(anthillInfo)))
+         obstacles, foods, entities._1, entities._2, entities._3, anthill, Some(anthillInfo)))
 
     case Clock(value: Int) =>
       /* Random birth of ants */
       if (Random.nextDouble() < 0.01) self ! AntBirth(value)
-      state.ants.values.foreach(_ ! Clock(value))
+      state.foragingAnts.values.foreach(_ ! Clock(value))
+      state.patrollingAnts.values.foreach(_ ! Clock(value))
       state.enemies.values.foreach(_ ! Clock(value))
-      state.ants.values.foreach(_ ! FoodPheromones(state.pheromones))
+      state.foragingAnts.values.foreach(_ ! FoodPheromones(state.pheromones))
       state.anthill match {
         case Some(x) => x ! Clock(value)
         case _ => print("Should never happen environment has no anthill")
@@ -56,7 +57,6 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
 
     case Move(position: Vector2D, delta: Vector2D) =>
-      import Implicits._
 
       val newPosition = position >> delta
 
@@ -111,7 +111,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     case AntBirth(clock: Int) =>
       import Implicits._
       /*Generate an id that doesn't exist for sure to avoid name conflicts*/
-      val antId = state.ants.size + clock
+      val antId = state.foragingAnts.size + clock
       val birthPosition = state.anthillInfo.position
       val ant = context.actorOf(ForagingAnt(ForagingAntInfo(state.anthill, id = antId, position = birthPosition, time = clock - 1), self), s"ant-$antId")
       ant ! Clock(clock)
@@ -120,7 +120,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     case KillAnt(id: Int) =>
       context.stop(sender)
       val newData = state.removeAnt(id)
-      if (newData.ants.isEmpty) state.gui.get ! Repaint(state.anthillInfo.get +: (state.obstacles ++ state.foods).toSeq)
+      if (newData.foragingAnts.isEmpty) state.gui.get ! Repaint(state.anthillInfo.get +: (state.obstacles ++ state.foods).toSeq)
       sendInfoToGUI(newData)
 
     case AddFoodPheromone(pheromone: FoodPheromone, threshold: Double) =>
@@ -133,30 +133,38 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   }
 
   /** Returns ants and enemies references, created from random position */
-  private def createEntitiesFromRandomPosition(nAnts: Int, nEnemies: Int, anthill: ActorRef): (Map[Int, ActorRef], Map[Int, ActorRef]) = {
-    val ants = (0 until nAnts).map(i => {
+  private def createEntitiesFromRandomPosition(nAnts: Int, nEnemies: Int, anthill: ActorRef): (Map[Int, ActorRef], Map[Int, ActorRef], Map[Int, ActorRef]) = {
+    val foragingAnts = (0 until nAnts).map(i => {
       val randomPosition = RandomVector2DInSquare(state.boundary.topLeft.x, state.boundary.topRight.x)
       i -> context.actorOf(ForagingAnt(ForagingAntInfo(anthill, id = i, position = randomPosition), self), s"ant-$i")
     }).toMap
 
+    val patrollingAnts = (0 until nAnts).map(i => {
+      val randomPosition = RandomVector2DInSquare(state.boundary.topLeft.x, state.boundary.topRight.x)
+      i -> context.actorOf(PatrollingAnt(PatrollingAntInfo(anthill, id = i, position = randomPosition), self), s"p-ant-$i")
+    }).toMap
+
     val enemies = (0 until nEnemies).map(i => {
       val randomPosition = RandomVector2DInSquare(state.boundary.topLeft.x, state.boundary.topRight.x)
       i -> context.actorOf(Enemy(EnemyInfo(id = i, position = randomPosition), self), s"enemy-$i")
     }).toMap
 
-    (ants, enemies)
+    (foragingAnts, patrollingAnts, enemies)
   }
 
   /** Returns ants and enemies references, creating ants from the center of boundary */
-  private def createAntFromAnthill(nAnts: Int, nEnemies:Int, anthill: ActorRef, anthillCenter: Vector2D): (Map[Int, ActorRef], Map[Int, ActorRef]) = {
-    val ants = (0 until nAnts).map(i => {
-      i -> context.actorOf(ForagingAnt(ForagingAntInfo(anthill, id = i, position = anthillCenter), self), s"ant-$i")
+  private def createAntFromAnthill(nAnts: Int, nEnemies:Int, anthill: ActorRef, anthillCenter: Vector2D): (Map[Int, ActorRef], Map[Int, ActorRef], Map[Int, ActorRef]) = {
+    val foragingAnts = (0 until nAnts).map(i => {
+      i -> context.actorOf(ForagingAnt(ForagingAntInfo(anthill, id = i, position = anthillCenter), self), s"f-ant-$i")
+    }).toMap
+    val patrollingAnts = (0 until nAnts).map(i => {
+      i -> context.actorOf(PatrollingAnt(PatrollingAntInfo(anthill, id = i, position = anthillCenter), self), s"p-ant-$i")
     }).toMap
     val enemies = (0 until nEnemies).map(i => {
       val randomPosition = RandomVector2DInSquare(state.boundary.topLeft.x, state.boundary.topRight.x)
       i -> context.actorOf(Enemy(EnemyInfo(id = i, position = randomPosition), self), s"enemy-$i")
     }).toMap
-    (ants, enemies)
+    (foragingAnts, patrollingAnts, enemies)
   }
 
   private def recursionCheck(obstacle: Iterable[Obstacle], position: Vector2D, newPosition: Vector2D):(Vector2D, Vector2D) = {
@@ -176,16 +184,16 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   }
 
   private def handleObstacleIntersection(obstacle: Iterable[Obstacle], position: Vector2D, newPosition: Vector2D): (Vector2D, Vector2D) = {
+  import Implicits._
 
     val t = (for (f <- obstacle)
       yield f.findIntersectionInformation(position, newPosition)).toList
 
     val intersectionAndDirectionOpt = t
       .filter(_.nonEmpty)
-      .map(_.get)
       .sortWith((a, b) => position --> a.intersectionPoint < position --> b.intersectionPoint).headOption
 
-    if(intersectionAndDirectionOpt.nonEmpty) {
+    if (intersectionAndDirectionOpt.nonEmpty) {
       val intersectionAndDirection = intersectionAndDirectionOpt.get
       val angleTest = if (intersectionAndDirection.angle < math.Pi / 2)
         math.Pi - (intersectionAndDirection.angle * 2)
@@ -205,11 +213,11 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
   private def sendInfoToGUI(info: EnvironmentInfo): Unit = {
     /* When all insects return their positions, environment send them to GUI */
-    if ((info.antsInfo.size == info.ants.size) && (info.enemiesInfo.size == info.enemies.size)) {
-      val fights = findFights(info.antsInfo, info.enemiesInfo)
+    if ((info.foragingAntsInfo.size == info.foragingAnts.size) && (info.enemiesInfo.size == info.enemies.size)) {
+      val fights = findFights(info.foragingAntsInfo, info.enemiesInfo)
       val updatedInfo = handleFights(info, fights)
 
-      info.gui.get ! Repaint(info.anthillInfo.get +: (info.antsInfo ++ info.enemiesInfo ++
+      info.gui.get ! Repaint(info.anthillInfo.get +: (info.foragingAntsInfo ++ info.patrollingAntsInfo ++ info.enemiesInfo ++
         info.obstacles ++ info.foods ++ info.pheromones ++ fights).toSeq)
       context >>> defaultBehaviour(updatedInfo.emptyInsectInfo())
     } else context >>> defaultBehaviour(info)
@@ -232,7 +240,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     for (loser <- losers(fights)) {
       loser match {
         case Left(ant) =>
-          context.stop(info.ants(ant))
+          context.stop(info.foragingAnts(ant))
           updatedInfo = updatedInfo.removeAnt(ant)
         case Right(enemy) =>
           context.stop(info.enemies(enemy))
