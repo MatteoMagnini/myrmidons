@@ -34,6 +34,9 @@ trait InsectCompetences[A <: SpecificInsectInfo[A]] {
    */
   def hasPriority(info: A): Boolean
 
+  implicit class RichContext(context: ActorContext) {
+    def >>> (behaviour: Receive): Unit = context become behaviour
+  }
 }
 
 /**
@@ -46,7 +49,7 @@ case class RandomWalk[A <: SpecificInsectInfo[A]]() extends InsectCompetences[A]
     val delta: Vector2D = RandomVector2DInCircle(MIN_VELOCITY, MAX_VELOCITY)
     val deltaWithInertia = OrientedVector2D((delta >> (info.inertia * INERTIA_FACTOR))./\, doubleInRange(MIN_VELOCITY, MAX_VELOCITY))
     environment.tell(Move(data.position, deltaWithInertia), insect)
-    context become behaviour(data)
+    context >>> behaviour(data)
   }
 
   override def hasPriority(info: A): Boolean = true

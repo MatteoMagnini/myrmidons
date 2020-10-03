@@ -10,12 +10,13 @@ case class PatrollingAnt (override val info: PatrollingAntInfo,
 
   override def receive: Receive = defaultBehaviour(info)
 
+  private val competences = List(RandomWalk[PatrollingAntInfo]())
+
   private def defaultBehaviour(data: PatrollingAntInfo): Receive = {
 
     case Clock(t) if t == data.time + 1 =>
       val newData = data.incTime()
-        subsumption(newData,
-        RandomWalk[PatrollingAntInfo]())(context, environment, self, newData, defaultBehaviour)
+      subsumption(newData,competences)(context, environment, self, newData, defaultBehaviour)
 
     case NewPosition(p, d) =>
       val newData = data.updatePosition(p).updateInertia(d)

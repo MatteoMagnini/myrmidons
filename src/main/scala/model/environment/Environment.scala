@@ -28,13 +28,14 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       val anthillInfo = AnthillInfo(state.boundary.center, 15, foodAmount = 5000)
       val anthill = context.actorOf(Anthill(anthillInfo, self), name = "anthill")
       val entities = if (!spawnFromAnthill) createEntitiesFromRandomPosition(nAnts, nEnemies, anthill)
-                     else createAntFromAnthill(nAnts, nEnemies, anthill, anthillInfo.position)
+      else createAntFromAnthill(nAnts, nEnemies, anthill, anthillInfo.position)
 
-//      val obstacles = if (obstaclesPresence.isDefined) (0 until obstaclesPresence.get).map(_ =>
-//        Obstacle.Square(RandomVector2DInCircle(50,90, anthillInfo.position), radius = 20)) else Seq.empty
-
-       val obstacles = for (i <- 0 until 5)
-        yield Obstacle(RandomVector2DInCircle(50,90, anthillInfo.position), radius = 20.0, math.round((Math.random()*8) + 3).toInt)
+      val obstacles = if (obstaclesPresence.isDefined) for {_ <- 0 until obstaclesPresence.get
+                                                            random = Obstacle.randomValid
+                                                            obstacle = Obstacle(RandomVector2DInCircle(50, 350,
+                                                              anthillInfo.position), 20, random)
+                                                            } yield obstacle
+      else Seq.empty
 
       val foods = if (foodPresence.isDefined) (0 until foodPresence).map(_ =>
         Food.createRandomFood(anthillInfo.position, 100, 150)) else Seq.empty
@@ -82,6 +83,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
                 position --> a.position < position --> b.position).head
             sender ! FoodNear(nearestFood.position)
             sender ! NewPosition(position , ZeroVector2D()) // TODO: should bounce also on food!
+
           } else {
             sender ! NewPosition(newPosition, newPosition - position)
           }
@@ -209,6 +211,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     } else {
       (position, (position - newPosition)/(((position - newPosition)|| )/4))
     }
+
   }
 
   private def sendInfoToGUI(info: EnvironmentInfo): Unit = {
@@ -230,7 +233,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       if ant.position ~~ enemy.position
     } yield Fight(ant, enemy, ant.position)
 
-  private def handleFights(info: EnvironmentInfo, fights: Iterable[Fight[ForagingAntInfo, EnemyInfo]]): EnvironmentInfo  = {
+  private def handleFights(info: EnvironmentInfo, fights: Iterable[Fight[ForagingAntInfo, EnemyInfo]]): EnvironmentInfo = {
 
     import model.Fights._
     import model.Fights.InsectFight._

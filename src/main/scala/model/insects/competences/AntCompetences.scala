@@ -23,7 +23,7 @@ case class GoBackToHome[A <: AntInfo[A]]() extends AntCompetences[A] {
   override def apply(context: ActorContext, environment: ActorRef, insect: ActorRef, info: A, behaviour: A => Receive): Unit = {
     val data = info.updateEnergy(ENERGY_RW)
     data.anthill.tell(AntTowardsAnthill(data.position, MAX_VELOCITY, data.inertia, NOISE, info.isInsideTheAnthill), insect)
-    context become behaviour(data)
+    context >>> behaviour(data)
   }
 
   override def hasPriority(info: A): Boolean = info.energy < 40 //TODO: to be parametrized, add new competence for carry food back to home
@@ -39,11 +39,10 @@ case class GoOutside[A <: AntInfo[A]]() extends AntCompetences[A] {
     val delta: Vector2D = RandomVector2DInCircle(MIN_VELOCITY, MAX_VELOCITY)
     val deltaWithInertia = OrientedVector2D((delta >> (info.inertia * INERTIA_FACTOR))./\, doubleInRange(MIN_VELOCITY, MAX_VELOCITY))
     environment.tell(Move(data.position, deltaWithInertia), insect)
-    context become behaviour(data)
+    context >>> behaviour(data)
   }
 
-  override def hasPriority(info: A): Boolean = info.isInsideTheAnthill && info.energy > 80
-  // info.isInsideTheAnthill && Random.nextDouble() * MAX_ENERGY < info.energy  //TODO: what if carrying food?
+  override def hasPriority(info: A): Boolean = info.isInsideTheAnthill && info.energy > 80 //TODO: try something with probability
 }
 
 /**
@@ -54,7 +53,7 @@ case class EatFromTheAnthill[A <: AntInfo[A]]() extends AntCompetences[A] {
   override def apply(context: ActorContext, environment: ActorRef, insect: ActorRef, info: A, behaviour: A => Receive): Unit = {
     info.anthill.tell(EatFood(FOOD_EATEN_PER_STEP), insect)
     val data = info.updateEnergy(ENERGY_EATING).updateInertia(ZeroVector2D())
-    context become behaviour(data)
+    context >>> behaviour(data)
   }
 
   override def hasPriority(info: A): Boolean = info.isInsideTheAnthill

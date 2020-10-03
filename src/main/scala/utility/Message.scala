@@ -1,5 +1,6 @@
 package utility
 
+import akka.actor.ActorContext
 import model.Drawable
 import model.anthill.AnthillInfo
 import model.environment.FoodPheromone
@@ -92,4 +93,6 @@ object Messages {
 
   case class KillAnt(id: Int) extends Message
 
+  //TODO: just for test!
+  case class Context(context: Option[ActorContext]) extends Message
 }

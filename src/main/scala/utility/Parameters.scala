@@ -3,7 +3,6 @@ package utility
 import utility.geometry.{Vector2D, ZeroVector2D}
 import scala.util.Random
 
-
 object Parameters {
 
   object ForagingAnt {
@@ -14,6 +13,14 @@ object Parameters {
     def STARTING_TIME = 0
     def STARTING_FOOD_AMOUNT = 0.0
     def STARTING_POSITION: Vector2D = ZeroVector2D()
+  }
+
+  object GUIConstant {
+    def ANT_SIZE = 4
+    def PHEROMONE_SIZE = 7
+    def FIGHT_SIZE = 20
+    def SET_TO_CENTER = 2
+    def OBSTACLE_SIZE = 20
   }
 
   object Competence {
