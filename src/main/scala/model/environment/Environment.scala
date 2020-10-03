@@ -3,7 +3,7 @@ package model.environment
 import akka.actor.{Actor, ActorContext, ActorLogging, ActorRef, Props}
 import model.Fights.Fight
 import model.anthill.{Anthill, AnthillInfo}
-import model.environment.elements.Food
+import model.environment.elements.{Food, IntersectionResult, Obstacle}
 import model.insects._
 import model.insects.info._
 import utility.Messages._
@@ -11,7 +11,6 @@ import utility.PheromoneSeq._
 import model.insects.info.SpecificInsectInfo
 import utility.geometry.{RandomVector2DInCircle, RandomVector2DInSquare, Vector2D, ZeroVector2D}
 import model.environment.elements.EnvironmentElements._
-import model.environment.elements.Obstacle
 import scala.util.Random
 
 /** Environment actor
@@ -31,8 +30,11 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       val entities = if (!spawnFromAnthill) createEntitiesFromRandomPosition(nAnts, nEnemies, anthill)
                      else createAntFromAnthill(nAnts, nEnemies, anthill, anthillInfo.position)
 
-      val obstacles = if (obstaclesPresence.isDefined) (0 until obstaclesPresence.get).map(_ =>
-        Obstacle.Square(RandomVector2DInCircle(50,90, anthillInfo.position), radius = 20)) else Seq.empty
+//      val obstacles = if (obstaclesPresence.isDefined) (0 until obstaclesPresence.get).map(_ =>
+//        Obstacle.Square(RandomVector2DInCircle(50,90, anthillInfo.position), radius = 20)) else Seq.empty
+
+       val obstacles = for (i <- 0 until 5)
+        yield Obstacle(RandomVector2DInCircle(50,90, anthillInfo.position), radius = 20.0, math.round((Math.random()*8) + 3).toInt)
 
       val foods = if (foodPresence.isDefined) (0 until foodPresence).map(_ =>
         Food.createRandomFood(anthillInfo.position, 100, 150)) else Seq.empty
@@ -64,10 +66,9 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
         /*Checking obstacles*/
         import model.environment.elements.EnvironmentElements.ObstacleHasInside
         val obstacle = checkHaveInside(state.obstacles, newPosition)
-        if (obstacle.isDefined) {
+        if (obstacle.nonEmpty) {
           // TODO: better name
-
-          val intersection = recursionCheck(obstacle.get, position, newPosition)
+          val intersection = recursionCheck(obstacle, position, newPosition)
           sender ! NewPosition(intersection._1, intersection._2)
 
         } else {
@@ -75,9 +76,11 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
           /*Checking food sources*/
           import model.environment.elements.EnvironmentElements.FoodHasInside
           val food = checkHaveInside(state.foods, newPosition)
-          if (food.isDefined) {
 
-            sender ! FoodNear(food.get.position)
+          if (food.nonEmpty) {
+            val nearestFood: Food = food.toList.sortWith((a, b) =>
+                position --> a.position < position --> b.position).head
+            sender ! FoodNear(nearestFood.position)
             sender ! NewPosition(position , ZeroVector2D()) // TODO: should bounce also on food!
           } else {
             sender ! NewPosition(newPosition, newPosition - position)
@@ -90,9 +93,11 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       import model.environment.elements.EnvironmentElements.FoodHasInside
 
       val food = checkHaveInside(state.foods, position)
-      if (food.isDefined) {
+      if (food.nonEmpty) {
         sender ! TakeFood(delta, position)
-        context >>> defaultBehaviour(state.updateFood(food, food - delta))
+        val nearestFood: Food = food.toList.sortWith((a, b) =>
+          position --> a.position < position --> b.position).head
+        context >>> defaultBehaviour(state.updateFood(nearestFood, nearestFood - delta))
       } else {
         sender ! TakeFood(0, position)
       }
@@ -154,7 +159,8 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     (ants, enemies)
   }
 
-  private def recursionCheck(obstacle: Obstacle, position: Vector2D, newPosition: Vector2D):(Vector2D, Vector2D) = {
+  private def recursionCheck(obstacle: Iterable[Obstacle], position: Vector2D, newPosition: Vector2D):(Vector2D, Vector2D) = {
+    println(s"delta: ${(position-newPosition)||} --------- ${((position-newPosition)||) < 1E-7}")
     val res = handleObstacleIntersection(obstacle, position, newPosition)
     val intersection = res._1
     val delta = res._2
@@ -163,37 +169,38 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
     val o = checkHaveInside(state.obstacles, bouncedPos)
     if (o.isEmpty) {
-      println("empty")
       (bouncedPos, delta)
-    } else
-      recursionCheck(o.get, intersection, bouncedPos)
+    } else {
+      recursionCheck(o, intersection, bouncedPos)
+    }
   }
 
-  private def handleObstacleIntersection(obstacle: Obstacle, position: Vector2D, newPosition: Vector2D): (Vector2D, Vector2D) = {
-    val intersectionAndDirection = obstacle.findIntersectionInformation(position, newPosition).head
-    println(s"intersection: ${intersectionAndDirection.intersectionPoint}")
+  private def handleObstacleIntersection(obstacle: Iterable[Obstacle], position: Vector2D, newPosition: Vector2D): (Vector2D, Vector2D) = {
 
-    val angleTest = if (intersectionAndDirection.angle < math.Pi / 2)
-      math.Pi - (intersectionAndDirection.angle * 2)
-    else
-      - ((2 * intersectionAndDirection.angle) - math.Pi)
-    val newDelta = intersectionAndDirection.intersectionPoint - newPosition
-    println(s"Angle: ${intersectionAndDirection.angle * 180 / math.Pi}")
-    println(s"rotationAngle: ${angleTest * 180 / math.Pi}")
-    println(s"Delta: $newDelta")
-    val orientedDelta = (
-      (math.cos(angleTest) * newDelta.x) - (math.sin(angleTest) * newDelta.y),
-      (math.sin(angleTest) * newDelta.x) + (math.cos(angleTest) * newDelta.y)
-    )
-    println(s"oriented: $orientedDelta")
+    val t = (for (f <- obstacle)
+      yield f.findIntersectionInformation(position, newPosition)).toList
 
-    import utility.geometry.TupleOp2._
-    val t: Vector2D = intersectionAndDirection.intersectionPoint >> orientedDelta
-    println(s"calculated position: $t")
-    println(checkHasInside(obstacle, intersectionAndDirection.intersectionPoint >> orientedDelta))
-    println(s"-------------------------------------------------")
-    Console.flush()
-    (intersectionAndDirection.intersectionPoint, orientedDelta)
+    val intersectionAndDirectionOpt = t
+      .filter(_.nonEmpty)
+      .map(_.get)
+      .sortWith((a, b) => position --> a.intersectionPoint < position --> b.intersectionPoint).headOption
+
+    if(intersectionAndDirectionOpt.nonEmpty) {
+      val intersectionAndDirection = intersectionAndDirectionOpt.get
+      val angleTest = if (intersectionAndDirection.angle < math.Pi / 2)
+        math.Pi - (intersectionAndDirection.angle * 2)
+      else
+        -((2 * intersectionAndDirection.angle) - math.Pi)
+      val newDelta = intersectionAndDirection.intersectionPoint - newPosition
+      val orientedDelta = (
+        (math.cos(angleTest) * newDelta.x) - (math.sin(angleTest) * newDelta.y),
+        (math.sin(angleTest) * newDelta.x) + (math.cos(angleTest) * newDelta.y)
+      )
+      import utility.geometry.TupleOp2._
+      (intersectionAndDirection.intersectionPoint, orientedDelta)
+    } else {
+      (position, (position - newPosition)/(((position - newPosition)|| )/4))
+    }
   }
 
   private def sendInfoToGUI(info: EnvironmentInfo): Unit = {
