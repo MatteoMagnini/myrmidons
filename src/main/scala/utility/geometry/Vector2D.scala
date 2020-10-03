@@ -21,7 +21,10 @@ package utility.geometry
     def -(delta: Vector2D): Vector2D = this >> (delta -)
 
     /** Returns a vector multiplied by a constant */
-    def *(s: Double): Vector2D = (s * x, s * y)
+    def *(s: Double): Vector2D = (x * s, y * s)
+
+  /** Returns a vector multiplied by a constant */
+    def /(s: Double): Vector2D = (x / s, y / s)
 
     /** Returns the norm of the vector */
     def || : Double = math.sqrt(x * x + y * y)

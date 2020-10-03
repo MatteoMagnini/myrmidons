@@ -67,9 +67,11 @@ object Messages {
    *
    * @param position the ant position
    * @param maxSpeed ant max velocity
+   * @param inertia ant inertia
+   * @param noise to avoid getting stacked
    * @param antIsIn  true if it is inside the anthill, false otherwise
    */
-  case class AntTowardsAnthill(position: Vector2D, maxSpeed: Double, noise: Double, antIsIn: Boolean) extends Message
+  case class AntTowardsAnthill(position: Vector2D, maxSpeed: Double, inertia: Vector2D, noise: Double, antIsIn: Boolean) extends Message
 
   case class FoodNear(foodPosition: Vector2D) extends Message
 

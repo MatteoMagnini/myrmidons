@@ -2,7 +2,7 @@ package model.insects.info
 
 import akka.actor.ActorRef
 import model.environment.FoodPheromone
-import utility.Parameters.ForagingAntConstant._
+import utility.Parameters.ForagingAnt._
 import utility.geometry.{Vector2D, ZeroVector2D}
 
 case class ForagingAntInfo(override val id: Int,
