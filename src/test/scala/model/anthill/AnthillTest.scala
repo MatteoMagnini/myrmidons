@@ -5,7 +5,7 @@ import akka.testkit.{TestKit, TestProbe}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.Geometry.Vector2D
+import utility.geometry.Vector2D
 import utility.Messages.{Clock, EatFood, StoreFood, UpdateAnthill}
 
 class AnthillTest extends TestKit(ActorSystem("EnvironmentTest"))

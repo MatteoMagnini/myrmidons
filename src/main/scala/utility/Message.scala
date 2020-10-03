@@ -1,10 +1,11 @@
 package utility
 
+import akka.actor.ActorContext
 import model.Drawable
 import model.anthill.AnthillInfo
 import model.environment.FoodPheromone
-import model.insects.InsectInfo
-import utility.Geometry.Vector2D
+import utility.geometry.Vector2D
+import model.insects.info.InsectInfo
 
 trait Message
 
@@ -13,9 +14,9 @@ object Messages {
   /** Message sent from GUI to environment, to start simulation.
    *
    * @param nAnts       number of ants to be created
-   * @param centerSpawn whether spawn ants from center of boundaries
+   * @param spawnFromAnthill whether spawn ants from anthill
    */
-  case class StartSimulation(nAnts: Int, nEnemies: Int, centerSpawn: Boolean = false, obstacles: Option[Int] = Some(6), food: Option[Int] = Some(6)) extends Message
+  case class StartSimulation(nAnts: Int, nEnemies: Int, spawnFromAnthill: Boolean = false, obstacles: Option[Int] = Some(6), food: Option[Int] = Some(6)) extends Message
 
   /** Message sent from GUI to environment and from environment to ants, to do a step in simulation.
    *
@@ -44,7 +45,7 @@ object Messages {
    *
    * @param info ants information
    */
-  case class Repaint(info: Iterable[Drawable]) extends Message
+  case class Repaint(info: Seq[Drawable]) extends Message
 
   /** Message sent from environment to ant, to share its new position.
    *
@@ -67,9 +68,11 @@ object Messages {
    *
    * @param position the ant position
    * @param maxSpeed ant max velocity
+   * @param inertia ant inertia
+   * @param noise to avoid getting stacked
    * @param antIsIn  true if it is inside the anthill, false otherwise
    */
-  case class AntTowardsAnthill(position: Vector2D, maxSpeed: Double, noise: Double, antIsIn: Boolean) extends Message
+  case class AntTowardsAnthill(position: Vector2D, maxSpeed: Double, inertia: Vector2D, noise: Double, antIsIn: Boolean) extends Message
 
   case class FoodNear(foodPosition: Vector2D) extends Message
 
@@ -90,4 +93,6 @@ object Messages {
 
   case class KillAnt(id: Int) extends Message
 
+  //TODO: just for test!
+  case class Context(context: Option[ActorContext]) extends Message
 }

@@ -1,10 +1,8 @@
-package utility
+package utility.geometry
 
-import model.Obstacle
 import org.scalatest.BeforeAndAfter
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.Geometry.{Vector2D, Vector3D}
-import utility.Geometry.TupleOp3._
+import utility.geometry.TupleOp3._
 class Vector3DTest extends AnyWordSpecLike with BeforeAndAfter {
 
   "A vector" when {

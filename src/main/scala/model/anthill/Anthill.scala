@@ -2,8 +2,10 @@ package model.anthill
 
 import akka.actor.{Actor, ActorRef, Props}
 import model.Drawable
-import utility.Geometry.{OrientedVector2DWithNoise, Vector2D, ZeroVector2D}
+import utility.geometry.{OrientedVector2D, OrientedVector2DWithNoise, Vector2D, ZeroVector2D}
 import utility.Messages._
+import utility.geometry.Vectors.doubleInRange
+import utility.Parameters.Competence._
 
 case class AnthillInfo(override val position: Vector2D,
                        radius: Double,
@@ -37,15 +39,16 @@ case class Anthill(info: AnthillInfo, environment: ActorRef) extends Actor {
       sender ! EatFood(newDelta)
       context become defaultBehaviour(newData)
 
-    case AntTowardsAnthill(position, maxSpeed, noise, antIsIn) =>
+    case AntTowardsAnthill(position, maxSpeed, inertia, noise, antIsIn) =>
       val dist = info.position - position
       if (!antIsIn && dist.|| <= data.radius) {
         sender ! UpdateAnthillCondition(true)
         environment.tell(Move(position, ZeroVector2D()), sender)
       } else {
-        val rad = dist./\
+        val rad = dist /\
         val delta = OrientedVector2DWithNoise(rad, maxSpeed, noise)
-        environment.tell(Move(position, delta), sender)
+        val delta2 = OrientedVector2D((delta >> (inertia * INERTIA_FACTOR))./\, doubleInRange(MIN_VELOCITY, MAX_VELOCITY))
+        environment.tell(Move(position, delta2), sender)
       }
 
     case Clock(_) =>

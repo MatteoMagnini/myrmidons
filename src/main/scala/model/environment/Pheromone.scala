@@ -1,7 +1,7 @@
 package model.environment
 
 import model.Drawable
-import utility.Geometry.Vector2D
+import utility.geometry.Vector2D
 
 /**
  * Abstraction for a real pheromone.
@@ -29,7 +29,7 @@ trait Pheromone extends Drawable {
 
 object FoodPheromoneInfo {
 
-  def DELTA: Double = 0.5
+  def DELTA: Double = 2.0
 
   def STARTING_INTENSITY: Double = 100.0
 

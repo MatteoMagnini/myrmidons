@@ -2,7 +2,7 @@ package utility
 
 import model.environment.Pheromone
 import SeqWithReplace._
-import utility.Geometry.{Vector2D, ZeroVector2D}
+import utility.geometry.{Vector2D, ZeroVector2D}
 
 object PheromoneSeq {
 
