@@ -3,8 +3,9 @@ package view.scene
 import akka.actor.{ActorRef, ActorSystem, Props}
 import model.environment.{Boundary, Environment, EnvironmentInfo}
 import utility.Messages.{Clock, StartSimulation}
-import view.actor.UiActor
+import view.actor.{UiActor, uiActorInfo}
 import view.actor.uiMessage.{RestartSimulation, StopSimulation}
+
 import scala.swing.event.ButtonClicked
 import scala.swing.{Button, FlowPanel, Label, Separator}
 
@@ -19,7 +20,7 @@ case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends FlowPanel {
   private val boundary = Boundary(0, 0, 800, 800)
   var uiActor: ActorRef = _
   var environment: ActorRef = _
-  uiActor = system.actorOf(Props(new UiActor(myrmidonsPanel, this)))
+  uiActor = system.actorOf(UiActor(uiActorInfo(myrmidonsPanel, this)))
   environment = system.actorOf(Environment(EnvironmentInfo(boundary)), name = "env-actor")
   var startFlag = false
 
@@ -58,7 +59,7 @@ case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends FlowPanel {
       this.startButton.enabled = true
       this.stopButton.enabled = false
       this.restartButton.enabled = true
-      uiActor.tell(StopSimulation(false), uiActor)
+      uiActor.tell(StopSimulation, uiActor)
 
     case ButtonClicked(component) if component == restartButton =>
       system.stop(environment)
@@ -67,7 +68,7 @@ case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends FlowPanel {
       this.stopButton.enabled = true
       this.startButton.enabled = false
 
-      val uiRestart: ActorRef = system.actorOf(Props(new UiActor(myrmidonsPanel, this)))
+      val uiRestart: ActorRef = system.actorOf(UiActor(uiActorInfo(myrmidonsPanel, this)))
       uiActor = uiRestart
       val environmentRestart: ActorRef = system.actorOf(Environment(EnvironmentInfo(boundary)),
         name = s"env+${stepText.text}")
