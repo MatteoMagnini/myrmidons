@@ -55,7 +55,7 @@ case class MyrmidonsPanel() extends Panel {
     }
   }
 
-  def draw_(): Unit = {
+  def drawEntities(): Unit = {
     repaint()
   }
 

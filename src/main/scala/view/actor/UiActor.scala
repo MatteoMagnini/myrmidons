@@ -1,11 +1,9 @@
 package view.actor
 
-
-import view.actor.uiMessage.{RestartSimulation, StopSimulation}
-import akka.actor.{Actor, ActorLogging, Props, Timers}
+import view.actor.uiMessage.{RestartSimulation, StepOver, StopSimulation}
+import akka.actor.{Actor, ActorContext, ActorLogging, Props, Timers}
 import model.Drawable
 import utility.Messages.{Clock, Repaint}
-import view.scene.{ControlPane, MyrmidonsPanel}
 
 import scala.concurrent.duration.DurationInt
 
@@ -16,55 +14,49 @@ import scala.concurrent.duration.DurationInt
  * new position of the simulation entities.
  */
 
-object UiActor {
-
-  private case object StepOver
-
-  def apply(panel: MyrmidonsPanel, control: ControlPane): Props =
-    Props(classOf[UiActor], panel, control)
-}
-
-case class UiActor(panel: MyrmidonsPanel, control: ControlPane)
+class UiActor(state: uiActorInfo)
   extends Actor with ActorLogging with Timers {
 
-  import UiActor._
+  override def receive: Receive = defaultBehaviour(state)
 
-  // TODO use context and not variable into actor
-  private var stopFlag = true
-  private var currentState = 1
+  private def defaultBehaviour(state: uiActorInfo): Receive = {
 
-  override def receive: Receive = defaultBehaviour
-
-  private def defaultBehaviour: Receive = {
 
     case Repaint(info: Seq[Drawable]) =>
 
-      val entitiesProperties = panel.setEntities(info)
-      panel.draw_()
-      currentState = currentState + 1
+      val entitiesProperties = state.setEntities(info)
+      state.drawEntities()
+      state.setControl(state.currentState, entitiesProperties)
 
-      import ImplicitConversion._
-      control.stepText.text = currentState
-      control.antPopulationText.text = entitiesProperties._1
-      control.anthillFoodAmount.text = entitiesProperties._2
-
-      if (stopFlag) {
-        timers.startSingleTimer(currentState, StepOver, 30.millis)
+      if (state.stopFlag) {
+        timers.startSingleTimer(state.currentState, StepOver, 30.millis)
       }
+      context >>> defaultBehaviour(state.incCurrentState)
 
     case StepOver =>
-      control.environment.tell(Clock(currentState), self)
+      state.control.environment.tell(Clock(state.currentState), self)
+      context >>> defaultBehaviour(uiActorInfo(state.panel, state.control,
+        state.stopFlag, state.currentState))
 
-    case StopSimulation(stopFlag: Boolean) =>
-      this.stopFlag = stopFlag
-      timers.cancel(currentState)
+    case StopSimulation =>
+      timers.cancel(state.currentState)
+      context >>> defaultBehaviour(state.stopSimulation)
 
     case RestartSimulation() =>
-      this.stopFlag = true
-      timers.startSingleTimer(currentState, StepOver, 30.millis)
+      timers.startSingleTimer(state.currentState, StepOver, 30.millis)
+      context >>> defaultBehaviour(state.startSimulation)
   }
+
+  private implicit class RichContext(context: ActorContext) {
+    def >>>(behaviour: Receive): Unit = context become behaviour
+  }
+
 }
 
 object ImplicitConversion {
   implicit def intToString(value: Int): String = value.toString
+}
+
+object UiActor {
+  def apply(state: uiActorInfo): Props = Props(classOf[UiActor], state)
 }
