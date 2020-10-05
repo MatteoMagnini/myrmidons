@@ -8,7 +8,7 @@ import model.insects.{Enemy, ForagingAnt}
 import model.insects.info.{EnemyInfo, ForagingAntInfo}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.Messages.{AddFoodPheromone, AntTowardsAnthill, Context, EatFood, KillAnt, Move, StoreFood, TakeFood, UpdateInsect}
+import utility.Messages.{AddFoodPheromone, AntTowardsAnthill, Context, EatFood, KillInsect, Move, StoreFood, TakeFood, UpdateInsect}
 import utility.geometry.{Vector2D, ZeroVector2D}
 
 class InsectCompetencesTest extends TestKit(ActorSystem("InsectCompetencesTest"))
@@ -50,7 +50,7 @@ with BeforeAndAfterAll{
         val dieCompetence = Die[EnemyInfo]()
         assert(dieCompetence.hasPriority(insectInfo))
         dieCompetence(context,senderRef,insect,insectInfo,defaultBehaviour)
-        sender.expectMsgType[KillAnt]
+        sender.expectMsgType[KillInsect]
         sender expectNoMessage
 
       }

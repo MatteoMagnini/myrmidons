@@ -68,6 +68,8 @@ trait EnvironmentInfo {
   /** Remove an enemy reference */
   def removeEnemy(id: Int): EnvironmentInfo
 
+  def removeInsect(info: InsectInfo): EnvironmentInfo
+
   /** Add an ant reference */
   def addAnt(id: Int, ant: ActorRef): EnvironmentInfo
 }
@@ -132,6 +134,13 @@ object EnvironmentInfo {
     override def removeAnt(id: Int): EnvironmentInfo = this.copy(foragingAnts = foragingAnts - id)
 
     override def removeEnemy(id: Int): EnvironmentInfo = this.copy(enemies = enemies - id)
+
+    override def removeInsect(info: InsectInfo): EnvironmentInfo = info match {
+      case info: ForagingAntInfo => this.removeAnt(info.id)
+      case info: PatrollingAntInfo => this.removeAnt(info.id)
+      case info: EnemyInfo => this.removeEnemy(info.id)
+      case _ => System.err.println("Insect not found in removeInsect"); this
+    }
 
     override def addAnt(id: Int, ant: ActorRef): EnvironmentInfo = this.copy(foragingAnts = foragingAnts + (id -> ant))
 

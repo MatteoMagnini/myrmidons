@@ -25,7 +25,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
     case StartSimulation(nAnts: Int, nEnemies: Int, spawnFromAnthill: Boolean, obstaclesPresence, foodPresence) =>
       import Implicits._
-      val anthillInfo = AnthillInfo(state.boundary.center, 15, foodAmount = 5000)
+      val anthillInfo = AnthillInfo(state.boundary.center, 15, foodAmount = 2000)
       val anthill = context.actorOf(Anthill(anthillInfo, self), name = "anthill")
       val entities = if (!spawnFromAnthill) createEntitiesFromRandomPosition(nAnts, nEnemies, anthill)
       else createAntFromAnthill(nAnts, nEnemies, anthill, anthillInfo.position)
@@ -44,8 +44,6 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
          obstacles, foods, entities._1, entities._2, entities._3, anthill, Some(anthillInfo)))
 
     case Clock(value: Int) =>
-      /* Random birth of ants */
-      if (Random.nextDouble() < 0.01) self ! AntBirth(value)
       state.foragingAnts.values.foreach(_ ! Clock(value))
       state.patrollingAnts.values.foreach(_ ! Clock(value))
       state.enemies.values.foreach(_ ! Clock(value))
@@ -69,8 +67,8 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
         val obstacle = checkHaveInside(state.obstacles, newPosition)
         if (obstacle.nonEmpty) {
           // TODO: better name
-          val intersection = recursionCheck(obstacle, position, newPosition)
-          sender ! NewPosition(intersection._1, intersection._2)
+          val bouncedPosition = recursionCheck(obstacle, position, newPosition)
+          sender ! NewPosition(bouncedPosition._1, bouncedPosition._2)
 
         } else {
 
@@ -79,10 +77,11 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
           val food = checkHaveInside(state.foods, newPosition)
 
           if (food.nonEmpty) {
-            val nearestFood: Food = food.toList.sortWith((a, b) =>
+            val t = recursionCheck(food, position, newPosition)
+            val nearestFood: Food = food.toList.sortWith((a, b) =>  //TODO: Not correct in all case
                 position --> a.position < position --> b.position).head
             sender ! FoodNear(nearestFood.position)
-            sender ! NewPosition(position , ZeroVector2D()) // TODO: should bounce also on food!
+            sender ! NewPosition(t._1 , t._2) // TODO: should bounce also on food!
 
           } else {
             sender ! NewPosition(newPosition, newPosition - position)
@@ -119,11 +118,11 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       ant ! Clock(clock)
       context >>> defaultBehaviour(state.addAnt(antId, ant))
 
-    case KillAnt(id: Int) =>
+    case KillInsect(info: InsectInfo) =>
       context.stop(sender)
-      val newData = state.removeAnt(id)
-      if (newData.foragingAnts.isEmpty) state.gui.get ! Repaint(state.anthillInfo.get +: (state.obstacles ++ state.foods).toSeq)
+      val newData = state.removeInsect(info)
       sendInfoToGUI(newData)
+
 
     case AddFoodPheromone(pheromone: FoodPheromone, threshold: Double) =>
       context >>> defaultBehaviour(state.addPheromone(pheromone, threshold))
@@ -170,7 +169,6 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   }
 
   private def recursionCheck(obstacle: Iterable[Obstacle], position: Vector2D, newPosition: Vector2D):(Vector2D, Vector2D) = {
-    println(s"delta: ${(position-newPosition)||} --------- ${((position-newPosition)||) < 1E-7}")
     val res = handleObstacleIntersection(obstacle, position, newPosition)
     val intersection = res._1
     val delta = res._2
@@ -188,10 +186,10 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   private def handleObstacleIntersection(obstacle: Iterable[Obstacle], position: Vector2D, newPosition: Vector2D): (Vector2D, Vector2D) = {
   import Implicits._
 
-    val t = (for (f <- obstacle)
+    val intersectionOnOverlappedObstacle = (for (f <- obstacle)
       yield f.findIntersectionInformation(position, newPosition)).toList
 
-    val intersectionAndDirectionOpt = t
+    val intersectionAndDirectionOpt = intersectionOnOverlappedObstacle
       .filter(_.nonEmpty)
       .sortWith((a, b) => position --> a.intersectionPoint < position --> b.intersectionPoint).headOption
 
@@ -216,7 +214,10 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
   private def sendInfoToGUI(info: EnvironmentInfo): Unit = {
     /* When all insects return their positions, environment send them to GUI */
-    if ((info.foragingAntsInfo.size == info.foragingAnts.size) && (info.enemiesInfo.size == info.enemies.size)) {
+
+    if ((info.foragingAntsInfo.size == info.foragingAnts.size)
+      && (info.patrollingAntsInfo.size == info.patrollingAnts.size)
+      && (info.enemiesInfo.size == info.enemies.size)) {
       val fights = findFights(info.foragingAntsInfo, info.enemiesInfo)
       val updatedInfo = handleFights(info, fights)
 

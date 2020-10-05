@@ -91,7 +91,7 @@ object Messages {
 
   case class AntBirth(clock: Int) extends Message
 
-  case class KillAnt(id: Int) extends Message
+  case class KillInsect(info: InsectInfo) extends Message
 
   //TODO: just for test!
   case class Context(context: Option[ActorContext]) extends Message

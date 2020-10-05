@@ -7,6 +7,8 @@ import utility.Messages._
 import utility.geometry.Vectors.doubleInRange
 import utility.Parameters.Competence._
 
+import scala.util.Random
+
 case class AnthillInfo(override val position: Vector2D,
                        radius: Double,
                        foodAmount: Double,
@@ -51,7 +53,13 @@ case class Anthill(info: AnthillInfo, environment: ActorRef) extends Actor {
         environment.tell(Move(position, delta2), sender)
       }
 
-    case Clock(_) =>
+    case Clock(value) =>
+      //val antBirthValue = data.foodAmount / (data.maxFoodAmount * 2)
+      /* Random birth of ants */
+      if (Random.nextDouble() < 0.01) {
+        environment ! AntBirth(value)
+        self ! StoreFood(if (data.foodAmount < 10) -data.foodAmount else -10)
+      }
       environment ! UpdateAnthill(data)
 
   }

@@ -1,7 +1,7 @@
 package model.insects
 
 import akka.actor.{ActorRef, Props}
-import model.insects.competences.RandomWalk
+import model.insects.competences.{Die, RandomWalk}
 import model.insects.info.EnemyInfo
 import utility.Messages.{Clock, Context, FoodNear, NewPosition, UpdateInsect}
 
@@ -10,7 +10,7 @@ class Enemy(override val info: EnemyInfo,
 
   override def receive: Receive = defaultBehaviour(info)
 
-  private val competences = List(RandomWalk[EnemyInfo]())
+  private val competences = List(Die[EnemyInfo](), RandomWalk[EnemyInfo]())
 
   private def defaultBehaviour(data: EnemyInfo): Receive = {
 

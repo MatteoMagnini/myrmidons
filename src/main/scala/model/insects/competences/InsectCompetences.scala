@@ -2,7 +2,7 @@ package model.insects.competences
 
 import akka.actor.Actor.Receive
 import akka.actor.{ActorContext, ActorRef}
-import model.insects.info.SpecificInsectInfo
+import model.insects.info.{SpecificInsectInfo}
 import utility.Messages._
 import utility.geometry.Vectors._
 import utility.geometry._
@@ -61,7 +61,7 @@ case class RandomWalk[A <: SpecificInsectInfo[A]]() extends InsectCompetences[A]
 case class Die[A <: SpecificInsectInfo[A]]() extends InsectCompetences[A] {
 
   override def apply(context: ActorContext, environment: ActorRef, insect: ActorRef, info: A, behaviour: A => Receive): Unit =
-    environment.tell(KillAnt(info.id), insect)
+    environment.tell(KillInsect(info), insect)
 
   override def hasPriority(info: A): Boolean = info.energy <= 0
 }
