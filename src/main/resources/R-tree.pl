@@ -10,15 +10,14 @@ max(X1,X2,R) :- R is X2.
 range(X1,X2).
 % rangeDifference(+Range, +Range, -Difference) --> difference between ranges
 rangeDifference(range(X1,X2),range(Y1,Y2), D) :- X1>Y1, X2<Y2, D is (X1-Y1) + (Y2-X2), !.
-rangeDifference(range(X1,X2),range(Y1,Y2), D) :- X1>Y1, D is (X1-Y1), !.
-rangeDifference(range(X1,X2),range(Y1,Y2), D) :- X2<Y2, D is (Y2-X2), !.
-rangeDifference(range(X1,X2),range(Y1,Y2), D) :- D is 0.
+rangeDifference(range(X1,_),range(Y1,_), D) :- X1>Y1, D is (X1-Y1), !.
+rangeDifference(range(_,X2),range(_,Y2), D) :- X2<Y2, D is (Y2-X2), !.
+rangeDifference(range(_,_),range(_,_), D) :- D is 0.
 
 % contains(+Range, +Range) --> returns whether a range contains another one
 contains(range(X1,X2),range(Y1,Y2)) :- X1=<Y1, X2>=Y2.
-bigger(range(X1,X2),range(Y1,Y2)) :- X1>=Y1, X2>=Y2. % range 1 is bigger (comes after) range 2
 % maxRange(+Range, +Range, -Range) --> returns merge of two range
-maxRange(range(X1,X2), range(Y1,Y2), range(Z1,Z2)) :- min(X1,Y1,Z1), max(X2,Y2,Z2).
+mergeRange(range(X1,X2), range(Y1,Y2), range(Z1,Z2)) :- min(X1,Y1,Z1), max(X2,Y2,Z2).
 
 % Node: Rectangle with two dimensions.
 node(RangeX,RangeY).
@@ -37,7 +36,7 @@ tree(L,V,R).
 % createTree(+Tree, +Node, +Tree, -Tree) --> create a tree given left and right branch and root node
 createTree(L,V,R,tree(L,V,R)).
 % takeRoot(+Tree, -RootValue) --> returns root value of a tree
-takeRoot(tree(L,V,R),V).
+takeRoot(tree(_,V,_),V).
 % isLeaf(+Node, +Tree) --> returns whether a node is leaf
 isLeaf(N,tree(nil,N,nil)).
 
@@ -45,16 +44,18 @@ isLeaf(N,tree(nil,N,nil)).
 % Base case: insert a value in an empty tree
 insert(N, nil, tree(nil, N, nil)).
 
-% caso appena più avanzato: aggiunta valore ad albero con un valore radice
+% Add value to a single-value tree -- case: new value is inside root range
 insert(node(RangeX1, RangeY1), tree(nil,node(RangeX2, RangeY2),nil), O) :- 
 				nodeContains(node(RangeX2,RangeY2), RangeX1,RangeY1),
 				createTree(tree(nil,node(RangeX1, RangeY1),nil), node(RangeX2, RangeY2), nil, O), !.
 
+% Add value to a single-value tree -- case: new value isn't inside root range -> need to expand it
 insert(node(RangeX1, RangeY1), tree(nil,node(RangeX2, RangeY2),nil), O) :-
-				createNode(R1,R2,V), maxRange(RangeX1,RangeX2,R1), maxRange(RangeY1,RangeY2,R2),
+				createNode(R1,R2,V), mergeRange(RangeX1,RangeX2,R1), mergeRange(RangeY1,RangeY2,R2),
 				createTree(tree(nil,node(RangeX1, RangeY1),nil),V, tree(nil,node(RangeX2, RangeY2),nil), O), !.
 
-% caso appena più avanzato: aggiunta valore ad albero con un valore radice e un ramo vuoto
+% Add value to a tree with an empty branch --- 
+%%%%%%%%%%%%%%%%%% USELESS ????? %%%%%%%%%%%%%%%%%
 insert(node(RangeX1, RangeY1), tree(L,node(RangeX2, RangeY2), nil), O) :-
 				nodeContains(node(RangeX2,RangeY2),RangeX1,RangeY1),
 				createTree(L,node(RangeX2, RangeY2), tree(nil, node(RangeX1, RangeY1), nil) ,O), !.
@@ -64,27 +65,30 @@ insert(node(RangeX1, RangeY1), tree(nil,node(RangeX2, RangeY2),R), O) :-
 				createTree(tree(nil, node(RangeX1, RangeY1),nil), node(RangeX2, RangeY2), R ,O), !.
 
 insert(node(RangeX1, RangeY1), tree(L,node(RangeX2, RangeY2), nil), O) :-
-				createNode(R1,R2,V), maxRange(RangeX1,RangeX2,R1), maxRange(RangeY1,RangeY2,R2),
+				createNode(R1,R2,V), mergeRange(RangeX1,RangeX2,R1), mergeRange(RangeY1,RangeY2,R2),
 				createTree(L,V, tree(nil, node(RangeX1, RangeY1), nil) ,O), !.
 
 insert(node(RangeX1, RangeY1), tree(nil,node(RangeX2, RangeY2), R), O) :-
-				createNode(R1,R2,V), maxRange(RangeX1,RangeX2,R1), maxRange(RangeY1,RangeY2,R2),
+				createNode(R1,R2,V), mergeRange(RangeX1,RangeX2,R1), mergeRange(RangeY1,RangeY2,R2),
 				createTree(tree(nil, node(RangeX1, RangeY1), nil), V, R, O), !.
 
 %%%%%%%%%%%%%%%% da gestire range che si intersecano!!!!
 
-% caso generale: aggiunta valore ad albero 
+% General case: add value to an arbitrary tree
+% If new range does not exceed root range
+
+%%%%%%%% USELESS ???? %%%%%%%%%%
 insert(node(RangeX1, RangeY1), tree(L,node(RangeX2, RangeY2),R), tree(L2,node(RangeX2, RangeY2),R)) :- 
 				contains(RangeX2, RangeX1), contains(RangeY2, RangeY1), %radice contiene valore: vado giù a scegliere uno dei due nodi
 				takeRoot(L,V), nodeContains(V,RangeX1,RangeY1),
 				insert(node(RangeX1, RangeY1),L,L2), !.
 				
+%%%%%%%% USELESS ???? %%%%%%%%%%				
 insert(node(RangeX1, RangeY1), tree(L,node(RangeX2, RangeY2),R), tree(L,node(RangeX2, RangeY2),R2)) :- 
 				contains(RangeX2, RangeX1), contains(RangeY2, RangeY1), %radice contiene valore: vado giù a scegliere uno dei due nodi
 				takeRoot(R,V), nodeContains(V,RangeX1,RangeY1),
 				insert(node(RangeX1, RangeY1),R,R2), !.
 
-% caso default
 insert(node(RangeX1, RangeY1), tree(L,node(RangeX2, RangeY2),R), tree(L2,node(RangeX2, RangeY2),R)) :- 
 				contains(RangeX2, RangeX1), contains(RangeY2, RangeY1), %radice contiene valore: vado giù a scegliere uno dei due nodi
 				takeRoot(L,LV), takeRoot(R,RV),
@@ -95,9 +99,10 @@ insert(node(RangeX1, RangeY1), tree(L,node(RangeX2, RangeY2),R), tree(L,node(Ran
 				contains(RangeX2, RangeX1), contains(RangeY2, RangeY1), %radice contiene valore: vado giù a scegliere uno dei due nodi
 				insert(node(RangeX1, RangeY1),R,R2), !.
 
-insert(node(RangeX1, RangeY1), tree(L,node(RangeX2, RangeY2),R), X) :- 
-				createNode(R1,R2,V), maxRange(RangeX1,RangeX2,R1), maxRange(RangeY1,RangeY2,R2),
-				insert(node(RangeX1, RangeY1), tree(L, V, R), X).
+% If new range exceeds root range
+insert(node(RangeX1, RangeY1), tree(L,node(RangeX2, RangeY2),R), O) :- 
+				createNode(R1,R2,V), mergeRange(RangeX1,RangeX2,R1), mergeRange(RangeY1,RangeY2,R2),
+				insert(node(RangeX1, RangeY1), tree(L, V, R), O).
 
 
 %insert(node(range(6,7), range(6,7)),tree(tree(tree(nil,node(range(3,4),range(3,4)),nil),node(range(2,4),range(2,4)),tree(nil,node(range(2,3),range(2,3)),nil)),node(range(1,6),range(1,6)),tree(nil,node(range(5,6),range(5,6)),nil)), X).
