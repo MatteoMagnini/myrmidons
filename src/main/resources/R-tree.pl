@@ -14,7 +14,6 @@ rangeDifference(range(X1,X2),range(Y1,Y2), D) :- X1>Y1, D is (X1-Y1), !.
 rangeDifference(range(X1,X2),range(Y1,Y2), D) :- X2<Y2, D is (Y2-X2), !.
 rangeDifference(range(X1,X2),range(Y1,Y2), D) :- D is 0.
 
-
 % contains(+Range, +Range) --> returns whether a range contains another one
 contains(range(X1,X2),range(Y1,Y2)) :- X1=<Y1, X2>=Y2.
 bigger(range(X1,X2),range(Y1,Y2)) :- X1>=Y1, X2>=Y2. % range 1 is bigger (comes after) range 2
@@ -28,11 +27,10 @@ createNode(R1,R2,node(R1,R2)).
 % nodeContains(+Node, +Range, +Range) --> returns whether a node contains a certain interval
 nodeContains(node(RangeX1, RangeY1),RangeX2,RangeY2) :- contains(RangeX1,RangeX2), contains(RangeY1, RangeY2).
 % minDistantNode(+Range, +Range, +Node, +Node, -Node) --> returns node closer to certain range
-minDistantNode(RangeXI,RangeYI, node(RangeX1,RangeY1), node(RangeX2,RangeY2)) :- 
+leftMinDistantNode(RangeXI,RangeYI, node(RangeX1,RangeY1), node(RangeX2,RangeY2)) :- 
 				rangeDifference(RangeXI,RangeX1,L1), rangeDifference(RangeYI,RangeY1,L2),
 				rangeDifference(RangeXI,RangeX2,R1), rangeDifference(RangeYI,RangeY2,R2),
 				(L1+L2) < (R1+R2), !.
-minDistantNode(RangeXI,RangeYI, node(RangeX1,RangeY1), node(RangeX2,RangeY2)).
 
 % Tree: left branch, root value, right branch
 tree(L,V,R).
@@ -90,13 +88,17 @@ insert(node(RangeX1, RangeY1), tree(L,node(RangeX2, RangeY2),R), tree(L,node(Ran
 insert(node(RangeX1, RangeY1), tree(L,node(RangeX2, RangeY2),R), tree(L2,node(RangeX2, RangeY2),R)) :- 
 				contains(RangeX2, RangeX1), contains(RangeY2, RangeY1), %radice contiene valore: vado giù a scegliere uno dei due nodi
 				takeRoot(L,LV), takeRoot(R,RV),
-				minDistantNode(RangeX1,RangeY1,LV,RV),
+				leftMinDistantNode(RangeX1,RangeY1,LV,RV),
 				insert(node(RangeX1, RangeY1),L,L2), !.
+
+insert(node(RangeX1, RangeY1), tree(L,node(RangeX2, RangeY2),R), tree(L,node(RangeX2, RangeY2),R2)) :- 
+				contains(RangeX2, RangeX1), contains(RangeY2, RangeY1), %radice contiene valore: vado giù a scegliere uno dei due nodi
+				insert(node(RangeX1, RangeY1),R,R2), !.
+
+insert(node(RangeX1, RangeY1), tree(L,node(RangeX2, RangeY2),R), X) :- 
+				createNode(R1,R2,V), maxRange(RangeX1,RangeX2,R1), maxRange(RangeY1,RangeY2,R2),
+				insert(node(RangeX1, RangeY1), tree(L, V, R), X).
+
+
+%insert(node(range(6,7), range(6,7)),tree(tree(tree(nil,node(range(3,4),range(3,4)),nil),node(range(2,4),range(2,4)),tree(nil,node(range(2,3),range(2,3)),nil)),node(range(1,6),range(1,6)),tree(nil,node(range(5,6),range(5,6)),nil)), X).
 				
-
-%insert(node(range(1,2), range(1,2)), tree(tree(nil,node(range(0,3),range(0,3)),nil),node(range(0,6),range(0,6)),tree(nil,node(range(3,6),range(3,6)),nil)), X).
-%insert(node(range(1,2), range(1,2)), tree(nil,node(range(3,4),range(3,4)),nil), X).
-%insertSimpleValue(V, tree(L,V2,R), tree(L,V2,R2)) :- insertSimpleValue(V,R,R2).
-
-
-%insertSimpleValue( node(range(1,2), range(2,3)), tree(nil,node(range(0,3),range(1,4)),nil), X).
