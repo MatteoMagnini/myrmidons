@@ -30,6 +30,7 @@ leftMinDistantNode(RangeXI,RangeYI, node(RangeX1,RangeY1), node(RangeX2,RangeY2)
 				rangeDifference(RangeXI,RangeX1,L1), rangeDifference(RangeYI,RangeY1,L2),
 				rangeDifference(RangeXI,RangeX2,R1), rangeDifference(RangeYI,RangeY2,R2),
 				(L1+L2) =< (R1+R2), !.
+nodeMinRange(node(RangeX1, RangeY1), node(RangeX2, RangeY2), node(RangeX3, RangeY3)) :- mergeRange(RangeX1, RangeX2, RangeX3), mergeRange(RangeY1, RangeY2, RangeY3). 
 
 % Tree: left branch, root value, right branch
 tree(L,V,R).
@@ -88,6 +89,22 @@ insert(node(RangeX1, RangeY1), tree(L,node(RangeX2, RangeY2),R), O) :-
 
 %insert(node(range(6,7), range(6,7)),tree(tree(tree(nil,node(range(3,4),range(3,4)),nil),node(range(2,4),range(2,4)),tree(nil,node(range(2,3),range(2,3)),nil)),node(range(1,6),range(1,6)),tree(nil,node(range(5,6),range(5,6)),nil)), X).
 
+remove(node(RangeXI,RangeYI), tree(L,node(RangeX, RangeY),R), tree(T,node(RangeX, RangeY), R)) :- 
+				contains(RangeX, RangeXI), contains(RangeY,RangeYI),
+				takeRoot(L,V), nodeContains(V,RangeXI,RangeYI),
+				remove(node(RangeXI,RangeYI),L, T), !.
+								
+remove(node(RangeXI,RangeYI), tree(L,node(RangeX, RangeY),R), tree(L,node(RangeX, RangeY), T)) :- 
+				contains(RangeX, RangeXI), contains(RangeY,RangeYI),
+				takeRoot(R,V), nodeContains(V,RangeXI,RangeYI),
+				remove(node(RangeXI,RangeYI),R, T), !.
+
+remove(node(RangeXI,RangeYI), tree(L,node(RangeX, RangeY),R),tree(L,node(RangeX, RangeY),R)).
+
+fixTree(tree(L, node(RangeX1, RangeY1), R), Tree) :- 
+				takeRoot(L, LV), takeRoot(R, RV), nodeMinRange(LV, RV, V),
+				createTree(L, V, R, T), fixTree(T, Tree).
+				
 
 %%%%%%%%%%%%%%%%%%%%% QUERY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -103,6 +120,6 @@ query(tree(L,node(RangeX, RangeY),R),RangeXI,RangeYI, OTree) :-
 
 query(tree(L,node(RangeX, RangeY),R),RangeXI,RangeYI, tree(L,node(RangeX, RangeY),R)) :-
 				contains(RangeX, RangeXI), contains(RangeY,RangeYI).
-				
+
 				
 %tree(tree(tree(nil,node(range(2,3),range(7,8)),nil),node(range(2,4),range(5,8)),tree(nil,node(range(3,4),range(5,6)),nil)),node(range(1,7),range(1,8)),tree(tree(nil,node(range(6,7),range(3,4)),nil),node(range(1,7),range(1,4)),tree(nil,node(range(1,2),range(1,2)),nil)))
