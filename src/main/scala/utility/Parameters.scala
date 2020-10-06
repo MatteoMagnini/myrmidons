@@ -6,21 +6,21 @@ import scala.util.Random
 object Parameters {
 
   object ForagingAnt {
-    def MAX_ENERGY = 100.0
-    def MAX_FOOD = 10.0
-    def FOOD_ENERGY_CONVERSION = 10.0
-    def STARTING_ENERGY = 100.0
-    def STARTING_TIME = 0
-    def STARTING_FOOD_AMOUNT = 0.0
-    def STARTING_POSITION: Vector2D = ZeroVector2D()
+    val MAX_ENERGY = 100.0
+    val MAX_FOOD = 10.0
+    val FOOD_ENERGY_CONVERSION = 10.0
+    val STARTING_ENERGY = 100.0
+    val STARTING_TIME = 0
+    val STARTING_FOOD_AMOUNT = 0.0
+    val STARTING_POSITION: Vector2D = ZeroVector2D()
   }
 
   object GUIConstant {
-    def ANT_SIZE = 4
-    def PHEROMONE_SIZE = 7
-    def FIGHT_SIZE = 20
-    def SET_TO_CENTER = 2
-    def OBSTACLE_SIZE = 20
+    val ANT_SIZE = 4
+    val PHEROMONE_SIZE = 7
+    val FIGHT_SIZE = 20
+    val SET_TO_CENTER = 2
+    val OBSTACLE_SIZE = 20
   }
 
   object Competence {
@@ -37,6 +37,12 @@ object Parameters {
     val ENERGY_SF: Double = -0.1
     val ENERGY_FPT: Double = -0.3
     val RANDOM: Random.type = scala.util.Random
+  }
+
+  object Environment {
+    val ANTHILL_RADIUS = 15
+    val FOOD_AMOUNT = 2000
+    val FOOD_RADIUS = (100, 150)
   }
 
 }

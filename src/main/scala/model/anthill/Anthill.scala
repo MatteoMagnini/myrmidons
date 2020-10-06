@@ -2,7 +2,9 @@ package model.anthill
 
 import akka.actor.{Actor, ActorRef, Props}
 import model.Drawable
-import utility.geometry.{OrientedVector2D, OrientedVector2DWithNoise, Vector2D, ZeroVector2D}
+import model.insects.{Enemy, ForagingAnt, PatrollingAnt}
+import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
+import utility.geometry._
 import utility.Messages._
 import utility.geometry.Vectors.doubleInRange
 import utility.Parameters.Competence._
@@ -62,6 +64,15 @@ case class Anthill(info: AnthillInfo, environment: ActorRef) extends Actor {
       }
       environment ! UpdateAnthill(data)
 
+    case CreateEntities(nAnts: Int, foragingProbability: Double) =>
+    /** Returns ants and enemies references, creating ants from the center of boundary */
+      val foragingAnts = (0 until (nAnts * foragingProbability).toInt).map(i => {
+        i -> context.actorOf(ForagingAnt(ForagingAntInfo(self, id = i, position = info.position), sender), s"f-ant-$i")
+      }).toMap
+      val patrollingAnts = (foragingAnts.size until foragingAnts.size + (nAnts * (1 - foragingProbability)).toInt).map(i => {
+        i -> context.actorOf(PatrollingAnt(PatrollingAntInfo(self, id = i, position = info.position), sender), s"p-ant-$i")
+      }).toMap
+      sender ! NewEntities(foragingAnts ++ patrollingAnts)
   }
 }
 

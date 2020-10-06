@@ -3,7 +3,7 @@ package view.actor
 import view.actor.uiMessage.{RestartSimulation, StepOver, StopSimulation}
 import akka.actor.{Actor, ActorContext, ActorLogging, Props, Timers}
 import model.Drawable
-import utility.Messages.{Clock, Repaint}
+import utility.Messages.{Clock, Ready, Repaint}
 
 import scala.concurrent.duration.DurationInt
 
@@ -21,6 +21,7 @@ class UiActor(state: uiActorInfo)
 
   private def defaultBehaviour(state: uiActorInfo): Receive = {
 
+    case Ready => timers.startSingleTimer(state.currentState, StepOver, 30.millis)
 
     case Repaint(info: Seq[Drawable]) =>
 

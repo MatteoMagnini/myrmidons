@@ -1,6 +1,6 @@
 package view.scene
 
-import akka.actor.{ActorRef, ActorSystem, Props}
+import akka.actor.{ActorRef, ActorSystem}
 import model.environment.{Boundary, Environment, EnvironmentInfo}
 import utility.Messages.{Clock, StartSimulation}
 import view.actor.{UiActor, uiActorInfo}
@@ -77,8 +77,8 @@ case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends FlowPanel {
   }
 
   private def tellStart(): Unit = {
-    environment.tell(StartSimulation(100, 10, spawnFromAnthill = true, obstacles = Some(5)), uiActor)
-    environment.tell(Clock(1), uiActor)
+    environment.tell(StartSimulation(100, 10, obstacles = Some(5)), uiActor)
+    //environment.tell(Clock(1), uiActor)
   }
 
 }

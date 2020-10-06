@@ -1,6 +1,7 @@
 package model.insects
 
 import akka.actor.{ActorRef, Props}
+import model.environment.FoodPheromone
 import model.insects.competences.RandomWalk
 import model.insects.info.PatrollingAntInfo
 import utility.Messages.{Clock, NewPosition, UpdateInsect}
@@ -23,6 +24,7 @@ case class PatrollingAnt (override val info: PatrollingAntInfo,
       environment ! UpdateInsect(newData)
       context become defaultBehaviour(newData)
 
+    case x =>
   }
 }
 
