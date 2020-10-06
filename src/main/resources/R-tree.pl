@@ -89,6 +89,8 @@ insert(node(RangeX1, RangeY1), tree(L,node(RangeX2, RangeY2),R), O) :-
 
 %insert(node(range(6,7), range(6,7)),tree(tree(tree(nil,node(range(3,4),range(3,4)),nil),node(range(2,4),range(2,4)),tree(nil,node(range(2,3),range(2,3)),nil)),node(range(1,6),range(1,6)),tree(nil,node(range(5,6),range(5,6)),nil)), X).
 
+remove(node(RangeX,RangeY), tree(nil,node(RangeX, RangeY),nil), nil) :- !.
+
 remove(node(RangeXI,RangeYI), tree(L,node(RangeX, RangeY),R), tree(T,node(RangeX, RangeY), R)) :- 
 				contains(RangeX, RangeXI), contains(RangeY,RangeYI),
 				takeRoot(L,V), nodeContains(V,RangeXI,RangeYI),
@@ -101,10 +103,22 @@ remove(node(RangeXI,RangeYI), tree(L,node(RangeX, RangeY),R), tree(L,node(RangeX
 
 remove(node(RangeXI,RangeYI), tree(L,node(RangeX, RangeY),R),tree(L,node(RangeX, RangeY),R)).
 
+fixTree(nil, nil).
+fixTree(tree(nil,node(RangeX1,RangeY1), nil), tree(nil, node(RangeX1, RangeY1), nil)):- !.
+fixTree(tree(nil, node(RangeX1, RangeY1), R), Tree) :- 
+				takeRoot(R, RV),
+				fixTree(R, T2), createTree(nil, RV, T2, Tree), !.		
+fixTree(tree(L, node(RangeX1, RangeY1), nil), Tree) :- 
+				takeRoot(L, LV),
+				fixTree(L, T1), createTree(T1, LV, nil, Tree), !.
 fixTree(tree(L, node(RangeX1, RangeY1), R), Tree) :- 
 				takeRoot(L, LV), takeRoot(R, RV), nodeMinRange(LV, RV, V),
-				createTree(L, V, R, T), fixTree(T, Tree).
-				
+				fixTree(L, T1), fixTree(R, T2), createTree(T1, V, T2, Tree).
+
+removeWithFix(Node, ITree, OTree) :- remove(Node, ITree, TTree), fixTree(TTree, OTree).
+			
+%remove( node(range(1,2), range(1,2)), tree(tree(nil, node(range(1,2), range(1,2)), nil), node(range(1,3), range(1,3)), tree(nil, node(range(2,3), range(2,3)), nil)), X).				
+
 getLeavesList(tree(nil, V, nil), [V]) :- !.
 getLeavesList(tree(L, V, R), List) :- getLeavesList(L, L1), getLeavesList(R, L2), append(L1,L2,List).
 
