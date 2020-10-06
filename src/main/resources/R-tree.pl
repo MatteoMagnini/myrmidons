@@ -105,6 +105,8 @@ fixTree(tree(L, node(RangeX1, RangeY1), R), Tree) :-
 				takeRoot(L, LV), takeRoot(R, RV), nodeMinRange(LV, RV, V),
 				createTree(L, V, R, T), fixTree(T, Tree).
 				
+getLeavesList(tree(nil, V, nil), [V]) :- !.
+getLeavesList(tree(L, V, R), List) :- getLeavesList(L, L1), getLeavesList(R, L2), append(L1,L2,List).
 
 %%%%%%%%%%%%%%%%%%%%% QUERY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -121,5 +123,6 @@ query(tree(L,node(RangeX, RangeY),R),RangeXI,RangeYI, OTree) :-
 query(tree(L,node(RangeX, RangeY),R),RangeXI,RangeYI, tree(L,node(RangeX, RangeY),R)) :-
 				contains(RangeX, RangeXI), contains(RangeY,RangeYI).
 
-				
+queryToList(Tree, Range1, Range2, List) :- query(Tree, Range1, Range2, Otree), getLeavesList(Otree, List).
+
 %tree(tree(tree(nil,node(range(2,3),range(7,8)),nil),node(range(2,4),range(5,8)),tree(nil,node(range(3,4),range(5,6)),nil)),node(range(1,7),range(1,8)),tree(tree(nil,node(range(6,7),range(3,4)),nil),node(range(1,7),range(1,4)),tree(nil,node(range(1,2),range(1,2)),nil)))
