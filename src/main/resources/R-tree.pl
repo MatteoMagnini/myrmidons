@@ -89,7 +89,20 @@ insert(node(RangeX1, RangeY1), tree(L,node(RangeX2, RangeY2),R), O) :-
 %insert(node(range(6,7), range(6,7)),tree(tree(tree(nil,node(range(3,4),range(3,4)),nil),node(range(2,4),range(2,4)),tree(nil,node(range(2,3),range(2,3)),nil)),node(range(1,6),range(1,6)),tree(nil,node(range(5,6),range(5,6)),nil)), X).
 
 
+%%%%%%%%%%%%%%%%%%%%% QUERY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+query(tree(L,node(RangeX, RangeY),R),RangeXI,RangeYI, OTree) :- 
+				contains(RangeX, RangeXI), contains(RangeY,RangeYI),
+				takeRoot(L,V), nodeContains(V,RangeXI,RangeYI),
+				query(L, RangeXI,RangeYI, OTree), !.
 
+query(tree(L,node(RangeX, RangeY),R),RangeXI,RangeYI, OTree) :- 
+				contains(RangeX, RangeXI), contains(RangeY,RangeYI),
+				takeRoot(R,V), nodeContains(V,RangeXI,RangeYI),
+				query(R, RangeXI,RangeYI, OTree), !.
 
-
+query(tree(L,node(RangeX, RangeY),R),RangeXI,RangeYI, tree(L,node(RangeX, RangeY),R)) :-
+				contains(RangeX, RangeXI), contains(RangeY,RangeYI).
+				
+				
+%tree(tree(tree(nil,node(range(2,3),range(7,8)),nil),node(range(2,4),range(5,8)),tree(nil,node(range(3,4),range(5,6)),nil)),node(range(1,7),range(1,8)),tree(tree(nil,node(range(6,7),range(3,4)),nil),node(range(1,7),range(1,4)),tree(nil,node(range(1,2),range(1,2)),nil)))
