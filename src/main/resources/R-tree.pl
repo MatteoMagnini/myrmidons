@@ -21,8 +21,6 @@ mergeRange(range(X1,X2), range(Y1,Y2), range(Z1,Z2)) :- min(X1,Y1,Z1), max(X2,Y2
 
 % Node: Rectangle with two dimensions.
 node(RangeX,RangeY).
-% createNode(+Range, +Range, -Node) --> creation of a node, given two range
-createNode(R1,R2,node(R1,R2)).
 % nodeContains(+Node, +Range, +Range) --> returns whether a node contains a certain interval
 nodeContains(node(RangeX1, RangeY1),RangeX2,RangeY2) :- contains(RangeX1,RangeX2), contains(RangeY1, RangeY2).
 % minDistantNode(+Range, +Range, +Node, +Node, -Node) --> returns whether left node is closer to certain range wrt right node
@@ -55,7 +53,7 @@ insert(node(RangeX1, RangeY1), tree(nil,node(RangeX2, RangeY2),nil), O) :-
 
 % Add value to a single-value tree -- case: new value isn't inside root range -> need to expand it
 insert(node(RangeX1, RangeY1), tree(nil,node(RangeX2, RangeY2),nil), O) :-
-				createNode(R1,R2,V), mergeRange(RangeX1,RangeX2,R1), mergeRange(RangeY1,RangeY2,R2),
+				nodeMinRange(node(RangeX1, RangeY1), node(RangeX2, RangeY2), V),
 				createTree(tree(nil,node(RangeX1, RangeY1),nil),V, tree(nil,node(RangeX2, RangeY2),nil), O), !.
 
 % General case: add value to an arbitrary tree
@@ -90,7 +88,7 @@ insert(node(RangeX1, RangeY1), tree(L,node(RangeX2, RangeY2),R), O) :-
 				
 % If new range exceeds root range in X or Y, not both
 insert(node(RangeX1, RangeY1), tree(L,node(RangeX2, RangeY2),R), O) :- 
-				createNode(R1,R2,V), mergeRange(RangeX1,RangeX2,R1), mergeRange(RangeY1,RangeY2,R2),
+				nodeMinRange(node(RangeX1, RangeY1), node(RangeX2, RangeY2), V),
 				insert(node(RangeX1, RangeY1), tree(L, V, R), O).
 
 %insert(node(range(6,7), range(6,7)),tree(tree(tree(nil,node(range(3,4),range(3,4)),nil),node(range(2,4),range(2,4)),tree(nil,node(range(2,3),range(2,3)),nil)),node(range(1,6),range(1,6)),tree(nil,node(range(5,6),range(5,6)),nil)), X).
