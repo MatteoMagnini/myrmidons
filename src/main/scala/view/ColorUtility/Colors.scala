@@ -22,7 +22,7 @@ object Colors {
       ANTHILL_COLOR_COMPONENT._3, anthillFood)
   }
 
-  private def FOOD_PHEROMONE_COLOR_COMPONENT: (Float, Float, Float) = (1f, 0.1f, 0.02f)
+  private def FOOD_PHEROMONE_COLOR_COMPONENT: (Float, Float, Float) = (0.0f, 0.9f, 0.02f)
 
   private def DANGER_PHEROMONE_COLOR_COMPONENT: (Float, Float, Float) = (0.5f, 0.0f, 0.5f)
 
@@ -31,7 +31,7 @@ object Colors {
   }
 
   def DANGER_PHEROMONE_COLOR(intensity: Float): Color = {
-    if (intensity < 0.3f) FOOD_PHEROMONE_COLOR_SET(0.3f) else DANGER_PHEROMONE_COLOR_SET(intensity)
+    if (intensity < 0.3f) DANGER_PHEROMONE_COLOR_SET(0.3f) else DANGER_PHEROMONE_COLOR_SET(intensity)
   }
 
   private def FOOD_PHEROMONE_COLOR_SET(intensity: Float): Color = {

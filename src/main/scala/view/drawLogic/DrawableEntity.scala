@@ -49,7 +49,7 @@ object DrawableEntities {
     import utility.Parameters.Pheromones._
 
     override def draw(elem: DangerPheromone, g: Graphics2D, size: Dimension): Unit = {
-      val pheromoneIntensity: Float = elem.intensity / 1000//DangerPheromoneInfo.MAX_INTENSITY
+      val pheromoneIntensity: Float = elem.intensity / DangerPheromoneInfo.MAX_INTENSITY
       g.setColor(DANGER_PHEROMONE_COLOR(pheromoneIntensity))
       drawEllipse(elem.position.x - (PHEROMONE_SIZE / SET_TO_CENTER),
         size.height - elem.position.y - (PHEROMONE_SIZE / SET_TO_CENTER),
