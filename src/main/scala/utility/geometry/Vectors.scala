@@ -1,5 +1,7 @@
 package utility.geometry
 
+import VectorsImplicits._
+
 object Vectors {
 
   /** Double equivalence with a certain precision check.
@@ -19,6 +21,44 @@ object Vectors {
     */
   def doubleInRange(min: Double, max: Double): Double =
     min + (max - min) * scala.util.Random.nextDouble()
+
+  /**
+   * This function return the intersection point of two line.
+   *
+   * @param seg1 (startSegPoint, stopSegPoint, lineVector)
+   * @param seg2 (startSegPoint, stopSegPoint, lineVector)
+   *
+   * @return an Option[Vector2D] if the intersection point of
+   *         the two segment are found, otherwise return None
+   * */
+  def findIntersectionPoint(seg1: (Vector2D, Vector2D, Vector3D),
+                                    seg2: (Vector2D, Vector2D, Vector3D)): Option[Vector2D] = {
+    val crossIntersection = seg1._3 X seg2._3
+    if (!(Vectors ~= (crossIntersection.z, 0.0, 1E-7))) {
+      val intersection = crossIntersection / crossIntersection.z
+      if ((intersection checkInside(seg1._1, seg1._2))
+        && (intersection checkInside(seg2._1, seg2._2))) {
+        return Some(intersection)
+      }
+    }
+    None
+  }
+
+  /**
+   * This function return the angle (in radians) formed by segment
+   * line intersection.
+   *
+   * @param seg1 (startSegPoint, stopSegPoint, lineVector)
+   * @param seg2 (startSegPoint, stopSegPoint, lineVector)
+   *
+   * @return angle
+   * */
+  def findIntersectionAngle(seg1: (Vector2D, Vector2D, Vector3D),
+                                    seg2: (Vector2D, Vector2D, Vector3D)): Double = {
+    val seg1Vector: Vector2D =  seg1._2 - seg1._1
+    val seg2Vector: Vector2D =  seg2._2 - seg2._1
+    seg2Vector ^ seg1Vector
+  }
 
 }
 

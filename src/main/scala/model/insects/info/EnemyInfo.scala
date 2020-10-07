@@ -1,6 +1,6 @@
 package model.insects.info
 
-import utility.Parameters.ForagingAntConstant._
+import utility.Parameters.ForagingAnt._
 import utility.geometry.{Vector2D, ZeroVector2D}
 
 case class EnemyInfo(override val id: Int,

@@ -2,7 +2,7 @@ package model
 
 
 import utility.geometry.Vector2D
-import model.insects.info.{EnemyInfo, ForagingAntInfo, SpecificInsectInfo}
+import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo, SpecificInsectInfo}
 
 
 object Fights {
@@ -40,9 +40,12 @@ object Fights {
   object InsectFight {
 
     /** An implementation of [[FightOutcome]], in the case of a fight between insects. */
-    implicit val insectFight: FightOutcome[ForagingAntInfo, EnemyInfo] =
+    implicit val foragingInsectFight: FightOutcome[ForagingAntInfo, EnemyInfo] =
       (firstFighter: ForagingAntInfo, secondFighter: EnemyInfo) =>
         if (firstFighter.energy < secondFighter.energy) Left(firstFighter) else Right(secondFighter)
+
+    implicit val patrollingInsectFight: FightOutcome[PatrollingAntInfo, EnemyInfo] =
+      (firstFighter: PatrollingAntInfo, secondFighter: EnemyInfo) => Left(firstFighter)
 
     //TODO: add patrolling and other cases
 

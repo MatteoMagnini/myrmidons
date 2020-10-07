@@ -2,8 +2,14 @@ package model.anthill
 
 import akka.actor.{Actor, ActorRef, Props}
 import model.Drawable
-import utility.geometry.{OrientedVector2DWithNoise, Vector2D, ZeroVector2D}
+import model.insects.{Enemy, ForagingAnt, PatrollingAnt}
+import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
+import utility.geometry._
 import utility.Messages._
+import utility.geometry.Vectors.doubleInRange
+import utility.Parameters.Competence._
+
+import scala.util.Random
 
 case class AnthillInfo(override val position: Vector2D,
                        radius: Double,
@@ -37,20 +43,36 @@ case class Anthill(info: AnthillInfo, environment: ActorRef) extends Actor {
       sender ! EatFood(newDelta)
       context become defaultBehaviour(newData)
 
-    case AntTowardsAnthill(position, maxSpeed, noise, antIsIn) =>
+    case AntTowardsAnthill(position, maxSpeed, inertia, noise, antIsIn) =>
       val dist = info.position - position
       if (!antIsIn && dist.|| <= data.radius) {
         sender ! UpdateAnthillCondition(true)
         environment.tell(Move(position, ZeroVector2D()), sender)
       } else {
-        val rad = dist./\
+        val rad = dist /\
         val delta = OrientedVector2DWithNoise(rad, maxSpeed, noise)
-        environment.tell(Move(position, delta), sender)
+        val delta2 = OrientedVector2D((delta >> (inertia * INERTIA_FACTOR))./\, doubleInRange(MIN_VELOCITY, MAX_VELOCITY))
+        environment.tell(Move(position, delta2), sender)
       }
 
-    case Clock(_) =>
+    case Clock(value) =>
+      //val antBirthValue = data.foodAmount / (data.maxFoodAmount * 2)
+      /* Random birth of ants */
+      if (Random.nextDouble() < 0.01) {
+        environment ! AntBirth(value)
+        self ! StoreFood(if (data.foodAmount < 10) -data.foodAmount else -10)
+      }
       environment ! UpdateAnthill(data)
 
+    case CreateEntities(nAnts: Int, foragingProbability: Double) =>
+    /** Returns ants and enemies references, creating ants from the center of boundary */
+      val foragingAnts = (0 until (nAnts * foragingProbability).toInt).map(i => {
+        i -> context.actorOf(ForagingAnt(ForagingAntInfo(self, id = i, position = info.position), sender), s"f-ant-$i")
+      }).toMap
+      val patrollingAnts = (foragingAnts.size until foragingAnts.size + (nAnts * (1 - foragingProbability)).toInt).map(i => {
+        i -> context.actorOf(PatrollingAnt(PatrollingAntInfo(self, id = i, position = info.position), sender), s"p-ant-$i")
+      }).toMap
+      sender ! NewEntities(foragingAnts ++ patrollingAnts)
   }
 }
 

@@ -5,16 +5,16 @@ import akka.testkit.{TestKit, TestProbe}
 import utility.geometry.TupleOp2._
 import model.anthill.{Anthill, AnthillInfo}
 import model.environment.FoodPheromone
-import model.environment.elements.Food
+import model.environment.elements.{Food, Obstacle}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import utility.geometry._
 import utility.Messages._
-import model.insects.Constant._
+import utility.Parameters.Competence._
 import model.insects.info.ForagingAntInfo
 import utility.Message
-import utility.Parameters.ForagingAntConstant._
+import utility.Parameters.ForagingAnt._
 
 class InsectTest extends TestKit(ActorSystem("InsectTest"))
   with AnyWordSpecLike
@@ -108,7 +108,7 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
 
       "update the sensor in presence of pheromones" in {
         assert(info.foodPheromones.isEmpty)
-        val info2 = info.updateFoodPheromones(pheromones).asInstanceOf[ForagingAntInfo]
+        val info2 = info.updateFoodPheromones(pheromones)
         assert(info2.foodPheromones.nonEmpty)
       }
 
@@ -148,7 +148,7 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
 
       "die" in {
         ant ! Clock(1)
-        sender.expectMsgType[KillAnt]
+        sender.expectMsgType[KillInsect]
         sender expectNoMessage
       }
     }
@@ -156,7 +156,7 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
 
   "Foraging ant" when {
 
-    val food = Food((2.0,2.0), MAX_FOOD * 2)
+    val food = Food((2.0,2.0), MAX_FOOD * 2, Obstacle((2,2), if (math.sqrt( MAX_FOOD * 2) < 5) 5 else math.sqrt( MAX_FOOD * 2),16))
     val anthillInfo = AnthillInfo(ZeroVector2D())
     val anthill = system.actorOf(Anthill(anthillInfo,senderRef), "anthill2")
     val startingAntPosition = (1,3)
