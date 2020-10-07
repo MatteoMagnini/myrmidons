@@ -7,7 +7,7 @@ import scala.swing.{FlowPanel, Label, Separator}
  * FlowPanel with short legend to understand color entities.
  */
 
-case class LabelPane() extends FlowPanel {
+private[view] case class LabelPane() extends FlowPanel {
 
   private val ant = new Label("Ant")
   private val food = new Label("Food")

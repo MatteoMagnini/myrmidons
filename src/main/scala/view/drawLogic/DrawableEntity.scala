@@ -7,8 +7,10 @@ import model.Fights.Fight
 import model.anthill.AnthillInfo
 import model.environment.elements.{Food, Obstacle}
 import model.environment.pheromones.{DangerPheromone, FoodPheromone}
+import utility.Parameters.Pheromones.FoodPheromoneInfo.MAX_INTENSITY
 import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
 import utility.Parameters.GUIConstant._
+import utility.Parameters.Pheromones.FoodPheromoneInfo
 import view.ColorUtility.Colors._
 
 import scala.swing.{Dimension, Graphics2D}
@@ -28,21 +30,6 @@ object DrawableEntities {
     g.fill(ellipse)
   }
 
-  implicit object drawFoodPheromone extends DrawableEntity[FoodPheromone] {
-
-    import ImplicitConversion._
-    import utility.Parameters.Pheromones._
-
-    override def draw(elem: FoodPheromone, g: Graphics2D, size: Dimension): Unit = {
-      val pheromoneIntensity: Float = elem.intensity / FoodPheromoneInfo.MAX_INTENSITY
-      g.setColor(FOOD_PHEROMONE_COLOR(pheromoneIntensity))
-      drawEllipse(elem.position.x - (PHEROMONE_SIZE / SET_TO_CENTER),
-        size.height - elem.position.y - (PHEROMONE_SIZE / SET_TO_CENTER),
-        PHEROMONE_SIZE, PHEROMONE_SIZE, g
-      )
-    }
-  }
-
   implicit object drawDangerPheromone extends DrawableEntity[DangerPheromone] {
 
     import ImplicitConversion._
@@ -51,6 +38,19 @@ object DrawableEntities {
     override def draw(elem: DangerPheromone, g: Graphics2D, size: Dimension): Unit = {
       val pheromoneIntensity: Float = elem.intensity / DangerPheromoneInfo.MAX_INTENSITY
       g.setColor(DANGER_PHEROMONE_COLOR(pheromoneIntensity))
+      drawEllipse(elem.position.x - (PHEROMONE_SIZE / SET_TO_CENTER),
+        size.height - elem.position.y - (PHEROMONE_SIZE / SET_TO_CENTER),
+        PHEROMONE_SIZE, PHEROMONE_SIZE, g
+      )
+    }
+  }
+  implicit object drawPheromone extends DrawableEntity[FoodPheromone] {
+
+    import ImplicitConversion._
+
+    override def draw(elem: FoodPheromone, g: Graphics2D, size: Dimension): Unit = {
+      val pheromoneIntensity: Float = elem.intensity / FoodPheromoneInfo.MAX_INTENSITY
+      g.setColor(FOOD_PHEROMONE_COLOR(pheromoneIntensity))
       drawEllipse(elem.position.x - (PHEROMONE_SIZE / SET_TO_CENTER),
         size.height - elem.position.y - (PHEROMONE_SIZE / SET_TO_CENTER),
         PHEROMONE_SIZE, PHEROMONE_SIZE, g

@@ -1,9 +1,11 @@
 package view.actor
 
-import view.actor.uiMessage.{RestartSimulation, StepOver, StopSimulation}
+import view.actor.uiMessage.{RestartSimulation, SaveInfo, StepOver, StopSimulation}
 import akka.actor.{Actor, ActorContext, ActorLogging, Props, Timers}
 import model.Drawable
-import utility.Messages.{Clock, Ready, Repaint}
+
+import utility.Messages.{Clock, Repaint,Ready}
+
 
 import scala.concurrent.duration.DurationInt
 
@@ -24,7 +26,7 @@ class UiActor(state: uiActorInfo)
     case Ready => timers.startSingleTimer(state.currentState, StepOver, 30.millis)
 
     case Repaint(info: Seq[Drawable]) =>
-
+      if(state.currentState % 20 == 0) state.control.reportManager.tell(SaveInfo(info),self)
       val entitiesProperties = state.setEntities(info)
       state.drawEntities()
       state.setControl(state.currentState, entitiesProperties)
