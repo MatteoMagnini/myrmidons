@@ -25,6 +25,7 @@ case class DangerPheromoneTaxis() extends PatrollingAntCompetences {
     context >>> behaviour(data.updateDangerPheromones(Seq.empty))
   }
 
-  override def hasPriority(info: PatrollingAntInfo): Boolean = true
+  override def hasPriority(info: PatrollingAntInfo): Boolean =
+    info.dangerPheromones.toStream.exists(p => p.position --> info.position < DANGER_PHEROMONE_RANGE)
 
 }

@@ -5,7 +5,7 @@ import model.Drawable
 import model.Fights.Fight
 import model.anthill.AnthillInfo
 import model.environment.elements.{Food, Obstacle}
-import model.environment.pheromones.FoodPheromone
+import model.environment.pheromones.{DangerPheromone, FoodPheromone}
 import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
 import view.drawLogic.singletonList
 
@@ -47,6 +47,8 @@ case class MyrmidonsPanel() extends Panel {
         case entity: EnemyInfo => draw(entity, g, size)
 
         case entity: FoodPheromone => draw(entity, g, size)
+
+        case entity: DangerPheromone => draw(entity, g, size)
 
         case entity: Fight[ForagingAntInfo, EnemyInfo] => draw(entity, g, size)
 

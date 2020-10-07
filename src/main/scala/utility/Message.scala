@@ -3,7 +3,7 @@ package utility
 import akka.actor.{ActorContext, ActorRef}
 import model.Drawable
 import model.anthill.AnthillInfo
-import model.environment.pheromones.FoodPheromone
+import model.environment.pheromones.{DangerPheromone, FoodPheromone}
 import utility.geometry.Vector2D
 import model.insects.info.InsectInfo
 
@@ -33,6 +33,10 @@ object Messages {
   case class FoodPheromones(pheromones: Seq[FoodPheromone]) extends Message
 
   case class AddFoodPheromone(foodPheromone: FoodPheromone, threshold: Double) extends Message
+
+  case class DangerPheromones(pheromones: Seq[DangerPheromone]) extends Message
+
+  case class AddDangerPheromone(dangerPheromone: DangerPheromone, threshold: Double) extends Message
 
   /** Message sent from ant to environment, to update its information.
    *
