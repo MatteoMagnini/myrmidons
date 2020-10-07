@@ -2,20 +2,20 @@ package model.insects.competences
 
 import akka.actor.Actor.Receive
 import akka.actor.{ActorContext, ActorRef}
-import model.environment.FoodPheromone
+import model.environment.pheromones.FoodPheromone
 import model.insects.info.ForagingAntInfo
 import utility.Messages._
 import utility.PheromoneSeq._
-import model.environment.FoodPheromoneInfo._
 import utility.geometry._
 import utility.Parameters.Competence._
+import utility.Parameters.Pheromones.FoodPheromoneInfo._
 import utility.Parameters.ForagingAnt._
 import scala.util.Random
 
 /**
  * Specific competences suitable only for foraging ants
  */
-trait ForagingAntCompetences extends InsectCompetences[ForagingAntInfo]
+trait ForagingAntCompetences extends AntCompetences[ForagingAntInfo]
 
 /**
  * Competence forcing a foraging ant to go back to the anthill when its carrying food.
@@ -35,7 +35,7 @@ case class PickFood() extends ForagingAntCompetences {
 
   override def apply(context: ActorContext, environment: ActorRef, insect: ActorRef, info: ForagingAntInfo, behaviour: ForagingAntInfo => Receive): Unit = {
     environment.tell(TakeFood(MAX_FOOD - info.foodAmount, info.foodPosition.get), insect)
-    context >>> behaviour(info.updateEnergy(ENERGY_PF))
+    context >>> behaviour(info.updateEnergy(ENERGY_PICK_FOOD))
   }
 
   override def hasPriority(info: ForagingAntInfo): Boolean = info.foodIsNear && info.foodAmount < MAX_FOOD
@@ -49,7 +49,7 @@ case class StoreFoodInAnthill() extends ForagingAntCompetences {
   override def apply(context: ActorContext, environment: ActorRef, insect: ActorRef,
                      info: ForagingAntInfo, behaviour: ForagingAntInfo => Receive): Unit = {
     info.anthill.tell(StoreFood(info.foodAmount), insect)
-    val data = info.freeFood().updateEnergy(ENERGY_SF)
+    val data = info.freeFood().updateEnergy(ENERGY_STORE_FOOD)
     environment.tell(UpdateInsect(data), insect)
     context >>> behaviour(data)
   }
@@ -63,8 +63,8 @@ case class StoreFoodInAnthill() extends ForagingAntCompetences {
 case class FoodPheromoneTaxis() extends ForagingAntCompetences {
 
   override def apply(context: ActorContext, environment: ActorRef, insect: ActorRef, info: ForagingAntInfo, behaviour: ForagingAntInfo => Receive): Unit = {
-    val delta = info.foodPheromones.toStream.filter(p => p.position --> info.position < ANT_PHEROMONE_THRESHOLD).weightedSum(info.position)
-    val data = info.updateEnergy(ENERGY_FPT)
+    val delta = info.foodPheromones.toStream.filter(p => p.position --> info.position < FOOD_PHEROMONE_RANGE).weightedSum(info.position)
+    val data = info.updateEnergy(ENERGY_FOOD_PHEROMONE_TAXIS)
     val newDelta = OrientedVector2DWithNoise(delta./\, MAX_VELOCITY, NOISE) >> (data.inertia * 2)
     val newDelta2 = OrientedVector2D(newDelta./\, MAX_VELOCITY)
     environment.tell(Move(data.position, newDelta2), insect)
@@ -72,7 +72,7 @@ case class FoodPheromoneTaxis() extends ForagingAntCompetences {
   }
 
   override def hasPriority(info: ForagingAntInfo): Boolean =
-    info.foodPheromones.toStream.exists(p => p.position --> info.position < ANT_PHEROMONE_THRESHOLD)
+    info.foodPheromones.toStream.exists(p => p.position --> info.position < FOOD_PHEROMONE_RANGE)
 }
 
 /**
@@ -80,9 +80,11 @@ case class FoodPheromoneTaxis() extends ForagingAntCompetences {
  */
 case class DropFoodPheromone() extends ForagingAntCompetences {
 
+  private def decreasingFunction: Double => Double = x => x/1.001 - DELTA
+
   override def apply(context: ActorContext, environment: ActorRef, insect: ActorRef, info: ForagingAntInfo, behaviour: ForagingAntInfo => Receive): Unit = {
-    environment.tell(AddFoodPheromone(FoodPheromone(info.position, DELTA, info.energy), FOOD_PHEROMONE_THRESHOLD), insect)
-    val data = info.updateEnergy(ENERGY_RW)
+    environment.tell(AddFoodPheromone(FoodPheromone(info.position, decreasingFunction, info.energy), FOOD_PHEROMONE_THRESHOLD), insect)
+    val data = info.updateEnergy(ENERGY_RANDOM_WALK)
     environment.tell(UpdateInsect(data), insect)
     context >>> behaviour(data)
   }

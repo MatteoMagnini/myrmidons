@@ -14,6 +14,7 @@ import model.environment.elements.EnvironmentElements._
 import utility.Parameters.Environment._
 import model.environment.elements.EnvironmentElements.FoodHasInside
 import Implicits._
+import model.environment.pheromones.FoodPheromone
 
 /** Environment actor
  *

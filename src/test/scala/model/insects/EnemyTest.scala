@@ -36,7 +36,7 @@ class EnemyTest extends TestKit(ActorSystem("InsectTest"))
         enemy ! NewPosition(result1.start >> result1.delta, result1.delta)
         val result2 = sender.expectMsgType[UpdateInsect]
         assert(result2.info.position != ZeroVector2D())
-        assert(result2.info.energy == STARTING_ENERGY + ENERGY_RW)
+        assert(result2.info.energy == STARTING_ENERGY + ENERGY_RANDOM_WALK)
         sender expectNoMessage
       }
 
@@ -46,7 +46,7 @@ class EnemyTest extends TestKit(ActorSystem("InsectTest"))
         enemy ! NewPosition(result1.start >> result1.delta, result1.delta)
         val result2 = sender.expectMsgType[UpdateInsect]
         assert(result2.info.position != ZeroVector2D())
-        assert(result2.info.energy == STARTING_ENERGY + ENERGY_RW * 2)
+        assert(result2.info.energy == STARTING_ENERGY + ENERGY_RANDOM_WALK * 2)
         sender expectNoMessage
       }
     }

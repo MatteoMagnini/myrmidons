@@ -1,8 +1,7 @@
 package model.insects
 
 import akka.actor.{ActorRef, Props}
-import model.environment.FoodPheromone
-import model.insects.competences.RandomWalk
+import model.insects.competences.{DangerPheromoneTaxis, Die, EatFromTheAnthill, GoBackToHome, GoOutside, RandomWalk}
 import model.insects.info.PatrollingAntInfo
 import utility.Messages.{Clock, NewPosition, UpdateInsect}
 
@@ -11,7 +10,12 @@ case class PatrollingAnt (override val info: PatrollingAntInfo,
 
   override def receive: Receive = defaultBehaviour(info)
 
-  private val competences = List(RandomWalk[PatrollingAntInfo]())
+  private val competences = List(Die[PatrollingAntInfo](),
+    GoOutside[PatrollingAntInfo](),
+    EatFromTheAnthill[PatrollingAntInfo](),
+    GoBackToHome[PatrollingAntInfo](),
+    DangerPheromoneTaxis(),
+    RandomWalk[PatrollingAntInfo]())
 
   private def defaultBehaviour(data: PatrollingAntInfo): Receive = {
 
@@ -24,7 +28,7 @@ case class PatrollingAnt (override val info: PatrollingAntInfo,
       environment ! UpdateInsect(newData)
       context become defaultBehaviour(newData)
 
-    case x =>
+    case x => //Discarding useless messages
   }
 }
 

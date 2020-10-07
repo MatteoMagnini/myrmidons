@@ -3,7 +3,7 @@ package utility
 import akka.actor.{ActorContext, ActorRef}
 import model.Drawable
 import model.anthill.AnthillInfo
-import model.environment.FoodPheromone
+import model.environment.pheromones.FoodPheromone
 import utility.geometry.Vector2D
 import model.insects.info.InsectInfo
 

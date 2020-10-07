@@ -2,8 +2,8 @@ package model.anthill
 
 import akka.actor.{Actor, ActorRef, Props}
 import model.Drawable
-import model.insects.{Enemy, ForagingAnt, PatrollingAnt}
-import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
+import model.insects.{ForagingAnt, PatrollingAnt}
+import model.insects.info.{ForagingAntInfo, PatrollingAntInfo}
 import utility.geometry._
 import utility.Messages._
 import utility.geometry.Vectors.doubleInRange

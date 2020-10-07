@@ -45,7 +45,7 @@ trait InsectCompetences[A <: SpecificInsectInfo[A]] {
 case class RandomWalk[A <: SpecificInsectInfo[A]]() extends InsectCompetences[A] {
 
   override def apply(context: ActorContext, environment: ActorRef, insect: ActorRef, info: A, behaviour: A => Receive): Unit = {
-    val data = info.updateEnergy(ENERGY_RW)
+    val data = info.updateEnergy(ENERGY_RANDOM_WALK)
     val delta: Vector2D = RandomVector2DInCircle(MIN_VELOCITY, MAX_VELOCITY)
     val deltaWithInertia = OrientedVector2D((delta >> (info.inertia * INERTIA_FACTOR))./\, doubleInRange(MIN_VELOCITY, MAX_VELOCITY))
     environment.tell(Move(data.position, deltaWithInertia), insect)

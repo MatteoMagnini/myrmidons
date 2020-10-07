@@ -3,6 +3,7 @@ package model.environment
 import akka.actor.ActorRef
 import model.anthill.AnthillInfo
 import model.environment.elements.{Food, Obstacle}
+import model.environment.pheromones.FoodPheromone
 import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo, PatrollingAntInfo}
 import utility.PheromoneSeq._
 
