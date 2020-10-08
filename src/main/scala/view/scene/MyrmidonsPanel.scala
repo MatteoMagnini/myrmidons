@@ -4,11 +4,10 @@ package view.scene
 import model.Drawable
 import model.Fights.Fight
 import model.anthill.AnthillInfo
-import model.environment.FoodPheromone
 import model.environment.elements.{Food, Obstacle}
+import model.environment.pheromones.{DangerPheromone, FoodPheromone}
 import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
 import view.drawLogic.singletonList
-
 import scala.swing.{Graphics2D, Panel}
 
 
@@ -17,12 +16,11 @@ import scala.swing.{Graphics2D, Panel}
  * and its view behaviours.
  */
 
-case class MyrmidonsPanel() extends Panel {
+private[view] case class MyrmidonsPanel() extends Panel {
 
   private var restartFlag = false
   private var infoEntities: Seq[Object] = Seq.empty
-  size.height = 800
-  size.width = 800
+
 
   override def paintComponent(g: Graphics2D) {
 
@@ -47,6 +45,8 @@ case class MyrmidonsPanel() extends Panel {
         case entity: EnemyInfo => draw(entity, g, size)
 
         case entity: FoodPheromone => draw(entity, g, size)
+
+        case entity: DangerPheromone => draw(entity, g, size)
 
         case entity: Fight[ForagingAntInfo, EnemyInfo] => draw(entity, g, size)
 
@@ -74,16 +74,16 @@ case class MyrmidonsPanel() extends Panel {
   def setEntities(info: Seq[Drawable]): (Int, Int) = {
 
     info.foreach(x => infoEntities = singletonList(x).head +: infoEntities)
-    var antsEntities: Seq[ForagingAntInfo] = Seq.empty
-    var anthillEntity: Option[AnthillInfo] = None
-
-    infoEntities.foreach {
-      case entity: ForagingAntInfo => antsEntities = entity +: antsEntities
-      //TODO: PatrollingAnts have to be added?
-      case entity: AnthillInfo => anthillEntity = Some(entity)
-      case _ =>
+    val anthillInfo: AnthillInfo = infoEntities.find {
+      case _: AnthillInfo => true
+      case _ => false
+    }.get.asInstanceOf[AnthillInfo]
+    val positionsCount = infoEntities.count {
+      case _: ForagingAntInfo => true
+      case _: PatrollingAntInfo => true
+      case _ => false
     }
-    (antsEntities.size, anthillEntity.get.foodAmount.toInt)
+    (positionsCount, anthillInfo.foodAmount.toInt)
   }
 
 }

@@ -2,7 +2,7 @@ package model.insects
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
-import model.environment.FoodPheromone
+import model.environment.pheromones.FoodPheromone
 import model.insects.info.ForagingAntInfo
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
@@ -84,7 +84,7 @@ class InsectInfoTest extends TestKit(ActorSystem("InsectInfoTest"))
         assert(checkAll(info5, position = newPosition, energy = newEnergy, inertia = newInertia))
       }
 
-      val newPheromones = Seq(FoodPheromone(ZeroVector2D(), DELTA, startingIntensity))
+      val newPheromones = Seq(FoodPheromone(ZeroVector2D(), x => x - DELTA, startingIntensity))
       val pheromoneIsEmpty = false
       val info6 = info5.updateFoodPheromones(newPheromones)
 

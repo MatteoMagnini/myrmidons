@@ -1,17 +1,27 @@
 package model.insects
 
 import akka.actor.{ActorRef, Props}
-import model.environment.FoodPheromone
-import model.insects.competences.RandomWalk
+import model.environment.pheromones.DangerPheromone
+import model.insects.competences.{DangerPheromoneTaxis, Die, EatFromTheAnthill, GoBackToHome, GoOutside, RandomWalk}
 import model.insects.info.PatrollingAntInfo
-import utility.Messages.{Clock, NewPosition, UpdateInsect}
+import utility.Messages.{AddDangerPheromone, Clock, DangerPheromones, EatFood, KillInsect, NewPosition, UpdateAnthillCondition, UpdateInsect}
+import utility.Parameters.ForagingAnt._
 
 case class PatrollingAnt (override val info: PatrollingAntInfo,
                      override val environment: ActorRef) extends Insect[PatrollingAntInfo] {
 
   override def receive: Receive = defaultBehaviour(info)
 
-  private val competences = List(RandomWalk[PatrollingAntInfo]())
+  private val competences = List(Die[PatrollingAntInfo](),
+    GoOutside[PatrollingAntInfo](),
+    EatFromTheAnthill[PatrollingAntInfo](),
+    GoBackToHome[PatrollingAntInfo](),
+    DangerPheromoneTaxis(),
+    RandomWalk[PatrollingAntInfo]())
+
+  import utility.Parameters.Pheromones.DangerPheromoneInfo._
+  private val decreasingDangerFunction: Double => Double = x => x - DELTA
+  private val dangerIntensity = STARTING_INTENSITY * INTENSITY_FACTOR
 
   private def defaultBehaviour(data: PatrollingAntInfo): Receive = {
 
@@ -24,7 +34,34 @@ case class PatrollingAnt (override val info: PatrollingAntInfo,
       environment ! UpdateInsect(newData)
       context become defaultBehaviour(newData)
 
-    case x =>
+    /**
+     * Update food pheromones.
+     */
+    case DangerPheromones(pheromones) =>
+      context >>> defaultBehaviour(data.updateDangerPheromones(pheromones))
+
+    /**
+     * The ant enters or exits the anthill.
+     */
+    case UpdateAnthillCondition(value) =>
+      context >>> defaultBehaviour(data.updateAnthillCondition(value))
+
+    /**
+     * Eat food from the environment.
+     */
+    case EatFood(amount) =>
+      val newData = data.updateEnergy(amount * FOOD_ENERGY_CONVERSION)
+      environment ! UpdateInsect(newData)
+      context >>> defaultBehaviour(newData)
+
+    /**
+     * Ant killed in a fight
+     */
+    case KillInsect(_) =>
+      environment ! AddDangerPheromone(DangerPheromone(data.position, decreasingDangerFunction, dangerIntensity),DANGER_PHEROMONE_MERGING_THRESHOLD)
+      context >>> defaultBehaviour(data.updateEnergy(-MAX_ENERGY))
+
+    case x => //Discarding useless messages
   }
 }
 

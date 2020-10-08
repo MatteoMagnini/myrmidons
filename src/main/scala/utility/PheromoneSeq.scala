@@ -1,7 +1,7 @@
 package utility
 
-import model.environment.Pheromone
 import SeqWithReplace._
+import model.environment.pheromones.Pheromone
 import utility.geometry.{Vector2D, ZeroVector2D}
 
 object PheromoneSeq {
