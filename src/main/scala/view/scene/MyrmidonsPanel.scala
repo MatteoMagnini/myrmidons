@@ -20,8 +20,7 @@ private[view] case class MyrmidonsPanel() extends Panel {
 
   private var restartFlag = false
   private var infoEntities: Seq[Object] = Seq.empty
-  size.height = 800
-  size.width = 800
+
 
   override def paintComponent(g: Graphics2D) {
 

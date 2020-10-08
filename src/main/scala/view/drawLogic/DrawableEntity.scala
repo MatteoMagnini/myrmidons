@@ -7,7 +7,6 @@ import model.Fights.Fight
 import model.anthill.AnthillInfo
 import model.environment.elements.{Food, Obstacle}
 import model.environment.pheromones.{DangerPheromone, FoodPheromone}
-import utility.Parameters.Pheromones.FoodPheromoneInfo.MAX_INTENSITY
 import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
 import utility.Parameters.GUIConstant._
 import utility.Parameters.Pheromones.FoodPheromoneInfo
@@ -44,6 +43,7 @@ object DrawableEntities {
       )
     }
   }
+
   implicit object drawPheromone extends DrawableEntity[FoodPheromone] {
 
     import ImplicitConversion._
@@ -81,7 +81,7 @@ object DrawableEntities {
 
   implicit object drawPatrollingAnt extends DrawableEntity[PatrollingAntInfo] {
     override def draw(elem: PatrollingAntInfo, g: Graphics2D, size: Dimension): Unit = {
-      g.setColor(Color.BLUE)
+      g.setColor(PATROLLING_ANT_COLOR)
       drawEllipse(elem.position.x - (ANT_SIZE / SET_TO_CENTER),
         size.height - elem.position.y - (ANT_SIZE / SET_TO_CENTER),
         ANT_SIZE, ANT_SIZE, g)

@@ -4,15 +4,18 @@ import org.jfree.chart.ChartFactory
 import org.jfree.chart.plot.XYPlot
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer
 import java.awt.Color
+
 import org.jfree.data.time.{TimeSeries, TimeSeriesCollection, Year}
 import org.jfree.chart.ChartPanel
 import org.jfree.chart.JFreeChart
+import utility.Parameters.GUIConstant.SIMULATION_SIZE
+
 import scala.swing.{Dimension, MainFrame}
 
 private[view] case class TimeSeriesPanel(history: Map[Int, (Int, Int, Int)])
   extends MainFrame {
 
-
+  centerOnScreen()
   title = "Myrmidons - Report"
 
   val chart: JFreeChart = ChartFactory.createTimeSeriesChart(
@@ -32,7 +35,7 @@ private[view] case class TimeSeriesPanel(history: Map[Int, (Int, Int, Int)])
   renderer.setBaseShapesFilled(true)
 
   peer.setContentPane(new ChartPanel(chart))
-  size = new Dimension(800, 900)
+  size = new Dimension(SIMULATION_SIZE._1, SIMULATION_SIZE._2)
   visible = true
 
   private def setTimesSeries(): TimeSeriesCollection = {

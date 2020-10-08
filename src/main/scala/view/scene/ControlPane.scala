@@ -1,34 +1,24 @@
 package view.scene
 
-import akka.actor.{ActorRef, ActorSystem, Props}
+import akka.actor.{ActorRef, ActorSystem}
 import model.environment.{Boundary, Environment, EnvironmentInfo}
 import utility.Messages.StartSimulation
-import view.actor.{ReportManager, UiActor, uiActorInfo}
+import utility.Parameters.GUIConstant.SIMULATION_BOUNDARY
+import view.actor.{ReportManager, ReportManagerInfo, UiActor, uiActorInfo}
 import view.actor.uiMessage.{RestartSimulation, ShowReport, StopSimulation}
 
 import scala.swing.event.ButtonClicked
-import scala.swing.{Button, FlowPanel, Label, MainFrame, Separator}
+import scala.swing.{Button, FlowPanel, Label, Separator}
 
 /**
  * FlowPanel which contains simulation button.
  *
  * @param myrmidonsPanel Panel when all the entities will be draw.
  */
-private[view] case class ControlPane(myrmidonsPanel: MyrmidonsPanel, mainFrame: MainFrame) extends FlowPanel {
+private[view] case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends FlowPanel {
 
   private val system = ActorSystem("Myrmidons-system")
-  private val boundary = Boundary(0, 0, 800, 800)
-  var uiActor: ActorRef = _
-  var environment: ActorRef = _
-  var reportManager: ActorRef = _
-  uiActor = system.actorOf(UiActor(uiActorInfo(myrmidonsPanel, this)))
-  environment = system.actorOf(Environment(EnvironmentInfo(boundary)), name = "env-actor")
-  reportManager = system.actorOf(Props[ReportManager](), "rep-actor")
-  var startFlag = false
-
-  var stepText = new Label("0")
-  var antPopulationText = new Label("0")
-  var anthillFoodAmount = new Label("0")
+  private val boundary = Boundary(0, 0, SIMULATION_BOUNDARY._1, SIMULATION_BOUNDARY._2)
   private val stepLabel = new Label("Step:")
   private val populationLabel = new Label("Ants number:")
   private val anthillFoodAmountLabel = new Label("Anthill Food:")
@@ -36,6 +26,19 @@ private[view] case class ControlPane(myrmidonsPanel: MyrmidonsPanel, mainFrame: 
   private val stopButton = new Button("Stop")
   private val restartButton = new Button("Restart")
   private val reportButton = new Button("Report")
+
+  var uiActor: ActorRef = _
+  var environment: ActorRef = _
+  var reportManager: ActorRef = _
+  uiActor = system.actorOf(UiActor(uiActorInfo(myrmidonsPanel, this)))
+  environment = system.actorOf(Environment(EnvironmentInfo(boundary)), name = "env-actor")
+  reportManager = system.actorOf(ReportManager(ReportManagerInfo()))
+
+  var startFlag = false
+  var stepText = new Label("0")
+  var antPopulationText = new Label("0")
+  var anthillFoodAmount = new Label("0")
+
   this.stopButton.enabled = false
   this.restartButton.enabled = false
   this.reportButton.enabled = false
@@ -84,7 +87,7 @@ private[view] case class ControlPane(myrmidonsPanel: MyrmidonsPanel, mainFrame: 
       this.reportButton.enabled = false
 
       val uiRestart: ActorRef = system.actorOf(UiActor(uiActorInfo(myrmidonsPanel, this)))
-      val reportRestart: ActorRef = system.actorOf(Props[ReportManager](), "rep-rest-actor")
+      val reportRestart: ActorRef = system.actorOf(ReportManager(ReportManagerInfo()))
       uiActor = uiRestart
       reportManager = reportRestart
       val environmentRestart: ActorRef = system.actorOf(Environment(EnvironmentInfo(boundary)),
@@ -96,11 +99,16 @@ private[view] case class ControlPane(myrmidonsPanel: MyrmidonsPanel, mainFrame: 
       reportManager.tell(ShowReport(), uiActor)
 
   }
+
   private def tellStart(): Unit = {
     environment.tell(StartSimulation(antSize, enemiesSize, obstacles = Some(obstacleSize),
       food = Some(foodSize)), uiActor)
   }
-  def setParameters(antSize: Int, anthillFood: Int,foodSize: Int, obstacleSize: Int, enemiesSize: Int): Unit = {
+
+  // TODO ADD FOOD ANTHILL IN START SIMULATION
+
+  def setParameters(antSize: Int, anthillFood: Int, foodSize: Int,
+                    obstacleSize: Int, enemiesSize: Int): Unit = {
     this.antSize = antSize
     this.anthillFood = anthillFood
     this.obstacleSize = obstacleSize

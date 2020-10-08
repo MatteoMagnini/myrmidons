@@ -52,6 +52,10 @@ object Parameters {
     val FIGHT_SIZE = 20
     val SET_TO_CENTER = 2
     val OBSTACLE_SIZE = 20
+    val SIMULATION_SIZE: (Int, Int) = (800,900)
+    val SIMULATION_BOUNDARY: (Int, Int) = (800,800)
+    val SETTING_SIZE = 400
+    val MIN_COMPONENT = 6
   }
 
   object Competence {
@@ -72,7 +76,7 @@ object Parameters {
   object Environment {
     val ANTHILL_RADIUS = 15
     val FOOD_AMOUNT = 2000
-    val FOOD_RADIUS = (100, 150)
+    val FOOD_RADIUS: (Int, Int) = (100, 150)
   }
 
 }

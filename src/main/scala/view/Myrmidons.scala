@@ -1,25 +1,21 @@
 package view
 
-import view.scene.{ControlPane, LabelPane, MyrmidonsPanel, ParametersPanel}
+import view.scene.ParametersPanel
 import utility.Parameters.GUIConstant._
-
-import scala.swing.{BorderPanel, Dimension, MainFrame, Point}
+import scala.swing.{BorderPanel, Dimension, MainFrame}
 
 /**
  * Simulation entry point.
  */
 object Myrmidons extends App {
 
-
   val frame: MainFrame = new MainFrame {
     title = "Myrmidons - Set Parameters"
-    val labelPane: ParametersPanel = ParametersPanel()
-
-
+    val settingPanel: ParametersPanel = ParametersPanel()
     contents = new BorderPanel {
-      layout += labelPane -> BorderPanel.Position.Center
+      layout += settingPanel -> BorderPanel.Position.Center
     }
-    size = new Dimension(300 , 300)
+    size = new Dimension(SETTING_SIZE, SETTING_SIZE)
     resizable = false
   }
   frame.visible = true
