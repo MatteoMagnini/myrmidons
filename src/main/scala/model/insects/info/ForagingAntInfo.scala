@@ -1,7 +1,7 @@
 package model.insects.info
 
 import akka.actor.ActorRef
-import model.environment.FoodPheromone
+import model.environment.pheromones.FoodPheromone
 import utility.Parameters.ForagingAnt._
 import utility.geometry.{Vector2D, ZeroVector2D}
 

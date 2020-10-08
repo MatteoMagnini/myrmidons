@@ -11,7 +11,8 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.1.2" % "test",
   "com.typesafe.akka" %% "akka-actor" % AkkaVersion,
   "com.typesafe.akka" %% "akka-testkit" % AkkaVersion % Test,
-  "org.scala-lang.modules" %% "scala-swing" % "2.1.1"
+  "org.scala-lang.modules" %% "scala-swing" % "2.1.1",
+  "org.jfree" % "jfreechart" % "1.0.14"
 )
 useCoursier := false
 coverageEnabled := true

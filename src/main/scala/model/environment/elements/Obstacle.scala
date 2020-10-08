@@ -10,7 +10,7 @@ import utility.geometry.VectorsImplicits._
  *
  * @param points list of vertex of polygon that describe an obstacle
  **/
-case class Obstacle(points: List[Vector2D]) extends Drawable {
+class Obstacle(val points: List[Vector2D]) extends Drawable {
 
   override val position: Vector2D = findCentroid(points)
 

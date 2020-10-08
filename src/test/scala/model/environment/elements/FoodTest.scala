@@ -5,7 +5,7 @@ import utility.geometry.TupleOp2._
 
 class FoodTest extends wordspec.AnyWordSpec {
   "A food" when {
-    val f = Food((10,15), 100)
+    val f = Food((10,15), 100, Obstacle((10,15),if (math.sqrt(100) < 5) 5 else math.sqrt(100), 16))
     "create with 100 of quantity" should {
       "have 100 of availability" in {
         assert(f.quantity === 100)

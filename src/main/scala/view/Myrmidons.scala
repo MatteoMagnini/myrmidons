@@ -1,7 +1,7 @@
 package view
 
-import view.scene.{ControlPane, InteractionPanel, LabelPane, MyrmidonsPanel}
-
+import view.scene.ParametersPanel
+import utility.Parameters.GUIConstant._
 import scala.swing.{BorderPanel, Dimension, MainFrame}
 
 /**
@@ -10,19 +10,14 @@ import scala.swing.{BorderPanel, Dimension, MainFrame}
 object Myrmidons extends App {
 
   val frame: MainFrame = new MainFrame {
-    title = "Myrmidons - Ant Simulator"
-    val myrmidonsPanel: MyrmidonsPanel = MyrmidonsPanel()
-    val controlPane: ControlPane = ControlPane(myrmidonsPanel)
-    val labelPane: LabelPane = LabelPane()
-    val interactionLabel: InteractionPanel = InteractionPanel(controlPane)
-
+    title = "Myrmidons - Set Parameters"
+    val settingPanel: ParametersPanel = ParametersPanel()
     contents = new BorderPanel {
-      layout += controlPane -> BorderPanel.Position.North
-      layout += myrmidonsPanel -> BorderPanel.Position.Center
-      layout += labelPane -> BorderPanel.Position.South
-      layout += interactionLabel -> BorderPanel.Position.East
+      layout += settingPanel -> BorderPanel.Position.Center
     }
-    size = new Dimension(800 + interactionLabel.size.width, 900)
+    size = new Dimension(SETTING_SIZE, SETTING_SIZE)
+    resizable = false
   }
   frame.visible = true
+
 }
