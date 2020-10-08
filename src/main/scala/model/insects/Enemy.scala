@@ -25,6 +25,9 @@ class Enemy(override val info: EnemyInfo,
 
     case FoodNear(_) => // println(s"Enemy ${info.id} near food")//TODO: MUST NOT RECEIVE THIS MESSAGE
 
+    /**
+     * Just for tests
+     */
     case Context(_) => sender ! Context(Some(context))
 
     case x => println("Enemies: Should never happen, received message: " + x + " from " + sender +info.time)
