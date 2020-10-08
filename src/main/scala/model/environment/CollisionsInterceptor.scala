@@ -17,22 +17,19 @@ object CollisionsInterceptor {
       import model.environment.elements.EnvironmentElements.ObstacleHasInside
       val obstacle = checkHaveInside(state.obstacles, newPosition)
       if (obstacle.nonEmpty) {
-        // TODO: better name
         val bouncedPosition = recursionCheck(state.obstacles, obstacle, position, newPosition)
         entity ! NewPosition(bouncedPosition._1, bouncedPosition._2)
 
       } else {
-
         /*Checking food sources*/
         import model.environment.elements.EnvironmentElements.FoodHasInside
         val food = checkHaveInside(state.foods, newPosition)
-
         if (food.nonEmpty) {
-          val t = recursionCheck(state.obstacles, food, position, newPosition)
+          val bouncingResult = recursionCheck(state.foods, food, position, newPosition)
           val nearestFood: Food = food.toList.sortWith((a, b) =>  //TODO: Not correct in all case
             position --> a.position < position --> b.position).head
           entity ! FoodNear(nearestFood.position)
-          entity ! NewPosition(t._1 , t._2) // TODO: should bounce also on food!
+          entity ! NewPosition(bouncingResult._1 , bouncingResult._2) // TODO: should bounce also on food!
 
         } else {
           entity ! NewPosition(newPosition, newPosition - position)
@@ -41,6 +38,7 @@ object CollisionsInterceptor {
     } else entity ! NewPosition(position - delta, delta -)
   }
 
+  @scala.annotation.tailrec
   private def recursionCheck(obstacles:Iterable[Obstacle], obstacle: Iterable[Obstacle], position: Vector2D, newPosition: Vector2D):(Vector2D, Vector2D) = {
     val res = handleObstacleIntersection(obstacle, position, newPosition)
     val intersection = res._1
@@ -80,7 +78,7 @@ object CollisionsInterceptor {
       import utility.geometry.TupleOp2._
       (intersectionAndDirection.intersectionPoint, orientedDelta)
     } else {
-      (position, (position - newPosition)/(((position - newPosition)|| )/4))
+      (position, (position - newPosition)/(((position - newPosition)|| )))
     }
 
   }

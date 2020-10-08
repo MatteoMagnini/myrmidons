@@ -18,7 +18,7 @@ case class Food(override val position: Vector2D, quantity: Double, o: Obstacle) 
    * @return new instance of Food with increased quantity
    **/
   def +(newQuantity: Double): Food = {
-    Food(position, quantity + newQuantity, this)
+    Food(position, quantity + newQuantity, Obstacle(position, Food.radius((quantity + newQuantity).toInt), points.size))
   }
 
   /** Decrease food quantity.
@@ -27,9 +27,9 @@ case class Food(override val position: Vector2D, quantity: Double, o: Obstacle) 
    * @return new instance of Food with decreased quantity
    **/
   def -(newQuantity: Double): Food = {
-    val dec: Double = (this + (- newQuantity)).quantity
-    if (dec < 1) this.copy(quantity = 0)
-    else this.copy(quantity = dec)
+    val food = (this + (- newQuantity))
+    if (food.quantity < 1) this.copy(quantity = 0)
+    else food
   }
 }
 
@@ -37,7 +37,8 @@ case class Food(override val position: Vector2D, quantity: Double, o: Obstacle) 
 object Food {
     def createRandomFood(position: Vector2D, minRadius:Double, maxRadius:Double, quantity: Int = 500): Food = {
       val pos = RandomVector2DInCircle(minRadius, maxRadius, position)
-      val radius: Double = if (math.sqrt(quantity) < 5) 5 else math.sqrt(quantity)
-      Food(Vector2D(pos.x, pos.y), quantity, Obstacle(pos, radius, 16))
+      Food(Vector2D(pos.x, pos.y), quantity, Obstacle(pos, radius(quantity), 16))
     }
+
+    def radius(quantity: Int): Double = if (math.sqrt(quantity) < 5) 5 else math.sqrt(quantity)
 }

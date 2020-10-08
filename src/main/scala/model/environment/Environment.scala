@@ -36,11 +36,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
         i -> context.actorOf(Enemy(EnemyInfo(id = i, position = randomPosition), self), s"enemy-$i")
       }).toMap
       // TODO: incapsulate inside obstacle
-      val obstacles = if (obstaclesPresence.isDefined) for {_ <- 0 until obstaclesPresence.get
-                                                            random = Obstacle.randomValid
-                                                            obstacle = Obstacle(RandomVector2DInCircle(50, 350,
-                                                              anthillInfo.position), 20, random)
-                                                            } yield obstacle
+      val obstacles = if (obstaclesPresence.isDefined) Obstacle.createRandom(obstaclesPresence.get, anthillInfo.position, (50,150)).toSeq
       else Seq.empty
 
       val foods = if (foodPresence.isDefined) (0 until foodPresence).map(_ =>
@@ -64,12 +60,10 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       CollisionsInterceptor.checkCollisions(self, sender, state, position, delta)
 
     case TakeFood(delta, position) =>
-      val food = checkHaveInside(state.foods, position)
+      val food = state.foods.filter(f => f.position ~~ (position, 1E-7))
       if (food.nonEmpty) {
         sender ! TakeFood(delta, position)
-        val nearestFood: Food = food.toList.sortWith((a, b) =>
-          position --> a.position < position --> b.position).head
-        context >>> defaultBehaviour(state.updateFood(nearestFood, nearestFood - delta))
+        context >>> defaultBehaviour(state.updateFood(food.head, food.head - delta))
       } else {
         sender ! TakeFood(0, position)
       }

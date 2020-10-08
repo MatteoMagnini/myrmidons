@@ -23,6 +23,17 @@ class ObstacleTest  extends wordspec.AnyWordSpec {
         assert(checkHasInside(o, (1.5,2.25)))
         assert(checkHasInside(o, (2.5,2.0)) === false)
       }
+
+      "aaaaaa" in {
+        val t = List(Obstacle.Triangle((10,10)),
+          Obstacle.Square((10.00222, 10.003)),
+
+          Obstacle.Octagon((100,100)),
+        )
+
+        //val ee= Obstacle.recursiveJoin(t,0)
+       // println(ee)
+      }
     }
   }
   
