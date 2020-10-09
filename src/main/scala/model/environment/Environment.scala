@@ -114,7 +114,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     if ((info.foragingAntsInfo.size + info.patrollingAntsInfo.size == info.ants.size)
       && (info.enemiesInfo.size == info.enemies.size)) {
 
-      val fights = findFights(info.foragingAntsInfo, info.enemiesInfo)
+      val fights = findFights(info.foragingAntsInfo ++ info.patrollingAntsInfo, info.enemiesInfo)
       val updatedInfo = handleFights(info, fights)
 
       info.gui.get ! Repaint(info.anthillInfo.get +: (info.foragingAntsInfo ++ info.patrollingAntsInfo ++ info.enemiesInfo ++
@@ -123,14 +123,14 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     } else context >>> defaultBehaviour(info)
   }
 
-  private def findFights(antsInfo: Iterable[ForagingAntInfo], enemiesInfo: Iterable[EnemyInfo]): Iterable[Fight[ForagingAntInfo, EnemyInfo]] =
+  private def findFights(antsInfo: Iterable[InsectInfo], enemiesInfo: Iterable[EnemyInfo]): Iterable[Fight[InsectInfo, EnemyInfo]] =
     for {
       ant <- antsInfo
       enemy <- enemiesInfo
       if ant.position ~~ enemy.position
     } yield Fight(ant, enemy, ant.position)
 
-  private def handleFights(info: EnvironmentInfo, fights: Iterable[Fight[ForagingAntInfo, EnemyInfo]]): EnvironmentInfo = {
+  private def handleFights(info: EnvironmentInfo, fights: Iterable[Fight[InsectInfo, EnemyInfo]]): EnvironmentInfo = {
 
     import model.Fights._
     import model.Fights.InsectFight._

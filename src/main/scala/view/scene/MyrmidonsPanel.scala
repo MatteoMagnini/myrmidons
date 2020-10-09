@@ -6,8 +6,9 @@ import model.Fights.Fight
 import model.anthill.AnthillInfo
 import model.environment.elements.{Food, Obstacle}
 import model.environment.pheromones.{DangerPheromone, FoodPheromone}
-import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
+import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo, PatrollingAntInfo}
 import view.drawLogic.singletonList
+
 import scala.swing.{Graphics2D, Panel}
 
 
@@ -48,7 +49,7 @@ private[view] case class MyrmidonsPanel() extends Panel {
 
         case entity: DangerPheromone => draw(entity, g, size)
 
-        case entity: Fight[ForagingAntInfo, EnemyInfo] => draw(entity, g, size)
+        case entity: Fight[InsectInfo, EnemyInfo] => draw(entity, g, size)
 
         case _ => println("Error matching enemies")
       }
