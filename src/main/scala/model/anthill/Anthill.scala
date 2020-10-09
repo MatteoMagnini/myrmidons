@@ -8,7 +8,7 @@ import utility.geometry._
 import utility.Messages._
 import utility.geometry.Vectors.doubleInRange
 import utility.Parameters.Competence._
-
+import Implicits._
 import scala.util.Random
 
 case class AnthillInfo(override val position: Vector2D,
@@ -66,10 +66,12 @@ case class Anthill(info: AnthillInfo, environment: ActorRef) extends Actor {
 
     case CreateEntities(nAnts: Int, foragingProbability: Double) =>
     /** Returns ants and enemies references, creating ants from the center of boundary */
-      val foragingAnts = (0 until (nAnts * foragingProbability).toInt).map(i => {
+      val nForaging = (nAnts * foragingProbability).ceil.toInt
+      val foragingAnts = (0 until nForaging).map(i => {
         i -> context.actorOf(ForagingAnt(ForagingAntInfo(self, id = i, position = info.position), sender), s"f-ant-$i")
       }).toMap
-      val patrollingAnts = (foragingAnts.size until foragingAnts.size + (nAnts * (1 - foragingProbability)).toInt).map(i => {
+      val nPatrolling = nForaging + (nAnts * (1 - foragingProbability)).toInt
+      val patrollingAnts = (nForaging until nPatrolling).map(i => {
         i -> context.actorOf(PatrollingAnt(PatrollingAntInfo(self, id = i, position = info.position), sender), s"p-ant-$i")
       }).toMap
       sender ! NewEntities(foragingAnts ++ patrollingAnts)
@@ -79,4 +81,8 @@ case class Anthill(info: AnthillInfo, environment: ActorRef) extends Actor {
 object Anthill {
   def apply(info: AnthillInfo, environment: ActorRef): Props =
     Props(classOf[Anthill], info, environment)
+}
+
+object Implicits {
+  def double2Int(x:Double):Int = x.toInt
 }
