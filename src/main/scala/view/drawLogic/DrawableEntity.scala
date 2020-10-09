@@ -7,7 +7,7 @@ import model.Fights.Fight
 import model.anthill.AnthillInfo
 import model.environment.elements.{Food, Obstacle}
 import model.environment.pheromones.{DangerPheromone, FoodPheromone}
-import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
+import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo, PatrollingAntInfo}
 import utility.Parameters.GUIConstant._
 import utility.Parameters.Pheromones.FoodPheromoneInfo
 import view.ColorUtility.Colors._
@@ -124,8 +124,8 @@ object DrawableEntities {
     }
   }
 
-  implicit object drawFight extends DrawableEntity[Fight[ForagingAntInfo, EnemyInfo]] {
-    override def draw(elem: Fight[ForagingAntInfo, EnemyInfo], g: Graphics2D, size: Dimension): Unit = {
+  implicit object drawFight extends DrawableEntity[Fight[InsectInfo, EnemyInfo]] {
+    override def draw(elem: Fight[InsectInfo, EnemyInfo], g: Graphics2D, size: Dimension): Unit = {
       import model.Fights._
       import model.Fights.InsectFight._
 

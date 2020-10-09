@@ -1,7 +1,7 @@
 package model
 
 import model.Fights.Fight
-import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
+import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo, PatrollingAntInfo}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import utility.geometry.ZeroVector2D
@@ -16,7 +16,7 @@ class FightsTest extends AnyWordSpecLike with Matchers {
     val ant = PatrollingAntInfo(null, energy = antEnergy)
     val insectEnergy = 10
     val insect = EnemyInfo(energy = insectEnergy)
-    val fight: Fight[PatrollingAntInfo, EnemyInfo] = Fight(ant, insect, ZeroVector2D())
+    val fight: Fight[InsectInfo, EnemyInfo] = Fight(ant, insect, ZeroVector2D())
 
     "happens" should {
 
@@ -38,10 +38,10 @@ class FightsTest extends AnyWordSpecLike with Matchers {
 
     val nFights = 5
     val maxEnergy = 100
-    val fights: Iterable[Fight[PatrollingAntInfo, EnemyInfo]] = for {
+    val fights: Iterable[Fight[InsectInfo, EnemyInfo]] = for {
       _ <- 0 to nFights
       antEnergy = Random.nextInt(maxEnergy)
-      ant: PatrollingAntInfo = PatrollingAntInfo(null, energy = antEnergy)
+      ant: InsectInfo = PatrollingAntInfo(null, energy = antEnergy)
       insectEnergy = Random.nextInt(maxEnergy)
       enemy: EnemyInfo = EnemyInfo(energy = insectEnergy)
     } yield Fight(ant, enemy, ZeroVector2D())

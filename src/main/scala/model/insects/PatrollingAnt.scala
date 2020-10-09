@@ -4,8 +4,8 @@ import akka.actor.{ActorRef, Props}
 import model.environment.pheromones.DangerPheromone
 import model.insects.competences.{DangerPheromoneTaxis, Die, EatFromTheAnthill, GoBackToHome, GoOutside, RandomWalk}
 import model.insects.info.PatrollingAntInfo
-import utility.Messages.{AddDangerPheromone, Clock, DangerPheromones, EatFood, KillInsect, NewPosition, UpdateAnthillCondition, UpdateInsect}
-import utility.Parameters.ForagingAnt._
+import utility.Messages.{AddDangerPheromone, Clock, Context, DangerPheromones, EatFood, KillInsect, NewPosition, UpdateAnthillCondition, UpdateInsect}
+import utility.Parameters.Insects.Ants.ForagingAnt._
 
 case class PatrollingAnt (override val info: PatrollingAntInfo,
                      override val environment: ActorRef) extends Insect[PatrollingAntInfo] {
@@ -60,6 +60,11 @@ case class PatrollingAnt (override val info: PatrollingAntInfo,
     case KillInsect(_) =>
       environment ! AddDangerPheromone(DangerPheromone(data.position, decreasingDangerFunction, dangerIntensity),DANGER_PHEROMONE_MERGING_THRESHOLD)
       context >>> defaultBehaviour(data.updateEnergy(-MAX_ENERGY))
+
+    /**
+     * Just for tests
+     */
+    case Context(_) => sender ! Context(Some(context))
 
     case x => //Discarding useless messages
   }
