@@ -6,7 +6,6 @@ import model.insects.info.{SpecificInsectInfo}
 import utility.Messages._
 import utility.geometry.Vectors._
 import utility.geometry._
-import utility.Parameters.Competence._
 
 /**
  * A competence is the minimal building block to achieve a more complex behaviour.

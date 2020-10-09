@@ -7,9 +7,8 @@ import model.insects.info.{ForagingAntInfo, PatrollingAntInfo}
 import utility.geometry._
 import utility.Messages._
 import utility.geometry.Vectors.doubleInRange
-import utility.Parameters.Competence._
-import Implicits._
 import scala.util.Random
+import model.insects.competences._
 
 case class AnthillInfo(override val position: Vector2D,
                        radius: Double,
@@ -83,6 +82,3 @@ object Anthill {
     Props(classOf[Anthill], info, environment)
 }
 
-object Implicits {
-  def double2Int(x:Double):Int = x.toInt
-}

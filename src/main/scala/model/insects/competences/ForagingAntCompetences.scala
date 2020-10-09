@@ -7,10 +7,9 @@ import model.insects.info.ForagingAntInfo
 import utility.Messages._
 import utility.PheromoneSeq._
 import utility.geometry._
-import utility.Parameters.Competence._
-import utility.Parameters.Pheromones.FoodPheromoneInfo._
 import utility.Parameters.Insects.Ants.ForagingAnt._
 import scala.util.Random
+import model.environment.pheromones.FoodPheromoneInfo._
 
 /**
  * Specific competences suitable only for foraging ants

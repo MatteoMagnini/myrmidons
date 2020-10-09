@@ -6,10 +6,9 @@ import java.awt.geom.Ellipse2D
 import model.Fights.Fight
 import model.anthill.AnthillInfo
 import model.environment.elements.{Food, Obstacle}
-import model.environment.pheromones.{DangerPheromone, FoodPheromone}
+import model.environment.pheromones.{DangerPheromone, DangerPheromoneInfo, FoodPheromone, FoodPheromoneInfo}
 import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo, PatrollingAntInfo}
 import utility.Parameters.GUIConstant._
-import utility.Parameters.Pheromones.FoodPheromoneInfo
 import view.ColorUtility.Colors._
 
 import scala.swing.{Dimension, Graphics2D}
@@ -31,9 +30,6 @@ object DrawableEntities {
 
   implicit object drawDangerPheromone extends DrawableEntity[DangerPheromone] {
 
-    import ImplicitConversion._
-    import utility.Parameters.Pheromones._
-
     override def draw(elem: DangerPheromone, g: Graphics2D, size: Dimension): Unit = {
       val pheromoneIntensity: Float = elem.intensity / DangerPheromoneInfo.MAX_INTENSITY
       g.setColor(DANGER_PHEROMONE_COLOR(pheromoneIntensity))
@@ -46,8 +42,6 @@ object DrawableEntities {
 
   implicit object drawPheromone extends DrawableEntity[FoodPheromone] {
 
-    import ImplicitConversion._
-
     override def draw(elem: FoodPheromone, g: Graphics2D, size: Dimension): Unit = {
       val pheromoneIntensity: Float = elem.intensity / FoodPheromoneInfo.MAX_INTENSITY
       g.setColor(FOOD_PHEROMONE_COLOR(pheromoneIntensity))
@@ -59,8 +53,6 @@ object DrawableEntities {
   }
 
   implicit object drawFood extends DrawableEntity[Food] {
-
-    import ImplicitConversion._
 
     override def draw(elem: Food, g: Graphics2D, size: Dimension): Unit = {
       val foodQuantity: Float = elem.quantity / 1000
@@ -111,8 +103,6 @@ object DrawableEntities {
 
   implicit object drawAnthill extends DrawableEntity[AnthillInfo] {
 
-    import ImplicitConversion._
-
     override def draw(elem: AnthillInfo, g: Graphics2D, size: Dimension): Unit = {
 
       val anthillFood: Float = elem.foodAmount / elem.maxFoodAmount
@@ -137,10 +127,4 @@ object DrawableEntities {
         size.height - insectLoser.position.y, FIGHT_SIZE, FIGHT_SIZE, g)
     }
   }
-
-
-}
-
-object ImplicitConversion {
-  implicit def doubleToFloat(value: Double): Float = value.toFloat
 }

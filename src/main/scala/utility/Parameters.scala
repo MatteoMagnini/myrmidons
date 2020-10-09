@@ -7,7 +7,7 @@ object Parameters {
 
   object Pheromones {
 
-    object FoodPheromoneInfo {
+  /*  object FoodPheromoneInfo {
       val DELTA: Double = 3.0
       val FOOD_PHEROMONE_MERGING_THRESHOLD: Double = 5.0
       val STARTING_INTENSITY: Double = 100.0
@@ -21,7 +21,7 @@ object Parameters {
       val STARTING_INTENSITY: Double = 100.0
       val MAX_INTENSITY: Double = 3000.0
       val INTENSITY_FACTOR: Double = 5.0
-    }
+    }*/
   }
 
   object Insects {
@@ -72,7 +72,7 @@ object Parameters {
     val MIN_COMPONENT = 6
   }
 
-  object Competence {
+ /* object Competence {
     val NOISE = 0.1
     val MAX_VELOCITY: Double = 5
     val MIN_VELOCITY: Double = 2
@@ -86,11 +86,11 @@ object Parameters {
     val ENERGY_DANGER_PHEROMONE_TAXIS: Double = -0.2
     val RANDOM: Random.type = scala.util.Random
   }
-
-  object Environment {
+*/
+ /* object Environment {
     val ANTHILL_RADIUS = 15
     val FOOD_AMOUNT = 2000
     val FOOD_RADIUS: (Int, Int) = (100, 150)
-  }
+  }*/
 
 }

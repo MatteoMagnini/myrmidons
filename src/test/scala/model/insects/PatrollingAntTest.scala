@@ -10,6 +10,8 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import utility.Messages.{Clock, DangerPheromones, Move, NewPosition, UpdateInsect}
 import utility.geometry.{Vector2D, ZeroVector2D}
+import model.insects.competences._
+import model.environment.pheromones.DangerPheromoneInfo._
 
 class PatrollingAntTest extends TestKit(ActorSystem("PatrollingAntTest"))
   with AnyWordSpecLike
@@ -26,7 +28,6 @@ class PatrollingAntTest extends TestKit(ActorSystem("PatrollingAntTest"))
   "A patrolling ant" when {
 
     import utility.Parameters.Insects.Ants.PatrollingAnt._
-    import utility.Parameters.Competence._
     import utility.geometry.Vectors._
 
     "performing random walk" should {
@@ -58,7 +59,6 @@ class PatrollingAntTest extends TestKit(ActorSystem("PatrollingAntTest"))
 
     "perceiving danger pheromones" should {
 
-      import utility.Parameters.Pheromones.DangerPheromoneInfo._
       val startingPheromoneIntensity = 10.0
       val startingInfo = PatrollingAntInfo(senderRef)
       val ant = system.actorOf(PatrollingAnt(startingInfo,senderRef), "ant-1")

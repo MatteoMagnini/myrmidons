@@ -1,7 +1,6 @@
 package model.environment.elements
 
 import model.Drawable
-import model.environment.elements
 import utility.geometry.{Vector2D, Vector3D, Vectors}
 import utility.geometry.VectorsImplicits._
 

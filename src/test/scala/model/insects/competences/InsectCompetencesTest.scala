@@ -139,7 +139,7 @@ with BeforeAndAfterAll{
 
       }
 
-      import utility.Parameters.Pheromones.FoodPheromoneInfo.DELTA
+      import model.environment.pheromones.FoodPheromoneInfo._
       val foodPheromone = FoodPheromone(Vector2D(4,6),x => x - DELTA,10)
       val foragingAntInfo4 = foragingAntInfo3.updateFoodPheromones(Seq(foodPheromone))
       "follow the food pheromones" in {
@@ -156,7 +156,7 @@ with BeforeAndAfterAll{
 
   "A patrolling ant competence" when {
 
-    import utility.Parameters.Pheromones.DangerPheromoneInfo._
+    import model.environment.pheromones.DangerPheromoneInfo._
     val dangerPheromone = DangerPheromone(Vector2D(-7,2), x => x - DELTA, 10)
     def defaultBehaviour(data: PatrollingAntInfo): Receive = {case _ =>}
     val patrollingAntInfo = PatrollingAntInfo(senderRef)

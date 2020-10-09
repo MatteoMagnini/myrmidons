@@ -11,7 +11,6 @@ import utility.PheromoneSeq._
 import model.insects.info.SpecificInsectInfo
 import utility.geometry.{RandomVector2DInCircle, RandomVector2DInSquare, Vector2D}
 import model.environment.elements.EnvironmentElements._
-import utility.Parameters.Environment._
 import model.environment.elements.EnvironmentElements.FoodHasInside
 import model.environment.pheromones.{DangerPheromone, FoodPheromone}
 
@@ -117,11 +116,10 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   private def sendInfoToGUI(info: EnvironmentInfo): Unit = {
     /* When all insects return their positions, environment send them to GUI */
     val fights = findFights(info.foragingAntsInfo ++ info.patrollingAntsInfo, info.enemiesInfo)
-    val updatedInfo = handleFights(info, fights)
 
     info.gui.get ! Repaint(info.anthillInfo.get +: (info.foragingAntsInfo ++ info.patrollingAntsInfo ++ info.enemiesInfo ++
       info.obstacles ++ info.foods ++ info.foodPheromones ++ info.dangerPheromones ++ fights).toSeq)
-    context >>> defaultBehaviour(updatedInfo.emptyInsectInfo())
+    context >>> defaultBehaviour(info.emptyInsectInfo())
   }
 
   private def findFights(antsInfo: Iterable[InsectInfo], enemiesInfo: Iterable[EnemyInfo]): Iterable[Fight[InsectInfo, EnemyInfo]] =
@@ -131,11 +129,9 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       if ant.position ~~ enemy.position
     } yield Fight(ant, enemy, ant.position)
 
-  private def handleFights(info: EnvironmentInfo, fights: Iterable[Fight[InsectInfo, EnemyInfo]]): EnvironmentInfo = {
-
+  private def handleFights(info: EnvironmentInfo, fights: Iterable[Fight[InsectInfo, EnemyInfo]]): Unit = {
     import model.Fights._
     import model.Fights.InsectFight._
-    var updatedInfo = info
     for (loser <- losers(fights)) {
       loser match {
         case Left(ant) =>
@@ -144,7 +140,6 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
           info.enemies(enemy) ! KillInsect(enemy)
       }
     }
-    updatedInfo
   }
 
   private implicit class RichContext(context: ActorContext) {
