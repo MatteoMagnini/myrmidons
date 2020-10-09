@@ -57,7 +57,6 @@ object CollisionsInterceptor {
   }
 
   private def handleObstacleIntersection(obstacle: Iterable[Obstacle], position: Vector2D, newPosition: Vector2D): (Vector2D, Vector2D) = {
-    import Implicits._
 
     val intersectionOnOverlappedObstacle = (for (f <- obstacle)
       yield f.findIntersectionInformation(position, newPosition)).toList

@@ -14,7 +14,7 @@ import model.environment.elements.EnvironmentElements._
 import utility.Parameters.Environment._
 import model.environment.elements.EnvironmentElements.FoodHasInside
 import model.environment.pheromones.{DangerPheromone, FoodPheromone}
-import Implicits._
+
 
 /** Environment actor
  *
@@ -135,15 +135,13 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
     import model.Fights._
     import model.Fights.InsectFight._
-    import Implicits._
     var updatedInfo = info
     for (loser <- losers(fights)) {
       loser match {
         case Left(ant) =>
-          info.ants(ant.id) ! KillInsect(ant)
+          info.ants(ant) ! KillInsect(ant)
         case Right(enemy) =>
-          context.stop(info.enemies(enemy))
-          updatedInfo = updatedInfo.removeEnemy(enemy)
+          info.enemies(enemy) ! KillInsect(enemy)
       }
     }
     updatedInfo
@@ -154,13 +152,6 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   }
 }
 
-
 object Environment {
   def apply(state: EnvironmentInfo): Props = Props(classOf[Environment], state)
-}
-
-object Implicits {
-  implicit def extractOption[X](value: Option[X]): X = value.get
-
-  implicit def entity2Id[X <: SpecificInsectInfo[X]](entity: X): Int = entity.id
 }
