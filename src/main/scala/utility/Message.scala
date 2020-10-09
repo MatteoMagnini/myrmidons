@@ -1,8 +1,9 @@
 package utility
 
+import akka.actor.{ActorContext, ActorRef}
 import model.Drawable
 import model.anthill.AnthillInfo
-import model.environment.FoodPheromone
+import model.environment.pheromones.{DangerPheromone, FoodPheromone}
 import utility.geometry.Vector2D
 import model.insects.info.InsectInfo
 
@@ -13,9 +14,8 @@ object Messages {
   /** Message sent from GUI to environment, to start simulation.
    *
    * @param nAnts       number of ants to be created
-   * @param spawnFromAnthill whether spawn ants from anthill
    */
-  case class StartSimulation(nAnts: Int, nEnemies: Int, spawnFromAnthill: Boolean = false, obstacles: Option[Int] = Some(6), food: Option[Int] = Some(6)) extends Message
+  case class StartSimulation(nAnts: Int, nEnemies: Int, obstacles: Option[Int] = Some(6), food: Option[Int] = Some(6)) extends Message
 
   /** Message sent from GUI to environment and from environment to ants, to do a step in simulation.
    *
@@ -33,6 +33,10 @@ object Messages {
   case class FoodPheromones(pheromones: Seq[FoodPheromone]) extends Message
 
   case class AddFoodPheromone(foodPheromone: FoodPheromone, threshold: Double) extends Message
+
+  case class DangerPheromones(pheromones: Seq[DangerPheromone]) extends Message
+
+  case class AddDangerPheromone(dangerPheromone: DangerPheromone, threshold: Double) extends Message
 
   /** Message sent from ant to environment, to update its information.
    *
@@ -61,6 +65,7 @@ object Messages {
 
   case class UpdateAnthill(info: AnthillInfo) extends Message
 
+  case object Ready extends Message
   /**
    * An ant has a bit of memory (it counts its steps).
    * The memory is emulated by asking the anthill actor to send the resulting movement to perform.
@@ -80,6 +85,9 @@ object Messages {
    */
   case class UpdateAnthillCondition(antIsInsideTheAnthill: Boolean) extends Message
 
+  case class CreateEntities(nAnts: Int, foragingProbability: Double) extends Message
+
+  case class NewEntities(ants: Map[Int, ActorRef]) extends Message
   /**
    * Message from GUI to create new ants with RandomPosition.
    *
@@ -90,6 +98,8 @@ object Messages {
 
   case class AntBirth(clock: Int) extends Message
 
-  case class KillAnt(id: Int) extends Message
+  case class KillInsect(info: InsectInfo) extends Message
 
+  //TODO: just for test!
+  case class Context(context: Option[ActorContext]) extends Message
 }

@@ -2,7 +2,7 @@ package model.insects.competences
 
 import akka.actor.Actor.Receive
 import akka.actor.{ActorContext, ActorRef}
-import model.insects.info.SpecificInsectInfo
+import model.insects.info.{SpecificInsectInfo}
 import utility.Messages._
 import utility.geometry.Vectors._
 import utility.geometry._
@@ -34,6 +34,9 @@ trait InsectCompetences[A <: SpecificInsectInfo[A]] {
    */
   def hasPriority(info: A): Boolean
 
+  implicit class RichContext(context: ActorContext) {
+    def >>> (behaviour: Receive): Unit = context become behaviour
+  }
 }
 
 /**
@@ -42,11 +45,11 @@ trait InsectCompetences[A <: SpecificInsectInfo[A]] {
 case class RandomWalk[A <: SpecificInsectInfo[A]]() extends InsectCompetences[A] {
 
   override def apply(context: ActorContext, environment: ActorRef, insect: ActorRef, info: A, behaviour: A => Receive): Unit = {
-    val data = info.updateEnergy(ENERGY_RW)
+    val data = info.updateEnergy(ENERGY_RANDOM_WALK)
     val delta: Vector2D = RandomVector2DInCircle(MIN_VELOCITY, MAX_VELOCITY)
     val deltaWithInertia = OrientedVector2D((delta >> (info.inertia * INERTIA_FACTOR))./\, doubleInRange(MIN_VELOCITY, MAX_VELOCITY))
     environment.tell(Move(data.position, deltaWithInertia), insect)
-    context become behaviour(data)
+    context >>> behaviour(data)
   }
 
   override def hasPriority(info: A): Boolean = true
@@ -58,7 +61,7 @@ case class RandomWalk[A <: SpecificInsectInfo[A]]() extends InsectCompetences[A]
 case class Die[A <: SpecificInsectInfo[A]]() extends InsectCompetences[A] {
 
   override def apply(context: ActorContext, environment: ActorRef, insect: ActorRef, info: A, behaviour: A => Receive): Unit =
-    environment.tell(KillAnt(info.id), insect)
+    environment.tell(KillInsect(info), insect)
 
   override def hasPriority(info: A): Boolean = info.energy <= 0
 }
