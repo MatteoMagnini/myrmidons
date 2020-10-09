@@ -33,8 +33,8 @@ class Obstacle(val points: List[Vector2D]) extends Drawable {
   })
 
 
-  def maxDistanceFromCenter() ={
-    points.sortWith((p1, p2) => (p1-->position) < (p2--> position)).head --> position
+  def maxDistanceFromCenter(): Double ={
+    points.sortWith((p1, p2) => (p1 --> position) < (p2 --> position)).head --> position
   }
 
   /**
@@ -85,13 +85,63 @@ class Obstacle(val points: List[Vector2D]) extends Drawable {
     )
   }
 
+  /**
+   * Given obstacle b, eliminate overlapped vertex and join other vertex in a single obstacle
+   *
+   * @param b obstacle to join.
+   *
+   * @return An Option of obstacle that is defined if join is well done, otherwise return None
+   * */
+  def ><(b:Obstacle): Option[Obstacle] = {
+    if(this.isInstanceOf[Food] != b.isInstanceOf[Food])
+      throw new IllegalArgumentException(s"$this and $b are different objects")
+
+    if(this equals b)
+      return Some(this)
+
+    val newPointList = (this ->| b).toList
+    if(newPointList.nonEmpty){
+      val centroid = Vectors.findCentroid(newPointList)
+      val ordered  = newPointList.sortWith((a,b) =>  ((a - centroid) /\) < ((b - centroid) /\))
+      Some(Obstacle(ordered))
+    } else None
+  }
+
+  /**
+   * Check the overlap between this obstacle and b
+   *
+   * @param b obstacle to check overlap
+   *
+   * @return if overlapping are found, return a list of no overlapped vertex. Otherwise return an empty list
+   * */
+  def ->|(b:Obstacle): Iterable[Vector2D] = {
+    import model.environment.elements.EnvironmentElements._
+    val freePointOfA = points.filter(p => !checkHasInside(b, p))
+    val freePointOfB = b.points.filter(p => !checkHasInside(this, p))
+
+    val overlappedPoint = points.filter(p => b.points.exists(p2 => p.~~(p2,1E-4)))
+
+    if((freePointOfA.size < points.size)
+      || (freePointOfB.size < b.points.size)
+      || overlappedPoint.nonEmpty
+      || (position --> b.position < math.min(maxDistanceFromCenter(), b.maxDistanceFromCenter()))) {
+      freePointOfA.diff(overlappedPoint)++ freePointOfB
+    } else {
+      overlappedPoint.foreach(x => println(x))
+      List.empty
+    }
+  }
+
 
   def canEqual(other: Any): Boolean = other.isInstanceOf[Obstacle]
 
   override def equals(other: Any): Boolean = other match {
     case that: Obstacle =>
-      (that canEqual this) &&
-        position ~~(that.position, 1E-6)
+      ((that canEqual this)
+        && position ~~(that.position, 1E-7)
+        && this.points.size == that.points.size
+        && this.points.map(p => that.points.exists(p2 => p~~(p2,1E-7))).foldRight(true)(_ == _)
+        )
     case _ => false
   }
 
@@ -105,6 +155,7 @@ class Obstacle(val points: List[Vector2D]) extends Drawable {
  * Obstacle factory.
  **/
 object Obstacle {
+
   /**
    * Obstacle by vertex list.
    **/
@@ -126,16 +177,34 @@ object Obstacle {
     Obstacle(vertex.toList)
   }
 
+  /**
+   * Factory for regular triangle
+   * */
   def Triangle(position: Vector2D, radius: Double = 10): Obstacle = Obstacle(position, radius, 3)
 
+  /**
+   * Factory for Square
+   * */
   def Square(position: Vector2D, radius: Double = 10): Obstacle = Obstacle(position, radius, 4)
 
+  /**
+   * Factory for Octagon
+   * */
   def Octagon(position: Vector2D, radius: Double = 10): Obstacle = Obstacle(position, radius, 8)
 
+  /**
+   * Create random random obstacles.
+   *
+   * @param nObstacle number of obstacle to join
+   * @param center center of spawn
+   * @param minMaxDistanceFromCenter (min,Max) distance from center that delimit area to spawn object
+   *
+   * @return list of spawned obstacle, this list should have size < of nObstacle because someone could be joined
+   * */
   def createRandom(nObstacle:Int, center: Vector2D, minMaxDistanceFromCenter: (Double, Double), radius: Double = 20):Iterable[Obstacle] = {
 
     val obstacles = (for {i <- 0 until nObstacle
-      random = Obstacle.randomValid
+      random = scala.util.Random.nextInt(10) + 3
       obstacle = Obstacle(
         RandomVector2DInCircle(minMaxDistanceFromCenter, center),
         radius,
@@ -146,86 +215,20 @@ object Obstacle {
     recursiveJoin(obstacles.toList, center, 0)
   }
 
-   @scala.annotation.tailrec
-  def recursiveJoin(obstacles: List[Obstacle], center: Vector2D, index: Int):Iterable[Obstacle]= {
-    if(index >= obstacles.size)
+  @scala.annotation.tailrec
+  private def recursiveJoin(obstacles: List[Obstacle], center: Vector2D, index: Int):Iterable[Obstacle]= {
+    if (index >= obstacles.size)
       return obstacles
 
-    val nextIndex = if(index == obstacles.size - 1) 0 else index + 1
-    val orderedObstacle = obstacles.sortWith((a,b) =>  ((a.position - center) /\) < ((b.position - center) /\))
-    val joinedObstacle = join(orderedObstacle(index), orderedObstacle(nextIndex))
+    val nextIndex = if (index == obstacles.size - 1) 0 else index + 1
+    val orderedObstacle = obstacles.sortWith((a, b) => ((a.position - center) /\) < ((b.position - center) /\))
+    val joinedObstacle = orderedObstacle(index) >< orderedObstacle(nextIndex)
 
-    if (joinedObstacle.isDefined){
+    if (joinedObstacle.isDefined) {
       val newObstacleList = joinedObstacle.head +: (orderedObstacle diff List(orderedObstacle(index), orderedObstacle(nextIndex)))
       recursiveJoin(newObstacleList, center, index)
     } else recursiveJoin(orderedObstacle, center, index + 1)
   }
-
-  def join(a:Obstacle, b:Obstacle): Option[Obstacle] = {
-    assert(a.isInstanceOf[Food] == b.isInstanceOf[Food])
-    if(a equals b)
-      return Some(a)
-
-    val newPointList = checkOverlap(a,b).toList
-    if(newPointList.nonEmpty){
-      val centroid = Vectors.findCentroid(newPointList)
-      val ordered  = newPointList.sortWith((a,b) =>  ((a - centroid) /\) < ((b - centroid) /\))
-      Some(Obstacle(ordered))
-    } else None
-  }
-
-  def checkOverlap(a:Obstacle, b:Obstacle): Iterable[Vector2D] = {
-    import model.environment.elements.EnvironmentElements._
-    val freePointOfA = a.points.filter(p => !checkHasInside(b, p))
-    val freePointOfB = b.points.filter(p => !checkHasInside(a, p))
-
-    val overlappedPoint = a.points.filter(p => b.points.exists(p2 => p.~~(p2,1E-4)))
-
-    if((freePointOfA.size < a.points.size)
-      || (freePointOfB.size < b.points.size)
-      || overlappedPoint.nonEmpty
-      || (a.position --> b.position < math.min(a.maxDistanceFromCenter(), b.maxDistanceFromCenter()))) {
-      freePointOfA.diff(overlappedPoint)++ freePointOfB
-    } else {
-      overlappedPoint.foreach(x => println(x))
-      List.empty
-    }
-  }
-
-//  def findOverlapAndJoin(obstacles: List[Obstacle], obstacle: Obstacle): List[Obstacle] = {
-//    //Check that obstacle isn't inside the list
-//    val removedObstacle =  obstacles.filter(o => !(o equals obstacle))
-//    //find all obstacle could have an overlap
-//    val nearObstacle = removedObstacle.filter(o => {
-//      val centroidDist = o.position --> obstacle.position
-//      val maxDistanceFromCenter = math.max(o.maxDistanceFromCenter(), obstacle.maxDistanceFromCenter())
-//      (centroidDist < maxDistanceFromCenter)
-//    })
-//    //if overlap isn't find check with other element of list
-//    if(nearObstacle.isEmpty){
-//      if(removedObstacle.headOption.nonEmpty) {
-//        val newElement = removedObstacle.head
-//        findOverlapAndJoin(removedObstacle, newElement)
-//      } else
-//        List()
-//    } else {
-//      // else join overlapped element
-//      val t = for {i <- 1 until nearObstacle.size
-//                   ob <- if(checkOverlap(nearObstacle(i - 1), nearObstacle(i)))
-//                   obstacles =
-//                   }
-//
-//      nearObstacle.foldRight(obstacle)(join(_,_).head)
-//      val clearObstacle =  obstacles.filter(o => {
-//        !nearObstacle.exists(o2 => o2 equals (o))
-//      })
-//      t +: clearObstacle
-//    }
-//  }
-
-
-  val listValue = List(3, 4, 8) // TODO refactor magic number
-  def randomValid: Int = listValue(scala.util.Random.nextInt(listValue.size))
 }
 
 case class IntersectionResult(intersectionPoint: Vector2D, angle: Double)

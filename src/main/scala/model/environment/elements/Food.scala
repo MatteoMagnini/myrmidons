@@ -18,7 +18,8 @@ case class Food(override val position: Vector2D, quantity: Double, o: Obstacle) 
    * @return new instance of Food with increased quantity
    **/
   def +(newQuantity: Double): Food = {
-    Food(position, quantity + newQuantity, Obstacle(position, Food.radius((quantity + newQuantity).toInt), points.size))
+    println(newQuantity)
+    Food(position, quantity + newQuantity, Obstacle(position, Food.radius(math.round(quantity + newQuantity).toInt),points.size))
   }
 
   /** Decrease food quantity.
@@ -27,9 +28,10 @@ case class Food(override val position: Vector2D, quantity: Double, o: Obstacle) 
    * @return new instance of Food with decreased quantity
    **/
   def -(newQuantity: Double): Food = {
-    val food = (this + (- newQuantity))
-    if (food.quantity < 1) this.copy(quantity = 0)
-    else food
+    if(quantity - newQuantity <= 0)
+      this.copy(quantity = 0)
+    else
+      this + (- newQuantity)
   }
 }
 

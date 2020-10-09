@@ -56,12 +56,6 @@ case class Anthill(info: AnthillInfo, environment: ActorRef) extends Actor {
       }
 
     case Clock(value) =>
-      //val antBirthValue = data.foodAmount / (data.maxFoodAmount * 2)
-      /* Random birth of ants */
-      if (Random.nextDouble() < 0.01) {
-        environment ! AntBirth(value)
-        self ! StoreFood(if (data.foodAmount < 10) -data.foodAmount else -10)
-      }
       environment ! UpdateAnthill(data)
 
     case CreateEntities(nAnts: Int, foragingProbability: Double) =>

@@ -36,7 +36,7 @@ private[view] case class MyrmidonsPanel() extends Panel {
 
         case entity: PatrollingAntInfo => draw(entity, g, size)
 
-        case entity: Food => draw(entity, g, size)
+        //case entity: Food => draw(entity, g, size)
 
         case entity: Obstacle => draw(entity, g, size)
 
@@ -73,7 +73,8 @@ private[view] case class MyrmidonsPanel() extends Panel {
 
   def setEntities(info: Seq[Drawable]): (Int, Int) = {
 
-    info.foreach(x => infoEntities = singletonList(x).head +: infoEntities)
+    //info.foreach(x => infoEntities = singletonList(x).head +: infoEntities)
+    infoEntities = info
     val anthillInfo: AnthillInfo = infoEntities.find {
       case _: AnthillInfo => true
       case _ => false

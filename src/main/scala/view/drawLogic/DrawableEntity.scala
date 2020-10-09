@@ -58,17 +58,17 @@ object DrawableEntities {
     }
   }
 
-  implicit object drawFood extends DrawableEntity[Food] {
-
-    import ImplicitConversion._
-
-    override def draw(elem: Food, g: Graphics2D, size: Dimension): Unit = {
-      val foodQuantity: Float = elem.quantity / 1000
-      g.setColor(FOOD_COLOR(foodQuantity))
-      drawEllipse(elem.position.x - elem.radius, size.height - elem.position.y - elem.radius,
-        elem.radius * SET_TO_CENTER, elem.radius * SET_TO_CENTER, g)
-    }
-  }
+//  implicit object drawFood extends DrawableEntity[Food] {
+//
+//    import ImplicitConversion._
+//
+//    override def draw(elem: Food, g: Graphics2D, size: Dimension): Unit = {
+//      val foodQuantity: Float = elem.quantity / 1000
+//      g.setColor(FOOD_COLOR(foodQuantity))
+//      drawEllipse(elem.position.x - elem.radius, size.height - elem.position.y - elem.radius,
+//        elem.radius * SET_TO_CENTER, elem.radius * SET_TO_CENTER, g)
+//    }
+//  }
 
   implicit object drawForagingAnt extends DrawableEntity[ForagingAntInfo] {
     override def draw(elem: ForagingAntInfo, g: Graphics2D, size: Dimension): Unit = {
@@ -90,7 +90,10 @@ object DrawableEntities {
 
   implicit object drawObstacle extends DrawableEntity[Obstacle] {
     override def draw(elem: Obstacle, g: Graphics2D, size: Dimension): Unit = {
-      g.setColor(OBSTACLE_COLOR)
+      g.setColor(elem match {
+        case food: Food => FOOD_COLOR((food.quantity / 1000).toFloat)
+        case _ => OBSTACLE_COLOR
+      })
       val vertex = for (seg <- elem.segments) yield seg._1
       val xCoordinates = for (v <- vertex) yield Math.round(v.x).toInt
       val yCoordination = for (v <- vertex) yield Math.round(size.height - v.y).toInt
