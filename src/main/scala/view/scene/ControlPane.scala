@@ -2,9 +2,10 @@ package view.scene
 
 import akka.actor.{ActorRef, ActorSystem}
 import model.environment.{Boundary, Environment, EnvironmentInfo}
-import utility.Messages.{Clock, StartSimulation}
-import view.actor.{UiActor, uiActorInfo}
-import view.actor.uiMessage.{RestartSimulation, StopSimulation}
+import utility.Messages.StartSimulation
+import utility.Parameters.GUIConstant.SIMULATION_BOUNDARY
+import view.actor.{ReportManager, ReportManagerInfo, UiActor, uiActorInfo}
+import view.actor.uiMessage.{RestartSimulation, ShowReport, StopSimulation}
 
 import scala.swing.event.ButtonClicked
 import scala.swing.{Button, FlowPanel, Label, Separator}
@@ -14,31 +15,44 @@ import scala.swing.{Button, FlowPanel, Label, Separator}
  *
  * @param myrmidonsPanel Panel when all the entities will be draw.
  */
-case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends FlowPanel {
+private[view] case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends FlowPanel {
 
   private val system = ActorSystem("Myrmidons-system")
-  private val boundary = Boundary(0, 0, 800, 800)
-  var uiActor: ActorRef = _
-  var environment: ActorRef = _
-  uiActor = system.actorOf(UiActor(uiActorInfo(myrmidonsPanel, this)))
-  environment = system.actorOf(Environment(EnvironmentInfo(boundary)), name = "env-actor")
-  var startFlag = false
-
-  var stepText = new Label("0")
-  var antPopulationText = new Label("0")
-  var anthillFoodAmount = new Label("0")
+  private val boundary = Boundary(0, 0, SIMULATION_BOUNDARY._1, SIMULATION_BOUNDARY._2)
   private val stepLabel = new Label("Step:")
   private val populationLabel = new Label("Ants number:")
   private val anthillFoodAmountLabel = new Label("Anthill Food:")
   private val startButton = new Button("Start")
   private val stopButton = new Button("Stop")
   private val restartButton = new Button("Restart")
+  private val reportButton = new Button("Report")
+
+  var uiActor: ActorRef = _
+  var environment: ActorRef = _
+  var reportManager: ActorRef = _
+  uiActor = system.actorOf(UiActor(uiActorInfo(myrmidonsPanel, this)))
+  environment = system.actorOf(Environment(EnvironmentInfo(boundary)), name = "env-actor")
+  reportManager = system.actorOf(ReportManager(ReportManagerInfo()))
+
+  var startFlag = false
+  var stepText = new Label("0")
+  var antPopulationText = new Label("0")
+  var anthillFoodAmount = new Label("0")
+
   this.stopButton.enabled = false
   this.restartButton.enabled = false
-  contents ++= Seq(startButton, stopButton, restartButton, stepLabel,
+  this.reportButton.enabled = false
+
+  private var antSize = 0
+  private var anthillFood = 0
+  private var obstacleSize = 0
+  private var enemiesSize = 0
+  private var foodSize = 0
+
+  contents ++= Seq(startButton, stopButton, restartButton, reportButton, stepLabel,
     stepText, new Separator(), populationLabel, antPopulationText, new Separator(), anthillFoodAmountLabel, anthillFoodAmount)
 
-  listenTo(startButton, stopButton, restartButton)
+  listenTo(startButton, stopButton, restartButton, reportButton)
   /**
    * When startButton is pressed the UiActor tell to Environment that the simulation
    * can be start with a sequence of obstacles and numbers of ants.
@@ -49,6 +63,7 @@ case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends FlowPanel {
       this.startButton.enabled = false
       this.stopButton.enabled = true
       this.restartButton.enabled = false
+      this.reportButton.enabled = false
       if (!startFlag) {
         tellStart()
       } else {
@@ -59,26 +74,45 @@ case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends FlowPanel {
       this.startButton.enabled = true
       this.stopButton.enabled = false
       this.restartButton.enabled = true
+      this.reportButton.enabled = true
       uiActor.tell(StopSimulation, uiActor)
 
     case ButtonClicked(component) if component == restartButton =>
       system.stop(environment)
       system.stop(uiActor)
+      system.stop(reportManager)
       this.restartButton.enabled = false
       this.stopButton.enabled = true
       this.startButton.enabled = false
+      this.reportButton.enabled = false
 
       val uiRestart: ActorRef = system.actorOf(UiActor(uiActorInfo(myrmidonsPanel, this)))
+      val reportRestart: ActorRef = system.actorOf(ReportManager(ReportManagerInfo()))
       uiActor = uiRestart
+      reportManager = reportRestart
       val environmentRestart: ActorRef = system.actorOf(Environment(EnvironmentInfo(boundary)),
         name = s"env+${stepText.text}")
       environment = environmentRestart
       tellStart()
+
+    case ButtonClicked(component) if component == reportButton =>
+      reportManager.tell(ShowReport(), uiActor)
+
   }
 
   private def tellStart(): Unit = {
-    environment.tell(StartSimulation(100, 10, obstacles = Some(5)), uiActor)
-    //environment.tell(Clock(1), uiActor)
+    environment.tell(StartSimulation(antSize, enemiesSize, obstacles = Some(obstacleSize),
+      food = Some(foodSize)), uiActor)
   }
 
+  // TODO ADD FOOD ANTHILL IN START SIMULATION
+
+  def setParameters(antSize: Int, anthillFood: Int, foodSize: Int,
+                    obstacleSize: Int, enemiesSize: Int): Unit = {
+    this.antSize = antSize
+    this.anthillFood = anthillFood
+    this.obstacleSize = obstacleSize
+    this.enemiesSize = enemiesSize
+    this.foodSize = foodSize
+  }
 }
