@@ -78,7 +78,7 @@ with BeforeAndAfterAll{
       }
 
 
-      val foragingAntInfo2 = foragingAntInfo.incFood(utility.Parameters.ForagingAnt.MAX_FOOD)
+      val foragingAntInfo2 = foragingAntInfo.incFood(utility.Parameters.Insects.Ants.ForagingAnt.MAX_FOOD)
       //Indirectly testing GoBackToHome because it is called in carryFoodCompetence apply.
       "carry to home" in {
 

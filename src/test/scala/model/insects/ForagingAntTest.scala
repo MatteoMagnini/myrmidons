@@ -14,7 +14,7 @@ import utility.Messages._
 import utility.Parameters.Competence._
 import model.insects.info.ForagingAntInfo
 import utility.Message
-import utility.Parameters.ForagingAnt._
+import utility.Parameters.Insects.Ants.ForagingAnt._
 
 class ForagingAntTest extends TestKit(ActorSystem("ForagingAntTest"))
   with AnyWordSpecLike

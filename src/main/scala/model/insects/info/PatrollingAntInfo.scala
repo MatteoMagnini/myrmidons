@@ -1,7 +1,7 @@
 package model.insects.info
 import akka.actor.ActorRef
 import model.environment.pheromones.DangerPheromone
-import utility.Parameters.PatrollingAnt._
+import utility.Parameters.Insects.Ants.PatrollingAnt._
 import utility.geometry.{Vector2D, ZeroVector2D}
 
 case class PatrollingAntInfo(override val id: Int,

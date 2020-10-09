@@ -5,7 +5,7 @@ import model.environment.pheromones.DangerPheromone
 import model.insects.competences.{DangerPheromoneTaxis, Die, EatFromTheAnthill, GoBackToHome, GoOutside, RandomWalk}
 import model.insects.info.PatrollingAntInfo
 import utility.Messages.{AddDangerPheromone, Clock, Context, DangerPheromones, EatFood, KillInsect, NewPosition, UpdateAnthillCondition, UpdateInsect}
-import utility.Parameters.ForagingAnt._
+import utility.Parameters.Insects.Ants.ForagingAnt._
 
 case class PatrollingAnt (override val info: PatrollingAntInfo,
                      override val environment: ActorRef) extends Insect[PatrollingAntInfo] {

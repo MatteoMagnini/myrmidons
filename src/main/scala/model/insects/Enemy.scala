@@ -19,7 +19,7 @@ class Enemy(override val info: EnemyInfo,
       subsumption(newData,competences)(context, environment, self, newData, defaultBehaviour)
 
     case NewPosition(p, d) =>
-      val newData = data.updatePosition(p).updateInertia(d)
+      val newData = data.updatePosition(p).updateInertia(d).updateEnergy(info.energy)
       environment ! UpdateInsect(newData)
       context become defaultBehaviour(newData)
 
