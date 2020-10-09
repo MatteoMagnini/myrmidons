@@ -52,8 +52,8 @@ object Parameters {
     }
 
     object Enemy {
-      val MIN_ENERGY = 65
-      val MAX_ENERGY = 85
+      val MIN_ENERGY = 50
+      val MAX_ENERGY = 70
       val STARTING_TIME = 0
       val ENERGY: Double = MIN_ENERGY + (MAX_ENERGY - MIN_ENERGY) * Random.nextDouble()
       val STARTING_POSITION: Vector2D = ZeroVector2D()
