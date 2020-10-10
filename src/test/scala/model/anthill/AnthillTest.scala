@@ -5,7 +5,7 @@ import akka.testkit.{TestKit, TestProbe}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.Messages.{Clock, EatFood, StoreFood, UpdateAnthill}
+import utility.Messages._
 import utility.geometry.Vector2D
 
 class AnthillTest extends TestKit(ActorSystem("AnthillTest"))
@@ -20,6 +20,12 @@ class AnthillTest extends TestKit(ActorSystem("AnthillTest"))
   val sender: TestProbe = TestProbe()
   implicit val senderRef: ActorRef = sender.ref
 
+  /* Ignore AntBirthMessages */
+  sender.ignoreMsg {
+    case AntBirth(_) => true
+    case _ => false
+  }
+
   "The anthill" when {
 
     val startingPosition = Vector2D(500,500)
@@ -33,7 +39,6 @@ class AnthillTest extends TestKit(ActorSystem("AnthillTest"))
         sender.expectMsg(UpdateAnthill(startingInfo))
         sender.expectNoMessage()
       }
-
     }
 
     "interacting with insects" should {
@@ -52,7 +57,6 @@ class AnthillTest extends TestKit(ActorSystem("AnthillTest"))
         anthill ! Clock(1)
         sender.expectMsg(UpdateAnthill(newInfo))
         sender.expectNoMessage()
-
       }
 
       "decrease the food storage if an insect take some food" in {
@@ -87,6 +91,7 @@ class AnthillTest extends TestKit(ActorSystem("AnthillTest"))
 
         anthill ! StoreFood(newFoodToStore)
         anthill ! Clock(4)
+
         sender.expectMsg(UpdateAnthill(newInfo))
         sender.expectNoMessage()
 
