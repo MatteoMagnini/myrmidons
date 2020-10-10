@@ -22,7 +22,6 @@ object DrawableEntities {
   def draw[T: DrawableEntity](elem: T, g: Graphics2D, size: Dimension): Unit =
     implicitly[DrawableEntity[T]].draw(elem, g, size)
 
-
   def drawEllipse(x: Double, y: Double, w: Double, h: Double, g: Graphics2D): Unit = {
     val ellipse = new Ellipse2D.Double(x, y, w, h)
     g.fill(ellipse)

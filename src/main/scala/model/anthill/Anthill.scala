@@ -56,22 +56,22 @@ case class Anthill(info: AnthillInfo, environment: ActorRef) extends Actor {
       }
 
     case Clock(value) =>
-      //val antBirthValue = data.foodAmount / (data.maxFoodAmount * 2)
+      val antBirthValue = data.foodAmount / data.maxFoodAmount * Random.nextDouble()
       /* Random birth of ants */
-      if (Random.nextDouble() < 0.01) {
+      if (antBirthValue > 0.2) {
         environment ! AntBirth(value)
-        self ! StoreFood(if (data.foodAmount < 10) -data.foodAmount else -10)
+        self ! StoreFood(if (data.foodAmount < 10) - data.foodAmount else - 10)
       }
       environment ! UpdateAnthill(data)
 
-    case CreateEntities(nAnts: Int, foragingProbability: Double) =>
+    case CreateEntities(nAnts: Int, foragingPercentage: Double) =>
 
       /** Returns ants and enemies references, creating ants from the center of boundary */
-      val nForaging = (nAnts * foragingProbability).ceil.toInt
+      val nForaging = (nAnts * foragingPercentage).ceil.toInt
       val foragingAnts = (0 until nForaging).map(i => {
         i -> context.actorOf(ForagingAnt(ForagingAntInfo(self, id = i, position = info.position), sender), s"f-ant-$i")
       }).toMap
-      val nPatrolling = nForaging + (nAnts * (1 - foragingProbability)).toInt
+      val nPatrolling = nForaging + (nAnts * (1 - foragingPercentage)).toInt
       val patrollingAnts = (nForaging until nPatrolling).map(i => {
         i -> context.actorOf(PatrollingAnt(PatrollingAntInfo(self, id = i, position = info.position), sender), s"p-ant-$i")
       }).toMap

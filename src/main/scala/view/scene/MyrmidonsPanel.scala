@@ -7,7 +7,7 @@ import model.anthill.AnthillInfo
 import model.environment.elements.{Food, Obstacle}
 import model.environment.pheromones.{DangerPheromone, FoodPheromone}
 import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo, PatrollingAntInfo}
-import view.drawLogic.singletonList
+import view.drawLogic._
 
 import scala.swing.{Graphics2D, Panel}
 
@@ -84,7 +84,7 @@ private[view] case class MyrmidonsPanel() extends Panel {
       case _: PatrollingAntInfo => true
       case _ => false
     }
-    (positionsCount, anthillInfo.foodAmount.toInt)
+    (positionsCount, anthillInfo.foodAmount)
   }
 
 }

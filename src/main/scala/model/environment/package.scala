@@ -6,7 +6,7 @@ package object environment {
 
   val ANTHILL_RADIUS = 15
   val FOOD_AMOUNT = 2000
-  val FOOD_RADIUS: (Int, Int) = (100, 150)
+  val FOOD_RADIUS: (Int, Int) = (120, 200)
 
   implicit def extractOption[X](value: Option[X]): X = value.get
 

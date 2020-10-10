@@ -52,7 +52,6 @@ object uiActorInfo {
 
 
     override def setControl(currentState: Int, entitiesProperties: (Int, Int)): Unit = {
-      import ImplicitConversion._
       control.stepText.text = currentState
       control.antPopulationText.text = entitiesProperties._1
       control.anthillFoodAmount.text = entitiesProperties._2

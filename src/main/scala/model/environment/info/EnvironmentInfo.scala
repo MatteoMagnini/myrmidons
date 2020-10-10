@@ -84,7 +84,6 @@ trait EnvironmentInfo {
 
 }
 
-
 object EnvironmentInfo {
 
   def apply(boundary: Boundary): EnvironmentInfo =

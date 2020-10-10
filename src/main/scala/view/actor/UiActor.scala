@@ -54,10 +54,6 @@ private[view] class UiActor(state: uiActorInfo)
 
 }
 
-object ImplicitConversion {
-  implicit def intToString(value: Int): String = value.toString
-}
-
 object UiActor {
   def apply(state: uiActorInfo): Props = Props(classOf[UiActor], state)
 }
