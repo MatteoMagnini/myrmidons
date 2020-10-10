@@ -2,7 +2,7 @@ package model.insects.competences
 
 import akka.actor.Actor.Receive
 import akka.actor.{ActorContext, ActorRef}
-import model.insects.info.{SpecificInsectInfo}
+import model.insects.info.SpecificInsectInfo
 import utility.Messages._
 import utility.geometry.Vectors._
 import utility.geometry._

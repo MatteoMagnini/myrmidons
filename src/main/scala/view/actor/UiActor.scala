@@ -1,11 +1,9 @@
 package view.actor
 
-import view.actor.uiMessage.{RestartSimulation, SaveInfo, StepOver, StopSimulation}
 import akka.actor.{Actor, ActorContext, ActorLogging, Props, Timers}
 import model.Drawable
-
-import utility.Messages.{Clock, Repaint, Ready}
-
+import utility.Messages.{Clock, Ready, Repaint}
+import view.actor.uiMessage.{RestartSimulation, SaveInfo, StepOver, StopSimulation}
 
 import scala.concurrent.duration.DurationInt
 

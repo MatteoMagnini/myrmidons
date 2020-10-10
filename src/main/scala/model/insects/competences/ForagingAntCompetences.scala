@@ -3,13 +3,14 @@ package model.insects.competences
 import akka.actor.Actor.Receive
 import akka.actor.{ActorContext, ActorRef}
 import model.environment.pheromones.FoodPheromone
+import model.environment.pheromones.FoodPheromoneInfo._
+import model.insects.Ants.ForagingAnt._
 import model.insects.info.ForagingAntInfo
 import utility.Messages._
 import utility.PheromoneSeq._
 import utility.geometry._
-import model.insects.Ants.ForagingAnt._
+
 import scala.util.Random
-import model.environment.pheromones.FoodPheromoneInfo._
 
 /**
  * Specific competences suitable only for foraging ants

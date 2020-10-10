@@ -1,6 +1,7 @@
 package view
 
 import view.scene.ParametersPanel
+
 import scala.swing.{BorderPanel, Dimension, MainFrame}
 
 /**

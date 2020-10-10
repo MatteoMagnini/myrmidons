@@ -1,14 +1,15 @@
 package view.drawLogic
 
-import java.awt.{Color, Polygon}
 import java.awt.geom.Ellipse2D
-import view._
+import java.awt.{Color, Polygon}
+
 import model.Fights.Fight
 import model.anthill.AnthillInfo
 import model.environment.elements.{Food, Obstacle}
 import model.environment.pheromones.{DangerPheromone, DangerPheromoneInfo, FoodPheromone, FoodPheromoneInfo}
 import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo, PatrollingAntInfo}
 import view.Colors._
+import view._
 
 import scala.swing.{Dimension, Graphics2D}
 
@@ -115,8 +116,8 @@ object DrawableEntities {
 
   implicit object drawFight extends DrawableEntity[Fight[InsectInfo, EnemyInfo]] {
     override def draw(elem: Fight[InsectInfo, EnemyInfo], g: Graphics2D, size: Dimension): Unit = {
-      import model.Fights._
       import model.Fights.InsectFight._
+      import model.Fights._
 
       val insectLoser = loser(elem) match {
         case Left(x) => g.setColor(Color.black); x

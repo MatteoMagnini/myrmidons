@@ -1,8 +1,8 @@
 package model.environment.elements
 
 import model.Drawable
-import utility.geometry.{Vector2D, Vector3D, Vectors}
 import utility.geometry.VectorsImplicits._
+import utility.geometry.{Vector2D, Vector3D, Vectors}
 
 /** An implementation of an obstacle.
  * It can accept every polygonal obstacle form.

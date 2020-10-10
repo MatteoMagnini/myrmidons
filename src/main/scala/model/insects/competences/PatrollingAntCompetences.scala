@@ -2,10 +2,10 @@ package model.insects.competences
 
 import akka.actor.Actor.Receive
 import akka.actor.{ActorContext, ActorRef}
+import model.insects.Ants.PatrollingAnt._
 import model.insects.info.PatrollingAntInfo
 import utility.Messages.Move
 import utility.geometry.{OrientedVector2D, OrientedVector2DWithNoise}
-import model.insects.Ants.PatrollingAnt._
 
 /**
  * Specific competences suitable only for foraging ants

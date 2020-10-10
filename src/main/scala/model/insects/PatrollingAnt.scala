@@ -2,11 +2,11 @@ package model.insects
 
 import akka.actor.{ActorRef, Props}
 import model.environment.pheromones.DangerPheromone
-import model.insects.competences.{DangerPheromoneTaxis, Die, EatFromTheAnthill, GoBackToHome, GoOutside, RandomWalk}
-import model.insects.info.PatrollingAntInfo
-import utility.Messages.{AddDangerPheromone, Clock, Context, DangerPheromones, EatFood, KillInsect, NewPosition, UpdateAnthillCondition, UpdateInsect}
-import Ants.PatrollingAnt._
 import model.environment.pheromones.DangerPheromoneInfo._
+import model.insects.Ants.PatrollingAnt._
+import model.insects.competences._
+import model.insects.info.PatrollingAntInfo
+import utility.Messages._
 
 case class PatrollingAnt (override val info: PatrollingAntInfo,
                      override val environment: ActorRef) extends Insect[PatrollingAntInfo] {

@@ -3,16 +3,15 @@ package model.environment
 import akka.actor.{Actor, ActorContext, ActorLogging, ActorRef, Props}
 import model.Fights.Fight
 import model.anthill.{Anthill, AnthillInfo}
+import model.environment.elements.EnvironmentElements.{FoodHasInside, _}
 import model.environment.elements.{Food, Obstacle}
+import model.environment.info.EnvironmentInfo
+import model.environment.pheromones.{DangerPheromone, FoodPheromone}
 import model.insects._
-import model.insects.info._
+import model.insects.info.{SpecificInsectInfo, _}
 import utility.Messages._
 import utility.PheromoneSeq._
-import model.insects.info.SpecificInsectInfo
 import utility.geometry.{RandomVector2DInCircle, RandomVector2DInSquare, Vector2D}
-import model.environment.elements.EnvironmentElements._
-import model.environment.elements.EnvironmentElements.FoodHasInside
-import model.environment.pheromones.{DangerPheromone, FoodPheromone}
 
 
 /** Environment actor
@@ -116,7 +115,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   private def sendInfoToGUI(info: EnvironmentInfo): Unit = {
     /* When all insects return their positions, environment send them to GUI */
     val fights = findFights(info.foragingAntsInfo ++ info.patrollingAntsInfo, info.enemiesInfo)
-
+    handleFights(info, fights)
     info.gui.get ! Repaint(info.anthillInfo.get +: (info.foragingAntsInfo ++ info.patrollingAntsInfo ++ info.enemiesInfo ++
       info.obstacles ++ info.foods ++ info.foodPheromones ++ info.dangerPheromones ++ fights).toSeq)
     context >>> defaultBehaviour(info.emptyInsectInfo())
@@ -130,8 +129,8 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     } yield Fight(ant, enemy, ant.position)
 
   private def handleFights(info: EnvironmentInfo, fights: Iterable[Fight[InsectInfo, EnemyInfo]]): Unit = {
-    import model.Fights._
     import model.Fights.InsectFight._
+    import model.Fights._
     for (loser <- losers(fights)) {
       loser match {
         case Left(ant) =>

@@ -1,5 +1,5 @@
 package utility.geometry
-import Vectors._
+import utility.geometry.Vectors._
 
 /** A vector in 3-dimensional space.
   *

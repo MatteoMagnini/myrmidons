@@ -1,6 +1,6 @@
 package utility.geometry
 
-import VectorsImplicits._
+import utility.geometry.VectorsImplicits._
 
 object Vectors {
 

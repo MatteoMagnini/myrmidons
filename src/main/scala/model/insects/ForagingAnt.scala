@@ -2,11 +2,11 @@ package model.insects
 
 import akka.actor.{ActorRef, Props}
 import model.environment.pheromones.DangerPheromone
-import model.insects.competences.{CarryFoodToHome, Die, DropFoodPheromone, EatFromTheAnthill, FoodPheromoneTaxis, GoBackToHome, GoOutside, PickFood, RandomWalk, StoreFoodInAnthill}
+import model.environment.pheromones.DangerPheromoneInfo._
+import model.insects.Ants.ForagingAnt._
+import model.insects.competences._
 import model.insects.info.ForagingAntInfo
 import utility.Messages._
-import Ants.ForagingAnt._
-import model.environment.pheromones.DangerPheromoneInfo._
 
 /**
   * Ant that performs foraging.

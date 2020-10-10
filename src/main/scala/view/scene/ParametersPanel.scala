@@ -2,6 +2,7 @@ package view.scene
 
 import view.Myrmidons.frame.dispose
 import view._
+
 import scala.swing.event.ButtonClicked
 import scala.swing.{BorderPanel, Button, Dimension, GridPanel, Label, MainFrame, TextField}
 

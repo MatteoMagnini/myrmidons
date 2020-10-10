@@ -2,13 +2,14 @@ package model.anthill
 
 import akka.actor.{Actor, ActorRef, Props}
 import model.Drawable
-import model.insects.{ForagingAnt, PatrollingAnt}
+import model.insects.competences._
 import model.insects.info.{ForagingAntInfo, PatrollingAntInfo}
-import utility.geometry._
+import model.insects.{ForagingAnt, PatrollingAnt}
 import utility.Messages._
 import utility.geometry.Vectors.doubleInRange
+import utility.geometry._
+
 import scala.util.Random
-import model.insects.competences._
 
 case class AnthillInfo(override val position: Vector2D,
                        radius: Double,
@@ -64,7 +65,8 @@ case class Anthill(info: AnthillInfo, environment: ActorRef) extends Actor {
       environment ! UpdateAnthill(data)
 
     case CreateEntities(nAnts: Int, foragingProbability: Double) =>
-    /** Returns ants and enemies references, creating ants from the center of boundary */
+
+      /** Returns ants and enemies references, creating ants from the center of boundary */
       val nForaging = (nAnts * foragingProbability).ceil.toInt
       val foragingAnts = (0 until nForaging).map(i => {
         i -> context.actorOf(ForagingAnt(ForagingAntInfo(self, id = i, position = info.position), sender), s"f-ant-$i")

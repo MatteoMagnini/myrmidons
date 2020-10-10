@@ -1,10 +1,10 @@
 package model.insects
 
 import akka.actor.{ActorRef, Props}
+import model.insects.Enemies._
 import model.insects.competences.{Die, RandomWalk}
 import model.insects.info.EnemyInfo
 import utility.Messages._
-import Enemies._
 
 class Enemy(override val info: EnemyInfo,
             override val environment: ActorRef) extends Insect[EnemyInfo] {

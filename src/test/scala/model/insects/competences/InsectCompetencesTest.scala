@@ -4,11 +4,11 @@ import akka.actor.Actor.Receive
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
 import model.environment.pheromones.{DangerPheromone, FoodPheromone}
-import model.insects.{Enemy, ForagingAnt, PatrollingAnt}
 import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
+import model.insects.{Enemy, ForagingAnt, PatrollingAnt}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.Messages.{AddFoodPheromone, AntTowardsAnthill, Context, EatFood, KillInsect, Move, StoreFood, TakeFood, UpdateInsect}
+import utility.Messages._
 import utility.geometry.{Vector2D, ZeroVector2D}
 
 class InsectCompetencesTest extends TestKit(ActorSystem("InsectCompetencesTest"))

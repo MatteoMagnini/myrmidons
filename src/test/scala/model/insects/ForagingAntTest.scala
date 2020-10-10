@@ -2,19 +2,19 @@ package model.insects
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
-import utility.geometry.TupleOp2._
 import model.anthill.{Anthill, AnthillInfo}
 import model.environment.elements.{Food, Obstacle}
 import model.environment.pheromones.FoodPheromone
+import model.insects.Ants.ForagingAnt._
+import model.insects.competences._
+import model.insects.info.ForagingAntInfo
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.geometry._
-import utility.Messages._
-import model.insects.info.ForagingAntInfo
 import utility.Message
-import model.insects.Ants.ForagingAnt._
-import model.insects.competences._
+import utility.Messages._
+import utility.geometry.TupleOp2._
+import utility.geometry._
 
 class ForagingAntTest extends TestKit(ActorSystem("ForagingAntTest"))
   with AnyWordSpecLike

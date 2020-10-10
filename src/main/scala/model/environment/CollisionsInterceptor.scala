@@ -3,10 +3,11 @@ package model.environment
 import akka.actor.ActorRef
 import model.environment.elements.EnvironmentElements.{checkHasInside, checkHaveInside}
 import model.environment.elements.{Food, Obstacle}
+import model.environment.info.EnvironmentInfo
 import utility.Messages.{FoodNear, NewPosition}
 import utility.geometry.Vector2D
 
-object CollisionsInterceptor {
+private[environment] object CollisionsInterceptor {
 
   def checkCollisions(environmentRef: ActorRef, entity: ActorRef, state: EnvironmentInfo, position: Vector2D, delta: Vector2D): Unit = {
     val newPosition = position >> delta

@@ -4,14 +4,14 @@ import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
 import model.anthill.{Anthill, AnthillInfo}
 import model.environment.pheromones.DangerPheromone
+import model.environment.pheromones.DangerPheromoneInfo._
+import model.insects.competences._
 import model.insects.info.PatrollingAntInfo
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.Messages.{Clock, DangerPheromones, Move, NewPosition, UpdateInsect}
+import utility.Messages._
 import utility.geometry.{Vector2D, ZeroVector2D}
-import model.insects.competences._
-import model.environment.pheromones.DangerPheromoneInfo._
 
 class PatrollingAntTest extends TestKit(ActorSystem("PatrollingAntTest"))
   with AnyWordSpecLike
@@ -27,8 +27,8 @@ class PatrollingAntTest extends TestKit(ActorSystem("PatrollingAntTest"))
 
   "A patrolling ant" when {
 
-    import utility.geometry.Vectors._
     import model.insects.Ants.PatrollingAnt._
+    import utility.geometry.Vectors._
 
     "performing random walk" should {
 
