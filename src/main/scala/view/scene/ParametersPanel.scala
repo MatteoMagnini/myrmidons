@@ -1,8 +1,7 @@
 package view.scene
 
-import utility.Parameters.GUIConstant.SIMULATION_SIZE
 import view.Myrmidons.frame.dispose
-
+import view._
 import scala.swing.event.ButtonClicked
 import scala.swing.{BorderPanel, Button, Dimension, GridPanel, Label, MainFrame, TextField}
 

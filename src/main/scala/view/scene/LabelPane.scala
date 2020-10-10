@@ -2,9 +2,8 @@ package view.scene
 
 import java.awt.Color
 
-import view.ColorUtility.Colors.{ANTHILL_COLOR_COMPONENT, ANT_COLOR, DANGER_PHEROMONE_COLOR_COMPONENT, ENEMIES_COLOR, FOOD_COLOR_COMPONENT, FOOD_PHEROMONE_COLOR_COMPONENT, OBSTACLE_COLOR, PATROLLING_ANT_COLOR}
-
 import scala.swing.{FlowPanel, Label, Separator}
+import view.Colors._
 
 /**
  * FlowPanel with short legend to understand color entities.

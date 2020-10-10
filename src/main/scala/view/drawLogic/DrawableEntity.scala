@@ -2,14 +2,13 @@ package view.drawLogic
 
 import java.awt.{Color, Polygon}
 import java.awt.geom.Ellipse2D
-
+import view._
 import model.Fights.Fight
 import model.anthill.AnthillInfo
 import model.environment.elements.{Food, Obstacle}
 import model.environment.pheromones.{DangerPheromone, DangerPheromoneInfo, FoodPheromone, FoodPheromoneInfo}
 import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo, PatrollingAntInfo}
-import utility.Parameters.GUIConstant._
-import view.ColorUtility.Colors._
+import view.Colors._
 
 import scala.swing.{Dimension, Graphics2D}
 

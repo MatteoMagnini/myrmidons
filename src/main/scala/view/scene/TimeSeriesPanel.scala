@@ -4,11 +4,10 @@ import org.jfree.chart.ChartFactory
 import org.jfree.chart.plot.XYPlot
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer
 import java.awt.Color
-
+import view._
 import org.jfree.data.time.{TimeSeries, TimeSeriesCollection, Year}
 import org.jfree.chart.ChartPanel
 import org.jfree.chart.JFreeChart
-import utility.Parameters.GUIConstant.SIMULATION_SIZE
 
 import scala.swing.{Dimension, MainFrame}
 
