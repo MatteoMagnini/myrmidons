@@ -8,7 +8,6 @@ import utility.geometry.ZeroVector2D
 
 import scala.util.Random
 
-
 class FightsTest extends AnyWordSpecLike with Matchers {
 
   "A fight between insect" when {
@@ -44,7 +43,7 @@ class FightsTest extends AnyWordSpecLike with Matchers {
       ant: InsectInfo = PatrollingAntInfo(null, energy = antEnergy)
       insectEnergy = Random.nextInt(maxEnergy)
       enemy: EnemyInfo = EnemyInfo(energy = insectEnergy)
-    } yield Fight(ant, enemy, ZeroVector2D())
+    } yield Fight(ant.asInstanceOf[InsectInfo], enemy, ZeroVector2D())
 
     "happens" should {
 

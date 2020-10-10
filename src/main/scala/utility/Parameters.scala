@@ -26,7 +26,7 @@ object Parameters {
 
   object Insects {
 
-    object Ants {
+ /*   object Ants {
 
       object ForagingAnt {
         val MAX_ENERGY = 100.0
@@ -57,7 +57,7 @@ object Parameters {
       val STARTING_TIME = 0
       val ENERGY: Double = MIN_ENERGY + (MAX_ENERGY - MIN_ENERGY) * Random.nextDouble()
       val STARTING_POSITION: Vector2D = ZeroVector2D()
-    }
+    }*/
   }
 
   object GUIConstant {

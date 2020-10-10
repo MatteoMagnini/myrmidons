@@ -27,8 +27,8 @@ class PatrollingAntTest extends TestKit(ActorSystem("PatrollingAntTest"))
 
   "A patrolling ant" when {
 
-    import utility.Parameters.Insects.Ants.PatrollingAnt._
     import utility.geometry.Vectors._
+    import model.insects.Ants.PatrollingAnt._
 
     "performing random walk" should {
 

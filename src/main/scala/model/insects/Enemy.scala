@@ -4,7 +4,7 @@ import akka.actor.{ActorRef, Props}
 import model.insects.competences.{Die, RandomWalk}
 import model.insects.info.EnemyInfo
 import utility.Messages._
-import utility.Parameters.Insects.Ants.ForagingAnt.MAX_ENERGY
+import Enemies._
 
 class Enemy(override val info: EnemyInfo,
             override val environment: ActorRef) extends Insect[EnemyInfo] {

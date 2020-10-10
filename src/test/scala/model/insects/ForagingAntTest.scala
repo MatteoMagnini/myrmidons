@@ -13,7 +13,7 @@ import utility.geometry._
 import utility.Messages._
 import model.insects.info.ForagingAntInfo
 import utility.Message
-import utility.Parameters.Insects.Ants.ForagingAnt._
+import model.insects.Ants.ForagingAnt._
 import model.insects.competences._
 
 class ForagingAntTest extends TestKit(ActorSystem("ForagingAntTest"))

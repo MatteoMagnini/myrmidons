@@ -5,7 +5,7 @@ import model.environment.pheromones.DangerPheromone
 import model.insects.competences.{CarryFoodToHome, Die, DropFoodPheromone, EatFromTheAnthill, FoodPheromoneTaxis, GoBackToHome, GoOutside, PickFood, RandomWalk, StoreFoodInAnthill}
 import model.insects.info.ForagingAntInfo
 import utility.Messages._
-import utility.Parameters.Insects.Ants.ForagingAnt._
+import Ants.ForagingAnt._
 import model.environment.pheromones.DangerPheromoneInfo._
 
 /**

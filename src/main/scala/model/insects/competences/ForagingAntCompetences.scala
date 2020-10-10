@@ -7,7 +7,7 @@ import model.insects.info.ForagingAntInfo
 import utility.Messages._
 import utility.PheromoneSeq._
 import utility.geometry._
-import utility.Parameters.Insects.Ants.ForagingAnt._
+import model.insects.Ants.ForagingAnt._
 import scala.util.Random
 import model.environment.pheromones.FoodPheromoneInfo._
 

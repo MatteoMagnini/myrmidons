@@ -77,8 +77,8 @@ with BeforeAndAfterAll{
 
       }
 
-
-      val foragingAntInfo2 = foragingAntInfo.incFood(utility.Parameters.Insects.Ants.ForagingAnt.MAX_FOOD)
+      import model.insects.Ants.ForagingAnt._
+      val foragingAntInfo2 = foragingAntInfo.incFood(MAX_FOOD)
       //Indirectly testing GoBackToHome because it is called in carryFoodCompetence apply.
       "carry to home" in {
 
