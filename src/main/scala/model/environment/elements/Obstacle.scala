@@ -53,10 +53,7 @@ class Obstacle(val points: List[Vector2D]) extends Drawable {
    *         or something wrong happened
    **/
   def findIntersectionInformation(oldPosition: Vector2D, newPosition: Vector2D): Option[IntersectionResult] = {
-    //println(s"Obstacle: $position")
-    //println(s"AntPos: $oldPosition")
-    //println(s"newPosition: $newPosition")
-    //segments foreach( _ => println(_))
+
     // ant path definition
     val antPath: (Vector2D, Vector2D, Vector3D) = (oldPosition, newPosition, oldPosition X newPosition)
     var intersections: List[IntersectionResult] = List()
@@ -140,7 +137,6 @@ class Obstacle(val points: List[Vector2D]) extends Drawable {
       ((that canEqual this)
         && position ~~(that.position, 1E-7)
         && this.points.size == that.points.size
-        && this.points.map(p => that.points.exists(p2 => p~~(p2,1E-7))).foldRight(true)(_ == _)
         )
     case _ => false
   }
@@ -211,7 +207,7 @@ object Obstacle {
         random
       )
     } yield obstacle)
-    //obstacles
+
     recursiveJoin(obstacles.toList, center, 0)
   }
 

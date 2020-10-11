@@ -28,7 +28,7 @@ object PheromoneSeq {
     private def recursiveMerge(newElement: A, threshold: Double, sequence: Seq[A]): Seq[A] =
       if (sequence.nonEmpty) {
         sequence.last.merge(newElement,threshold) match {
-          case Some(x) => seq.replace(sequence.last,x.asInstanceOf[A])
+          case Some(x) if x.isInstanceOf[A] => seq.replace(sequence.last,x.asInstanceOf[A])
           case None => recursiveMerge(newElement, threshold, sequence.take(sequence.length - 1))
         }
       } else newElement +: seq

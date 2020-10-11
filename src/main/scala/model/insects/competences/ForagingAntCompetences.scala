@@ -9,7 +9,7 @@ import utility.PheromoneSeq._
 import utility.geometry._
 import utility.Parameters.Competence._
 import utility.Parameters.Pheromones.FoodPheromoneInfo._
-import utility.Parameters.ForagingAnt._
+import utility.Parameters.Insects.Ants.ForagingAnt._
 import scala.util.Random
 
 /**

@@ -134,9 +134,7 @@ object EnvironmentInfo {
       case insectInfo: EnemyInfo => this.copy(enemiesInfo = insectInfo +: enemiesInfo)
       case insectInfo: ForagingAntInfo => this.copy(foragingAntsInfo = insectInfo +: foragingAntsInfo)
       case insectInfo: PatrollingAntInfo => this.copy(patrollingAntsInfo = insectInfo +: patrollingAntsInfo)
-
-
-      case _ => println("error in updateInsectInfo insect info not recognized"); this
+      case _ => System.err.println("error in updateInsectInfo insect info not recognized"); this
     }
 
     override def emptyInsectInfo(): EnvironmentData = this.copy(foragingAntsInfo = Seq.empty, patrollingAntsInfo = Seq.empty, enemiesInfo = Seq.empty)
@@ -145,14 +143,7 @@ object EnvironmentInfo {
 
     override def updateFood(food: Food, updatedFood: Food): EnvironmentData =
       if (updatedFood.quantity > 0) {
-        println(s"foo $food")
-        println(s"upfoo $updatedFood")
-        println(s"-----------------------------------------------")
-        val list = (foods filter(f => !(f equals food))) :+ updatedFood
-        list.foreach(x => println(x))
-        println(s"===============================================")
-        this.copy(foods = list)
-
+        this.copy(foods = (foods filter(f => !(f equals food))) :+ updatedFood)
       } else
         this.copy(foods = foods remove food)
 

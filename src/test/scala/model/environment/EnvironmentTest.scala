@@ -18,12 +18,13 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
   override def afterAll: Unit = {
     TestKit.shutdownActorSystem(system)
   }
+
   val topLeftCorner:(Int, Int) = (0,0)
   val width = 100
   val height = 100
   val boundary = Boundary(topLeftCorner._1, topLeftCorner._2, width, height)
 
- /* "Environment without obstacles" when {
+  "Environment without obstacles" when {
     val sender = TestProbe()
     implicit val senderRef: ActorRef = sender.ref
 
@@ -32,16 +33,16 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
     var newPosition = ZeroVector2D()
 
     "spawn an ant" should {
-      val nAnts = 2
+      val nAnts = 1
       environment ! StartSimulation(nAnts, 0, obstacles = None, food = None)
       sender expectMsg Ready
       environment ! Clock(1)
 
       "receive its initial position" in {
         val result = sender.expectMsgType[Repaint]
+        println(result.info)
         initialPosition = result.info.filter {
           case _: ForagingAntInfo => true
-          case _: PatrollingAntInfo => true
           case _ => false
         }.head.position
       }
@@ -53,7 +54,6 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
         val result = sender.expectMsgType[Repaint]
         newPosition = result.info.filter {
           case _: ForagingAntInfo => true
-          case _: PatrollingAntInfo => true
           case _ => false
         }.head.position
       }
@@ -161,6 +161,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
       val result2 = sender.expectMsgType[Repaint]
       nAntsPostBirth = result2.info.count {
         case _: ForagingAntInfo => true
+        case _: PatrollingAntInfo => true
         case _ => false
       }
 
@@ -168,5 +169,5 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
         assert(nAntsPostBirth > nAntsPreBirth)
       }
     }
-  }*/
+  }
 }

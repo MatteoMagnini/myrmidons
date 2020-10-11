@@ -1,6 +1,5 @@
 package model.environment.elements
 
-import model.Drawable
 import utility.geometry.{RandomVector2DInCircle, Vector2D}
 
 /**A food source.
@@ -18,7 +17,6 @@ case class Food(override val position: Vector2D, quantity: Double, o: Obstacle) 
    * @return new instance of Food with increased quantity
    **/
   def +(newQuantity: Double): Food = {
-    println(newQuantity)
     Food(position, quantity + newQuantity, Obstacle(position, Food.radius(math.round(quantity + newQuantity).toInt),points.size))
   }
 

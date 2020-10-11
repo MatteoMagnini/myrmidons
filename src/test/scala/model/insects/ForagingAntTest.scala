@@ -14,9 +14,9 @@ import utility.Messages._
 import utility.Parameters.Competence._
 import model.insects.info.ForagingAntInfo
 import utility.Message
-import utility.Parameters.ForagingAnt._
+import utility.Parameters.Insects.Ants.ForagingAnt._
 
-class InsectTest extends TestKit(ActorSystem("InsectTest"))
+class ForagingAntTest extends TestKit(ActorSystem("ForagingAntTest"))
   with AnyWordSpecLike
   with Matchers
   with BeforeAndAfterAll{
@@ -219,11 +219,6 @@ class InsectTest extends TestKit(ActorSystem("InsectTest"))
         assert(result1.info.foodAmount == MAX_FOOD)
         sender expectNoMessage
       }
-
     }
-
   }
-
-
-
 }
