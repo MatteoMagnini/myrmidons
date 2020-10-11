@@ -12,6 +12,7 @@ import model.insects.info.SpecificInsectInfo
 import utility.geometry.{RandomVector2DInSquare, Vector2D, ZeroVector2D}
 import model.environment.elements.EnvironmentElements._
 import utility.Parameters.Environment._
+import utility.Parameters.Insects.Ants.ForagingAnt
 import model.environment.pheromones.{DangerPheromone, FoodPheromone}
 import Implicits._
 
@@ -45,13 +46,14 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       val obstacles = if (obstaclesPresence.isDefined) Obstacle.createRandom(obstaclesPresence.get, anthillInfo.position, (50,150)).toSeq
       else Seq.empty
 
+      val foods = if (foodPresence.isDefined) (0 until foodPresence).map(_ =>
+        Food.createRandomFood(anthillInfo.position, FOOD_RADIUS._1, FOOD_RADIUS._2)) else Seq.empty
+
       val enemies = (0 until nEnemies).map(i => {
-        val randomPosition = randomPositionOutObstacle(obstacles, (state.boundary.topLeft.x, state.boundary.topRight.x))
+        val randomPosition = randomPositionOutObstacle(obstacles ++ foods, (state.boundary.topLeft.x, state.boundary.topRight.x))
         i -> context.actorOf(Enemy(EnemyInfo(id = i, position = randomPosition), self), s"enemy-$i")
       }).toMap
 
-      val foods = if (foodPresence.isDefined) (0 until foodPresence).map(_ =>
-        Food.createRandomFood(anthillInfo.position, FOOD_RADIUS._1, FOOD_RADIUS._2)) else Seq.empty
 
       context >>> initializationBehaviour(EnvironmentInfo(Some(sender), state.boundary,
         obstacles, foods, anthill, Some(anthillInfo)).addEnemies(enemies))
@@ -64,7 +66,9 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   private def defaultBehaviour(state: EnvironmentInfo): Receive = {
 
     case Clock(value: Int) =>
-      if (Random.nextDouble() < 0.1) {
+      val antHillFoodPercentage = state.anthillInfo.get.foodAmount/state.anthillInfo.get.maxFoodAmount
+      val scaleFactor = 1 / ForagingAnt.MAX_FOOD
+      if (Random.nextDouble() < (antHillFoodPercentage * scaleFactor)) {
         self ! AntBirth(value)
       }
       state.ants.values.foreach(_ ! Clock(value))
@@ -76,7 +80,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       context >>> defaultBehaviour(newData.updateFoodPheromones(state.foodPheromones.tick()))
 
     case Move(position: Vector2D, delta: Vector2D) =>
-      CollisionsInterceptor.checkCollisions(self, sender, state, position, delta)
+      CollisionsInterceptor.checkCollisions(sender, state, position, delta)
 
     case TakeFood(delta, position) =>
       val food = state.foods.filter(f => f.position ~~ (position, 1E-7))
@@ -105,7 +109,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       val ant = if(math.random()< 0.3)
         context.actorOf(PatrollingAnt(PatrollingAntInfo(state.anthill, id = antId, position = birthPosition, time = clock-1), self), s"ant-$antId")
       else
-        context.actorOf(ForagingAnt(ForagingAntInfo(state.anthill, id = antId, position = birthPosition, time = clock-1), self), s"ant-$antId")
+        context.actorOf(model.insects.ForagingAnt(ForagingAntInfo(state.anthill, id = antId, position = birthPosition, time = clock-1), self), s"f-ant-$antId")
 
       ant ! Clock(clock)
       context >>> defaultBehaviour(state.addAnt(antId, ant))
@@ -124,6 +128,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
     case AddDangerPheromone(pheromone: DangerPheromone, threshold: Double) =>
       context >>> defaultBehaviour(state.addDangerPheromone(pheromone, threshold))
+
   }
 
   private def sendInfoToGUI(info: EnvironmentInfo): Unit = {
