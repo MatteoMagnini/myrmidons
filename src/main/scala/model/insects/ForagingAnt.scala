@@ -1,10 +1,12 @@
 package model.insects
 
 import akka.actor.{ActorRef, Props}
-import model.insects.competences.{CarryFoodToHome, Die, DropFoodPheromone, EatFromTheAnthill, FoodPheromoneTaxis, GoBackToHome, GoOutside, PickFood, RandomWalk, StoreFoodInAnthill}
+import model.environment.pheromones.DangerPheromone
+import model.environment.pheromones.DangerPheromoneInfo._
+import model.insects.Ants.ForagingAnt._
+import model.insects.competences._
 import model.insects.info.ForagingAntInfo
 import utility.Messages._
-import utility.Parameters.ForagingAnt._
 
 /**
   * Ant that performs foraging.
@@ -27,6 +29,9 @@ case class ForagingAnt(override val info: ForagingAntInfo,
     PickFood(),
     FoodPheromoneTaxis(),
     RandomWalk[ForagingAntInfo]())
+
+  private val decreasingDangerFunction: Double => Double = x => x - DELTA
+  private val dangerIntensity = STARTING_INTENSITY * INTENSITY_FACTOR
 
   private def defaultBehaviour(data: ForagingAntInfo): Receive = {
 
@@ -80,9 +85,19 @@ case class ForagingAnt(override val info: ForagingAntInfo,
       environment ! UpdateInsect(newData)
       context >>> defaultBehaviour(newData)
 
+    /**
+     * Ant killed in a fight
+     */
+    case KillInsect(_) =>
+      environment ! AddDangerPheromone(DangerPheromone(data.position, decreasingDangerFunction, dangerIntensity),DANGER_PHEROMONE_MERGING_THRESHOLD)
+      context >>> defaultBehaviour(data.updateEnergy(-MAX_ENERGY))
+
+    /**
+     * Just for tests
+     */
     case Context(_) => sender ! Context(Some(context))
 
-    case x => System.err.println(s"ForagingAnt ${info.id}: received unhandled message $x from $sender")
+    case x => //System.err.println(s"ForagingAnt ${info.id}: received unhandled message $x from $sender")
   }
 }
 

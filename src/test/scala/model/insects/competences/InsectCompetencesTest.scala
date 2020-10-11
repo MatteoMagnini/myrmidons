@@ -3,12 +3,12 @@ package model.insects.competences
 import akka.actor.Actor.Receive
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
-import model.environment.FoodPheromone
-import model.insects.{Enemy, ForagingAnt}
-import model.insects.info.{EnemyInfo, ForagingAntInfo}
+import model.environment.pheromones.{DangerPheromone, FoodPheromone}
+import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
+import model.insects.{Enemy, ForagingAnt, PatrollingAnt}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.Messages.{AddFoodPheromone, AntTowardsAnthill, Context, EatFood, KillAnt, Move, StoreFood, TakeFood, UpdateInsect}
+import utility.Messages._
 import utility.geometry.{Vector2D, ZeroVector2D}
 
 class InsectCompetencesTest extends TestKit(ActorSystem("InsectCompetencesTest"))
@@ -50,7 +50,7 @@ with BeforeAndAfterAll{
         val dieCompetence = Die[EnemyInfo]()
         assert(dieCompetence.hasPriority(insectInfo))
         dieCompetence(context,senderRef,insect,insectInfo,defaultBehaviour)
-        sender.expectMsgType[KillAnt]
+        sender.expectMsgType[KillInsect]
         sender expectNoMessage
 
       }
@@ -77,8 +77,8 @@ with BeforeAndAfterAll{
 
       }
 
-
-      val foragingAntInfo2 = foragingAntInfo.incFood(utility.Parameters.ForagingAnt.MAX_FOOD)
+      import model.insects.Ants.ForagingAnt._
+      val foragingAntInfo2 = foragingAntInfo.incFood(MAX_FOOD)
       //Indirectly testing GoBackToHome because it is called in carryFoodCompetence apply.
       "carry to home" in {
 
@@ -139,13 +139,41 @@ with BeforeAndAfterAll{
 
       }
 
-      val foragingAntInfo4 = foragingAntInfo3.updateFoodPheromones(Seq(FoodPheromone(Vector2D(2,3),0,10)))
+      import model.environment.pheromones.FoodPheromoneInfo._
+      val foodPheromone = FoodPheromone(Vector2D(4,6),x => x - DELTA,10)
+      val foragingAntInfo4 = foragingAntInfo3.updateFoodPheromones(Seq(foodPheromone))
       "follow the food pheromones" in {
 
         val foodPheromoneTaxisCompetence = FoodPheromoneTaxis()
         assert(foodPheromoneTaxisCompetence.hasPriority(foragingAntInfo4))
         foodPheromoneTaxisCompetence(context,senderRef,foragingAnt,foragingAntInfo3,defaultBehaviour)
-        sender.expectMsgType[Move]
+        val result = sender.expectMsgType[Move]
+        assert((result.start >> result.delta) --> foodPheromone.position < foragingAntInfo4.position --> foodPheromone.position)
+        sender expectNoMessage
+      }
+    }
+  }
+
+  "A patrolling ant competence" when {
+
+    import model.environment.pheromones.DangerPheromoneInfo._
+    val dangerPheromone = DangerPheromone(Vector2D(-7,2), x => x - DELTA, 10)
+    def defaultBehaviour(data: PatrollingAntInfo): Receive = {case _ =>}
+    val patrollingAntInfo = PatrollingAntInfo(senderRef)
+    val patrollingAnt = system.actorOf(PatrollingAnt(patrollingAntInfo,senderRef), "insect-2")
+    patrollingAnt ! Context(None)
+    val context = sender.expectMsgType[Context].context.get
+
+    "perceiving danger pheromones" should {
+
+      val patrollingAntInfo = PatrollingAntInfo(senderRef).updateDangerPheromones(Seq(dangerPheromone))
+      "move towards them" in {
+
+        val dangerPheromoneTaxis = DangerPheromoneTaxis()
+        assert(dangerPheromoneTaxis.hasPriority(patrollingAntInfo))
+        dangerPheromoneTaxis(context,senderRef,patrollingAnt,patrollingAntInfo,defaultBehaviour)
+        val result = sender.expectMsgType[Move]
+        assert((result.start >> result.delta) --> dangerPheromone.position < patrollingAntInfo.position --> dangerPheromone.position)
         sender expectNoMessage
       }
     }

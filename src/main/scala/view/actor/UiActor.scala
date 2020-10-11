@@ -1,9 +1,9 @@
 package view.actor
 
-import view.actor.uiMessage.{RestartSimulation, StepOver, StopSimulation}
 import akka.actor.{Actor, ActorContext, ActorLogging, Props, Timers}
 import model.Drawable
-import utility.Messages.{Clock, Repaint}
+import utility.Messages.{Clock, Ready, Repaint}
+import view.actor.uiMessage.{RestartSimulation, SaveInfo, StepOver, StopSimulation}
 
 import scala.concurrent.duration.DurationInt
 
@@ -14,16 +14,17 @@ import scala.concurrent.duration.DurationInt
  * new position of the simulation entities.
  */
 
-class UiActor(state: uiActorInfo)
+private[view] class UiActor(state: uiActorInfo)
   extends Actor with ActorLogging with Timers {
 
   override def receive: Receive = defaultBehaviour(state)
 
   private def defaultBehaviour(state: uiActorInfo): Receive = {
 
+    case Ready => timers.startSingleTimer(state.currentState, StepOver, 30.millis)
 
     case Repaint(info: Seq[Drawable]) =>
-
+      if (state.currentState % 20 == 0) state.control.reportManager.tell(SaveInfo(info), self)
       val entitiesProperties = state.setEntities(info)
       state.drawEntities()
       state.setControl(state.currentState, entitiesProperties)
@@ -51,10 +52,6 @@ class UiActor(state: uiActorInfo)
     def >>>(behaviour: Receive): Unit = context become behaviour
   }
 
-}
-
-object ImplicitConversion {
-  implicit def intToString(value: Int): String = value.toString
 }
 
 object UiActor {

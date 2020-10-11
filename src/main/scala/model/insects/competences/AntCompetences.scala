@@ -6,7 +6,6 @@ import model.insects.info.AntInfo
 import utility.Messages.{AntTowardsAnthill, EatFood, Move}
 import utility.geometry.Vectors._
 import utility.geometry._
-import utility.Parameters.Competence._
 
 /**
  * Competence for all ants.
@@ -21,7 +20,7 @@ trait AntCompetences[A <: AntInfo[A]] extends InsectCompetences[A]
 case class GoBackToHome[A <: AntInfo[A]]() extends AntCompetences[A] {
 
   override def apply(context: ActorContext, environment: ActorRef, insect: ActorRef, info: A, behaviour: A => Receive): Unit = {
-    val data = info.updateEnergy(ENERGY_RW)
+    val data = info.updateEnergy(ENERGY_RANDOM_WALK)
     data.anthill.tell(AntTowardsAnthill(data.position, MAX_VELOCITY, data.inertia, NOISE, info.isInsideTheAnthill), insect)
     context >>> behaviour(data)
   }
@@ -35,7 +34,7 @@ case class GoBackToHome[A <: AntInfo[A]]() extends AntCompetences[A] {
 case class GoOutside[A <: AntInfo[A]]() extends AntCompetences[A] {
 
   override def apply(context: ActorContext, environment: ActorRef, insect: ActorRef, info: A, behaviour: A => Receive): Unit = {
-    val data = info.updateEnergy(ENERGY_RW).updateAnthillCondition(false)
+    val data = info.updateEnergy(ENERGY_RANDOM_WALK).updateAnthillCondition(false)
     val delta: Vector2D = RandomVector2DInCircle(MIN_VELOCITY, MAX_VELOCITY)
     val deltaWithInertia = OrientedVector2D((delta >> (info.inertia * INERTIA_FACTOR))./\, doubleInRange(MIN_VELOCITY, MAX_VELOCITY))
     environment.tell(Move(data.position, deltaWithInertia), insect)

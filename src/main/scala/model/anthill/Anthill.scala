@@ -2,10 +2,14 @@ package model.anthill
 
 import akka.actor.{Actor, ActorRef, Props}
 import model.Drawable
-import utility.geometry.{OrientedVector2D, OrientedVector2DWithNoise, Vector2D, ZeroVector2D}
+import model.insects.competences._
+import model.insects.info.{ForagingAntInfo, PatrollingAntInfo}
+import model.insects.{ForagingAnt, PatrollingAnt}
 import utility.Messages._
 import utility.geometry.Vectors.doubleInRange
-import utility.Parameters.Competence._
+import utility.geometry._
+
+import scala.util.Random
 
 case class AnthillInfo(override val position: Vector2D,
                        radius: Double,
@@ -51,9 +55,27 @@ case class Anthill(info: AnthillInfo, environment: ActorRef) extends Actor {
         environment.tell(Move(position, delta2), sender)
       }
 
-    case Clock(_) =>
+    case Clock(value) =>
+      val antBirthValue = data.foodAmount / data.maxFoodAmount * Random.nextDouble()
+      /* Random birth of ants */
+      if (antBirthValue > 0.2) {
+        environment ! AntBirth(value)
+        self ! StoreFood(if (data.foodAmount < 10) - data.foodAmount else - 10)
+      }
       environment ! UpdateAnthill(data)
 
+    case CreateEntities(nAnts: Int, foragingPercentage: Double) =>
+
+      /** Returns ants and enemies references, creating ants from the center of boundary */
+      val nForaging = (nAnts * foragingPercentage).ceil.toInt
+      val foragingAnts = (0 until nForaging).map(i => {
+        i -> context.actorOf(ForagingAnt(ForagingAntInfo(self, id = i, position = info.position), sender), s"f-ant-$i")
+      }).toMap
+      val nPatrolling = nForaging + (nAnts * (1 - foragingPercentage)).toInt
+      val patrollingAnts = (nForaging until nPatrolling).map(i => {
+        i -> context.actorOf(PatrollingAnt(PatrollingAntInfo(self, id = i, position = info.position), sender), s"p-ant-$i")
+      }).toMap
+      sender ! NewEntities(foragingAnts ++ patrollingAnts)
   }
 }
 
@@ -61,3 +83,4 @@ object Anthill {
   def apply(info: AnthillInfo, environment: ActorRef): Props =
     Props(classOf[Anthill], info, environment)
 }
+

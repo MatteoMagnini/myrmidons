@@ -1,6 +1,7 @@
 package model.insects.info
 import akka.actor.ActorRef
-import utility.Parameters.ForagingAnt._
+import model.environment.pheromones.DangerPheromone
+import model.insects.Ants.PatrollingAnt._
 import utility.geometry.{Vector2D, ZeroVector2D}
 
 case class PatrollingAntInfo(override val id: Int,
@@ -9,7 +10,8 @@ case class PatrollingAntInfo(override val id: Int,
                         override val energy: Double,
                         override val time: Int,
                         override val anthill: ActorRef,
-                        override val isInsideTheAnthill: Boolean)  extends AntInfo[PatrollingAntInfo]  {
+                        override val isInsideTheAnthill: Boolean,
+                        dangerPheromones: Seq[DangerPheromone] )  extends AntInfo[PatrollingAntInfo]  {
 
   /**
     * @param value the new condition
@@ -44,10 +46,16 @@ case class PatrollingAntInfo(override val id: Int,
     */
   override def incTime(): PatrollingAntInfo =
     this.copy(time = time + 1)
-}
 
+  /**
+   * @param pheromones the sequence of danger pheromones in the environment
+   * @return a new PatrollingAntInfo with the updated danger pheromones
+   */
+  def updateDangerPheromones(pheromones: Seq[DangerPheromone]): PatrollingAntInfo =
+    this.copy(dangerPheromones = pheromones)
+}
 
 object PatrollingAntInfo {
   def apply( anthill: ActorRef, id: Int = 0, position: Vector2D = STARTING_POSITION, energy: Double = STARTING_ENERGY, time: Int = STARTING_TIME): PatrollingAntInfo =
-    PatrollingAntInfo(id, position, ZeroVector2D(), energy, time, anthill, false)
+    PatrollingAntInfo(id, position, ZeroVector2D(), energy, time, anthill, isInsideTheAnthill = false, Seq.empty)
 }

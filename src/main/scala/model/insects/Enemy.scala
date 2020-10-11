@@ -1,16 +1,17 @@
 package model.insects
 
 import akka.actor.{ActorRef, Props}
-import model.insects.competences.RandomWalk
+import model.insects.Enemies._
+import model.insects.competences.{Die, RandomWalk}
 import model.insects.info.EnemyInfo
-import utility.Messages.{Clock, Context, FoodNear, NewPosition, UpdateInsect}
+import utility.Messages._
 
 class Enemy(override val info: EnemyInfo,
             override val environment: ActorRef) extends Insect[EnemyInfo] {
 
   override def receive: Receive = defaultBehaviour(info)
 
-  private val competences = List(RandomWalk[EnemyInfo]())
+  private val competences = List(Die[EnemyInfo](), RandomWalk[EnemyInfo]())
 
   private def defaultBehaviour(data: EnemyInfo): Receive = {
 
@@ -19,15 +20,21 @@ class Enemy(override val info: EnemyInfo,
       subsumption(newData,competences)(context, environment, self, newData, defaultBehaviour)
 
     case NewPosition(p, d) =>
-      val newData = data.updatePosition(p).updateInertia(d)
+      val newData = data.updatePosition(p).updateInertia(d).updateEnergy(info.energy)
       environment ! UpdateInsect(newData)
       context become defaultBehaviour(newData)
 
     case FoodNear(_) => // println(s"Enemy ${info.id} near food")//TODO: MUST NOT RECEIVE THIS MESSAGE
 
+    /**
+     * Just for tests
+     */
     case Context(_) => sender ! Context(Some(context))
 
-    case x => println("Enemies: Should never happen, received message: " + x + " from " + sender)
+    case KillInsect(_) =>
+      context >>> defaultBehaviour(data.updateEnergy(-MAX_ENERGY))
+
+    case x => println("Enemies: Should never happen, received message: " + x + " from " + sender +info.time)
   }
 }
 

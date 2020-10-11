@@ -1,6 +1,6 @@
 package model.insects.info
 
-import utility.Parameters.ForagingAnt._
+import model.insects.Enemies._
 import utility.geometry.{Vector2D, ZeroVector2D}
 
 case class EnemyInfo(override val id: Int,
@@ -23,6 +23,6 @@ case class EnemyInfo(override val id: Int,
 }
 
 object EnemyInfo {
-  def apply(id: Int = 0, position: Vector2D = STARTING_POSITION, energy: Double = STARTING_ENERGY, time: Int = STARTING_TIME): EnemyInfo =
+  def apply(id: Int = 0, position: Vector2D = STARTING_POSITION, energy: Double = ENERGY, time: Int = STARTING_TIME): EnemyInfo =
     new EnemyInfo(id, position, ZeroVector2D(), energy, time)
 }

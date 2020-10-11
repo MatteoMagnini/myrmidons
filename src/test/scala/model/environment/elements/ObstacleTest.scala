@@ -2,8 +2,7 @@ package model.environment.elements
 
 import org.scalatest._
 import utility.geometry.TupleOp2._
-import utility.geometry.TupleOp3._
-import utility.geometry.{Vector2D, Vector3D}
+import utility.geometry.Vector2D
 
 class ObstacleTest  extends wordspec.AnyWordSpec {
   "An obstacle" when {

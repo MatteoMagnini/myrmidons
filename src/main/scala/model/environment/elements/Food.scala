@@ -1,6 +1,5 @@
 package model.environment.elements
 
-import model.Drawable
 import utility.geometry.{RandomVector2DInCircle, Vector2D}
 
 /**A food source.
@@ -8,9 +7,9 @@ import utility.geometry.{RandomVector2DInCircle, Vector2D}
   * @param position position in environment
   * @param quantity quantity of food
   */
-case class Food(override val position: Vector2D, quantity: Double) extends Drawable {
+case class Food(override val position: Vector2D, quantity: Double, o: Obstacle) extends Obstacle(o.points) {
 
-  def radius: Double = if (math.sqrt(quantity) < 5) 5 else math.sqrt(quantity)
+  def radius: Double = o.position --> o.points.head
 
   /** Increase food quantity.
    *
@@ -18,7 +17,7 @@ case class Food(override val position: Vector2D, quantity: Double) extends Drawa
    * @return new instance of Food with increased quantity
    **/
   def +(newQuantity: Double): Food = {
-    Food(position, quantity + newQuantity)
+    Food(position, quantity + newQuantity, this)
   }
 
   /** Decrease food quantity.
@@ -37,6 +36,7 @@ case class Food(override val position: Vector2D, quantity: Double) extends Drawa
 object Food {
     def createRandomFood(position: Vector2D, minRadius:Double, maxRadius:Double, quantity: Int = 500): Food = {
       val pos = RandomVector2DInCircle(minRadius, maxRadius, position)
-      Food(Vector2D(pos.x, pos.y), quantity)
-  }
+      val radius: Double = if (math.sqrt(quantity) < 5) 5 else math.sqrt(quantity)
+      Food(Vector2D(pos.x, pos.y), quantity, Obstacle(pos, radius, 16))
+    }
 }

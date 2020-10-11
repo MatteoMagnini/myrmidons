@@ -1,16 +1,15 @@
 package model.environment.elements
 
 import model.Drawable
-import model.environment.elements
-import utility.geometry.{Vector2D, Vector3D, Vectors}
 import utility.geometry.VectorsImplicits._
+import utility.geometry.{Vector2D, Vector3D, Vectors}
 
 /** An implementation of an obstacle.
  * It can accept every polygonal obstacle form.
  *
  * @param points list of vertex of polygon that describe an obstacle
  **/
-case class Obstacle(points: List[Vector2D]) extends Drawable {
+class Obstacle(val points: List[Vector2D]) extends Drawable {
 
   override val position: Vector2D = findCentroid(points)
 

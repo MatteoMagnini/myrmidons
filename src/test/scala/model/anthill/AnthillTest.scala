@@ -5,10 +5,10 @@ import akka.testkit.{TestKit, TestProbe}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
+import utility.Messages._
 import utility.geometry.Vector2D
-import utility.Messages.{Clock, EatFood, StoreFood, UpdateAnthill}
 
-class AnthillTest extends TestKit(ActorSystem("EnvironmentTest"))
+class AnthillTest extends TestKit(ActorSystem("AnthillTest"))
   with AnyWordSpecLike
   with Matchers
   with BeforeAndAfterAll {
@@ -19,6 +19,12 @@ class AnthillTest extends TestKit(ActorSystem("EnvironmentTest"))
 
   val sender: TestProbe = TestProbe()
   implicit val senderRef: ActorRef = sender.ref
+
+  /* Ignore AntBirthMessages */
+  sender.ignoreMsg {
+    case AntBirth(_) => true
+    case _ => false
+  }
 
   "The anthill" when {
 
@@ -33,7 +39,6 @@ class AnthillTest extends TestKit(ActorSystem("EnvironmentTest"))
         sender.expectMsg(UpdateAnthill(startingInfo))
         sender.expectNoMessage()
       }
-
     }
 
     "interacting with insects" should {
@@ -52,7 +57,6 @@ class AnthillTest extends TestKit(ActorSystem("EnvironmentTest"))
         anthill ! Clock(1)
         sender.expectMsg(UpdateAnthill(newInfo))
         sender.expectNoMessage()
-
       }
 
       "decrease the food storage if an insect take some food" in {
@@ -68,7 +72,7 @@ class AnthillTest extends TestKit(ActorSystem("EnvironmentTest"))
 
       }
 
-      "decrease to 0 if an insect request exceed the current food amount" in {
+      "decrease to 0 if an insect request exceeds the current food amount" in {
 
         val newInfo = AnthillInfo(startingPosition)
 
@@ -87,6 +91,7 @@ class AnthillTest extends TestKit(ActorSystem("EnvironmentTest"))
 
         anthill ! StoreFood(newFoodToStore)
         anthill ! Clock(4)
+
         sender.expectMsg(UpdateAnthill(newInfo))
         sender.expectNoMessage()
 
