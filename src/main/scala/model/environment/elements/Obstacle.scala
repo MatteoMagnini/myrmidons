@@ -1,3 +1,4 @@
+
 package model.environment.elements
 
 import model.Drawable
@@ -91,15 +92,17 @@ class Obstacle(val points: List[Vector2D]) extends Drawable {
     if(this.isInstanceOf[Food] != b.isInstanceOf[Food])
       throw new IllegalArgumentException(s"$this and $b are different objects")
 
-    if(this equals b)
-      return Some(this)
+    if(this equals b) {
+      Some(this)
+    } else {
 
-    val newPointList = (this ->| b).toList
-    if(newPointList.nonEmpty){
-      val centroid = Vectors.findCentroid(newPointList)
-      val ordered  = newPointList.sortWith((a,b) =>  ((a - centroid) /\) < ((b - centroid) /\))
-      Some(Obstacle(ordered))
-    } else None
+      val newPointList = (this ->| b).toList
+      if (newPointList.nonEmpty) {
+        val centroid = Vectors.findCentroid(newPointList)
+        val ordered = newPointList.sortWith((a, b) => ((a - centroid) /\) < ((b - centroid) /\))
+        Some(Obstacle(ordered))
+      } else None
+    }
   }
 
   /**
