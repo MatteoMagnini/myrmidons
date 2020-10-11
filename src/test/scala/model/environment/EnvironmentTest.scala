@@ -2,12 +2,13 @@ package model.environment
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
-import model.insects.ForagingAntInfo
+import model.environment.elements.EnvironmentElements
+import model.insects.info.{ForagingAntInfo, PatrollingAntInfo}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.Geometry.{Vector2D, ZeroVector2D}
-import utility.Messages.{AntBirth, Clock, Repaint, StartSimulation}
+import utility.geometry.{Vector2D, ZeroVector2D}
+import utility.Messages._
 
 class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
   with AnyWordSpecLike
@@ -17,6 +18,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
   override def afterAll: Unit = {
     TestKit.shutdownActorSystem(system)
   }
+
   val topLeftCorner:(Int, Int) = (0,0)
   val width = 100
   val height = 100
@@ -33,11 +35,16 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
     "spawn an ant" should {
       val nAnts = 1
       environment ! StartSimulation(nAnts, 0, obstacles = None, food = None)
+      sender expectMsg Ready
       environment ! Clock(1)
 
       "receive its initial position" in {
         val result = sender.expectMsgType[Repaint]
-        initialPosition = result.info.head.position
+        println(result.info)
+        initialPosition = result.info.filter {
+          case _: ForagingAntInfo => true
+          case _ => false
+        }.head.position
       }
     }
     "make ant move" should {
@@ -45,7 +52,10 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
 
       "receive its new position" in {
         val result = sender.expectMsgType[Repaint]
-        newPosition = result.info.head.position
+        newPosition = result.info.filter {
+          case _: ForagingAntInfo => true
+          case _ => false
+        }.head.position
       }
       "receive no more messages" in {
         sender.expectNoMessage()
@@ -54,8 +64,8 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
         assert(initialPosition != newPosition)
       }
       "check if ant didn't go outside boundary" in {
-        import model.EnvironmentElements.BoundaryHasInside
-        assert(model.EnvironmentElements.checkHasInside(boundary, newPosition))
+        import model.environment.elements.EnvironmentElements.BoundaryHasInside
+        assert(EnvironmentElements.checkHasInside(boundary, newPosition))
       }
     }
   }
@@ -69,12 +79,14 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
 
     "spawn multiple ants" should {
       environment ! StartSimulation(nAnts, 0, obstacles = None, food = None)
+      sender expectMsg Ready
       environment ! Clock(1)
 
       "receive all their positions" in {
         val result = sender.expectMsgType[Repaint]
         val positionsCount = result.info.count {
           case _: ForagingAntInfo => true
+          case _: PatrollingAntInfo => true
           case _ => false
         }
         assert(positionsCount >= nAnts)
@@ -88,6 +100,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
         val result = sender.expectMsgType[Repaint]
         val positions = result.info.filter {
           case _: ForagingAntInfo => true
+          case _: PatrollingAntInfo => true
           case _ => false
         }
         assert(positions.size >= nAnts)
@@ -96,8 +109,8 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
         sender.expectNoMessage()
       }
       "check that no ant went outside boundary" in {
-        import model.EnvironmentElements.BoundaryHasInside
-        assert(positions.forall(x => model.EnvironmentElements.checkHasInside(boundary, x)))
+        import EnvironmentElements.BoundaryHasInside
+        assert(positions.forall(x => elements.EnvironmentElements.checkHasInside(boundary, x)))
       }
     }
   }
@@ -111,29 +124,32 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
 
     "spawn ants and make them move" should {
       environment ! StartSimulation(nAnts, 0)
+      sender expectMsg Ready
       environment ! Clock(1)
     }
     "receive all their positions" in {
       val result = sender.expectMsgType[Repaint]
       val positionsCount = result.info.count {
         case _: ForagingAntInfo => true
+        case _: PatrollingAntInfo => true
         case _ => false
       }
       assert(positionsCount >= nAnts)
     }
   }
 
-  "Environment with an ant" when {
+ "Environment with an ant" when {
     val sender = TestProbe()
     implicit val senderRef: ActorRef = sender.ref
 
-    val nAnts = 1
+    val nAnts = 2
     val environment = system.actorOf(Environment(EnvironmentInfo(boundary)), name = "env-actor-4")
     var nAntsPreBirth = 0
     var nAntsPostBirth = 0
 
     "other ants born" should {
       environment ! StartSimulation(nAnts, 0)
+      sender expectMsg Ready
       environment ! Clock(1)
       val result = sender.expectMsgType[Repaint]
       nAntsPreBirth = result.info.count {
@@ -145,6 +161,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
       val result2 = sender.expectMsgType[Repaint]
       nAntsPostBirth = result2.info.count {
         case _: ForagingAntInfo => true
+        case _: PatrollingAntInfo => true
         case _ => false
       }
 

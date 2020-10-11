@@ -5,10 +5,10 @@ import akka.testkit.{TestKit, TestProbe}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.Geometry.Vector2D
+import utility.geometry.Vector2D
 import utility.Messages.{Clock, EatFood, StoreFood, UpdateAnthill}
 
-class AnthillTest extends TestKit(ActorSystem("EnvironmentTest"))
+class AnthillTest extends TestKit(ActorSystem("AnthillTest"))
   with AnyWordSpecLike
   with Matchers
   with BeforeAndAfterAll {
@@ -68,7 +68,7 @@ class AnthillTest extends TestKit(ActorSystem("EnvironmentTest"))
 
       }
 
-      "decrease to 0 if an insect request exceed the current food amount" in {
+      "decrease to 0 if an insect request exceeds the current food amount" in {
 
         val newInfo = AnthillInfo(startingPosition)
 

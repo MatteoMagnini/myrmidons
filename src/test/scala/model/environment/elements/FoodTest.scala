@@ -1,11 +1,12 @@
-package model
+package model.environment.elements
 
 import org.scalatest.wordspec
-import utility.Geometry.TupleOp._
+import utility.geometry.TupleOp2._
+import utility.geometry.Vectors
 
 class FoodTest extends wordspec.AnyWordSpec {
   "A food" when {
-    val f = Food((10,15), 100)
+    val f = Food((10,15), 100, Obstacle((10,15),Food.radius(100), 16))
     "create with 100 of quantity" should {
       "have 100 of availability" in {
         assert(f.quantity === 100)
@@ -25,7 +26,7 @@ class FoodTest extends wordspec.AnyWordSpec {
     }
     "exist" should {
       "have a dimension that follow sqrt(100)" in {
-        //assert(f.xDim === 20)
+        assert(Vectors.~=(f.position-->f.points.head, f.radius, 1E-6))
       }
     }
   }
