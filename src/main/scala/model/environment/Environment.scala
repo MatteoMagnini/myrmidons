@@ -1,20 +1,19 @@
 package model.environment
 
-import akka.actor.{Actor, ActorContext, ActorLogging, ActorRef, Props}
+import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import model.Fights.Fight
 import model.anthill.{Anthill, AnthillInfo}
+import model.environment.elements.EnvironmentElements._
 import model.environment.elements.{Food, Obstacle}
+import model.environment.info.EnvironmentInfo
+import model.environment.pheromones.{DangerPheromone, FoodPheromone}
+import model.insects.Ants.ForagingAnt._
 import model.insects._
-import model.insects.info._
+import model.insects.info.{SpecificInsectInfo, _}
 import utility.Messages._
 import utility.PheromoneSeq._
-import model.insects.info.SpecificInsectInfo
 import utility.geometry.{RandomVector2DInSquare, Vector2D, ZeroVector2D}
-import model.environment.elements.EnvironmentElements._
-import utility.Parameters.Environment._
-import utility.Parameters.Insects.Ants.ForagingAnt
-import model.environment.pheromones.{DangerPheromone, FoodPheromone}
-import Implicits._
+import utility.RichActor._
 
 import scala.util.Random
 
@@ -31,7 +30,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     case StartSimulation(nAnts: Int, nEnemies: Int, obstaclesPresence, foodPresence) =>
       val anthillInfo = AnthillInfo(state.boundary.center, ANTHILL_RADIUS , FOOD_AMOUNT)
       val anthill = context.actorOf(Anthill(anthillInfo, self), name = "anthill")
-      anthill ! CreateEntities(nAnts, 0.5)
+      anthill ! CreateEntities(nAnts, FORAGING_PERCENTAGE)
 
       def randomPositionOutObstacle(obstacleList: Seq[Obstacle], minMax:(Double,Double)):Vector2D = {
         import model.environment.elements.EnvironmentElements.ObstacleHasInside
@@ -67,7 +66,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
     case Clock(value: Int) =>
       val antHillFoodPercentage = state.anthillInfo.get.foodAmount/state.anthillInfo.get.maxFoodAmount
-      val scaleFactor = 1 / ForagingAnt.MAX_FOOD
+      val scaleFactor = 1 / MAX_FOOD
       if (Random.nextDouble() < (antHillFoodPercentage * scaleFactor)) {
         self ! AntBirth(value)
       }
@@ -133,11 +132,10 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
   private def sendInfoToGUI(info: EnvironmentInfo): Unit = {
     val fights = findFights(info.foragingAntsInfo ++ info.patrollingAntsInfo, info.enemiesInfo)
-    val updatedInfo = handleFights(info, fights)
-
+    handleFights(info, fights)
     info.gui.get ! Repaint(info.anthillInfo.get +: (info.foragingAntsInfo ++ info.patrollingAntsInfo ++ info.enemiesInfo ++
       info.obstacles ++ info.foods ++ info.foodPheromones ++ info.dangerPheromones ++ fights).toSeq)
-    context >>> defaultBehaviour(updatedInfo.emptyInsectInfo())
+    context >>> defaultBehaviour(info.emptyInsectInfo())
   }
 
   private def findFights(antsInfo: Iterable[InsectInfo], enemiesInfo: Iterable[EnemyInfo]): Iterable[Fight[InsectInfo, EnemyInfo]] =
@@ -147,36 +145,21 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       if ant.position ~~ enemy.position
     } yield Fight(ant, enemy, ant.position)
 
-  private def handleFights(info: EnvironmentInfo, fights: Iterable[Fight[InsectInfo, EnemyInfo]]): EnvironmentInfo = {
-
-    import model.Fights._
+  private def handleFights(info: EnvironmentInfo, fights: Iterable[Fight[InsectInfo, EnemyInfo]]): Unit = {
     import model.Fights.InsectFight._
-    import Implicits._
-    var updatedInfo = info
+    import model.Fights._
     for (loser <- losers(fights)) {
       loser match {
         case Left(ant) =>
-          info.ants(ant.id) ! KillInsect(ant)
+          info.ants(ant) ! KillInsect(ant)
         case Right(enemy) =>
-          context.stop(info.enemies(enemy))
-          updatedInfo = updatedInfo.removeEnemy(enemy)
+          info.enemies(enemy) ! KillInsect(enemy)
       }
     }
-    updatedInfo
   }
 
-  private implicit class RichContext(context: ActorContext) {
-    def >>>(behaviour: Receive): Unit = context become behaviour
-  }
 }
-
 
 object Environment {
   def apply(state: EnvironmentInfo): Props = Props(classOf[Environment], state)
-}
-
-object Implicits {
-  implicit def extractOption[X](value: Option[X]): X = value.get
-
-  implicit def entity2Id[X <: SpecificInsectInfo[X]](entity: X): Int = entity.id
 }

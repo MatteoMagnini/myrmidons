@@ -1,7 +1,8 @@
-package model.environment
+package model.environment.info
 
 import akka.actor.ActorRef
 import model.anthill.AnthillInfo
+import model.environment.Boundary
 import model.environment.elements.{Food, Obstacle}
 import model.environment.pheromones.{DangerPheromone, FoodPheromone}
 import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo, PatrollingAntInfo}
@@ -75,12 +76,6 @@ trait EnvironmentInfo {
   /** Returns updated insect anthill information */
   def updateAnthillInfo(anthillInfo: Option[AnthillInfo]): EnvironmentInfo
 
-  /** Remove an ant reference */
-  def removeAnt(id: Int): EnvironmentInfo
-
-  /** Remove an enemy reference */
-  def removeEnemy(id: Int): EnvironmentInfo
-
   def removeInsect(info: InsectInfo): EnvironmentInfo
 
   /** Add an ant reference */
@@ -91,7 +86,6 @@ trait EnvironmentInfo {
   def addEnemies(ants: Map[Int, ActorRef]): EnvironmentInfo
 
 }
-
 
 object EnvironmentInfo {
 
@@ -150,14 +144,10 @@ object EnvironmentInfo {
     override def updateAnthillInfo(anthillInfo: Option[AnthillInfo]): EnvironmentInfo =
       this.copy(anthillInfo = anthillInfo)
 
-    override def removeAnt(id: Int): EnvironmentInfo = this.copy(ants = ants - id)
-
-    override def removeEnemy(id: Int): EnvironmentInfo = this.copy(enemies = enemies - id)
-
     override def removeInsect(info: InsectInfo): EnvironmentInfo = info match {
-      case info: ForagingAntInfo => this.removeAnt(info.id)
-      case info: PatrollingAntInfo => this.removeAnt(info.id)
-      case info: EnemyInfo => this.removeEnemy(info.id)
+      case info: ForagingAntInfo => this.copy(ants = ants - info.id)
+      case info: PatrollingAntInfo => this.copy(ants = ants - info.id)
+      case info: EnemyInfo => this.copy(enemies = enemies - info.id)
       case _ => System.err.println("Insect not found in removeInsect"); this
     }
 
@@ -179,5 +169,4 @@ object EnvironmentInfo {
     override def addDangerPheromone(danger: DangerPheromone, threshold: Double): EnvironmentInfo =
       this.copy(dangerPheromones = dangerPheromones.add(danger, threshold))
   }
-
 }

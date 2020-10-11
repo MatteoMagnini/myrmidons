@@ -28,9 +28,7 @@ case class FoodPheromone(override val position: Vector2D,
 }
 
 object FoodPheromone {
-
-  import utility.Parameters.Pheromones.FoodPheromoneInfo.MAX_INTENSITY
-
+  import FoodPheromoneInfo._
   def apply(position: Vector2D, decreasingFunction: Double => Double, intensity: Double): FoodPheromone =
     new FoodPheromone(position, decreasingFunction, if (intensity > MAX_INTENSITY) MAX_INTENSITY else intensity)
 }

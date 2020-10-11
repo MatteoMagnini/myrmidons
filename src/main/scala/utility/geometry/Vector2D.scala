@@ -1,6 +1,6 @@
 package utility.geometry
 
-  import Vectors._
+  import utility.geometry.Vectors._
 
 /** A vector in 2-dimensional space.
     *

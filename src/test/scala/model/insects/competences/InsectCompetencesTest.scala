@@ -4,11 +4,11 @@ import akka.actor.Actor.Receive
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
 import model.environment.pheromones.{DangerPheromone, FoodPheromone}
-import model.insects.{Enemy, ForagingAnt, PatrollingAnt}
 import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
+import model.insects.{Enemy, ForagingAnt, PatrollingAnt}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.Messages.{AddFoodPheromone, AntTowardsAnthill, Context, EatFood, KillInsect, Move, StoreFood, TakeFood, UpdateInsect}
+import utility.Messages._
 import utility.geometry.{Vector2D, ZeroVector2D}
 
 class InsectCompetencesTest extends TestKit(ActorSystem("InsectCompetencesTest"))
@@ -77,8 +77,8 @@ with BeforeAndAfterAll{
 
       }
 
-
-      val foragingAntInfo2 = foragingAntInfo.incFood(utility.Parameters.Insects.Ants.ForagingAnt.MAX_FOOD)
+      import model.insects.Ants.ForagingAnt._
+      val foragingAntInfo2 = foragingAntInfo.incFood(MAX_FOOD)
       //Indirectly testing GoBackToHome because it is called in carryFoodCompetence apply.
       "carry to home" in {
 
@@ -139,7 +139,7 @@ with BeforeAndAfterAll{
 
       }
 
-      import utility.Parameters.Pheromones.FoodPheromoneInfo.DELTA
+      import model.environment.pheromones.FoodPheromoneInfo._
       val foodPheromone = FoodPheromone(Vector2D(4,6),x => x - DELTA,10)
       val foragingAntInfo4 = foragingAntInfo3.updateFoodPheromones(Seq(foodPheromone))
       "follow the food pheromones" in {
@@ -156,7 +156,7 @@ with BeforeAndAfterAll{
 
   "A patrolling ant competence" when {
 
-    import utility.Parameters.Pheromones.DangerPheromoneInfo._
+    import model.environment.pheromones.DangerPheromoneInfo._
     val dangerPheromone = DangerPheromone(Vector2D(-7,2), x => x - DELTA, 10)
     def defaultBehaviour(data: PatrollingAntInfo): Receive = {case _ =>}
     val patrollingAntInfo = PatrollingAntInfo(senderRef)

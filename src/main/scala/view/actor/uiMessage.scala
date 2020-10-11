@@ -17,7 +17,8 @@ object uiMessage {
   case class ShowReport() extends uiMessage
 
   case class History(info: Seq[Drawable]) extends uiMessage
-  case class   SaveToFile() extends uiMessage
+
+  case class SaveToFile() extends uiMessage
 
 }
 

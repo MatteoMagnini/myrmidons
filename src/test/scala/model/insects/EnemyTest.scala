@@ -2,14 +2,12 @@ package model.insects
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
-import utility.Parameters.Competence._
-import utility.Parameters.Insects.Ants.ForagingAnt._
 import model.insects.info.EnemyInfo
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.geometry.ZeroVector2D
 import utility.Messages.{Clock, Move, NewPosition, UpdateInsect}
+import utility.geometry.ZeroVector2D
 
 class EnemyTest extends TestKit(ActorSystem("InsectTest"))
   with AnyWordSpecLike

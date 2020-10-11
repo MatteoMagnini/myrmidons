@@ -1,7 +1,7 @@
 package view
 
 import view.scene.ParametersPanel
-import utility.Parameters.GUIConstant._
+
 import scala.swing.{BorderPanel, Dimension, MainFrame}
 
 /**

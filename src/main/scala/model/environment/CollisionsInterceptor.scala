@@ -3,10 +3,11 @@ package model.environment
 import akka.actor.ActorRef
 import model.environment.elements.EnvironmentElements.{checkHasInside, checkHaveInside}
 import model.environment.elements.{Food, Obstacle}
+import model.environment.info.EnvironmentInfo
 import utility.Messages.{FoodNear, NewPosition}
 import utility.geometry.Vector2D
 
-object CollisionsInterceptor {
+private[environment] object CollisionsInterceptor {
 
   /**
    * Extension of Environment move function. His job is check
@@ -90,7 +91,6 @@ object CollisionsInterceptor {
    *         3: obstacle on which an insect is bounced
    * */
   private def handleObstacleIntersection(obstacle: Iterable[Obstacle], position: Vector2D, newPosition: Vector2D): (Vector2D, Vector2D, Option[Obstacle]) = {
-    import Implicits._
 
     val intersectionOnOverlappedObstacle = (for (f <- obstacle)
       yield (f.findIntersectionInformation(position, newPosition),f)).toList

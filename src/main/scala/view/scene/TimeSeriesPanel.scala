@@ -1,14 +1,12 @@
 package view.scene
 
-import org.jfree.chart.ChartFactory
-import org.jfree.chart.plot.XYPlot
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer
 import java.awt.Color
 
+import org.jfree.chart.{ChartFactory, ChartPanel, JFreeChart}
+import org.jfree.chart.plot.XYPlot
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer
 import org.jfree.data.time.{TimeSeries, TimeSeriesCollection, Year}
-import org.jfree.chart.ChartPanel
-import org.jfree.chart.JFreeChart
-import utility.Parameters.GUIConstant.SIMULATION_SIZE
+import view._
 
 import scala.swing.{Dimension, MainFrame}
 

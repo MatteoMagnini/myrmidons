@@ -2,10 +2,12 @@ package model.insects
 
 import akka.actor.{ActorRef, Props}
 import model.environment.pheromones.DangerPheromone
-import model.insects.competences.{CarryFoodToHome, Die, DropFoodPheromone, EatFromTheAnthill, FoodPheromoneTaxis, GoBackToHome, GoOutside, PickFood, RandomWalk, StoreFoodInAnthill}
+import model.environment.pheromones.DangerPheromoneInfo._
+import model.insects.Ants.ForagingAnt._
+import model.insects.competences._
 import model.insects.info.ForagingAntInfo
 import utility.Messages._
-import utility.Parameters.Insects.Ants.ForagingAnt._
+import utility.RichActor._
 
 /**
   * Ant that performs foraging.
@@ -29,7 +31,6 @@ case class ForagingAnt(override val info: ForagingAntInfo,
     FoodPheromoneTaxis(),
     RandomWalk[ForagingAntInfo]())
 
-  import utility.Parameters.Pheromones.DangerPheromoneInfo._
   private val decreasingDangerFunction: Double => Double = x => x - DELTA
   private val dangerIntensity = STARTING_INTENSITY * INTENSITY_FACTOR
 
