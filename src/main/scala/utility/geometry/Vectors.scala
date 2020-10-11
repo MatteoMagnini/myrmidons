@@ -60,6 +60,12 @@ object Vectors {
     seg2Vector ^ seg1Vector
   }
 
+  // a segments is described as a two point and a line pass through them
+  def findCentroid(l: List[Vector2D]): Vector2D = {
+    l.foldRight(Vector2D(0.0, 0.0))(_ >> _) / l.size
+  }
+
+
 }
 
 /** Implicit conversions from [[utility.geometry.Vector2D]] to [[utility.geometry.Vector3D]] and vice versa. */

@@ -5,6 +5,8 @@ import model.insects.Enemies._
 import model.insects.competences.{Die, RandomWalk}
 import model.insects.info.EnemyInfo
 import utility.Messages._
+import utility.RichActor._
+
 
 class Enemy(override val info: EnemyInfo,
             override val environment: ActorRef) extends Insect[EnemyInfo] {

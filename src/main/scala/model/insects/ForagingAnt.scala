@@ -7,6 +7,7 @@ import model.insects.Ants.ForagingAnt._
 import model.insects.competences._
 import model.insects.info.ForagingAntInfo
 import utility.Messages._
+import utility.RichActor._
 
 /**
   * Ant that performs foraging.

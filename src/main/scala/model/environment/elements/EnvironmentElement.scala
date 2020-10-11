@@ -43,7 +43,7 @@ object EnvironmentElements {
   /**How to check positions in [[model.environment.elements.Food]] */
   implicit object FoodHasInside extends EnvironmentElement[Food] {
     override def hasInside(element: Food, position: Vector2D): Boolean =
-      position --> element.position <= element.radius
+      implicitly[EnvironmentElement[Obstacle]].hasInside(element, position)
   }
 
   /**How to check positions in [[model.environment.elements.Obstacle]] */

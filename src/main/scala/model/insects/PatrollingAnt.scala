@@ -7,6 +7,7 @@ import model.insects.Ants.PatrollingAnt._
 import model.insects.competences._
 import model.insects.info.PatrollingAntInfo
 import utility.Messages._
+import utility.RichActor._
 
 case class PatrollingAnt (override val info: PatrollingAntInfo,
                      override val environment: ActorRef) extends Insect[PatrollingAntInfo] {

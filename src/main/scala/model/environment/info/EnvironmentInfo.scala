@@ -26,6 +26,9 @@ trait EnvironmentInfo {
   /** References to ant actors */
   def ants: Map[Int, ActorRef]
 
+  /**Highest used Id*/
+  def maxAntId: Int
+
   /** Ants information */
   def foragingAntsInfo: Iterable[ForagingAntInfo]
 
@@ -88,11 +91,11 @@ object EnvironmentInfo {
 
   def apply(boundary: Boundary): EnvironmentInfo =
 
-    EnvironmentData(None, boundary, Seq.empty, Seq.empty, Map.empty, Seq.empty, Seq.empty, Map.empty, Seq.empty, None, None, Seq[FoodPheromone](), Seq[DangerPheromone]())
+    EnvironmentData(None, boundary, Seq.empty, Seq.empty, Map.empty, 0, Seq.empty, Seq.empty, Map.empty, Seq.empty, None, None, Seq[FoodPheromone](), Seq[DangerPheromone]())
 
   def apply(gui: Option[ActorRef], boundary: Boundary, obstacles: Seq[Obstacle], foods: Seq[Food],
             anthill: ActorRef, anthillInfo: Option[AnthillInfo]): EnvironmentInfo =
-    EnvironmentData(gui, boundary, obstacles, foods, Map.empty, Seq.empty, Seq.empty, Map.empty, Seq.empty, Some(anthill), anthillInfo, Seq.empty, Seq.empty)
+    EnvironmentData(gui, boundary, obstacles, foods, Map.empty, 0, Seq.empty, Seq.empty, Map.empty, Seq.empty, Some(anthill), anthillInfo, Seq.empty, Seq.empty)
 
 
   /** Internal state of environment.
@@ -110,6 +113,7 @@ object EnvironmentInfo {
                                            override val obstacles: Seq[Obstacle],
                                            override val foods: Seq[Food],
                                            override val ants: Map[Int, ActorRef],
+                                           override val maxAntId: Int,
                                            override val foragingAntsInfo: Seq[ForagingAntInfo],
                                            override val patrollingAntsInfo: Seq[PatrollingAntInfo],
                                            override val enemies: Map[Int, ActorRef],
@@ -124,9 +128,7 @@ object EnvironmentInfo {
       case insectInfo: EnemyInfo => this.copy(enemiesInfo = insectInfo +: enemiesInfo)
       case insectInfo: ForagingAntInfo => this.copy(foragingAntsInfo = insectInfo +: foragingAntsInfo)
       case insectInfo: PatrollingAntInfo => this.copy(patrollingAntsInfo = insectInfo +: patrollingAntsInfo)
-
-
-      case _ => println("error in updateInsectInfo insect info not recognized"); this
+      case _ => System.err.println("error in updateInsectInfo insect info not recognized"); this
     }
 
     override def emptyInsectInfo(): EnvironmentData = this.copy(foragingAntsInfo = Seq.empty, patrollingAntsInfo = Seq.empty, enemiesInfo = Seq.empty)
@@ -134,8 +136,10 @@ object EnvironmentInfo {
     import utility.SeqWithReplace._
 
     override def updateFood(food: Food, updatedFood: Food): EnvironmentData =
-      if (updatedFood.quantity > 0) this.copy(foods = foods replace(food, updatedFood))
-      else this.copy(foods = foods remove food)
+      if (updatedFood.quantity > 0) {
+        this.copy(foods = (foods filter(f => !(f equals food))) :+ updatedFood)
+      } else
+        this.copy(foods = foods remove food)
 
     override def updateAnthillInfo(anthillInfo: Option[AnthillInfo]): EnvironmentInfo =
       this.copy(anthillInfo = anthillInfo)
@@ -146,9 +150,10 @@ object EnvironmentInfo {
       case info: EnemyInfo => this.copy(enemies = enemies - info.id)
       case _ => System.err.println("Insect not found in removeInsect"); this
     }
-    override def addAnt(id: Int, ant: ActorRef): EnvironmentInfo = this.copy(ants = ants + (id -> ant))
 
-    override def addAnts(newAnts: Map[Int, ActorRef]): EnvironmentInfo = this.copy(ants = ants ++ newAnts)
+    override def addAnt(id: Int, ant: ActorRef): EnvironmentInfo = this.copy(ants = ants + (id -> ant), maxAntId = maxAntId + 1)
+
+    override def addAnts(newAnts: Map[Int, ActorRef]): EnvironmentInfo = this.copy(ants = ants ++ newAnts, maxAntId = maxAntId + newAnts.size)
 
     def addEnemies(newEnemies: Map[Int, ActorRef]): EnvironmentInfo = this.copy(enemies = enemies ++ newEnemies)
 

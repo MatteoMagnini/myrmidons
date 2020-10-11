@@ -6,6 +6,8 @@ import model.insects.Ants.PatrollingAnt._
 import model.insects.info.PatrollingAntInfo
 import utility.Messages.Move
 import utility.geometry.{OrientedVector2D, OrientedVector2DWithNoise}
+import utility.RichActor._
+
 
 /**
  * Specific competences suitable only for foraging ants

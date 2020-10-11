@@ -2,7 +2,7 @@ package view.actor
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-
+import utility.RichActor._
 import akka.actor.{Actor, ActorContext, ActorLogging, Props}
 import model.Drawable
 import model.anthill.AnthillInfo
@@ -82,9 +82,6 @@ private[view] class ReportManager(state: ReportManagerInfo) extends Actor with A
     writeFile("LogicTime|AnthillFood|ForagingAntSize|ForagingAntChange|PatrollingAntSize|PatrollingAntChange|EnemySize")
   }
 
-  private implicit class RichContext(context: ActorContext) {
-    def >>>(behaviour: Receive): Unit = context become behaviour
-  }
 
 }
 

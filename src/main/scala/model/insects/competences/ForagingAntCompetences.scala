@@ -9,6 +9,8 @@ import model.insects.info.ForagingAntInfo
 import utility.Messages._
 import utility.PheromoneSeq._
 import utility.geometry._
+import utility.RichActor._
+
 
 import scala.util.Random
 

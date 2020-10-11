@@ -81,9 +81,11 @@ package utility.geometry
     def apply(minRadius: Double = 0.0, maxRadius: Double = 1.0, center: Vector2D = ZeroVector2D()): Vector2D = {
       assert(minRadius >= 0)
       assert(maxRadius > 0)
-      OrientedVector2D(scala.util.Random.nextDouble() * 2 * Math.PI, doubleInRange(minRadius, maxRadius)) >> center
+      OrientedVector2D(scala.util.Random.nextDouble() * 2 * math.Pi, doubleInRange(minRadius, maxRadius)) >> center
     }
-
+    def apply(minMaxRadius: (Double, Double), center: Vector2D): Vector2D = {
+      RandomVector2DInCircle(minMaxRadius._1, minMaxRadius._2, center)
+    }
   }
 
   /** Random vector factory inside a square or rectangle */
