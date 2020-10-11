@@ -1,3 +1,4 @@
+
 package model
 
 import utility.geometry.Vector2D
@@ -10,7 +11,3 @@ trait Drawable {
   val position: Vector2D
   //type Position
 }
-
-/*trait SpecificDrawable[A <: SpecificDrawable[A]] extends Drawable {
-  def getType : A
-}*/

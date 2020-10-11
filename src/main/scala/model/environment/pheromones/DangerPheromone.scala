@@ -19,9 +19,7 @@ case class DangerPheromone(override val position: Vector2D,
 }
 
 object DangerPheromone {
-
-  import utility.Parameters.Pheromones.DangerPheromoneInfo.MAX_INTENSITY
-
+  import DangerPheromoneInfo._
   def apply(position: Vector2D, decreasingFunction: Double => Double, intensity: Double): DangerPheromone =
     new DangerPheromone(position, decreasingFunction, if (intensity > MAX_INTENSITY) MAX_INTENSITY else intensity)
 }

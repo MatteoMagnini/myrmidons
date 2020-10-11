@@ -1,14 +1,14 @@
 package view.actor
 
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import utility.RichActor._
 import akka.actor.{Actor, ActorContext, ActorLogging, Props}
 import model.Drawable
 import model.anthill.AnthillInfo
 import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
-import view.actor.uiMessage.{History, SaveToFile, SaveInfo, ShowReport}
+import view.actor.uiMessage.{History, SaveInfo, SaveToFile, ShowReport}
 import view.scene.TimeSeriesPanel
-import java.time.format.DateTimeFormatter
-import java.time.LocalDateTime
-
 
 private[view] class ReportManager(state: ReportManagerInfo) extends Actor with ActorLogging {
   override def receive: Receive = defaultBehaviour(state)
@@ -68,8 +68,7 @@ private[view] class ReportManager(state: ReportManagerInfo) extends Actor with A
    */
   def writeFile(s: String): Unit = {
 
-    import java.io.FileWriter
-    import java.io.PrintWriter
+    import java.io.{FileWriter, PrintWriter}
     val writer = new PrintWriter(new FileWriter("SimulationReport.txt", true))
     writer.write(s + "\n")
     writer.close()
@@ -83,9 +82,6 @@ private[view] class ReportManager(state: ReportManagerInfo) extends Actor with A
     writeFile("LogicTime|AnthillFood|ForagingAntSize|ForagingAntChange|PatrollingAntSize|PatrollingAntChange|EnemySize")
   }
 
-  private implicit class RichContext(context: ActorContext) {
-    def >>>(behaviour: Receive): Unit = context become behaviour
-  }
 
 }
 

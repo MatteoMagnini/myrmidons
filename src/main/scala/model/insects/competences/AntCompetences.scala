@@ -6,7 +6,7 @@ import model.insects.info.AntInfo
 import utility.Messages.{AntTowardsAnthill, EatFood, Move}
 import utility.geometry.Vectors._
 import utility.geometry._
-import utility.Parameters.Competence._
+import utility.RichActor._
 
 /**
  * Competence for all ants.

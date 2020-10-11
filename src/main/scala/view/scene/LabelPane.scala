@@ -2,7 +2,7 @@ package view.scene
 
 import java.awt.Color
 
-import view.ColorUtility.Colors.{ANTHILL_COLOR_COMPONENT, ANT_COLOR, DANGER_PHEROMONE_COLOR_COMPONENT, ENEMIES_COLOR, FOOD_COLOR_COMPONENT, FOOD_PHEROMONE_COLOR_COMPONENT, OBSTACLE_COLOR, PATROLLING_ANT_COLOR}
+import view.Colors._
 
 import scala.swing.{FlowPanel, Label, Separator}
 

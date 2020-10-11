@@ -1,6 +1,6 @@
 package model.insects
 
-import akka.actor.{Actor, ActorContext, ActorLogging, ActorRef}
+import akka.actor.{Actor, ActorLogging, ActorRef}
 import model.insects.competences.InsectCompetences
 import model.insects.info.SpecificInsectInfo
 
@@ -28,7 +28,4 @@ trait Insect[A <: SpecificInsectInfo[A]] extends Actor with ActorLogging {
   def subsumption(info: A, competences: Iterable[InsectCompetences[A]]): InsectCompetences[A] =
     competences.filter(c => c.hasPriority(info)).head
 
-  implicit class RichContext(context: ActorContext) {
-    def >>> (behaviour: Receive): Unit = context become behaviour
-  }
 }

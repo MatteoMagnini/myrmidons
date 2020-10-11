@@ -1,12 +1,10 @@
 package view.actor
 
-import view.actor.uiMessage.{RestartSimulation, SaveInfo, StepOver, StopSimulation}
 import akka.actor.{Actor, ActorContext, ActorLogging, Props, Timers}
 import model.Drawable
-
-import utility.Messages.{Clock, Repaint, Ready}
-
-
+import utility.Messages.{Clock, Ready, Repaint}
+import view.actor.uiMessage.{RestartSimulation, SaveInfo, StepOver, StopSimulation}
+import utility.RichActor._
 import scala.concurrent.duration.DurationInt
 
 /**
@@ -50,14 +48,7 @@ private[view] class UiActor(state: uiActorInfo)
       context >>> defaultBehaviour(state.startSimulation)
   }
 
-  private implicit class RichContext(context: ActorContext) {
-    def >>>(behaviour: Receive): Unit = context become behaviour
-  }
 
-}
-
-object ImplicitConversion {
-  implicit def intToString(value: Int): String = value.toString
 }
 
 object UiActor {

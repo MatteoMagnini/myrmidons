@@ -2,11 +2,12 @@ package model.insects.competences
 
 import akka.actor.Actor.Receive
 import akka.actor.{ActorContext, ActorRef}
-import model.insects.info.{SpecificInsectInfo}
+import model.insects.info.SpecificInsectInfo
 import utility.Messages._
 import utility.geometry.Vectors._
 import utility.geometry._
-import utility.Parameters.Competence._
+import utility.RichActor._
+
 
 /**
  * A competence is the minimal building block to achieve a more complex behaviour.
@@ -34,9 +35,6 @@ trait InsectCompetences[A <: SpecificInsectInfo[A]] {
    */
   def hasPriority(info: A): Boolean
 
-  implicit class RichContext(context: ActorContext) {
-    def >>> (behaviour: Receive): Unit = context become behaviour
-  }
 }
 
 /**

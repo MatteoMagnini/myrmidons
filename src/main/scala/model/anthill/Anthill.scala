@@ -1,15 +1,30 @@
+// Copyright (C) 2011-2012 the original author or authors.
+// See the LICENCE.txt file distributed with this work for additional
+// information regarding copyright ownership.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package model.anthill
 
 import akka.actor.{Actor, ActorRef, Props}
 import model.Drawable
-import model.insects.{ForagingAnt, PatrollingAnt}
+import model.insects.competences._
 import model.insects.info.{ForagingAntInfo, PatrollingAntInfo}
-import utility.geometry._
+import model.insects.{ForagingAnt, PatrollingAnt}
 import utility.Messages._
 import utility.geometry.Vectors.doubleInRange
-import utility.Parameters.Competence._
-import Implicits._
-import scala.util.Random
+import utility.geometry._
+
 
 case class AnthillInfo(override val position: Vector2D,
                        radius: Double,
@@ -56,15 +71,22 @@ case class Anthill(info: AnthillInfo, environment: ActorRef) extends Actor {
       }
 
     case Clock(value) =>
-      environment ! UpdateAnthill(data)
+    /*  val antBirthValue = data.foodAmount / data.maxFoodAmount * Random.nextDouble()
+      /* Random birth of ants */
+      if (antBirthValue > 0.2) {
+        environment ! AntBirth(value)
+        self ! StoreFood(if (data.foodAmount < 10) - data.foodAmount else - 10)
+      }*/
+    environment ! UpdateAnthill(data)
 
-    case CreateEntities(nAnts: Int, foragingProbability: Double) =>
-    /** Returns ants and enemies references, creating ants from the center of boundary */
-      val nForaging = (nAnts * foragingProbability).ceil.toInt
+    case CreateEntities(nAnts: Int, foragingPercentage: Double) =>
+
+      /** Returns ants and enemies references, creating ants from the center of boundary */
+      val nForaging = (nAnts * foragingPercentage).ceil.toInt
       val foragingAnts = (0 until nForaging).map(i => {
         i -> context.actorOf(ForagingAnt(ForagingAntInfo(self, id = i, position = info.position), sender), s"f-ant-$i")
       }).toMap
-      val nPatrolling = nForaging + (nAnts * (1 - foragingProbability)).toInt
+      val nPatrolling = nForaging + (nAnts * (1 - foragingPercentage)).toInt
       val patrollingAnts = (nForaging until nPatrolling).map(i => {
         i -> context.actorOf(PatrollingAnt(PatrollingAntInfo(self, id = i, position = info.position), sender), s"p-ant-$i")
       }).toMap
@@ -77,6 +99,3 @@ object Anthill {
     Props(classOf[Anthill], info, environment)
 }
 
-object Implicits {
-  def double2Int(x:Double):Int = x.toInt
-}

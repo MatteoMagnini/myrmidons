@@ -1,12 +1,11 @@
+
 package model.environment.elements
 
 import model.Drawable
-import model.environment.elements
-import model.environment.elements.EnvironmentElements.{checkHasInside, checkHaveInside}
-import utility.geometry.{RandomVector2DInCircle, Vector2D, Vector3D, Vectors, ZeroVector2D}
+import utility.geometry.RandomVector2DInCircle
 import utility.geometry.VectorsImplicits._
+import utility.geometry.{Vector2D, Vector3D, Vectors}
 
-import scala.runtime.SymbolLiteral
 
 /** An implementation of an obstacle.
  * It can accept every polygonal obstacle form.
@@ -93,15 +92,17 @@ class Obstacle(val points: List[Vector2D]) extends Drawable {
     if(this.isInstanceOf[Food] != b.isInstanceOf[Food])
       throw new IllegalArgumentException(s"$this and $b are different objects")
 
-    if(this equals b)
-      return Some(this)
+    if(this equals b) {
+      Some(this)
+    } else {
 
-    val newPointList = (this ->| b).toList
-    if(newPointList.nonEmpty){
-      val centroid = Vectors.findCentroid(newPointList)
-      val ordered  = newPointList.sortWith((a,b) =>  ((a - centroid) /\) < ((b - centroid) /\))
-      Some(Obstacle(ordered))
-    } else None
+      val newPointList = (this ->| b).toList
+      if (newPointList.nonEmpty) {
+        val centroid = Vectors.findCentroid(newPointList)
+        val ordered = newPointList.sortWith((a, b) => ((a - centroid) /\) < ((b - centroid) /\))
+        Some(Obstacle(ordered))
+      } else None
+    }
   }
 
   /**
@@ -142,7 +143,7 @@ class Obstacle(val points: List[Vector2D]) extends Drawable {
   }
 
   override def hashCode(): Int = {
-    val state = Seq(position)
+    val state = Seq(position, points.head)
     state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
   }
 }
@@ -199,14 +200,14 @@ object Obstacle {
    * */
   def createRandom(nObstacle:Int, center: Vector2D, minMaxDistanceFromCenter: (Double, Double), radius: Double = 20):Iterable[Obstacle] = {
 
-    val obstacles = (for {i <- 0 until nObstacle
+    val obstacles = for {i <- 0 until nObstacle
       random = scala.util.Random.nextInt(10) + 3
       obstacle = Obstacle(
         RandomVector2DInCircle(minMaxDistanceFromCenter, center),
         radius,
         random
       )
-    } yield obstacle)
+    } yield obstacle
 
     recursiveJoin(obstacles.toList, center, 0)
   }
