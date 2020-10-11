@@ -6,7 +6,7 @@ object Colors {
 
   def ANT_COLOR: Color = Color.BLACK
 
-  def OBSTACLE_COLOR: Color = new Color(0.5f, 0.5f, 0.5f, 0.5f)
+  def OBSTACLE_COLOR: Color = new Color(0.5f, 0.5f, 0.5f)
 
   def ENEMIES_COLOR: Color = Color.RED
 

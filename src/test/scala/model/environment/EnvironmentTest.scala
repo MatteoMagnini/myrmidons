@@ -161,6 +161,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
       val result2 = sender.expectMsgType[Repaint]
       nAntsPostBirth = result2.info.count {
         case _: ForagingAntInfo => true
+        case _: PatrollingAntInfo => true
         case _ => false
       }
 
