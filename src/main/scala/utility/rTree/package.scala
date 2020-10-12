@@ -15,5 +15,7 @@ package object rTree {
       }
   }
 
+  implicit def toOption[X](value:X): Option[X] = Some(value)
+
 
 }

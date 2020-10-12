@@ -6,7 +6,8 @@ object RTree {
   type Node = (Option[Int], MyRange, MyRange)
 
   object Node {
-    def apply(id: Option[Int], rangeX: MyRange, rangeY: MyRange): Node = new Node(id, rangeX, rangeY)
+    def apply(id:Option[Int],rangeX: MyRange, rangeY: MyRange): Node = new Node(id, rangeX, rangeY)
+    def apply(rangeX: MyRange, rangeY: MyRange): Node = new Node(None, rangeX, rangeY)
   }
 
   sealed trait Tree {
@@ -34,8 +35,14 @@ object RTree {
     }
 
     override def size: Int = this match {
-      case x:NotEmptyTree => 1 + x.l.size + x.r.size
+      case x:NotEmptyTree if isLeaf(x) => 1 + x.l.size + x.r.size
+      case x:NotEmptyTree => x.l.size + x.r.size
       case _ => 0
+    }
+
+    private def isLeaf(tree:Tree):Boolean = tree match {
+      case x:NotEmptyTree => x.l.root.isEmpty || x.r.root.isEmpty
+      case _ => false
     }
   }
 

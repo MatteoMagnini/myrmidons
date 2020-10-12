@@ -11,6 +11,7 @@ class RTreeProlog(val engine: Prolog) {
   val node = "node"
   val tree = "tree"
   val nil = "nil"
+  val getLeavesList = "getLeavesList"
 
   def insertNode(node: Node, tree: Tree): Tree = {
     val variable = Variable()
@@ -19,13 +20,19 @@ class RTreeProlog(val engine: Prolog) {
     getTermAsTree(result)
   }
 
+  /*def getLeaves(tree:Tree): List[Node] = {
+    val variable = Variable()
+    val goal = new Struct(getLeavesList, getTreeAsTerm(tree), variable)
+    val result = engine.solve(goal).getTerm(variable.getName)
+
+  }*/
+
   def getNodeAsTerm(n: Node): Term =
     new Struct(node, TuPrologInt(n._1.get), getRangeAsTerm(n._2), getRangeAsTerm(n._3))
 
   def getTermAsNode(term: Term): Node = {
     val struct = term.getTerm.asInstanceOf[Struct]
     Node(struct.getArg(0).getAsInt, getTermAsRange(struct.getArg(1)), getTermAsRange(struct.getArg(2)))
-
   }
 
   def getRangeAsTerm(r: MyRange): Term =
@@ -58,9 +65,9 @@ object RTreeProlog {
 
 object Main extends App {
   val engine = RTreeProlog()
-  val res = engine.insertNode(Node(Some(2), (2, 3), (2, 3)), Tree(Tree(), Node(Some(1), (1, 2), (1, 2)), Tree()))
+  val res = engine.insertNode(Node(2, (2, 3), (2, 3)), Tree(Tree(), Node(1, (1, 2), (1, 2)), Tree()))
   println(res)
-  val struct = engine.getTreeAsTerm(Tree(Tree(), Node(Some(1), (1, 2), (1, 2)), Tree()))
+  val struct = engine.getTreeAsTerm(Tree(Tree(), Node(1, (1, 2), (1, 2)), Tree()))
   val m = struct.asInstanceOf[Struct]
   val tree = engine.getTermAsTree(m)
   println(tree)
