@@ -125,7 +125,6 @@ class Obstacle(val points: List[Vector2D]) extends Drawable {
       || (position --> b.position < math.min(maxDistanceFromCenter(), b.maxDistanceFromCenter()))) {
       freePointOfA.diff(overlappedPoint)++ freePointOfB
     } else {
-      overlappedPoint.foreach(x => println(x))
       List.empty
     }
   }

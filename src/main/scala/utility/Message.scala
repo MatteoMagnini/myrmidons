@@ -3,6 +3,7 @@ package utility
 import akka.actor.{ActorContext, ActorRef}
 import model.Drawable
 import model.anthill.AnthillInfo
+import model.environment.info.InsectReferences
 import model.environment.pheromones.{DangerPheromone, FoodPheromone}
 import utility.geometry.Vector2D
 import model.insects.info.InsectInfo
@@ -87,7 +88,7 @@ object Messages {
 
   case class CreateEntities(nAnts: Int, foragingProbability: Double) extends Message
 
-  case class NewEntities(ants: Map[Int, ActorRef]) extends Message
+  case class NewEntities(ants: InsectReferences) extends Message
   /**
    * Message from GUI to create new ants with RandomPosition.
    *
