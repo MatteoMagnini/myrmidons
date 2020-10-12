@@ -1,4 +1,4 @@
-package utility.r_tree
+package utility.rTree
 
 import java.io.InputStream
 

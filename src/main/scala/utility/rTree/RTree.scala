@@ -1,18 +1,19 @@
-package utility.r_tree
+package utility.rTree
 
 object RTree {
 
   type MyRange = (Double, Double)
-  type Node = (Int, MyRange, MyRange)
+  type Node = (Option[Int], MyRange, MyRange)
 
   object Node {
-    def apply(id: Int, rangeX: MyRange, rangeY: MyRange): Node = new Node(id, rangeX, rangeY)
+    def apply(id: Option[Int], rangeX: MyRange, rangeY: MyRange): Node = new Node(id, rangeX, rangeY)
   }
 
   sealed trait Tree {
     def left: Tree
     def right: Tree
     def root: Option[Node]
+    def size: Int
   }
 
   trait TreeImpl extends Tree {
@@ -30,6 +31,11 @@ object RTree {
     override def root: Option[Node] = this match {
       case x:NotEmptyTree => Some(x.node)
       case _ => None
+    }
+
+    override def size: Int = this match {
+      case x:NotEmptyTree => 1 + x.l.size + x.r.size
+      case _ => 0
     }
   }
 
