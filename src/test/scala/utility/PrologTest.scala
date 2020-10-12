@@ -39,6 +39,14 @@ class PrologTest extends AnyWordSpecLike with BeforeAndAfter {
       }
     }
 
+    val neighbours = "[node(2,range(15.0,35.0),range(20.0,40.0)),node(1,range(-10.0,10.0),range(-10.0,10.0))]"
+
+    "searching near node" should {
+      "return the ids" in {
+        assert(neighbours == rTree.neighbours(Vector2D(10,10)))
+      }
+    }
+
     val id3 = 3
     val pheromone3 = FoodPheromone(Vector2D(10,-10), decreasingFunction, STARTING_INTENSITY)
 
@@ -50,15 +58,13 @@ class PrologTest extends AnyWordSpecLike with BeforeAndAfter {
       }
     }
 
-    //TODO: not true now
-    /*"removing an existing node" should {
+    "removing an existing node" should {
       "go back to previous tree" in {
         rTree = rTree.remove(id2,pheromone2)
         val result = rTree.tree
-        println(result)
-        //assert(solution1 == result)
+        assert(solution1 == result)
       }
-    }*/
+    }
 
   }
 
