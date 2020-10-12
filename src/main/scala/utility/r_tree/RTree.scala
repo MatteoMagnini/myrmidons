@@ -18,26 +18,26 @@ object RTree {
   trait TreeImpl extends Tree {
 
     override def left: Tree = this match {
-      case x: NonEmptyTree => x.l
+      case x: NotEmptyTree => x.l
       case  _ => EmptyTree()
     }
 
     override def right: Tree = this match {
-      case x:NonEmptyTree => x.r
+      case x:NotEmptyTree => x.r
       case  _ => EmptyTree()
     }
 
     override def root: Option[Node] = this match {
-      case x:NonEmptyTree => Some(x.node)
+      case x:NotEmptyTree => Some(x.node)
       case _ => None
     }
   }
 
   case class EmptyTree() extends TreeImpl
-  case class NonEmptyTree(l: Tree, node: Node, r: Tree) extends TreeImpl
+  case class NotEmptyTree(l: Tree, node: Node, r: Tree) extends TreeImpl
 
   object Tree {
     def apply(): Tree = EmptyTree()
-    def apply(left: Tree, root: Node, right: Tree): Tree = NonEmptyTree(left, root, right)
+    def apply(left: Tree, root: Node, right: Tree): Tree = NotEmptyTree(left, root, right)
   }
 }
