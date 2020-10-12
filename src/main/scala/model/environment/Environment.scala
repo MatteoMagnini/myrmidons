@@ -25,6 +25,16 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
   override def receive: Receive = initializationBehaviour(state)
 
+  def randomPositionOutObstacle(obstacleList: Seq[Obstacle], minMax:(Double,Double)):Vector2D = {
+    import model.environment.elements.EnvironmentElements.ObstacleHasInside
+    var randomPosition = ZeroVector2D()
+    do{
+      randomPosition = RandomVector2DInSquare(minMax._1, minMax._2)
+    }
+    while(checkHaveInside(obstacleList, randomPosition).nonEmpty)
+    randomPosition
+  }
+
   private def initializationBehaviour(state:EnvironmentInfo): Receive = {
 
     case StartSimulation(nAnts: Int, nEnemies: Int, obstaclesPresence, foodPresence) =>
@@ -32,24 +42,23 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       val anthill = context.actorOf(Anthill(anthillInfo, self), name = "anthill")
       anthill ! CreateEntities(nAnts, FORAGING_PERCENTAGE)
 
-      def randomPositionOutObstacle(obstacleList: Seq[Obstacle], minMax:(Double,Double)):Vector2D = {
-        import model.environment.elements.EnvironmentElements.ObstacleHasInside
-        var randomPosition = ZeroVector2D()
-        do{
-          randomPosition = RandomVector2DInSquare(minMax._1, minMax._2)
-        }
-        while(checkHaveInside(obstacleList, randomPosition).nonEmpty)
-        randomPosition
+      val obstacles = if (obstaclesPresence.isDefined) {
+        Obstacle.createRandom(obstaclesPresence.get, anthillInfo.position, (50,150)).toSeq
+      }
+      else {
+        Seq.empty
       }
 
-      val obstacles = if (obstaclesPresence.isDefined) Obstacle.createRandom(obstaclesPresence.get, anthillInfo.position, (50,150)).toSeq
-      else Seq.empty
-
-      val foods = if (foodPresence.isDefined) (0 until foodPresence).map(_ =>
-        Food.createRandomFood(anthillInfo.position, FOOD_RADIUS._1, FOOD_RADIUS._2)) else Seq.empty
+      val foods = if (foodPresence.isDefined) {
+        (0 until foodPresence).map(_ =>
+          Food.createRandomFood(anthillInfo.position, FOOD_RADIUS._1, FOOD_RADIUS._2))
+      } else {
+        Seq.empty
+      }
 
       val enemies = (0 until nEnemies).map(i => {
-        val randomPosition = randomPositionOutObstacle(obstacles ++ foods, (state.boundary.topLeft.x, state.boundary.topRight.x))
+        val randomPosition = randomPositionOutObstacle(obstacles ++ foods,
+          (state.boundary.topLeft.x, state.boundary.topRight.x))
         i -> context.actorOf(Enemy(EnemyInfo(id = i, position = randomPosition), self), s"enemy-$i")
       }).toMap
 
@@ -63,9 +72,8 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   }
 
   private def defaultBehaviour(state: EnvironmentInfo): Receive = {
-
     case Clock(value: Int) =>
-      val antHillFoodPercentage = state.anthillInfo.get.foodAmount/state.anthillInfo.get.maxFoodAmount
+      val antHillFoodPercentage = state.anthillInfo.get.foodAmount / state.anthillInfo.get.maxFoodAmount
       val scaleFactor = 1 / MAX_FOOD
       if (Random.nextDouble() < (antHillFoodPercentage * scaleFactor)) {
         self ! AntBirth(value)
@@ -97,48 +105,64 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       if ((newState.foragingAntsInfo.size + newState.patrollingAntsInfo.size == newState.ants.size)
         && (newState.enemiesInfo.size == newState.enemies.size)) {
         sendInfoToGUI(newState)
-      }  else context >>> defaultBehaviour(newState)
+      }  else {context >>> defaultBehaviour(newState)}
 
     case UpdateAnthill(anthillInfo: AnthillInfo) =>
       context >>> defaultBehaviour(state.updateAnthillInfo(Some(anthillInfo)))
 
-    case AntBirth(clock: Int) =>
-      val antId = state.maxAntId + 1
-      val birthPosition = state.anthillInfo.position
-      val ant = if(math.random()< 0.3)
-        context.actorOf(PatrollingAnt(PatrollingAntInfo(state.anthill, id = antId, position = birthPosition, time = clock-1), self), s"ant-$antId")
-      else
-        context.actorOf(model.insects.ForagingAnt(ForagingAntInfo(state.anthill, id = antId, position = birthPosition, time = clock-1), self), s"f-ant-$antId")
+    case AntBirth(clock: Int) => context >>> defaultBehaviour(createNewAnt(clock, state, 0.3f))
 
-      ant ! Clock(clock)
-      context >>> defaultBehaviour(state.addAnt(antId, ant))
-
-    case KillInsect(info: InsectInfo) =>
-      context.stop(sender)
-      val newState = state.removeInsect(info)
-      if ((newState.foragingAntsInfo.size + newState.patrollingAntsInfo.size == newState.ants.size)
-        && (newState.enemiesInfo.size == newState.enemies.size)) {
-        sendInfoToGUI(newState)
-      } else context >>> defaultBehaviour(newState)
-      //
+    case KillInsect(info: InsectInfo) => killInsect(info, state)
 
     case AddFoodPheromone(pheromone: FoodPheromone, threshold: Double) =>
       context >>> defaultBehaviour(state.addFoodPheromone(pheromone, threshold))
 
     case AddDangerPheromone(pheromone: DangerPheromone, threshold: Double) =>
       context >>> defaultBehaviour(state.addDangerPheromone(pheromone, threshold))
+  }
 
+  private def createNewAnt(clock:Int, state: EnvironmentInfo, patrollingAntProb: Double): EnvironmentInfo = {
+    val antId = state.maxAntId + 1
+    val birthPosition = state.anthillInfo.position
+    val ant = if(math.random() < patrollingAntProb) {
+      context.actorOf(PatrollingAnt(PatrollingAntInfo(
+        state.anthill,
+        id = antId,
+        position = birthPosition,
+        time = clock-1), self), s"ant-$antId")
+    } else {
+      context.actorOf(model.insects.ForagingAnt(ForagingAntInfo(
+        state.anthill,
+        id = antId,
+        position = birthPosition,
+        time = clock-1), self), s"f-ant-$antId")
+    }
+    ant ! Clock(clock)
+    state.addAnt(antId, ant)
+  }
+
+  private def killInsect(info: InsectInfo, state: EnvironmentInfo): Unit = {
+    context.stop(sender)
+    val newState = state.removeInsect(info)
+    if ((newState.foragingAntsInfo.size + newState.patrollingAntsInfo.size == newState.ants.size)
+      && (newState.enemiesInfo.size == newState.enemies.size)) {
+      sendInfoToGUI(newState)
+    } else {context >>> defaultBehaviour(newState)}
   }
 
   private def sendInfoToGUI(info: EnvironmentInfo): Unit = {
     val fights = findFights(info.foragingAntsInfo ++ info.patrollingAntsInfo, info.enemiesInfo)
     handleFights(info, fights)
-    info.gui.get ! Repaint(info.anthillInfo.get +: (info.foragingAntsInfo ++ info.patrollingAntsInfo ++ info.enemiesInfo ++
-      info.obstacles ++ info.foods ++ info.foodPheromones ++ info.dangerPheromones ++ fights).toSeq)
+    val obstacles = info.obstacles ++ info.foods
+    val insect = info.foragingAntsInfo ++ info.patrollingAntsInfo ++ info.enemiesInfo
+    val pheromones = info.foodPheromones ++ info.dangerPheromones
+    info.gui.get ! Repaint(info.anthillInfo.get +: (insect ++ obstacles ++ pheromones ++ fights).toSeq)
     context >>> defaultBehaviour(info.emptyInsectInfo())
   }
 
-  private def findFights(antsInfo: Iterable[InsectInfo], enemiesInfo: Iterable[EnemyInfo]): Iterable[Fight[InsectInfo, EnemyInfo]] =
+  private def findFights(antsInfo: Iterable[InsectInfo],
+                         enemiesInfo: Iterable[EnemyInfo])
+  : Iterable[Fight[InsectInfo, EnemyInfo]] =
     for {
       ant <- antsInfo
       enemy <- enemiesInfo
