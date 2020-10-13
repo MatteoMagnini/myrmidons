@@ -37,8 +37,9 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
   private def initializationBehaviour(state:EnvironmentInfo): Receive = {
 
-    case StartSimulation(nAnts: Int, nEnemies: Int, obstaclesPresence, foodPresence) =>
-      val anthillInfo = AnthillInfo(state.boundary.center, ANTHILL_RADIUS , FOOD_AMOUNT)
+    case StartSimulation(nAnts: Int, nEnemies: Int, obstaclesPresence, foodPresence, anthillFood) =>
+
+      val anthillInfo = AnthillInfo(state.boundary.center, ANTHILL_RADIUS , anthillFood.get)
       val anthill = context.actorOf(Anthill(anthillInfo, self), name = "anthill")
       anthill ! CreateEntities(nAnts, FORAGING_PERCENTAGE)
 

@@ -16,7 +16,7 @@ import scala.swing.{Button, FlowPanel, GridPanel, Label, Separator, TextField}
  *
  * @param myrmidonsPanel Panel when all the entities will be draw.
  */
-private[view] case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends GridPanel(2,2) {
+private[view] case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends GridPanel(2, 2) {
 
   private val system = ActorSystem("Myrmidons-system")
   private val boundary = Boundary(0, 0, SIMULATION_BOUNDARY._1, SIMULATION_BOUNDARY._2)
@@ -53,15 +53,15 @@ private[view] case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends Gri
   private var enemiesSize = 0
   private var foodSize = 0
 
-  contents ++= Seq(new FlowPanel{
+  contents ++= Seq(new FlowPanel {
     contents ++= Seq(startButton, stopButton, restartButton, reportButton,
-       timeLabel , timeInput, buttonSetTime)
+      timeLabel, timeInput, buttonSetTime)
 
-  }, new FlowPanel{
+  }, new FlowPanel {
     contents ++= Seq(stepLabel,
-        stepText,
-        populationLabel, antPopulationText, new Separator(),
-        anthillFoodAmountLabel, anthillFoodAmount)
+      stepText,
+      populationLabel, antPopulationText, new Separator(),
+      anthillFoodAmountLabel, anthillFoodAmount)
   })
 
 
@@ -111,14 +111,14 @@ private[view] case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends Gri
     case ButtonClicked(component) if component == reportButton =>
       reportManager.tell(ShowReport(), uiActor)
     case ButtonClicked(component) if component == buttonSetTime =>
-      uiActor! setRate(timeInput.text.toInt)
+      uiActor ! setRate(timeInput.text.toInt)
 
   }
 
   private def tellStart(): Unit = {
     environment.tell(StartSimulation(antSize, enemiesSize, obstacles = Some(obstacleSize),
-      food = Some(foodSize)), uiActor)
-    //anthillFood
+      food = Some(foodSize), anthillFood = Some(anthillFood)), uiActor)
+
   }
 
 
