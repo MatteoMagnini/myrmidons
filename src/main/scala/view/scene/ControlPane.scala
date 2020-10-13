@@ -117,7 +117,8 @@ private[view] case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends Gri
 
   private def tellStart(): Unit = {
     environment.tell(StartSimulation(antSize, enemiesSize, obstacles = Some(obstacleSize),
-      food = Some(foodSize), anthillFood), uiActor)
+      food = Some(foodSize)), uiActor)
+    //anthillFood
   }
 
 

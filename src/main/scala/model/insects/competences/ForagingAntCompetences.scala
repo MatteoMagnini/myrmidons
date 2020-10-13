@@ -85,7 +85,7 @@ case class DropFoodPheromone() extends ForagingAntCompetences {
   private def decreasingFunction: Double => Double = x => x/1.001 - DELTA
 
   override def apply(context: ActorContext, environment: ActorRef, insect: ActorRef, info: ForagingAntInfo, behaviour: ForagingAntInfo => Receive): Unit = {
-    environment.tell(AddFoodPheromone(FoodPheromone(info.position, decreasingFunction, info.energy), FOOD_PHEROMONE_MERGING_THRESHOLD), insect)
+    environment.tell(AddPheromone(FoodPheromone(info.position, decreasingFunction, info.energy), FOOD_PHEROMONE_MERGING_THRESHOLD), insect)
     val data = info.updateEnergy(ENERGY_RANDOM_WALK)
     environment.tell(UpdateInsect(data), insect)
     context >>> behaviour(data)
