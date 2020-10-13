@@ -6,7 +6,7 @@ import view._
 import scala.swing.event.ButtonClicked
 import scala.swing.{BorderPanel, Button, Dimension, GridPanel, Label, MainFrame, TextField}
 
-private[view] case class ParametersPanel() extends GridPanel(6, 2) {
+private[view] case class ParametersPanel() extends GridPanel(PARAMETER_GRID._1,PARAMETER_GRID._2) {
   private val antSize = new Label("Number of Ant (F+G)")
   private val antSizeInput = new TextField()
   private val anthillFood = new Label("Number of food in anthill")
@@ -31,8 +31,8 @@ private[view] case class ParametersPanel() extends GridPanel(6, 2) {
         obstacleSizeInput, enemiesSizeInput)
 
     case ButtonClicked(component) if component == setDefaultButton =>
-      showSimulationWithParameters(120, 5000,
-        6, 5, 50)
+      showSimulationWithParameters(DEFAULT_ANT_SIZE, DEFAULT_ANTHILL_FOOD,
+        DEFAULT_FOOD_SIZE, DEFAULT_OBSTACLE_SIZE, DEFAULT_ENEMIES_SIZE)
       //TODO Decidere default number
   }
 

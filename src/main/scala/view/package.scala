@@ -7,7 +7,7 @@ package object view {
   val FIGHT_SIZE = 20
   val SET_TO_CENTER = 2
   val OBSTACLE_SIZE = 20
-  val SIMULATION_SIZE: (Int, Int) = (800, 900)
+  val SIMULATION_SIZE: (Int, Int) = (800, 925)
   val SIMULATION_BOUNDARY: (Int, Int) = (800, 800)
   val SETTING_SIZE = 400
   val MIN_COMPONENT = 6
@@ -22,7 +22,7 @@ package object view {
 
     def ANTHILL_COLOR_COMPONENT: (Float, Float, Float) = (0f, 0.5f, 0f)
 
-    def PATROLLING_ANT_COLOR = new Color(0.5f, 0, 0)
+    def PATROLLING_ANT_COLOR: Color = new Color(0.5f, 0, 0)
 
     def FOOD_PHEROMONE_COLOR_COMPONENT: (Float, Float, Float) = (0.0f, 0.9f, 0.02f)
 

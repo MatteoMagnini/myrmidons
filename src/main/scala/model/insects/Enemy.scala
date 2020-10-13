@@ -36,7 +36,7 @@ class Enemy(override val info: EnemyInfo,
     case KillInsect(_) =>
       context >>> defaultBehaviour(data.updateEnergy(-MAX_ENERGY))
 
-    case x => println("Enemies: Should never happen, received message: " + x + " from " + sender +info.time)
+    case x => //println("Enemies: Should never happen, received message: " + x + " from " + sender +info.time)
   }
 }
 

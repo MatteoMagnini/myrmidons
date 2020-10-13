@@ -20,5 +20,8 @@ object uiMessage {
 
   case class SaveToFile() extends uiMessage
 
+  case class setRate(rate: Int) extends uiMessage
+  case class Save() extends uiMessage
+  case class Sa() extends uiMessage
 }
 

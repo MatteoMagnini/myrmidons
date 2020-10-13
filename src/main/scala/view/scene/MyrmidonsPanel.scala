@@ -4,7 +4,7 @@ package view.scene
 import model.Drawable
 import model.Fights.Fight
 import model.anthill.AnthillInfo
-import model.environment.elements.{Food, Obstacle}
+import model.environment.elements.Obstacle
 import model.environment.pheromones.{DangerPheromone, FoodPheromone}
 import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo, PatrollingAntInfo}
 import view.drawLogic._
@@ -25,7 +25,9 @@ private[view] case class MyrmidonsPanel() extends Panel {
 
   override def paintComponent(g: Graphics2D) {
 
-    if (restartFlag) g.clearRect(0, 0, size.width, size.height)
+    if (restartFlag) {
+      g.clearRect(0, 0, size.width, size.height)
+    }
     else {
       g.clearRect(0, 0, size.width, size.height)
 
@@ -36,8 +38,6 @@ private[view] case class MyrmidonsPanel() extends Panel {
         case entity: ForagingAntInfo => draw(entity, g, size)
 
         case entity: PatrollingAntInfo => draw(entity, g, size)
-
-        //case entity: Food => draw(entity, g, size)
 
         case entity: Obstacle => draw(entity, g, size)
 
@@ -51,7 +51,7 @@ private[view] case class MyrmidonsPanel() extends Panel {
 
         case entity: Fight[InsectInfo, EnemyInfo] => draw(entity, g, size)
 
-        case _ => println("Error matching enemies")
+        case _ =>
       }
       infoEntities = Seq.empty
     }
@@ -75,7 +75,6 @@ private[view] case class MyrmidonsPanel() extends Panel {
   def setEntities(info: Seq[Drawable]): (Int, Int) = {
 
     info.foreach(x => infoEntities = singletonList(x).head +: infoEntities)
-    //infoEntities = info
     val anthillInfo: AnthillInfo = infoEntities.find {
       case _: AnthillInfo => true
       case _ => false

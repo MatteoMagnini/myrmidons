@@ -10,7 +10,6 @@ object MemoHelper {
 
 object singletonList {
   private val memoized: Any => Seq[Any] = memoize(x => {
-    // if(x.isInstanceOf[AnthillInfo])println(s" Calling singleton with input $x")
     Seq(x)
   })
 

@@ -5,18 +5,18 @@ import model.environment.info.EnvironmentInfo
 import model.environment.{Boundary, Environment}
 import utility.Messages.StartSimulation
 import view._
-import view.actor.uiMessage.{RestartSimulation, ShowReport, StopSimulation}
+import view.actor.uiMessage.{RestartSimulation, ShowReport, StopSimulation, setRate}
 import view.actor.{ReportManager, ReportManagerInfo, UiActor, uiActorInfo}
 
 import scala.swing.event.ButtonClicked
-import scala.swing.{Button, FlowPanel, Label, Separator}
+import scala.swing.{Button, FlowPanel, GridPanel, Label, Separator, TextField}
 
 /**
  * FlowPanel which contains simulation button.
  *
  * @param myrmidonsPanel Panel when all the entities will be draw.
  */
-private[view] case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends FlowPanel {
+private[view] case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends GridPanel(2,2) {
 
   private val system = ActorSystem("Myrmidons-system")
   private val boundary = Boundary(0, 0, SIMULATION_BOUNDARY._1, SIMULATION_BOUNDARY._2)
@@ -27,6 +27,9 @@ private[view] case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends Flo
   private val stopButton = new Button("Stop")
   private val restartButton = new Button("Restart")
   private val reportButton = new Button("Report")
+  private val timeLabel = new Label("Clock Rate:")
+  private val timeInput = new TextField(columns = 3)
+  private val buttonSetTime = new Button("Set Rate")
 
   var uiActor: ActorRef = _
   var environment: ActorRef = _
@@ -50,10 +53,19 @@ private[view] case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends Flo
   private var enemiesSize = 0
   private var foodSize = 0
 
-  contents ++= Seq(startButton, stopButton, restartButton, reportButton, stepLabel,
-    stepText, new Separator(), populationLabel, antPopulationText, new Separator(), anthillFoodAmountLabel, anthillFoodAmount)
+  contents ++= Seq(new FlowPanel{
+    contents ++= Seq(startButton, stopButton, restartButton, reportButton,
+       timeLabel , timeInput, buttonSetTime)
 
-  listenTo(startButton, stopButton, restartButton, reportButton)
+  }, new FlowPanel{
+    contents ++= Seq(stepLabel,
+        stepText,
+        populationLabel, antPopulationText, new Separator(),
+        anthillFoodAmountLabel, anthillFoodAmount)
+  })
+
+
+  listenTo(startButton, stopButton, restartButton, reportButton, buttonSetTime)
   /**
    * When startButton is pressed the UiActor tell to Environment that the simulation
    * can be start with a sequence of obstacles and numbers of ants.
@@ -98,15 +110,16 @@ private[view] case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends Flo
 
     case ButtonClicked(component) if component == reportButton =>
       reportManager.tell(ShowReport(), uiActor)
+    case ButtonClicked(component) if component == buttonSetTime =>
+      uiActor! setRate(timeInput.text.toInt)
 
   }
 
   private def tellStart(): Unit = {
     environment.tell(StartSimulation(antSize, enemiesSize, obstacles = Some(obstacleSize),
-      food = Some(foodSize)), uiActor)
+      food = Some(foodSize), anthillFood), uiActor)
   }
 
-  // TODO ADD FOOD ANTHILL IN START SIMULATION
 
   def setParameters(antSize: Int, anthillFood: Int, foodSize: Int,
                     obstacleSize: Int, enemiesSize: Int): Unit = {

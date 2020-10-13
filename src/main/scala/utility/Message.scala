@@ -15,7 +15,8 @@ object Messages {
    *
    * @param nAnts       number of ants to be created
    */
-  case class StartSimulation(nAnts: Int, nEnemies: Int, obstacles: Option[Int] = Some(6), food: Option[Int] = Some(6)) extends Message
+  case class StartSimulation(nAnts: Int, nEnemies: Int, obstacles: Option[Int] = Some(6),
+                             food: Option[Int] = Some(6), anthillFood: Double) extends Message
 
   /** Message sent from GUI to environment and from environment to ants, to do a step in simulation.
    *

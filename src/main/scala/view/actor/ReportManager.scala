@@ -1,25 +1,24 @@
 package view.actor
 
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import utility.RichActor._
-import akka.actor.{Actor, ActorContext, ActorLogging, Props}
+import java.io.{FileWriter, PrintWriter}
+import java.util
+
+import akka.actor.{Actor, ActorLogging, Props}
 import model.Drawable
 import model.anthill.AnthillInfo
 import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
-import view.actor.uiMessage.{History, SaveInfo, SaveToFile, ShowReport}
+import utility.RichActor._
+import view.actor.uiMessage._
 import view.scene.TimeSeriesPanel
+
+import scala.collection.immutable.ListMap
 
 private[view] class ReportManager(state: ReportManagerInfo) extends Actor with ActorLogging {
   override def receive: Receive = defaultBehaviour(state)
 
-  initializeFile()
-
   private def defaultBehaviour(state: ReportManagerInfo): Receive = {
 
-
     case SaveInfo(info: Seq[Drawable]) =>
-
       self ! History(info)
       context >>> defaultBehaviour(state.setState(state.foragingAnt, state.patrollingAnt,
         state.enemies))
@@ -42,49 +41,39 @@ private[view] class ReportManager(state: ReportManagerInfo) extends Actor with A
       self ! SaveToFile()
       context >>> defaultBehaviour(state.saveInfo(foragingAnts, patrollingAnts, enemies, anthill))
 
+
     case SaveToFile() =>
-
-      writeFile(state.currentClock + "\t\t\t" +
-        state.anthill.get.foodAmount.toInt + "\t\t"
-        + state.foragingAnt.size + "\t\t\t\t\t" +
-        (state.foragingAnt.size - state.currentForagingAntSize).toString +
-        "\t\t\t\t" + state.patrollingAnt.size + "\t\t\t\t\t" +
-        (state.patrollingAnt.size - state.currentPatrollingAntSize).toString
-        + "\t\t\t\t" + (state.enemies.size - state.currentEnemiesAntSize))
-
-      context >>> defaultBehaviour(state.updateHistory(Map(state.currentClock -> (state.foragingAnt.size,
-        state.patrollingAnt.size, state.enemies.size))))
+      val history = Map(state.currentClock -> (state.foragingAnt.size,
+        state.patrollingAnt.size, state.enemies.size, state.anthill.get.foodAmount.toInt))
+      context >>> defaultBehaviour(state.updateHistory(history))
 
 
     case ShowReport() =>
-
+      val items = new util.ArrayList[util.ArrayList[InfoReport]]()
+      val v = new util.ArrayList[InfoReport]()
+      val res = ListMap(state.history.toSeq.sortBy(_._1): _*)
+      res.foreach { x =>
+        v.add(InfoReport(x._1, x._2._1, x._2._2, x._2._3, x._2._4))
+      }
+      items.add(v)
+      writeFile(items)
       val frameTimeSeries = TimeSeriesPanel(state.history)
       frameTimeSeries.visible = true
-
   }
 
   /**
    * write a `String` to the `filename`.
    */
-  def writeFile(s: String): Unit = {
-
-    import java.io.{FileWriter, PrintWriter}
-    val writer = new PrintWriter(new FileWriter("SimulationReport.txt", true))
-    writer.write(s + "\n")
+  def writeFile(list: util.ArrayList[util.ArrayList[InfoReport]]): Unit = {
+    val writer = new PrintWriter(new FileWriter("REPORT_NAME", false))
+    import com.google.gson.GsonBuilder
+    val gson = new GsonBuilder().setPrettyPrinting().create
+    list.forEach { x =>writer.write(gson.toJson(x))}
     writer.close()
   }
-
-  private def initializeFile(): Unit = {
-
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-    val formatDateTime = LocalDateTime.now.format(formatter)
-    writeFile("Report Myrmidons - Ant Simulator |" + formatDateTime)
-    writeFile("LogicTime|AnthillFood|ForagingAntSize|ForagingAntChange|PatrollingAntSize|PatrollingAntChange|EnemySize")
-  }
-
-
 }
 
 object ReportManager {
   def apply(state: ReportManagerInfo): Props = Props(classOf[ReportManager], state)
 }
+

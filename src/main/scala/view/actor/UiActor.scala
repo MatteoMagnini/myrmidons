@@ -3,8 +3,9 @@ package view.actor
 import akka.actor.{Actor, ActorContext, ActorLogging, Props, Timers}
 import model.Drawable
 import utility.Messages.{Clock, Ready, Repaint}
-import view.actor.uiMessage.{RestartSimulation, SaveInfo, StepOver, StopSimulation}
+import view.actor.uiMessage.{RestartSimulation, SaveInfo, StepOver, StopSimulation, setRate}
 import utility.RichActor._
+
 import scala.concurrent.duration.DurationInt
 
 /**
@@ -21,7 +22,8 @@ private[view] class UiActor(state: uiActorInfo)
 
   private def defaultBehaviour(state: uiActorInfo): Receive = {
 
-    case Ready => timers.startSingleTimer(state.currentState, StepOver, 30.millis)
+    case Ready =>
+      timers.startSingleTimer(state.currentState, StepOver, state.rate.millis)
 
     case Repaint(info: Seq[Drawable]) =>
       if (state.currentState % 20 == 0) state.control.reportManager.tell(SaveInfo(info), self)
@@ -30,22 +32,29 @@ private[view] class UiActor(state: uiActorInfo)
       state.setControl(state.currentState, entitiesProperties)
 
       if (state.stopFlag) {
-        timers.startSingleTimer(state.currentState, StepOver, 30.millis)
+        timers.startSingleTimer(state.currentState, StepOver, state.rate.millis)
       }
       context >>> defaultBehaviour(state.incCurrentState)
 
     case StepOver =>
       state.control.environment.tell(Clock(state.currentState), self)
       context >>> defaultBehaviour(uiActorInfo(state.panel, state.control,
-        state.stopFlag, state.currentState))
+        state.stopFlag, state.currentState, state.rate))
 
     case StopSimulation =>
       timers.cancel(state.currentState)
       context >>> defaultBehaviour(state.stopSimulation)
 
     case RestartSimulation() =>
-      timers.startSingleTimer(state.currentState, StepOver, 30.millis)
+      timers.startSingleTimer(state.currentState, StepOver, state.rate.millis)
       context >>> defaultBehaviour(state.startSimulation)
+
+    case setRate(rate: Int) =>
+      timers.cancel(state.currentState)
+      timers.startSingleTimer(state.currentState, StepOver, state.rate.millis)
+      context >>> defaultBehaviour(state.setRate(rate))
+
+
   }
 
 

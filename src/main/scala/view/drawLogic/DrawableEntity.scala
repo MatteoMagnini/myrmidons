@@ -29,9 +29,8 @@ object DrawableEntities {
   }
 
   implicit object drawDangerPheromone extends DrawableEntity[DangerPheromone] {
-
     override def draw(elem: DangerPheromone, g: Graphics2D, size: Dimension): Unit = {
-      val pheromoneIntensity: Float = elem.intensity / DangerPheromoneInfo.MAX_INTENSITY
+       val pheromoneIntensity: Float = elem.intensity / DangerPheromoneInfo.MAX_INTENSITY
       g.setColor(DANGER_PHEROMONE_COLOR(pheromoneIntensity))
       drawEllipse(elem.position.x - (PHEROMONE_SIZE / SET_TO_CENTER),
         size.height - elem.position.y - (PHEROMONE_SIZE / SET_TO_CENTER),
@@ -41,7 +40,6 @@ object DrawableEntities {
   }
 
   implicit object drawPheromone extends DrawableEntity[FoodPheromone] {
-
     override def draw(elem: FoodPheromone, g: Graphics2D, size: Dimension): Unit = {
       val pheromoneIntensity: Float = elem.intensity / FoodPheromoneInfo.MAX_INTENSITY
       g.setColor(FOOD_PHEROMONE_COLOR(pheromoneIntensity))
@@ -95,9 +93,7 @@ object DrawableEntities {
   }
 
   implicit object drawAnthill extends DrawableEntity[AnthillInfo] {
-
     override def draw(elem: AnthillInfo, g: Graphics2D, size: Dimension): Unit = {
-
       val anthillFood: Float = elem.foodAmount / elem.maxFoodAmount
       g.setColor(ANTHILL_COLOR(anthillFood))
       drawEllipse(elem.position.x - elem.radius * SET_TO_CENTER,
@@ -111,7 +107,6 @@ object DrawableEntities {
     override def draw(elem: Fight[InsectInfo, EnemyInfo], g: Graphics2D, size: Dimension): Unit = {
       import model.Fights.InsectFight._
       import model.Fights._
-
       val insectLoser = loser(elem) match {
         case Left(x) => g.setColor(Color.black); x
         case Right(x) => g.setColor(Color.red); x

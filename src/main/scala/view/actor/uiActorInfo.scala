@@ -7,6 +7,8 @@ trait uiActorInfo {
 
   def setEntities(info: Seq[Drawable]): (Int, Int)
 
+  def rate: Int
+
   def panel: MyrmidonsPanel
 
   def control: ControlPane
@@ -24,23 +26,26 @@ trait uiActorInfo {
   def drawEntities(): Unit
 
   def setControl(currentState: Int, entitiesProperties: (Int, Int)): Unit
+
+  def setRate(rate: Int): uiActorInfo
 }
 
 object uiActorInfo {
 
 
   def apply(panel: MyrmidonsPanel, control: ControlPane): uiActorInfo =
-    uiActorData(panel, control, stopFlag = true, 1)
+    uiActorData(panel, control, stopFlag = true, 1, DEFAULT_RATE)
 
   def apply(panel: MyrmidonsPanel, control: ControlPane, stopFlag: Boolean,
-            currentState: Int): uiActorInfo =
-    uiActorData(panel, control, stopFlag, currentState)
+            currentState: Int, rate: Int): uiActorInfo =
+    uiActorData(panel, control, stopFlag, currentState, rate)
 
 
   private[this] case class uiActorData(override val panel: MyrmidonsPanel,
                                        override val control: ControlPane,
                                        override val stopFlag: Boolean,
-                                       override val currentState: Int) extends uiActorInfo {
+                                       override val currentState: Int,
+                                       override val rate: Int) extends uiActorInfo {
 
     override def stopSimulation: uiActorInfo = this.copy(stopFlag = false)
 
@@ -58,6 +63,8 @@ object uiActorInfo {
     }
 
     override def drawEntities(): Unit = panel.drawEntities()
+
+    override def setRate(rate: Int): uiActorInfo = this.copy(rate = rate)
   }
 
 }
