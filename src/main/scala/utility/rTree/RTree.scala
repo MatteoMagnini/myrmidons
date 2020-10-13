@@ -6,7 +6,7 @@ object RTree {
   case class Node(id: Option[Int], rangeX: MyRange, rangeY: MyRange)
 
   object Node {
-    def apply(id:Option[Int], rangeX: MyRange, rangeY: MyRange): Node = new Node(id, rangeX, rangeY)
+    def apply(id: Option[Int], rangeX: MyRange, rangeY: MyRange): Node = new Node(id, rangeX, rangeY)
     def apply(rangeX: MyRange, rangeY: MyRange): Node = new Node(None, rangeX, rangeY)
   }
 

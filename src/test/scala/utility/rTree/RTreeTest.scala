@@ -3,6 +3,7 @@ package utility.rTree
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
+import utility.geometry.ZeroVector2D
 import utility.rTree.RTree.{Node, Tree}
 
 class RTreeTest extends AnyWordSpecLike with Matchers with BeforeAndAfterAll {
@@ -11,9 +12,9 @@ class RTreeTest extends AnyWordSpecLike with Matchers with BeforeAndAfterAll {
 
   "An empty R-Tree" when {
     val tree = Tree()
+    val node = Node(1, (0, 0), (0, 0))
 
     "adding a node" should {
-      val node = Node(1, (0, 0), (0, 0))
       val prologResult = engine.insertNode(node, tree)
 
       "give as result a one-value tree" in {
@@ -26,11 +27,18 @@ class RTreeTest extends AnyWordSpecLike with Matchers with BeforeAndAfterAll {
     }
 
     "removing a node" should {
-      val node = Node(1, (0, 0), (0, 0))
       val prologResult = engine.removeNode(node, tree)
 
       "give an empty tree as result" in {
         assert(prologResult.size == 0)
+      }
+    }
+
+    "queried" should {
+      val prologResult = engine.query(ZeroVector2D(), tree)
+
+      "give an empty tree as result" in {
+        assert(prologResult.isEmpty)
       }
     }
   }
