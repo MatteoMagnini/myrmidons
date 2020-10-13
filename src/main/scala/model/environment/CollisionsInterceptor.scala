@@ -44,7 +44,7 @@ private[environment] object CollisionsInterceptor {
       } else {
         entity ! NewPosition(newPosition, newPosition - position)
       }
-    } else entity ! NewPosition(position - delta, delta -)
+    } else {entity ! NewPosition(position - delta, delta -)}
   }
 
   /**
@@ -64,7 +64,11 @@ private[environment] object CollisionsInterceptor {
    *         3: a flag that define if the obstacle is a food or not
    * */
   @scala.annotation.tailrec
-  private def recursionCheck(obstacles:Iterable[Obstacle], obstacle: Iterable[Obstacle], position: Vector2D, newPosition: Vector2D):(Vector2D, Vector2D, Boolean) = {
+  private def recursionCheck(obstacles:Iterable[Obstacle],
+                             obstacle: Iterable[Obstacle],
+                             position: Vector2D,
+                             newPosition: Vector2D)
+  :(Vector2D, Vector2D, Boolean) = {
     val res = handleObstacleIntersection(obstacle, position, newPosition)
     val intersection = res._1
     val delta = res._2
@@ -91,7 +95,10 @@ private[environment] object CollisionsInterceptor {
    *         2: the new delta of insect
    *         3: obstacle on which an insect is bounced
    * */
-  private def handleObstacleIntersection(obstacle: Iterable[Obstacle], position: Vector2D, newPosition: Vector2D): (Vector2D, Vector2D, Option[Obstacle]) = {
+  private def handleObstacleIntersection(obstacle: Iterable[Obstacle],
+                                         position: Vector2D,
+                                         newPosition: Vector2D)
+  : (Vector2D, Vector2D, Option[Obstacle]) = {
 
     val intersectionOnOverlappedObstacle = (for (f <- obstacle)
       yield (f.findIntersectionInformation(position, newPosition),f)).toList
@@ -102,10 +109,11 @@ private[environment] object CollisionsInterceptor {
 
     if (intersectionAndDirectionOpt.nonEmpty) {
       val intersectionAndDirection = intersectionAndDirectionOpt._1.get
-      val angleTest = if (intersectionAndDirection.angle < math.Pi / 2)
+      val angleTest = if (intersectionAndDirection.angle < math.Pi / 2) {
         math.Pi - (intersectionAndDirection.angle * 2)
-      else
+      } else {
         -((2 * intersectionAndDirection.angle) - math.Pi)
+      }
       val newDelta = intersectionAndDirection.intersectionPoint - newPosition
       val orientedDelta = (
         (math.cos(angleTest) * newDelta.x) - (math.sin(angleTest) * newDelta.y),
