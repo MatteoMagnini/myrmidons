@@ -12,16 +12,15 @@ object uiMessage {
 
   case class StepOver() extends uiMessage
 
-  case class SaveInfo(info: Seq[Drawable]) extends uiMessage
+  case class ReportInfo(info: Seq[Drawable]) extends uiMessage
 
-  case class ShowReport() extends uiMessage
+  case class ShowAndSaveReport() extends uiMessage
 
   case class History(info: Seq[Drawable]) extends uiMessage
 
-  case class SaveToFile() extends uiMessage
+  case class UpdateHistory() extends uiMessage
 
   case class setRate(rate: Int) extends uiMessage
-  case class Save() extends uiMessage
-  case class Sa() extends uiMessage
+
 }
 

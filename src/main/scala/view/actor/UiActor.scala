@@ -1,10 +1,10 @@
 package view.actor
 
-import akka.actor.{Actor, ActorContext, ActorLogging, Props, Timers}
+import akka.actor.{Actor, ActorLogging, Props, Timers}
 import model.Drawable
 import utility.Messages.{Clock, Ready, Repaint}
-import view.actor.uiMessage.{RestartSimulation, SaveInfo, StepOver, StopSimulation, setRate}
 import utility.RichActor._
+import view.actor.uiMessage._
 
 import scala.concurrent.duration.DurationInt
 
@@ -26,7 +26,7 @@ private[view] class UiActor(state: uiActorInfo)
       timers.startSingleTimer(state.currentState, StepOver, state.rate.millis)
 
     case Repaint(info: Seq[Drawable]) =>
-      if (state.currentState % 20 == 0) state.control.reportManager.tell(SaveInfo(info), self)
+      if (state.currentState % 20 == 0) state.control.reportManager.tell(ReportInfo(info), self)
       val entitiesProperties = state.setEntities(info)
       state.drawEntities()
       state.setControl(state.currentState, entitiesProperties)
@@ -54,10 +54,7 @@ private[view] class UiActor(state: uiActorInfo)
       timers.startSingleTimer(state.currentState, StepOver, state.rate.millis)
       context >>> defaultBehaviour(state.setRate(rate))
 
-
   }
-
-
 }
 
 object UiActor {

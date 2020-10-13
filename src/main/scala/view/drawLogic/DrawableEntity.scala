@@ -7,7 +7,7 @@ import java.awt.{Color, Polygon}
 import model.Fights.Fight
 import model.anthill.AnthillInfo
 import model.environment.elements.{Food, Obstacle}
-import model.environment.pheromones.{DangerPheromone, DangerPheromoneInfo, FoodPheromone, FoodPheromoneInfo}
+import model.environment.pheromones.{DangerPheromone, DangerPheromoneInfo, FoodPheromone, FoodPheromoneInfo, Pheromone}
 import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo, PatrollingAntInfo}
 import view.Colors._
 import view._
@@ -28,10 +28,13 @@ object DrawableEntities {
     g.fill(ellipse)
   }
 
-  implicit object drawDangerPheromone extends DrawableEntity[DangerPheromone] {
-    override def draw(elem: DangerPheromone, g: Graphics2D, size: Dimension): Unit = {
-       val pheromoneIntensity: Float = elem.intensity / DangerPheromoneInfo.MAX_INTENSITY
-      g.setColor(DANGER_PHEROMONE_COLOR(pheromoneIntensity))
+  implicit object drawPheromone extends DrawableEntity[Pheromone] {
+    override def draw(elem: Pheromone, g: Graphics2D, size: Dimension): Unit = {
+      val pheromoneIntensity: Float = elem.intensity / DangerPheromoneInfo.MAX_INTENSITY
+      g.setColor(elem match {
+        case _: DangerPheromone => DANGER_PHEROMONE_COLOR(pheromoneIntensity)
+        case _ => FOOD_PHEROMONE_COLOR(pheromoneIntensity)
+      })
       drawEllipse(elem.position.x - (PHEROMONE_SIZE / SET_TO_CENTER),
         size.height - elem.position.y - (PHEROMONE_SIZE / SET_TO_CENTER),
         PHEROMONE_SIZE, PHEROMONE_SIZE, g
@@ -39,29 +42,13 @@ object DrawableEntities {
     }
   }
 
-  implicit object drawPheromone extends DrawableEntity[FoodPheromone] {
-    override def draw(elem: FoodPheromone, g: Graphics2D, size: Dimension): Unit = {
-      val pheromoneIntensity: Float = elem.intensity / FoodPheromoneInfo.MAX_INTENSITY
-      g.setColor(FOOD_PHEROMONE_COLOR(pheromoneIntensity))
-      drawEllipse(elem.position.x - (PHEROMONE_SIZE / SET_TO_CENTER),
-        size.height - elem.position.y - (PHEROMONE_SIZE / SET_TO_CENTER),
-        PHEROMONE_SIZE, PHEROMONE_SIZE, g
-      )
-    }
-  }
 
-  implicit object drawForagingAnt extends DrawableEntity[ForagingAntInfo] {
-    override def draw(elem: ForagingAntInfo, g: Graphics2D, size: Dimension): Unit = {
-      g.setColor(ANT_COLOR)
-      drawEllipse(elem.position.x - (ANT_SIZE / SET_TO_CENTER),
-        size.height - elem.position.y - (ANT_SIZE / SET_TO_CENTER),
-        ANT_SIZE, ANT_SIZE, g)
-    }
-  }
-
-  implicit object drawPatrollingAnt extends DrawableEntity[PatrollingAntInfo] {
-    override def draw(elem: PatrollingAntInfo, g: Graphics2D, size: Dimension): Unit = {
-      g.setColor(PATROLLING_ANT_COLOR)
+  implicit object drawForagingAnt extends DrawableEntity[InsectInfo] {
+    override def draw(elem: InsectInfo, g: Graphics2D, size: Dimension): Unit = {
+      g.setColor(elem match {
+        case _: ForagingAntInfo => ANT_COLOR
+        case _ => PATROLLING_ANT_COLOR
+      })
       drawEllipse(elem.position.x - (ANT_SIZE / SET_TO_CENTER),
         size.height - elem.position.y - (ANT_SIZE / SET_TO_CENTER),
         ANT_SIZE, ANT_SIZE, g)

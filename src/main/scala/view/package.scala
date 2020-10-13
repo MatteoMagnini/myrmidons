@@ -10,30 +10,29 @@ package object view {
   val SIMULATION_SIZE: (Int, Int) = (800, 925)
   val SIMULATION_BOUNDARY: (Int, Int) = (800, 800)
   val SETTING_SIZE = 400
-  val MIN_COMPONENT = 6
+  val MIN_COMPONENT = "6"
 
   object Colors {
 
-    def ANT_COLOR: Color = Color.BLACK
+    val ANT_COLOR: Color = Color.BLACK
 
-    def OBSTACLE_COLOR: Color = new Color(0.5f, 0.5f, 0.5f)
+    val OBSTACLE_COLOR: Color = new Color(0.5f, 0.5f, 0.5f)
 
-    def ENEMIES_COLOR: Color = Color.RED
+    val ENEMIES_COLOR: Color = Color.RED
 
-    def ANTHILL_COLOR_COMPONENT: (Float, Float, Float) = (0f, 0.5f, 0f)
+    val ANTHILL_COLOR_COMPONENT: (Float, Float, Float) = (0f, 0.5f, 0f)
 
-    def PATROLLING_ANT_COLOR: Color = new Color(0.5f, 0, 0)
+    val PATROLLING_ANT_COLOR: Color = new Color(0.5f, 0, 0)
 
-    def FOOD_PHEROMONE_COLOR_COMPONENT: (Float, Float, Float) = (0.0f, 0.9f, 0.02f)
+    val FOOD_PHEROMONE_COLOR_COMPONENT: (Float, Float, Float) = (0.0f, 0.9f, 0.02f)
 
-    def DANGER_PHEROMONE_COLOR_COMPONENT: (Float, Float, Float) = (0.5f, 0.0f, 0.5f)
+    val DANGER_PHEROMONE_COLOR_COMPONENT: (Float, Float, Float) = (0.5f, 0.0f, 0.5f)
 
+    val FOOD_COLOR_COMPONENT: (Float, Float, Float) = (0f, 0f, 1f)
 
     def ANTHILL_COLOR(anthillFood: Float): Color = {
       if (anthillFood < 0.3f) ANTHILL_COLOR_SET(0.3f) else ANTHILL_COLOR_SET(anthillFood)
     }
-
-    def FOOD_COLOR_COMPONENT: (Float, Float, Float) = (0f, 0f, 1f)
 
     private def ANTHILL_COLOR_SET(anthillFood: Float): Color = {
       new Color(ANTHILL_COLOR_COMPONENT._1,

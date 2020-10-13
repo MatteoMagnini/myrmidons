@@ -9,7 +9,7 @@ import model.anthill.AnthillInfo
 import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
 import utility.RichActor._
 import view.actor.uiMessage._
-import view.scene.TimeSeriesPanel
+import view.frame.TimeSeriesFrame
 
 import scala.collection.immutable.ListMap
 
@@ -18,7 +18,7 @@ private[view] class ReportManager(state: ReportManagerInfo) extends Actor with A
 
   private def defaultBehaviour(state: ReportManagerInfo): Receive = {
 
-    case SaveInfo(info: Seq[Drawable]) =>
+    case ReportInfo(info: Seq[Drawable]) =>
       self ! History(info)
       context >>> defaultBehaviour(state.setState(state.foragingAnt, state.patrollingAnt,
         state.enemies))
@@ -38,17 +38,17 @@ private[view] class ReportManager(state: ReportManagerInfo) extends Actor with A
         case _ =>
       }
 
-      self ! SaveToFile()
+      self ! UpdateHistory()
       context >>> defaultBehaviour(state.saveInfo(foragingAnts, patrollingAnts, enemies, anthill))
 
 
-    case SaveToFile() =>
+    case UpdateHistory() =>
       val history = Map(state.currentClock -> (state.foragingAnt.size,
         state.patrollingAnt.size, state.enemies.size, state.anthill.get.foodAmount.toInt))
       context >>> defaultBehaviour(state.updateHistory(history))
 
 
-    case ShowReport() =>
+    case ShowAndSaveReport() =>
       val items = new util.ArrayList[util.ArrayList[InfoReport]]()
       val v = new util.ArrayList[InfoReport]()
       val res = ListMap(state.history.toSeq.sortBy(_._1): _*)
@@ -57,7 +57,7 @@ private[view] class ReportManager(state: ReportManagerInfo) extends Actor with A
       }
       items.add(v)
       writeFile(items)
-      val frameTimeSeries = TimeSeriesPanel(state.history)
+      val frameTimeSeries = TimeSeriesFrame(state.history)
       frameTimeSeries.visible = true
   }
 
@@ -65,7 +65,7 @@ private[view] class ReportManager(state: ReportManagerInfo) extends Actor with A
    * write a `String` to the `filename`.
    */
   def writeFile(list: util.ArrayList[util.ArrayList[InfoReport]]): Unit = {
-    val writer = new PrintWriter(new FileWriter("REPORT_NAME", false))
+    val writer = new PrintWriter(new FileWriter(REPORT_NAME, false))
     import com.google.gson.GsonBuilder
     val gson = new GsonBuilder().setPrettyPrinting().create
     list.forEach { x =>writer.write(gson.toJson(x))}

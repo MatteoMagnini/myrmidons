@@ -1,7 +1,7 @@
 package view.actor
 
 import model.Drawable
-import view.scene.{ControlPane, MyrmidonsPanel}
+import view.scene.{ControlPanel, MyrmidonsPanel}
 
 trait uiActorInfo {
 
@@ -11,7 +11,7 @@ trait uiActorInfo {
 
   def panel: MyrmidonsPanel
 
-  def control: ControlPane
+  def control: ControlPanel
 
   def stopFlag: Boolean
 
@@ -33,16 +33,16 @@ trait uiActorInfo {
 object uiActorInfo {
 
 
-  def apply(panel: MyrmidonsPanel, control: ControlPane): uiActorInfo =
+  def apply(panel: MyrmidonsPanel, control: ControlPanel): uiActorInfo =
     uiActorData(panel, control, stopFlag = true, 1, DEFAULT_RATE)
 
-  def apply(panel: MyrmidonsPanel, control: ControlPane, stopFlag: Boolean,
+  def apply(panel: MyrmidonsPanel, control: ControlPanel, stopFlag: Boolean,
             currentState: Int, rate: Int): uiActorInfo =
     uiActorData(panel, control, stopFlag, currentState, rate)
 
 
   private[this] case class uiActorData(override val panel: MyrmidonsPanel,
-                                       override val control: ControlPane,
+                                       override val control: ControlPanel,
                                        override val stopFlag: Boolean,
                                        override val currentState: Int,
                                        override val rate: Int) extends uiActorInfo {

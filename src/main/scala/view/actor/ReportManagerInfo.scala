@@ -59,7 +59,7 @@ object ReportManagerInfo {
     override def setState(foraging: Seq[ForagingAntInfo], patrolling: Seq[PatrollingAntInfo],
                           enemies: Seq[EnemyInfo]): ReportManagerInfo = {
       this.copy(
-        currentClock = currentClock + 20,
+        currentClock = currentClock + REPORT_INC_CLOCK,
         currentSize = (foraging.size, patrolling.size, enemies.size),
         foragingAnt = Seq.empty,
         patrollingAnt = Seq.empty,
@@ -77,6 +77,5 @@ object ReportManagerInfo {
       )
     }
   }
-
 }
 

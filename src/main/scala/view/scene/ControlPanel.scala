@@ -5,18 +5,18 @@ import model.environment.info.EnvironmentInfo
 import model.environment.{Boundary, Environment}
 import utility.Messages.StartSimulation
 import view._
-import view.actor.uiMessage.{RestartSimulation, ShowReport, StopSimulation, setRate}
+import view.actor.uiMessage.{RestartSimulation, ShowAndSaveReport, StopSimulation, setRate}
 import view.actor.{ReportManager, ReportManagerInfo, UiActor, uiActorInfo}
 
 import scala.swing.event.ButtonClicked
 import scala.swing.{Button, FlowPanel, GridPanel, Label, Separator, TextField}
 
 /**
- * FlowPanel which contains simulation button.
+ * Grid Panel which contains simulation button.
  *
  * @param myrmidonsPanel Panel when all the entities will be draw.
  */
-private[view] case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends GridPanel(2, 2) {
+private[view] case class ControlPanel(myrmidonsPanel: MyrmidonsPanel) extends GridPanel(2, 2) {
 
   private val system = ActorSystem("Myrmidons-system")
   private val boundary = Boundary(0, 0, SIMULATION_BOUNDARY._1, SIMULATION_BOUNDARY._2)
@@ -56,7 +56,6 @@ private[view] case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends Gri
   contents ++= Seq(new FlowPanel {
     contents ++= Seq(startButton, stopButton, restartButton, reportButton,
       timeLabel, timeInput, buttonSetTime)
-
   }, new FlowPanel {
     contents ++= Seq(stepLabel,
       stepText,
@@ -72,17 +71,19 @@ private[view] case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends Gri
    */
 
   reactions += {
-    case ButtonClicked(component) if component == startButton =>
+    case ButtonClicked(`startButton`) =>
       this.startButton.enabled = false
       this.stopButton.enabled = true
       this.restartButton.enabled = false
       this.reportButton.enabled = false
+
       if (!startFlag) {
         tellStart()
       } else {
         uiActor.tell(RestartSimulation(), uiActor)
       }
-    case ButtonClicked(component) if component == stopButton =>
+
+    case ButtonClicked(`stopButton`) =>
       this.startFlag = true
       this.startButton.enabled = true
       this.stopButton.enabled = false
@@ -90,7 +91,7 @@ private[view] case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends Gri
       this.reportButton.enabled = true
       uiActor.tell(StopSimulation, uiActor)
 
-    case ButtonClicked(component) if component == restartButton =>
+    case ButtonClicked(`restartButton`) =>
       system.stop(environment)
       system.stop(uiActor)
       system.stop(reportManager)
@@ -108,9 +109,10 @@ private[view] case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends Gri
       environment = environmentRestart
       tellStart()
 
-    case ButtonClicked(component) if component == reportButton =>
-      reportManager.tell(ShowReport(), uiActor)
-    case ButtonClicked(component) if component == buttonSetTime =>
+    case ButtonClicked(`reportButton`) =>
+      reportManager.tell(ShowAndSaveReport(), uiActor)
+
+    case ButtonClicked(`buttonSetTime`) =>
       uiActor ! setRate(timeInput.text.toInt)
 
   }
@@ -118,7 +120,6 @@ private[view] case class ControlPane(myrmidonsPanel: MyrmidonsPanel) extends Gri
   private def tellStart(): Unit = {
     environment.tell(StartSimulation(antSize, enemiesSize, obstacles = Some(obstacleSize),
       food = Some(foodSize), anthillFood = Some(anthillFood)), uiActor)
-
   }
 
 
