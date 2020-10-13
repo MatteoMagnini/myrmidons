@@ -1,15 +1,15 @@
 package utility.rTree
 
-import java.io.InputStream
-
 import alice.tuprolog.{Prolog, Theory, Var}
-
 
 object PrologFacilities {
 
-  def getEngine(theories: InputStream*):Prolog = {
+  def getEngine(resource: String):Prolog = {
     val engine = new Prolog()
-    theories foreach { f => engine addTheory new Theory(f) }
+    val file = scala.io.Source.fromResource(resource)
+    val lines = file.mkString
+    file.close()
+    engine.setTheory(new Theory(lines))
     engine
   }
 

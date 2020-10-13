@@ -81,7 +81,8 @@ insert(node(ID1,RangeX1, RangeY1), tree(L,node(ID2,RangeX2, RangeY2),R), tree(L,
 
 insert(node(ID1,RangeX1, RangeY1), tree(L,node(ID2,RangeX2, RangeY2),R), tree(L2,node(ID2,RangeX2, RangeY2),R)) :- 
 				contains(RangeX2, RangeX1), contains(RangeY2, RangeY1),
-				takeRoot(L,LV), takeRoot(R,RV), % both left and right branch don't contain new value: calculate min expansion to add new node
+				takeRoot(L,LV), takeRoot(R,RV),
+ % both left and right branch don't contain new value: calculate min expansion to add new node
 				% if there is an empty branch, distance from it will be 0 -> new node will be put there
 				leftMinDistantNode(RangeX1,RangeY1,LV,RV),
 				insert(node(ID1,RangeX1, RangeY1),L,L2), !.
@@ -91,7 +92,8 @@ insert(node(ID1,RangeX1, RangeY1), tree(L,node(ID2,RangeX2, RangeY2),R), tree(L,
 				contains(RangeX2, RangeX1), contains(RangeY2, RangeY1),
 				insert(node(ID1,RangeX1, RangeY1),R,R2), !.
 				
-% --- rare cases ---
+
+% --- rare cases ---
 % New node contains root of tree: it becomes root
 insert(node(ID1,RangeX1, RangeY1), tree(L,node(ID2,RangeX2, RangeY2),R), O) :- 
 				contains(RangeX1, RangeX2), contains(RangeY1, RangeY2),
@@ -107,6 +109,7 @@ insert(node(ID1,RangeX1, RangeY1), tree(L,node(ID2,RangeX2, RangeY2),R), O) :-
 %------------- NODE REMOVAL ---------------
 % remove(+Node, +Tree, -Tree) --> returns new tree with removed node (without fixing tree) NB: node to be removed has to be leaf
 % Base case: remove node from a single value tree
+remove(node(ID,RangeX,RangeY), nil, nil).
 remove(node(ID,RangeX,RangeY), tree(nil,node(ID,RangeX, RangeY),nil), nil) :- !.
 
 % Iterate to find node to be removed
@@ -138,7 +141,7 @@ fixTree(tree(L, node(_,RangeX1, RangeY1), nil), Tree) :-
 				takeRoot(L, LV), isLeaf(LV,L),
 				createTree(nil, LV, nil, Tree), !.
 
-% Genral case: every node has to be merge of its childern intervals -> inverse recursion 
+% General case: every node has to be merge of its childern intervals -> inverse recursion
 fixTree(tree(L, node(_,RangeX1, RangeY1), R), Tree) :- 
 				fixTree(L, T1), fixTree(R, T2), 
 				takeRoot(T1, LV), takeRoot(T2, RV), nodeMinRange(LV, RV, V),
@@ -148,9 +151,11 @@ fixTree(tree(L, node(_,RangeX1, RangeY1), R), Tree) :-
 removeWithFix(Node, ITree, OTree) :- remove(Node, ITree, TTree), fixTree(TTree, OTree).
 			
 %removeWithFix( node(range(1,2), range(1,2)), tree(tree(nil, node(range(1,2), range(1,2)), nil), node(range(1,3), range(1,3)), tree(nil, node(range(2,3), range(2,3)), nil)), X).				
-% fixTree(  tree(tree(tree(nil,node(range(1,2),range(1,2)),nil),node(range(1,3),range(1,3)),nil),node(range(1,6),range(1,6)),nil), X).
 
-%------------- QUERY ---------------
+% fixTree(  tree(tree(tree(nil,node(range(1,2),range(1,2)),nil),node(range(1,3),range(1,3)),nil),node(range(1,6),range(1,6)),nil), X).
+
+
+%------------- QUERY ---------------
 % query(+Tree, +RangeX, +RangeY, -Tree) --> returns minimal sub-tree of values inside ranges
 % Iterate in branches as long as nodes contain input ranges
 
@@ -174,7 +179,8 @@ getLeavesList(tree(nil, V, nil), [V]) :- !.
 getLeavesList(tree(L, V, R), List) :- getLeavesList(L, L1), getLeavesList(R, L2), append(L1,L2,List).
 
 % queryToList(+Tree, +RangeX, +RangeY, -List) --> returns result of a query in list format
-queryToList(Tree, Range1, Range2, List) :- query(Tree, Range1, Range2, Otree), getLeavesList(Otree, List).
+queryToList(Tree, Range1, Range2, List) :- query(Tree, Range1, Range2, Otree
+), getLeavesList(Otree, List).
 
 
 %removeWithFix( node(1,range(2,3),range(7,8)),tree(tree(tree(nil,node(1,range(2,3),range(7,8)),nil),node(none,range(2,4),range(5,8)),tree(nil,node(2,range(3,4),range(5,6)),nil)),node(none,range(1,7),range(1,8)),tree(tree(nil,node(3,range(6,7),range(3,4)),nil),node(none,range(1,7),range(1,4)),tree(nil,node(4,range(1,2),range(1,2)),nil))), X).
