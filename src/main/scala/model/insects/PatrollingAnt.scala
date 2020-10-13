@@ -1,7 +1,7 @@
 package model.insects
 
 import akka.actor.{ActorRef, Props}
-import model.environment.pheromones.DangerPheromone
+import model.environment.pheromones.{DangerPheromone, Pheromone}
 import model.environment.pheromones.DangerPheromoneInfo._
 import model.insects.Ants.PatrollingAnt._
 import model.insects.competences._
@@ -38,7 +38,7 @@ case class PatrollingAnt (override val info: PatrollingAntInfo,
     /**
      * Update food pheromones.
      */
-    case DangerPheromones(pheromones) =>
+    case Pheromones(pheromones) =>
       context >>> defaultBehaviour(data.updateDangerPheromones(pheromones))
 
     /**
@@ -59,7 +59,8 @@ case class PatrollingAnt (override val info: PatrollingAntInfo,
      * Ant killed in a fight
      */
     case KillInsect(_) =>
-      environment ! AddDangerPheromone(DangerPheromone(data.position, decreasingDangerFunction, dangerIntensity),DANGER_PHEROMONE_MERGING_THRESHOLD)
+      environment ! AddPheromone(DangerPheromone(data.position, decreasingDangerFunction, dangerIntensity),
+        DANGER_PHEROMONE_MERGING_THRESHOLD)
       context >>> defaultBehaviour(data.updateEnergy(-MAX_ENERGY))
 
     /**
@@ -68,6 +69,13 @@ case class PatrollingAnt (override val info: PatrollingAntInfo,
     case Context(_) => sender ! Context(Some(context))
 
     case x => //Discarding useless messages
+  }
+
+  private implicit def pheromonesToFoodPheromones(pheromones: Seq[Pheromone]): Seq[DangerPheromone] = {
+    pheromones.toStream.filter(p => p match {
+      case p: DangerPheromone => true
+      case _ => false
+    }).map(p => p.asInstanceOf[DangerPheromone])
   }
 }
 

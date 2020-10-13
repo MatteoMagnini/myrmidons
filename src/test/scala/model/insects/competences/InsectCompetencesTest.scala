@@ -95,7 +95,7 @@ with BeforeAndAfterAll{
         val dropFoodPheromoneCompetence = DropFoodPheromone()
         //No assert on hasPriority because it is stochastic.
         dropFoodPheromoneCompetence(context, senderRef, foragingAnt, foragingAntInfo2, defaultBehaviour)
-        sender.expectMsgType[AddFoodPheromone]
+        sender.expectMsgType[AddPheromone]
         sender.expectMsgType[UpdateInsect]
         sender expectNoMessage
 

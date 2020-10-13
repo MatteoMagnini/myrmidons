@@ -6,7 +6,7 @@ import model.anthill.{Anthill, AnthillInfo}
 import model.environment.elements.EnvironmentElements._
 import model.environment.elements.{Food, Obstacle}
 import model.environment.info.EnvironmentInfo
-import model.environment.pheromones.{DangerPheromone, FoodPheromone}
+import model.environment.pheromones.Pheromone
 import model.insects.Ants.ForagingAnt._
 import model.insects._
 import model.insects.info.{SpecificInsectInfo, _}
@@ -72,6 +72,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   }
 
   private def defaultBehaviour(state: EnvironmentInfo): Receive = {
+
     case Clock(value: Int) =>
       val antHillFoodPercentage = state.anthillInfo.get.foodAmount / state.anthillInfo.get.maxFoodAmount
       val scaleFactor = 1 / MAX_FOOD
@@ -79,12 +80,11 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
         self ! AntBirth(value)
       }
       state.ants.values.foreach(_ ! Clock(value))
-      state.ants.values.foreach(_ ! FoodPheromones(state.foodPheromones))
-      state.ants.values.foreach(_ ! DangerPheromones(state.dangerPheromones))
+      state.ants.values.foreach(_ ! Pheromones(state.pheromones))
       state.enemies.values.foreach(_ ! Clock(value))
       state.anthill.get ! Clock(value)
-      val newData = state.updateDangerPheromones(state.dangerPheromones.tick())
-      context >>> defaultBehaviour(newData.updateFoodPheromones(state.foodPheromones.tick()))
+      val newData = state.updatePheromones(state.pheromones.tick())
+      context >>> defaultBehaviour(newData)
 
     case Move(position: Vector2D, delta: Vector2D) =>
       CollisionsInterceptor.checkCollisions(sender, state, position, delta)
@@ -114,11 +114,9 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
     case KillInsect(info: InsectInfo) => killInsect(info, state)
 
-    case AddFoodPheromone(pheromone: FoodPheromone, threshold: Double) =>
-      context >>> defaultBehaviour(state.addFoodPheromone(pheromone, threshold))
+    case AddPheromone(pheromone: Pheromone, threshold: Double) =>
+      context >>> defaultBehaviour(state.addPheromone(pheromone, threshold))
 
-    case AddDangerPheromone(pheromone: DangerPheromone, threshold: Double) =>
-      context >>> defaultBehaviour(state.addDangerPheromone(pheromone, threshold))
   }
 
   private def createNewAnt(clock:Int, state: EnvironmentInfo, patrollingAntProb: Double): EnvironmentInfo = {
@@ -155,7 +153,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     handleFights(info, fights)
     val obstacles = info.obstacles ++ info.foods
     val insect = info.foragingAntsInfo ++ info.patrollingAntsInfo ++ info.enemiesInfo
-    val pheromones = info.foodPheromones ++ info.dangerPheromones
+    val pheromones = info.pheromones
     info.gui.get ! Repaint(info.anthillInfo.get +: (insect ++ obstacles ++ pheromones ++ fights).toSeq)
     context >>> defaultBehaviour(info.emptyInsectInfo())
   }

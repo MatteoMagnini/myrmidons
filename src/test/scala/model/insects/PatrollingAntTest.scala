@@ -65,7 +65,7 @@ class PatrollingAntTest extends TestKit(ActorSystem("PatrollingAntTest"))
 
       "perform danger pheromones taxis" in {
         val pheromones = Seq(DangerPheromone(Vector2D(5,0), x => x - DELTA,startingPheromoneIntensity ))
-        ant ! DangerPheromones(pheromones)
+        ant ! Pheromones(pheromones)
         ant ! Clock(1)
         val result1 = sender.expectMsgType[Move]
         ant ! NewPosition(result1.start >> result1.delta, result1.delta)

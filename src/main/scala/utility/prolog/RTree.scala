@@ -7,6 +7,8 @@ import utility.geometry.Vector2D
 
 class RTree(val engine: Prolog, val tree: Term) {
 
+  val regexForDouble = "^(-?)(0|([1-9][0-9]*))(\\.[0-9]+)?$"
+
   def insert(id: Int, pheromone: Pheromone): RTree = {
     val query = new Struct("insert",(id,pheromone),tree,new Var("R"))
     val newTree = engine.solve(query).getTerm("R")
@@ -21,8 +23,8 @@ class RTree(val engine: Prolog, val tree: Term) {
 
   def neighbours(position: Vector2D): String = {
     val query = new Struct("queryToList",tree, position.x, position.y, new Var("R"))
-    val ids = engine.solve(query).getTerm("R").toString
-    ids.split()
+    val nodes = engine.solve(query).getTerm("R").toString
+    nodes
   }
 
   private implicit def pheromoneToNode(pair:(Int,Pheromone)): Term = {

@@ -3,7 +3,7 @@ package utility
 import akka.actor.{ActorContext, ActorRef}
 import model.Drawable
 import model.anthill.AnthillInfo
-import model.environment.pheromones.{DangerPheromone, FoodPheromone}
+import model.environment.pheromones.{DangerPheromone, FoodPheromone, Pheromone}
 import utility.geometry.Vector2D
 import model.insects.info.InsectInfo
 
@@ -13,9 +13,12 @@ object Messages {
 
   /** Message sent from GUI to environment, to start simulation.
    *
-   * @param nAnts       number of ants to be created
+   * @param nAnts number of ants to be created
    */
-  case class StartSimulation(nAnts: Int, nEnemies: Int, obstacles: Option[Int] = Some(6), food: Option[Int] = Some(6)) extends Message
+  case class StartSimulation(nAnts: Int,
+                             nEnemies: Int,
+                             obstacles: Option[Int] = Some(6),
+                             food: Option[Int] = Some(6)) extends Message
 
   /** Message sent from GUI to environment and from environment to ants, to do a step in simulation.
    *
@@ -30,13 +33,9 @@ object Messages {
    */
   case class Move(start: Vector2D, delta: Vector2D) extends Message
 
-  case class FoodPheromones(pheromones: Seq[FoodPheromone]) extends Message
+  case class Pheromones(pheromones: Seq[Pheromone]) extends Message
 
-  case class AddFoodPheromone(foodPheromone: FoodPheromone, threshold: Double) extends Message
-
-  case class DangerPheromones(pheromones: Seq[DangerPheromone]) extends Message
-
-  case class AddDangerPheromone(dangerPheromone: DangerPheromone, threshold: Double) extends Message
+  case class AddPheromone(foodPheromone: Pheromone, threshold: Double) extends Message
 
   /** Message sent from ant to environment, to update its information.
    *
@@ -76,7 +75,11 @@ object Messages {
    * @param noise to avoid getting stacked
    * @param antIsIn  true if it is inside the anthill, false otherwise
    */
-  case class AntTowardsAnthill(position: Vector2D, maxSpeed: Double, inertia: Vector2D, noise: Double, antIsIn: Boolean) extends Message
+  case class AntTowardsAnthill(position: Vector2D,
+                               maxSpeed: Double,
+                               inertia: Vector2D,
+                               noise: Double,
+                               antIsIn: Boolean) extends Message
 
   case class FoodNear(foodPosition: Vector2D) extends Message
 
