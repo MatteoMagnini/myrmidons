@@ -64,13 +64,13 @@ class PatrollingAntTest extends TestKit(ActorSystem("PatrollingAntTest"))
       val ant = system.actorOf(PatrollingAnt(startingInfo,senderRef), "ant-1")
 
       "perform danger pheromones taxis" in {
-        val pheromones = Seq(DangerPheromone(Vector2D(5,0), x => x - DELTA,startingPheromoneIntensity ))
+        val pheromones = Map(1 -> DangerPheromone(Vector2D(5,0), x => x - DELTA,startingPheromoneIntensity ))
         ant ! Pheromones(pheromones)
         ant ! Clock(1)
         val result1 = sender.expectMsgType[Move]
         ant ! NewPosition(result1.start >> result1.delta, result1.delta)
         val result2 = sender.expectMsgType[UpdateInsect]
-        assert(result2.info.position --> pheromones.last.position < result1.start --> pheromones.last.position)
+        assert(result2.info.position --> pheromones.last._2.position < result1.start --> pheromones.last._2.position)
         assert(~=(result2.info.energy, STARTING_ENERGY + ENERGY_DANGER_PHEROMONE_TAXIS))
         sender expectNoMessage
       }

@@ -71,8 +71,8 @@ case class PatrollingAnt (override val info: PatrollingAntInfo,
     case x => //Discarding useless messages
   }
 
-  private implicit def pheromonesToFoodPheromones(pheromones: Seq[Pheromone]): Seq[DangerPheromone] = {
-    pheromones.toStream.filter(p => p match {
+  private implicit def pheromonesToFoodPheromones(pheromones: Map[Int,Pheromone]): Seq[DangerPheromone] = {
+    pheromones.values.toStream.filter(p => p match {
       case p: DangerPheromone => true
       case _ => false
     }).map(p => p.asInstanceOf[DangerPheromone])

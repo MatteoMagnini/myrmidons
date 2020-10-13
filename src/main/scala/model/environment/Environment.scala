@@ -11,7 +11,7 @@ import model.insects.Ants.ForagingAnt._
 import model.insects._
 import model.insects.info.{SpecificInsectInfo, _}
 import utility.Messages._
-import utility.PheromoneSeq._
+import utility.PheromoneMap._
 import utility.geometry.{RandomVector2DInSquare, Vector2D, ZeroVector2D}
 import utility.RichActor._
 
@@ -153,7 +153,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     handleFights(info, fights)
     val obstacles = info.obstacles ++ info.foods
     val insect = info.foragingAntsInfo ++ info.patrollingAntsInfo ++ info.enemiesInfo
-    val pheromones = info.pheromones
+    val pheromones: Seq[Pheromone] = info.pheromones
     info.gui.get ! Repaint(info.anthillInfo.get +: (insect ++ obstacles ++ pheromones ++ fights).toSeq)
     context >>> defaultBehaviour(info.emptyInsectInfo())
   }
@@ -178,6 +178,10 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
           info.enemies(enemy) ! KillInsect(enemy)
       }
     }
+  }
+
+  private implicit def mapToSeqPheromone(map: Map[Int, Pheromone]): Seq[Pheromone] = {
+    map.values.toSeq
   }
 
 }

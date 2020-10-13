@@ -6,7 +6,7 @@ import model.environment.Boundary
 import model.environment.elements.{Food, Obstacle}
 import model.environment.pheromones.Pheromone
 import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo, PatrollingAntInfo}
-import utility.PheromoneSeq._
+import utility.PheromoneMap._
 
 /** Internal state of environment. */
 trait EnvironmentInfo {
@@ -44,13 +44,13 @@ trait EnvironmentInfo {
   def anthillInfo: Option[AnthillInfo]
 
   /** Pheromones dropped by ants */
-  def pheromones: Seq[Pheromone]
+  def pheromones: Map[Int, Pheromone]
 
   /** Reference to anthill */
   def anthill: Option[ActorRef]
 
   /** Returns updated pheromones*/
-  def updatePheromones(pheromones: Seq[Pheromone]): EnvironmentInfo
+  def updatePheromones(pheromones: Map[Int,Pheromone]): EnvironmentInfo
 
   /** Add pheromones*/
   def addPheromone(pheromone: Pheromone, threshold: Double): EnvironmentInfo
@@ -83,13 +83,13 @@ object EnvironmentInfo {
   def apply(boundary: Boundary): EnvironmentInfo =
     EnvironmentData(None, boundary, Seq.empty, Seq.empty,
       Map.empty, 0, Seq.empty, Seq.empty, Map.empty,
-      Seq.empty, None, None, Seq[Pheromone]())
+      Seq.empty, None, None, Map[Int,Pheromone]())
 
   def apply(gui: Option[ActorRef], boundary: Boundary, obstacles: Seq[Obstacle], foods: Seq[Food],
             anthill: ActorRef, anthillInfo: Option[AnthillInfo]): EnvironmentInfo =
     EnvironmentData(gui, boundary, obstacles, foods,
       Map.empty, 0, Seq.empty, Seq.empty, Map.empty,
-      Seq.empty, Some(anthill), anthillInfo, Seq.empty)
+      Seq.empty, Some(anthill), anthillInfo, Map.empty)
 
 
   /** Internal state of environment.
@@ -114,7 +114,7 @@ object EnvironmentInfo {
                                            override val enemiesInfo: Seq[EnemyInfo],
                                            override val anthill: Option[ActorRef],
                                            override val anthillInfo: Option[AnthillInfo],
-                                           override val pheromones: Seq[Pheromone])
+                                           override val pheromones: Map[Int,Pheromone])
     extends EnvironmentInfo {
 
     /** Returns ant info, adding ant information */
@@ -155,7 +155,7 @@ object EnvironmentInfo {
 
     def addEnemies(newEnemies: Map[Int, ActorRef]): EnvironmentInfo = this.copy(enemies = enemies ++ newEnemies)
 
-    override def updatePheromones(pheromones: Seq[Pheromone]): EnvironmentInfo =
+    override def updatePheromones(pheromones: Map[Int,Pheromone]): EnvironmentInfo =
       this.copy(pheromones = pheromones)
 
     override def addPheromone(pheromone: Pheromone, threshold: Double): EnvironmentInfo =

@@ -18,8 +18,12 @@ object PheromoneSeq {
       if (seq.isEmpty) None else Some(seq.toStream.sortWith((e1, e2) => e1.intensity > e2.intensity).last)
 
     def weightedSum(position: Vector2D): Vector2D =
-      if (seq.isEmpty) ZeroVector2D()
-      else seq.toStream.map(e => (e.position - position) * (e.intensity / (e.position --> position))).reduce(_>>_)
+      if (seq.isEmpty) {
+        ZeroVector2D()
+      }
+      else {
+        seq.toStream.map(e => (e.position - position) * (e.intensity / (e.position --> position))).reduce(_>>_)
+      }
 
     private def merge(newElement: A, threshold: Double): Seq[A] =
       recursiveMerge(newElement, threshold, seq)
@@ -31,7 +35,8 @@ object PheromoneSeq {
           case Some(x) if x.isInstanceOf[A] => seq.replace(sequence.last,x.asInstanceOf[A])
           case None => recursiveMerge(newElement, threshold, sequence.take(sequence.length - 1))
         }
-      } else newElement +: seq
-
+      } else {
+        newElement +: seq
+      }
   }
 }

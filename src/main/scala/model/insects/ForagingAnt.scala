@@ -84,8 +84,8 @@ case class ForagingAnt(override val info: ForagingAntInfo,
     case x => //System.err.println(s"ForagingAnt ${info.id}: received unhandled message $x from $sender")
   }
 
-  private implicit def pheromonesToFoodPheromones(pheromones: Seq[Pheromone]): Seq[FoodPheromone] = {
-    pheromones.toStream.filter(p => p match {
+  private implicit def pheromonesToFoodPheromones(pheromones: Map[Int,Pheromone]): Seq[FoodPheromone] = {
+    pheromones.values.toStream.filter(p => p match {
       case p: FoodPheromone => true
       case _ => false
     }).map(p => p.asInstanceOf[FoodPheromone])
