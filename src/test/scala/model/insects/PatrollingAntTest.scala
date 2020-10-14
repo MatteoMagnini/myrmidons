@@ -12,6 +12,8 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import utility.Messages._
 import utility.geometry.{Vector2D, ZeroVector2D}
+import utility.rTree.RTree.Tree
+import utility.rTree.RTreeProlog
 
 class PatrollingAntTest extends TestKit(ActorSystem("PatrollingAntTest"))
   with AnyWordSpecLike
@@ -62,10 +64,13 @@ class PatrollingAntTest extends TestKit(ActorSystem("PatrollingAntTest"))
       val startingPheromoneIntensity = 10.0
       val startingInfo = PatrollingAntInfo(senderRef)
       val ant = system.actorOf(PatrollingAnt(startingInfo,senderRef), "ant-1")
+      import utility.rTree.getPheromoneAsNode
+      val tree = Tree()
+      val engine = RTreeProlog()
 
       "perform danger pheromones taxis" in {
         val pheromones = Map(1 -> DangerPheromone(Vector2D(5,0), x => x - DELTA,startingPheromoneIntensity ))
-        ant ! Pheromones(pheromones)
+        ant ! Pheromones(pheromones, engine.insertNode((pheromones.head._1,pheromones.head._2),tree), engine)
         ant ! Clock(1)
         val result1 = sender.expectMsgType[Move]
         ant ! NewPosition(result1.start >> result1.delta, result1.delta)

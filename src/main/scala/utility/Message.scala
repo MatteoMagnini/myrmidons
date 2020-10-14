@@ -7,6 +7,8 @@ import model.environment.info.InsectReferences
 import model.environment.pheromones.Pheromone
 import utility.geometry.Vector2D
 import model.insects.info.InsectInfo
+import utility.rTree.RTree.Tree
+import utility.rTree.RTreeProlog
 
 trait Message
 
@@ -34,7 +36,7 @@ object Messages {
    */
   case class Move(start: Vector2D, delta: Vector2D) extends Message
 
-  case class Pheromones(pheromones: Map[Int,Pheromone]) extends Message
+  case class Pheromones(pheromones: Map[Int,Pheromone], tree: Tree, engine: RTreeProlog) extends Message
 
   case class AddPheromone(foodPheromone: Pheromone, threshold: Double) extends Message
 

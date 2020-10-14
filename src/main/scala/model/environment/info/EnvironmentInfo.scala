@@ -7,6 +7,9 @@ import model.environment.elements.{Food, Obstacle}
 import model.environment.pheromones.Pheromone
 import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo, PatrollingAntInfo}
 import utility.PheromoneMap._
+import utility.rTree.RTree.{Node, Tree}
+import utility.rTree.RTreeProlog
+import utility.rTree.getPheromoneAsNode
 
 /** Internal state of environment. */
 trait EnvironmentInfo {
@@ -46,6 +49,12 @@ trait EnvironmentInfo {
   /** Pheromones dropped by ants */
   def pheromones: Map[Int, Pheromone]
 
+  /** RTree for pheromones */
+  def tree: Tree
+
+  /** Prolog engine */
+  def engine: RTreeProlog
+
   /** Reference to anthill */
   def anthill: Option[ActorRef]
 
@@ -83,13 +92,13 @@ object EnvironmentInfo {
   def apply(boundary: Boundary): EnvironmentInfo =
     EnvironmentData(None, boundary, Seq.empty, Seq.empty,
       Map.empty, 0, Seq.empty, Seq.empty, Map.empty,
-      Seq.empty, None, None, Map[Int,Pheromone]())
+      Seq.empty, None, None, Map[Int,Pheromone](), Tree(), RTreeProlog())
 
   def apply(gui: Option[ActorRef], boundary: Boundary, obstacles: Seq[Obstacle], foods: Seq[Food],
             anthill: ActorRef, anthillInfo: Option[AnthillInfo]): EnvironmentInfo =
     EnvironmentData(gui, boundary, obstacles, foods,
       Map.empty, 0, Seq.empty, Seq.empty, Map.empty,
-      Seq.empty, Some(anthill), anthillInfo, Map.empty)
+      Seq.empty, Some(anthill), anthillInfo, Map.empty, Tree(), RTreeProlog())
 
 
   /** Internal state of environment.
@@ -114,7 +123,9 @@ object EnvironmentInfo {
                                            override val enemiesInfo: Seq[EnemyInfo],
                                            override val anthill: Option[ActorRef],
                                            override val anthillInfo: Option[AnthillInfo],
-                                           override val pheromones: Map[Int,Pheromone])
+                                           override val pheromones: Map[Int,Pheromone],
+                                           override val tree: Tree,
+                                           override val engine: RTreeProlog)
     extends EnvironmentInfo {
 
     /** Returns ant info, adding ant information */
@@ -155,10 +166,22 @@ object EnvironmentInfo {
 
     def addEnemies(newEnemies: InsectReferences): EnvironmentInfo = this.copy(enemies = enemies ++ newEnemies)
 
-    override def updatePheromones(pheromones: Map[Int,Pheromone]): EnvironmentInfo =
-      this.copy(pheromones = pheromones)
+    override def updatePheromones(newPheromones: Map[Int,Pheromone]): EnvironmentInfo = {
+      val ids = pheromones.keys filterNot newPheromones.keys.toSet
+      var newTree = tree
+      ids.foreach(id => newTree = engine.removeNode((id,pheromones(id)),newTree))
+      this.copy(pheromones = newPheromones, tree = newTree)
+    }
 
-    override def addPheromone(pheromone: Pheromone, threshold: Double): EnvironmentInfo =
-      this.copy(pheromones = pheromones.add(pheromone, threshold))
+    override def addPheromone(pheromone: Pheromone, threshold: Double): EnvironmentInfo = {
+      val newMap = pheromones.add(pheromone, threshold)
+      val newTree = if(newMap.size > pheromones.size) {
+        engine.insertNode((pheromones.nextKey, pheromone),tree)
+      } else {
+        tree
+      }
+      this.copy(pheromones = newMap,
+      tree = newTree)
+    }
   }
 }

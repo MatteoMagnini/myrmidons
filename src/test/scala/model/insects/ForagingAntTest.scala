@@ -15,6 +15,8 @@ import utility.Message
 import utility.Messages._
 import utility.geometry.TupleOp2._
 import utility.geometry._
+import utility.rTree.RTree.Tree
+import utility.rTree.RTreeProlog
 
 class ForagingAntTest extends TestKit(ActorSystem("ForagingAntTest"))
   with AnyWordSpecLike
@@ -112,11 +114,14 @@ class ForagingAntTest extends TestKit(ActorSystem("ForagingAntTest"))
         assert(info2.foodPheromones.nonEmpty)
       }
 
+      import utility.rTree.getPheromoneAsNode
       val ant = system.actorOf(ForagingAnt(ForagingAntInfo(senderRef, id = 2),senderRef), "ant-2")
+      val tree = Tree()
+      val engine = RTreeProlog()
 
       "perform food pheromone taxis" in {
         val pheromones = Map(1 -> FoodPheromone(Vector2D(5,0), x => x - DELTA,startingPheromoneIntensity ))
-        ant ! Pheromones(pheromones)
+        ant ! Pheromones(pheromones, engine.insertNode((pheromones.head._1,pheromones.head._2),tree), engine)
         ant ! Clock(1)
         val result1 = sender.expectMsgType[Move]
         ant ! NewPosition(result1.start >> result1.delta, result1.delta)
@@ -128,7 +133,7 @@ class ForagingAntTest extends TestKit(ActorSystem("ForagingAntTest"))
 
       "multiple times" in {
         val pheromones = Map(1 -> FoodPheromone(Vector2D(8,1),x => x - DELTA, startingPheromoneIntensity))
-        ant ! Pheromones(pheromones)
+        ant ! Pheromones(pheromones, engine.insertNode((pheromones.head._1,pheromones.head._2),tree), engine)
         ant ! Clock(2)
         val result1 = sender.expectMsgType[Move]
         ant ! NewPosition(result1.start >> result1.delta, result1.delta)

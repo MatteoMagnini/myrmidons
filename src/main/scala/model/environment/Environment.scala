@@ -80,7 +80,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
         self ! AntBirth(value)
       }
       state.ants.values.foreach(_ ! Clock(value))
-      state.ants.values.foreach(_ ! Pheromones(state.pheromones))
+      state.ants.values.foreach(_ ! Pheromones(state.pheromones, state.tree, state.engine))
       state.enemies.values.foreach(_ ! Clock(value))
       state.anthill.get ! Clock(value)
       val newData = state.updatePheromones(state.pheromones.tick())

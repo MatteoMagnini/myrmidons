@@ -48,8 +48,9 @@ case class ForagingAnt(override val info: ForagingAntInfo,
       context >>> defaultBehaviour(newData)
 
     /* Update food pheromones */
-    case Pheromones(pheromones) =>
-      context >>> defaultBehaviour(data.updateFoodPheromones(pheromones))
+    case Pheromones(pheromones, tree, engine) =>
+      val ids = engine.query(data.position, tree)
+      context >>> defaultBehaviour(data.updateFoodPheromones(pheromones filterKeys ids.toSet))
 
     /* The ant perceive food in its proximity */
     case FoodNear(position) =>

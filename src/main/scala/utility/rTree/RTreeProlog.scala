@@ -8,10 +8,10 @@ import utility.rTree.RTree.{MyRange, Node, Tree}
 
 class RTreeProlog(val engine: Prolog) {
 
-  val insert = "insert"
-  val remove = "removeWithFix"
-  val getLeavesList = "getLeavesList"
-  val query = "queryToList"
+  private val insert = "insert"
+  private val remove = "removeWithFix"
+  private val getLeavesList = "getLeavesList"
+  private val query = "queryToList"
 
   def insertNode(node: Node, tree: Tree): Tree = {
     val variable = Variable()
