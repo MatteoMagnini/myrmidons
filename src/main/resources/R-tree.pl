@@ -19,6 +19,9 @@ rangeDifference(range(_,_),range(_,_), D) :- D is 0.
 % contains(+Range, +Range) --> returns whether a range contains another one
 contains(range(X1,X2),range(Y1,Y2)) :- X1=<Y1, X2>=Y2.
 
+% intersects(+Range, +Range) --> returns whether a range contains another one
+intersects(range(X1,X2),range(Y1,Y2)) :- X1=<Y1; X2>=Y2.
+
 % maxRange(+Range, +Range, -Range) --> returns merge of two range
 mergeRange(range(X1,X2), range(Y1,Y2), range(Z1,Z2)) :- min(X1,Y1,Z1), max(X2,Y2,Z2).
 
@@ -27,6 +30,9 @@ node(Id,RangeX,RangeY).
 
 % nodeContains(+Node, +Range, +Range) --> returns whether a node contains a certain interval
 nodeContains(node(_,RangeX1, RangeY1),RangeX2,RangeY2) :- contains(RangeX1,RangeX2), contains(RangeY1, RangeY2).
+
+% nodeIntersects(+Node, +Range, +Range) --> returns whether a node intersects a certain interval
+nodeIntersects(node(_,RangeX1, RangeY1),RangeX2,RangeY2) :- intersects(RangeX1,RangeX2), intersects(RangeY1, RangeY2).
 
 % minDistantNode(+Range, +Range, +Node, +Node, -Node) --> returns whether left node is closer to certain range wrt right node
 leftMinDistantNode(RangeXI,RangeYI, node(_,RangeX1,RangeY1), node(_,RangeX2,RangeY2)) :- 
@@ -168,6 +174,9 @@ query(tree(L,node(_,RangeX, RangeY),R),RangeXI,RangeYI, OTree) :-
 				contains(RangeX, RangeXI), contains(RangeY,RangeYI),
 				takeRoot(R,V), nodeContains(V,RangeXI,RangeYI),
 				query(R, RangeXI,RangeYI, OTree), !.
+
+query(tree(L,V,R),RangeXI,RangeYI, tree(L,V,R)) :-
+				nodeIntersects(V,RangeXI,RangeYI), !.
 
 % Output subtree when ranges are no more contained in nodes
 query(tree(L,node(ID,RangeX, RangeY),R),RangeXI,RangeYI, tree(L,node(ID,RangeX, RangeY),R)) :-
