@@ -24,7 +24,7 @@ trait EnvironmentInfo {
   def foods: Iterable[Food]
 
   /** References to ant actors */
-  def ants: Map[Int, ActorRef]
+  def ants: InsectReferences
 
   /**Highest used Id*/
   def maxAntId: Int
@@ -35,7 +35,7 @@ trait EnvironmentInfo {
   def patrollingAntsInfo: Iterable[PatrollingAntInfo]
 
   /** References to enemy actors */
-  def enemies: Map[Int, ActorRef]
+  def enemies: InsectReferences
 
   /** Enemies information */
   def enemiesInfo: Iterable[EnemyInfo]
@@ -72,9 +72,9 @@ trait EnvironmentInfo {
   /** Add an ant reference */
   def addAnt(id: Int, ant: ActorRef): EnvironmentInfo
 
-  def addAnts(ants: Map[Int, ActorRef]): EnvironmentInfo
+  def addAnts(ants: InsectReferences): EnvironmentInfo
 
-  def addEnemies(ants: Map[Int, ActorRef]): EnvironmentInfo
+  def addEnemies(ants: InsectReferences): EnvironmentInfo
 
 }
 
@@ -106,11 +106,11 @@ object EnvironmentInfo {
                                            override val boundary: Boundary,
                                            override val obstacles: Seq[Obstacle],
                                            override val foods: Seq[Food],
-                                           override val ants: Map[Int, ActorRef],
+                                           override val ants: InsectReferences,
                                            override val maxAntId: Int,
                                            override val foragingAntsInfo: Seq[ForagingAntInfo],
                                            override val patrollingAntsInfo: Seq[PatrollingAntInfo],
-                                           override val enemies: Map[Int, ActorRef],
+                                           override val enemies: InsectReferences,
                                            override val enemiesInfo: Seq[EnemyInfo],
                                            override val anthill: Option[ActorRef],
                                            override val anthillInfo: Option[AnthillInfo],
@@ -153,7 +153,7 @@ object EnvironmentInfo {
     override def addAnts(newAnts: Map[Int, ActorRef]): EnvironmentInfo =
       this.copy(ants = ants ++ newAnts, maxAntId = maxAntId + newAnts.size)
 
-    def addEnemies(newEnemies: Map[Int, ActorRef]): EnvironmentInfo = this.copy(enemies = enemies ++ newEnemies)
+    def addEnemies(newEnemies: InsectReferences): EnvironmentInfo = this.copy(enemies = enemies ++ newEnemies)
 
     override def updatePheromones(pheromones: Map[Int,Pheromone]): EnvironmentInfo =
       this.copy(pheromones = pheromones)

@@ -1,12 +1,12 @@
 package model.environment
 
-import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import akka.actor.{Actor, ActorLogging, Props}
 import model.Fights.Fight
 import model.anthill.{Anthill, AnthillInfo}
 import model.environment.elements.EnvironmentElements._
 import model.environment.elements.{Food, Obstacle}
-import model.environment.info.EnvironmentInfo
 import model.environment.pheromones.Pheromone
+import model.environment.info.{EnvironmentInfo, InsectReferences}
 import model.insects.Ants.ForagingAnt._
 import model.insects._
 import model.insects.info.{SpecificInsectInfo, _}
@@ -66,7 +66,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       context >>> initializationBehaviour(EnvironmentInfo(Some(sender), state.boundary,
         obstacles, foods, anthill, Some(anthillInfo)).addEnemies(enemies))
 
-    case NewEntities(ants: Map[Int, ActorRef]) =>
+    case NewEntities(ants: InsectReferences) =>
       state.gui.get ! Ready
       context >>> defaultBehaviour(state.addAnts(ants))
   }
