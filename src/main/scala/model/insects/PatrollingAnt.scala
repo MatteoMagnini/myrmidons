@@ -38,8 +38,9 @@ case class PatrollingAnt (override val info: PatrollingAntInfo,
     /**
      * Update food pheromones.
      */
-    case Pheromones(pheromones) =>
-      context >>> defaultBehaviour(data.updateDangerPheromones(pheromones))
+    case Pheromones(pheromones, tree, engine) =>
+      val ids = engine.query(data.position, tree)
+      context >>> defaultBehaviour(data.updateDangerPheromones(pheromones filterKeys ids.toSet))
 
     /**
      * The ant enters or exits the anthill.

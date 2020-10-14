@@ -15,6 +15,13 @@ object PheromoneMap {
     def add(newElement: A, threshold: Double = 1E-10): Map[Int, A] =
       merge(newElement,threshold)
 
+    def nextKey: Int =
+      if(map.isEmpty) {
+        1
+      } else {
+        map.keys.max + 1
+      }
+
     def strongest: Option[A] =
       if (map.isEmpty) None else Some(map.values.toStream.sortWith((e1, e2) => e1.intensity > e2.intensity).last)
 
@@ -30,14 +37,14 @@ object PheromoneMap {
       recursiveMerge(newElement, threshold, map)
 
     @scala.annotation.tailrec
-    private def recursiveMerge(newElement: A, threshold: Double, map: Map[Int,A]): Map[Int,A] =
-      if (map.nonEmpty) {
-        map.last._2.merge(newElement,threshold) match {
-          case Some(x) if x.isInstanceOf[A] => map + (map.last._1 -> x.asInstanceOf[A])
-          case None => recursiveMerge(newElement, threshold, map.take(map.size - 1))
+    private def recursiveMerge(newElement: A, threshold: Double, recMap: Map[Int,A]): Map[Int,A] =
+      if (recMap.nonEmpty) {
+        recMap.last._2.merge(newElement,threshold) match {
+          case Some(x) if x.isInstanceOf[A] => map + (recMap.last._1 -> x.asInstanceOf[A])
+          case None => recursiveMerge(newElement, threshold, recMap.take(recMap.size - 1))
         }
       } else {
-        map + (map.keys.max + 1 -> newElement)
+        map + (nextKey -> newElement)
       }
   }
 }

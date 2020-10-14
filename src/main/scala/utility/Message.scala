@@ -1,11 +1,14 @@
 package utility
 
-import akka.actor.{ActorContext, ActorRef}
+import akka.actor.ActorContext
 import model.Drawable
 import model.anthill.AnthillInfo
-import model.environment.pheromones.{DangerPheromone, FoodPheromone, Pheromone}
+import model.environment.info.InsectReferences
+import model.environment.pheromones.Pheromone
 import utility.geometry.Vector2D
 import model.insects.info.InsectInfo
+import utility.rTree.RTree.Tree
+import utility.rTree.RTreeProlog
 
 trait Message
 
@@ -35,7 +38,7 @@ object Messages {
    */
   case class Move(start: Vector2D, delta: Vector2D) extends Message
 
-  case class Pheromones(pheromones: Map[Int,Pheromone]) extends Message
+  case class Pheromones(pheromones: Map[Int,Pheromone], tree: Tree, engine: RTreeProlog) extends Message
 
   case class AddPheromone(foodPheromone: Pheromone, threshold: Double) extends Message
 
@@ -92,7 +95,7 @@ object Messages {
 
   case class CreateEntities(nAnts: Int, foragingProbability: Double) extends Message
 
-  case class NewEntities(ants: Map[Int, ActorRef]) extends Message
+  case class NewEntities(ants: InsectReferences) extends Message
   /**
    * Message from GUI to create new ants with RandomPosition.
    *
