@@ -32,8 +32,12 @@ case class PatrollingAnt (override val info: PatrollingAntInfo,
 
     case NewPosition(p, d) =>
       val newData = data.updatePosition(p).updateInertia(d)
-      environment ! UpdateInsect(newData)
-      context become defaultBehaviour(newData)
+      if(data.position ~~(p,1E-7) && !data.isInsideTheAnthill) {
+        environment ! KillInsect(data)
+      } else {
+        environment ! UpdateInsect(newData)
+      }
+      context >>> defaultBehaviour(newData)
 
     /**
      * Update food pheromones.

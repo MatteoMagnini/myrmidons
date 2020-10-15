@@ -26,25 +26,30 @@ private[environment] object CollisionsInterceptor {
    * */
   def checkCollisions(entity: ActorRef, state: EnvironmentInfo, position: Vector2D, delta: Vector2D): Unit = {
     val newPosition = position >> delta
-    /*Checking boundary*/
-    import model.environment.elements.EnvironmentElements.BoundaryHasInside
-    if (checkHasInside(state.boundary, newPosition)) {
-      /*Checking obstacles*/
-      import model.environment.elements.EnvironmentElements.ObstacleHasInside
-      val of = state.obstacles ++ state.foods
-      val obstacle = checkHaveInside(of, newPosition)
-      if (obstacle.nonEmpty) {
-        val bouncedPosition = recursionCheck(of, obstacle, position, newPosition)
-        if(bouncedPosition._3){
-          val nearestFood: Food = state.foods.toList.sortWith((a, b) =>  //TODO: Not correct in all case
+    import model.environment.elements.EnvironmentElements.FoodHasInside
+    if (checkHaveInside(state.foods, position).isEmpty) {
+      /*Checking boundary*/
+      import model.environment.elements.EnvironmentElements.BoundaryHasInside
+      if (checkHasInside(state.boundary, newPosition)) {
+        /*Checking obstacles*/
+        import model.environment.elements.EnvironmentElements.ObstacleHasInside
+        val of = state.obstacles ++ state.foods
+        val obstacle = checkHaveInside(of, newPosition)
+        if (obstacle.nonEmpty) {
+          val bouncedPosition = recursionCheck(of, obstacle, position, newPosition)
+          if(bouncedPosition._3){
+            val nearestFood: Food = state.foods.toList.sortWith((a, b) =>  //TODO: Not correct in all case
             position --> a.position < position --> b.position).head
-          entity ! FoodNear(nearestFood.position)
-        }
-        entity ! NewPosition(bouncedPosition._1, bouncedPosition._2)
-      } else {
+            entity ! FoodNear(nearestFood.position)
+          }
+          entity ! NewPosition(bouncedPosition._1, bouncedPosition._2)
+        } else {
         entity ! NewPosition(newPosition, newPosition - position)
-      }
-    } else {entity ! NewPosition(position - delta, delta -)}
+        }
+      } else {entity ! NewPosition(position - delta, delta -)}
+    } else {
+      entity ! NewPosition(position, delta)
+    }
   }
 
   /**
