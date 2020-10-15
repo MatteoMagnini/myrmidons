@@ -1,18 +1,23 @@
 package model.environment
 
-import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import akka.actor.{Actor, ActorLogging, Props}
 import model.Fights.Fight
 import model.anthill.{Anthill, AnthillInfo}
 import model.environment.elements.EnvironmentElements._
 import model.environment.elements.{Food, Obstacle}
-import model.environment.info.EnvironmentInfo
-import model.environment.pheromones.{DangerPheromone, FoodPheromone}
+import model.environment.pheromones.Pheromone
+import model.environment.info.{EnvironmentInfo, InsectReferences}
 import model.insects.Ants.ForagingAnt._
 import model.insects._
 import model.insects.info.{SpecificInsectInfo, _}
 import utility.Messages._
+<<<<<<< HEAD
 import utility.PheromoneSeq._
 import utility.geometry.{RandomVector2DInSquare, Vector2D, Vectors, ZeroVector2D}
+=======
+import utility.PheromoneMap._
+import utility.geometry.{RandomVector2DInSquare, Vector2D, ZeroVector2D}
+>>>>>>> 4be4b3cd6a3d1a1baf371da0769c8e90879ab603
 import utility.RichActor._
 
 import scala.util.Random
@@ -79,23 +84,24 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       context >>> initializationBehaviour(EnvironmentInfo(Some(sender), state.boundary,
         obstacles, foods, anthill, Some(anthillInfo)).addEnemies(enemies))
 
-    case NewEntities(ants: Map[Int, ActorRef]) =>
+    case NewEntities(ants: InsectReferences) =>
       state.gui.get ! Ready
       context >>> defaultBehaviour(state.addAnts(ants))
   }
 
 
   private def defaultBehaviour(state: EnvironmentInfo): Receive = {
+
     case Clock(value: Int) =>
       checkAntBirth(state,value)
       state.ants.values.foreach(_ ! Clock(value))
-      state.ants.values.foreach(_ ! FoodPheromones(state.foodPheromones))
-      state.ants.values.foreach(_ ! DangerPheromones(state.dangerPheromones))
+      state.ants.values.foreach(_ ! Pheromones(state.pheromones, state.tree))
       state.enemies.values.foreach(_ ! Clock(value))
       state.anthill.get ! Clock(value)
-      val newData = checkFoodSpawn(state).updateDangerPheromones(state.dangerPheromones.tick())
-      //val newData = state.updateDangerPheromones(state.dangerPheromones.tick())
-      context >>> defaultBehaviour(newData.updateFoodPheromones(state.foodPheromones.tick()))
+      val newData = checkFoodSpawn(state).updatePheromones(state.pheromones.tick())
+      //val newData = state.updatePheromones(state.pheromones.tick())
+      context >>> defaultBehaviour(newData)
+
 
     case Move(position: Vector2D, delta: Vector2D) =>
       CollisionsInterceptor.checkCollisions(sender, state, position, delta)
@@ -125,11 +131,9 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
     case KillInsect(info: InsectInfo) => killInsect(info, state)
 
-    case AddFoodPheromone(pheromone: FoodPheromone, threshold: Double) =>
-      context >>> defaultBehaviour(state.addFoodPheromone(pheromone, threshold))
+    case AddPheromone(pheromone: Pheromone, threshold: Double) =>
+      context >>> defaultBehaviour(state.addPheromone(pheromone, threshold))
 
-    case AddDangerPheromone(pheromone: DangerPheromone, threshold: Double) =>
-      context >>> defaultBehaviour(state.addDangerPheromone(pheromone, threshold))
   }
 
   private def checkFoodSpawn(state: EnvironmentInfo): EnvironmentInfo = {
@@ -193,7 +197,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     handleFights(info, fights)
     val obstacles = info.obstacles ++ info.foods
     val insect = info.foragingAntsInfo ++ info.patrollingAntsInfo ++ info.enemiesInfo
-    val pheromones = info.foodPheromones ++ info.dangerPheromones
+    val pheromones: Seq[Pheromone] = info.pheromones
     info.gui.get ! Repaint(info.anthillInfo.get +: (insect ++ obstacles ++ pheromones ++ fights).toSeq)
     context >>> defaultBehaviour(info.emptyInsectInfo())
   }
@@ -218,6 +222,10 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
           info.enemies(enemy) ! KillInsect(enemy)
       }
     }
+  }
+
+  private implicit def mapToSeqPheromone(map: Map[Int, Pheromone]): Seq[Pheromone] = {
+    map.values.toSeq
   }
 
 }
