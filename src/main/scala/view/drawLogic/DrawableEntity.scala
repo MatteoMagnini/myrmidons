@@ -7,9 +7,9 @@ import java.awt.{Color, Polygon}
 import model.Fights.Fight
 import model.anthill.AnthillInfo
 import model.environment.elements.{Food, Obstacle}
-import model.environment.pheromones.{DangerPheromone, DangerPheromoneInfo, FoodPheromone, FoodPheromoneInfo}
+import model.environment.pheromones.{DangerPheromone, DangerPheromoneInfo, Pheromone}
 import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo, PatrollingAntInfo}
-import view.Colors._
+import view.Colors.{ENEMIES_COLOR, _}
 import view._
 
 import scala.swing.{Dimension, Graphics2D}
@@ -20,53 +20,54 @@ trait DrawableEntity[A] {
 
 object DrawableEntities {
 
-  def draw[T: DrawableEntity](elem: T, g: Graphics2D, size: Dimension): Unit =
-    implicitly[DrawableEntity[T]].draw(elem, g, size)
+  /**
+   * Draw simulation elem with its parameters.
+   * @param elem simulation element.
+   * @param graphic graphic.
+   * @param size panel size.
+   * @tparam T Entities type.
+   */
+  def draw[T: DrawableEntity](elem: T, graphic: Graphics2D, size: Dimension): Unit =
+    implicitly[DrawableEntity[T]].draw(elem, graphic, size)
 
+  /**
+   * Draw ellipse in panel.
+   * @param x position in x.
+   * @param y position in y.
+   * @param w weight.
+   * @param h height.
+   * @param g graphics.
+   */
   def drawEllipse(x: Double, y: Double, w: Double, h: Double, g: Graphics2D): Unit = {
     val ellipse = new Ellipse2D.Double(x, y, w, h)
     g.fill(ellipse)
   }
 
-  implicit object drawDangerPheromone extends DrawableEntity[DangerPheromone] {
-
-    override def draw(elem: DangerPheromone, g: Graphics2D, size: Dimension): Unit = {
+  implicit object drawPheromone extends DrawableEntity[Pheromone] {
+    override def draw(elem: Pheromone, g: Graphics2D, size: Dimension): Unit = {
       val pheromoneIntensity: Float = elem.intensity / DangerPheromoneInfo.MAX_INTENSITY
-      g.setColor(DANGER_PHEROMONE_COLOR(pheromoneIntensity))
-      drawEllipse(elem.position.x - (PHEROMONE_SIZE / SET_TO_CENTER),
-        size.height - elem.position.y - (PHEROMONE_SIZE / SET_TO_CENTER),
-        PHEROMONE_SIZE, PHEROMONE_SIZE, g
+      g.setColor(elem match {
+        case _: DangerPheromone => DANGER_PHEROMONE_COLOR(pheromoneIntensity)
+        case _ => FOOD_PHEROMONE_COLOR(pheromoneIntensity)
+      })
+      drawEllipse(elem.position.x - (PHEROMONE_DRAW_SIZE / SET_TO_CENTER),
+        size.height - elem.position.y - (PHEROMONE_DRAW_SIZE / SET_TO_CENTER),
+        PHEROMONE_DRAW_SIZE, PHEROMONE_DRAW_SIZE, g
       )
     }
   }
 
-  implicit object drawPheromone extends DrawableEntity[FoodPheromone] {
 
-    override def draw(elem: FoodPheromone, g: Graphics2D, size: Dimension): Unit = {
-      val pheromoneIntensity: Float = elem.intensity / FoodPheromoneInfo.MAX_INTENSITY
-      g.setColor(FOOD_PHEROMONE_COLOR(pheromoneIntensity))
-      drawEllipse(elem.position.x - (PHEROMONE_SIZE / SET_TO_CENTER),
-        size.height - elem.position.y - (PHEROMONE_SIZE / SET_TO_CENTER),
-        PHEROMONE_SIZE, PHEROMONE_SIZE, g
-      )
-    }
-  }
-
-  implicit object drawForagingAnt extends DrawableEntity[ForagingAntInfo] {
-    override def draw(elem: ForagingAntInfo, g: Graphics2D, size: Dimension): Unit = {
-      g.setColor(ANT_COLOR)
-      drawEllipse(elem.position.x - (ANT_SIZE / SET_TO_CENTER),
-        size.height - elem.position.y - (ANT_SIZE / SET_TO_CENTER),
-        ANT_SIZE, ANT_SIZE, g)
-    }
-  }
-
-  implicit object drawPatrollingAnt extends DrawableEntity[PatrollingAntInfo] {
-    override def draw(elem: PatrollingAntInfo, g: Graphics2D, size: Dimension): Unit = {
-      g.setColor(PATROLLING_ANT_COLOR)
-      drawEllipse(elem.position.x - (ANT_SIZE / SET_TO_CENTER),
-        size.height - elem.position.y - (ANT_SIZE / SET_TO_CENTER),
-        ANT_SIZE, ANT_SIZE, g)
+  implicit object drawInsect extends DrawableEntity[InsectInfo] {
+    override def draw(elem: InsectInfo, g: Graphics2D, size: Dimension): Unit = {
+      g.setColor(elem match {
+        case _: ForagingAntInfo => ANT_COLOR
+        case _: PatrollingAntInfo => PATROLLING_ANT_COLOR
+        case _ => ENEMIES_COLOR
+      })
+      drawEllipse(elem.position.x - (ANT_DRAW_SIZE / SET_TO_CENTER),
+        size.height - elem.position.y - (ANT_DRAW_SIZE / SET_TO_CENTER),
+        ANT_DRAW_SIZE, ANT_DRAW_SIZE, g)
     }
   }
 
@@ -85,19 +86,8 @@ object DrawableEntities {
     }
   }
 
-  implicit object drawEnemies extends DrawableEntity[EnemyInfo] {
-    override def draw(elem: EnemyInfo, g: Graphics2D, size: Dimension): Unit = {
-      g.setColor(ENEMIES_COLOR)
-      drawEllipse(elem.position.x - (ANT_SIZE / SET_TO_CENTER),
-        size.height - elem.position.y - (ANT_SIZE / SET_TO_CENTER),
-        ANT_SIZE, ANT_SIZE, g)
-    }
-  }
-
   implicit object drawAnthill extends DrawableEntity[AnthillInfo] {
-
     override def draw(elem: AnthillInfo, g: Graphics2D, size: Dimension): Unit = {
-
       val anthillFood: Float = elem.foodAmount / elem.maxFoodAmount
       g.setColor(ANTHILL_COLOR(anthillFood))
       drawEllipse(elem.position.x - elem.radius * SET_TO_CENTER,
@@ -111,13 +101,13 @@ object DrawableEntities {
     override def draw(elem: Fight[InsectInfo, EnemyInfo], g: Graphics2D, size: Dimension): Unit = {
       import model.Fights.InsectFight._
       import model.Fights._
-
       val insectLoser = loser(elem) match {
         case Left(x) => g.setColor(Color.black); x
         case Right(x) => g.setColor(Color.red); x
       }
       drawEllipse(insectLoser.position.x,
-        size.height - insectLoser.position.y, FIGHT_SIZE, FIGHT_SIZE, g)
+        size.height - insectLoser.position.y, FIGHT_DRAW_SIZE, FIGHT_DRAW_SIZE, g)
     }
   }
+
 }
