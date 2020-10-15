@@ -9,10 +9,23 @@ import model.Drawable
  */
 trait Pheromone extends Drawable {
 
+  /**
+   * The rule for decreasing intensity over time.
+   *
+   * @return the new intensity
+   */
   def decreasingFunction: Double => Double
 
+  /**
+   * @return the intensity of the pheromone.
+   */
   def intensity: Double
 
+  /**
+   * Apply the decreasing function.
+   *
+   * @return the new pheromone if it is not compleatly evaporated
+   */
   def decrease: Option[Pheromone]
 
   /**

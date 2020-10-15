@@ -42,6 +42,9 @@ trait InsectCompetences[A <: SpecificInsectInfo[A]] {
 
 /**
  * Competence performing a random walk.
+ *
+ * @param behaviour of the insect
+ * @tparam A the type of the insect
  */
 case class RandomWalk[A <: SpecificInsectInfo[A]](behaviour: A => Receive) extends InsectCompetences[A] {
 
@@ -59,6 +62,9 @@ case class RandomWalk[A <: SpecificInsectInfo[A]](behaviour: A => Receive) exten
 
 /**
  * When energy is 0 the insect dies. Must be the first competence for every insects.
+ *
+ * @param behaviour of the insect
+ * @tparam A the type of the insect
  */
 case class Die[A <: SpecificInsectInfo[A]](behaviour: A => Receive) extends InsectCompetences[A] {
 

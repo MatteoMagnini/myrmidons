@@ -5,7 +5,7 @@ import java.awt.geom.Ellipse2D
 import java.awt.{Color, Polygon}
 
 import model.Fights.Fight
-import model.anthill.AnthillInfo
+import model.environment.anthill.AnthillInfo
 import model.environment.elements.{Food, Obstacle}
 import model.environment.pheromones.{DangerPheromone, DangerPheromoneInfo, FoodPheromone, FoodPheromoneInfo}
 import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo, PatrollingAntInfo}

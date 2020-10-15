@@ -38,10 +38,13 @@ object Vectors {
       val intersection = crossIntersection / crossIntersection.z
       if ((intersection checkInside(seg1._1, seg1._2))
         && (intersection checkInside(seg2._1, seg2._2))) {
-        return Some(intersection)
+        Some(intersection)
+      } else {
+        None
       }
+    } else {
+      None
     }
-    None
   }
 
   /**

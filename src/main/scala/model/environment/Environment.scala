@@ -2,7 +2,7 @@ package model.environment
 
 import akka.actor.{Actor, ActorLogging, Props}
 import model.Fights.Fight
-import model.anthill.{Anthill, AnthillInfo}
+import model.environment.anthill.{Anthill, AnthillInfo}
 import model.environment.elements.EnvironmentElements._
 import model.environment.elements.{Food, Obstacle}
 import model.environment.pheromones.Pheromone

@@ -2,7 +2,7 @@ package utility
 
 import akka.actor.ActorContext
 import model.Drawable
-import model.anthill.AnthillInfo
+import model.environment.anthill.AnthillInfo
 import model.environment.info.InsectReferences
 import model.environment.pheromones.Pheromone
 import utility.geometry.Vector2D

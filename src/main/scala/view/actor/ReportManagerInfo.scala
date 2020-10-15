@@ -1,6 +1,6 @@
 package view.actor
 
-import model.anthill.AnthillInfo
+import model.environment.anthill.AnthillInfo
 import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
 
 
