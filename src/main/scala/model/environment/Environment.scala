@@ -11,13 +11,8 @@ import model.insects.Ants.ForagingAnt._
 import model.insects._
 import model.insects.info.{SpecificInsectInfo, _}
 import utility.Messages._
-<<<<<<< HEAD
-import utility.PheromoneSeq._
-import utility.geometry.{RandomVector2DInSquare, Vector2D, Vectors, ZeroVector2D}
-=======
 import utility.PheromoneMap._
 import utility.geometry.{RandomVector2DInSquare, Vector2D, ZeroVector2D}
->>>>>>> 4be4b3cd6a3d1a1baf371da0769c8e90879ab603
 import utility.RichActor._
 
 import scala.util.Random
