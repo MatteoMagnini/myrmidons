@@ -122,7 +122,7 @@ class ForagingAntTest extends TestKit(ActorSystem("ForagingAntTest"))
 
       "perform food pheromone taxis" in {
         val pheromones = Map(1 -> FoodPheromone(Vector2D(5,0), x => x - DELTA,startingPheromoneIntensity ))
-        ant ! Pheromones(pheromones, engine.insertNode((pheromones.head._1,pheromones.head._2),tree), engine)
+        ant ! Pheromones(pheromones, engine.insertNode((pheromones.head._1,pheromones.head._2),tree))
         ant ! Clock(1)
         val result1 = sender.expectMsgType[Move]
         ant ! NewPosition(result1.start >> result1.delta, result1.delta)
@@ -134,7 +134,7 @@ class ForagingAntTest extends TestKit(ActorSystem("ForagingAntTest"))
 
       "multiple times" in {
         val pheromones = Map(1 -> FoodPheromone(Vector2D(8,1),x => x - DELTA, startingPheromoneIntensity))
-        ant ! Pheromones(pheromones, engine.insertNode((pheromones.head._1,pheromones.head._2),tree), engine)
+        ant ! Pheromones(pheromones, engine.insertNode((pheromones.head._1,pheromones.head._2),tree))
         ant ! Clock(2)
         val result1 = sender.expectMsgType[Move]
         ant ! NewPosition(result1.start >> result1.delta, result1.delta)

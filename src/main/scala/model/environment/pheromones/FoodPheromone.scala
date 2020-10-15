@@ -3,11 +3,10 @@ package model.environment.pheromones
 import utility.geometry.Vector2D
 
 /**
- * A foraging ant releases it when carrying food to the anthill.
- * When searching for food, a foraging ant follows it.
+ * A pheromone indicating the presence of a food source.
  *
  * @param position of the pheromone
- * @param decreasingFunction TODO: should become a function
+ * @param decreasingFunction simulating evaporation over time
  * @param intensity the current intensity value
  */
 case class FoodPheromone(override val position: Vector2D,
@@ -15,16 +14,23 @@ case class FoodPheromone(override val position: Vector2D,
                          override val intensity: Double) extends Pheromone {
 
   override def decrease: Option[FoodPheromone] =
-    if (decreasingFunction(intensity) <= 0) None else Some(FoodPheromone(position, decreasingFunction, decreasingFunction(intensity)))
+    if (decreasingFunction(intensity) <= 0) {
+      None
+    } else {
+      Some(FoodPheromone(position, decreasingFunction, decreasingFunction(intensity)))
+    }
 
   override def merge(pheromone: Pheromone, threshold: Double = 1E-10): Option[FoodPheromone] = pheromone match {
     case p: FoodPheromone =>
-      if (position --> p.position > threshold) None
-      else Some(FoodPheromone(position, decreasingFunction, this.intensity + p.intensity))
+      if (position --> p.position > threshold) {
+        None
+      }
+      else {
+        Some(FoodPheromone(position, decreasingFunction, this.intensity + p.intensity))
+      }
 
     case _ => None
   }
-
 }
 
 object FoodPheromone {
