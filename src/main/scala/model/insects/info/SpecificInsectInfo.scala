@@ -3,6 +3,9 @@ package model.insects.info
 import model.Drawable
 import utility.geometry.Vector2D
 
+/**
+ * The information in common with all kind of insects.
+ */
 trait InsectInfo extends Drawable {
 
   /**
@@ -29,7 +32,11 @@ trait InsectInfo extends Drawable {
 
 }
 
-/** The information in common with all kind of insects plus the specialized type carried. */
+/**
+ * The information in common with all kind of insects.
+ *
+ * @tparam A the specific type of insect
+ */
 trait SpecificInsectInfo[A <: SpecificInsectInfo[A]] extends InsectInfo {
 
   /**

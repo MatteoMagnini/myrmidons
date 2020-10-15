@@ -3,6 +3,15 @@ package model.insects.info
 import model.insects.Enemies._
 import utility.geometry.{Vector2D, ZeroVector2D}
 
+/**
+ * This class defines an enemy state.
+ *
+ * @param id of the enemy
+ * @param position of the enemy
+ * @param inertia of the enemy
+ * @param energy of the enemy
+ * @param time of simulation
+ */
 case class EnemyInfo(override val id: Int,
                      override val position: Vector2D,
                      override val inertia: Vector2D,
@@ -23,6 +32,7 @@ case class EnemyInfo(override val id: Int,
 }
 
 object EnemyInfo {
-  def apply(id: Int = 0, position: Vector2D = STARTING_POSITION, energy: Double = ENERGY, time: Int = STARTING_TIME): EnemyInfo =
+  def apply(id: Int = 0, position: Vector2D = STARTING_POSITION,
+            energy: Double = ENERGY, time: Int = STARTING_TIME): EnemyInfo =
     new EnemyInfo(id, position, ZeroVector2D(), energy, time)
 }
