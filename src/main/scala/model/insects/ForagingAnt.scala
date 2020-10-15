@@ -8,6 +8,7 @@ import model.insects.competences._
 import model.insects.info.ForagingAntInfo
 import utility.Messages._
 import utility.RichActor._
+import utility.rTree.RTreeProlog
 
 /**
   * Ant that performs foraging.
@@ -20,6 +21,7 @@ case class ForagingAnt(override val info: ForagingAntInfo,
 
   override def receive: Receive = defaultBehaviour(info)
 
+  private val engine = RTreeProlog()
   private val competences = List(Die[ForagingAntInfo](),
     GoOutside[ForagingAntInfo](),
     StoreFoodInAnthill(),
@@ -48,7 +50,7 @@ case class ForagingAnt(override val info: ForagingAntInfo,
       context >>> defaultBehaviour(newData)
 
     /* Update food pheromones */
-    case Pheromones(pheromones, tree, engine) =>
+    case Pheromones(pheromones, tree) =>
       val ids = engine.query(data.position, tree)
       context >>> defaultBehaviour(data.updateFoodPheromones(pheromones filterKeys ids.toSet))
 

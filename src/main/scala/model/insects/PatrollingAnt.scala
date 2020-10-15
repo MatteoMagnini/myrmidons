@@ -8,12 +8,14 @@ import model.insects.competences._
 import model.insects.info.PatrollingAntInfo
 import utility.Messages._
 import utility.RichActor._
+import utility.rTree.RTreeProlog
 
 case class PatrollingAnt (override val info: PatrollingAntInfo,
                      override val environment: ActorRef) extends Insect[PatrollingAntInfo] {
 
   override def receive: Receive = defaultBehaviour(info)
 
+  private val engine = RTreeProlog()
   private val competences = List(Die[PatrollingAntInfo](),
     GoOutside[PatrollingAntInfo](),
     EatFromTheAnthill[PatrollingAntInfo](),
@@ -38,7 +40,7 @@ case class PatrollingAnt (override val info: PatrollingAntInfo,
     /**
      * Update food pheromones.
      */
-    case Pheromones(pheromones, tree, engine) =>
+    case Pheromones(pheromones, tree) =>
       val ids = engine.query(data.position, tree)
       context >>> defaultBehaviour(data.updateDangerPheromones(pheromones filterKeys ids.toSet))
 

@@ -70,7 +70,7 @@ class PatrollingAntTest extends TestKit(ActorSystem("PatrollingAntTest"))
 
       "perform danger pheromones taxis" in {
         val pheromones = Map(1 -> DangerPheromone(Vector2D(5,0), x => x - DELTA,startingPheromoneIntensity ))
-        ant ! Pheromones(pheromones, engine.insertNode((pheromones.head._1,pheromones.head._2),tree), engine)
+        ant ! Pheromones(pheromones, engine.insertNode((pheromones.head._1,pheromones.head._2),tree))
         ant ! Clock(1)
         val result1 = sender.expectMsgType[Move]
         ant ! NewPosition(result1.start >> result1.delta, result1.delta)
