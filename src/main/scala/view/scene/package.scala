@@ -9,6 +9,8 @@ package object scene {
   val DEFAULT_OBSTACLE_SIZE: Int = 5
   val DEFAULT_ENEMIES_SIZE: Int = 50
   val PARAMETER_GRID: (Int, Int) = (6, 2)
+  val MIN_COMPONENT = "6"
+  val SIMULATION_BOUNDARY: (Int, Int) = (800, 800)
 
   implicit def numberFrom(component: TextField): Int = {
     if (component.text == "") {

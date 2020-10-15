@@ -55,7 +55,11 @@ object uiActorInfo {
 
     override def setEntities(info: Seq[Drawable]): (Int, Int) = panel.setEntities(info)
 
-
+    /**
+     * Set in ControlPanel its label which refers simulation info.
+     * @param currentState current state of simulation.
+     * @param entitiesProperties current number of entities.
+     */
     override def setControl(currentState: Int, entitiesProperties: (Int, Int)): Unit = {
       control.stepText.text = currentState
       control.antPopulationText.text = entitiesProperties._1

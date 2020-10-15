@@ -3,7 +3,7 @@ package view
 import view.frame.SettingFrame
 
 /**
- * Simulation entry point.
+ * Myrmidons - simulation entry point.
  */
 object Myrmidons extends App {
   val settingFrame =  SettingFrame()

@@ -9,10 +9,8 @@ import view.actor.uiMessage._
 import scala.concurrent.duration.DurationInt
 
 /**
- * Gui Actor which can receive following message:
- * - StepOver : the timer is expired and notify environment with Clock message.
- * - updateInsect : from Environment to UiActor to notify
- * new position of the simulation entities.
+ * Gui Actor that manage clock simulation and simulation control.
+ * @param state uiActor state.
  */
 
 private[view] class UiActor(state: uiActorInfo)
@@ -26,7 +24,7 @@ private[view] class UiActor(state: uiActorInfo)
       timers.startSingleTimer(state.currentState, StepOver, state.rate.millis)
 
     case Repaint(info: Seq[Drawable]) =>
-      if (state.currentState % 20 == 0) state.control.reportManager.tell(ReportInfo(info), self)
+      if (state.currentState % REPORT_INC_CLOCK == 0) state.control.reportManager.tell(ReportInfo(info), self)
       val entitiesProperties = state.setEntities(info)
       state.drawEntities()
       state.setControl(state.currentState, entitiesProperties)

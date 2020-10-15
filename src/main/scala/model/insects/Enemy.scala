@@ -36,7 +36,7 @@ class Enemy(override val info: EnemyInfo,
     /** Enemy killed in a fight */
     case KillInsect(_) =>
       context >>> defaultBehaviour(data.updateEnergy(-MAX_ENERGY))
-      
+
     /** Just for tests */
     case Context(_) => sender ! Context(Some(context))
 

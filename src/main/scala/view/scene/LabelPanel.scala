@@ -1,59 +1,54 @@
 package view.scene
 
-import java.awt.Color
-
 import view.Colors._
 
 import scala.swing.{FlowPanel, Label, Separator}
 
-/**
- * FlowPanel with short legend to understand color entities.
- */
+trait LabelPanel extends FlowPanel {}
 
-private[view] case class LabelPanel() extends FlowPanel {
+object LabelPanel {
 
-  private val foragingAnt = new Label("ForagingAnt")
-  private val patrollingAnt = new Label("PatrollingAnt")
-  private val food = new Label("Food")
-  private val obstacle = new Label("Obstacle")
-  private val anthill = new Label("Anthill")
-  private val insect = new Label("Enemy")
-  private val foodPheromone = new Label("FoodPheromone")
-  private val dangerousPheromone = new Label("DangerousPheromone")
-  private val separator = new Separator()
+  def apply(): LabelPanel = new LabelPanelImpl()
+
   /**
-   * Each label refers to entities colors in simulation.
+   * FlowPanel with short legend to understand color entities.
    */
-  separator.background = ANT_COLOR
+  private[view] class LabelPanelImpl() extends LabelPanel {
 
-  food.foreground = new Color(FOOD_COLOR_COMPONENT._1,
-    FOOD_COLOR_COMPONENT._2, FOOD_COLOR_COMPONENT._3)
+    private val foragingAnt = new Label("ForagingAnt")
+    private val patrollingAnt = new Label("PatrollingAnt")
+    private val food = new Label("Food")
+    private val obstacle = new Label("Obstacle")
+    private val anthill = new Label("Anthill")
+    private val insect = new Label("Enemy")
+    private val foodPheromone = new Label("FoodPheromone")
+    private val dangerousPheromone = new Label("DangerousPheromone")
+    private val separator = new Separator()
 
-  foragingAnt.foreground = ANT_COLOR
+    /**
+     * Each label refers to entities colors in simulation.
+     */
 
-  patrollingAnt.foreground = PATROLLING_ANT_COLOR
-
-  obstacle.foreground = OBSTACLE_COLOR
-
-  insect.foreground = ENEMIES_COLOR
-
-  anthill.foreground = new Color(ANTHILL_COLOR_COMPONENT._1,
-    ANTHILL_COLOR_COMPONENT._2, ANTHILL_COLOR_COMPONENT._3)
-
-  foodPheromone.foreground = new Color(FOOD_PHEROMONE_COLOR_COMPONENT._1,
-    FOOD_PHEROMONE_COLOR_COMPONENT._2, FOOD_PHEROMONE_COLOR_COMPONENT._3)
-
-  dangerousPheromone.foreground = new Color(DANGER_PHEROMONE_COLOR_COMPONENT._1,
-    DANGER_PHEROMONE_COLOR_COMPONENT._2, DANGER_PHEROMONE_COLOR_COMPONENT._3)
+    food.foreground = FOOD_COLOR
+    foragingAnt.foreground = ANT_COLOR
+    patrollingAnt.foreground = PATROLLING_ANT_COLOR
+    obstacle.foreground = OBSTACLE_COLOR
+    insect.foreground = ENEMIES_COLOR
+    anthill.foreground = ANTHILL_COLOR
+    foodPheromone.foreground = FOOD_PHEROMONE_COLOR
+    dangerousPheromone.foreground = DANGER_PHEROMONE_COLOR
 
 
-  contents ++= Seq(foragingAnt, separator,
-    patrollingAnt, separator,
-    food, separator,
-    obstacle, separator,
-    anthill, separator,
-    insect, separator,
-    foodPheromone, separator,
-    dangerousPheromone
-  )
+    contents ++= Seq(foragingAnt, separator,
+      patrollingAnt, separator,
+      food, separator,
+      obstacle, separator,
+      anthill, separator,
+      insect, separator,
+      foodPheromone, separator,
+      dangerousPheromone
+    )
+  }
+
 }
+
