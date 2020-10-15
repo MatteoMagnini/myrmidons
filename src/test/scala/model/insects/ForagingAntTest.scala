@@ -2,7 +2,7 @@ package model.insects
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
-import model.anthill.{Anthill, AnthillInfo}
+import model.environment.anthill.{Anthill, AnthillInfo}
 import model.environment.elements.{Food, Obstacle}
 import model.environment.pheromones.FoodPheromone
 import model.insects.Ants.ForagingAnt._
@@ -17,6 +17,7 @@ import utility.geometry.TupleOp2._
 import utility.geometry._
 import utility.rTree.RTree.Tree
 import utility.rTree.RTreeProlog
+import utility.geometry.Vectors._
 
 class ForagingAntTest extends TestKit(ActorSystem("ForagingAntTest"))
   with AnyWordSpecLike
@@ -54,7 +55,7 @@ class ForagingAntTest extends TestKit(ActorSystem("ForagingAntTest"))
         ant ! NewPosition(result1.start >> result1.delta, result1.delta)
         val result2 = sender.expectMsgType[UpdateInsect]
         assert(result2.info.position != ZeroVector2D())
-        assert(result2.info.energy == STARTING_ENERGY + ENERGY_RANDOM_WALK * 2)
+        assert(~= (result2.info.energy, STARTING_ENERGY + ENERGY_RANDOM_WALK * 2))
         sender expectNoMessage
       }
     }
@@ -76,7 +77,7 @@ class ForagingAntTest extends TestKit(ActorSystem("ForagingAntTest"))
         val result2 = sender.expectMsgType[UpdateInsect]
         assert(anthillInfo.position --> result2.info.position < anthillInfo.radius)
         assert(result2.info.inertia == result1.delta)
-        assert(result2.info.energy == finalEnergy)
+        assert(~=(result2.info.energy, finalEnergy))
         sender expectNoMessage
       }
 
@@ -140,7 +141,7 @@ class ForagingAntTest extends TestKit(ActorSystem("ForagingAntTest"))
         ant ! NewPosition(result1.start >> result1.delta, result1.delta)
         val result2 = sender.expectMsgType[UpdateInsect]
         assert(result2.info.position --> pheromones.last._2.position < result1.start --> pheromones.last._2.position)
-        assert(result2.info.energy == STARTING_ENERGY + 2 * ENERGY_FOOD_PHEROMONE_TAXIS)
+        assert(~=(result2.info.energy, STARTING_ENERGY + 2 * ENERGY_FOOD_PHEROMONE_TAXIS))
         sender expectNoMessage
       }
     }

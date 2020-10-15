@@ -3,9 +3,9 @@ package view.scene
 
 import model.Drawable
 import model.Fights.Fight
-import model.anthill.AnthillInfo
-import model.environment.elements.Obstacle
 import model.environment.pheromones.Pheromone
+import model.environment.anthill.AnthillInfo
+import model.environment.elements.Obstacle
 import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo, PatrollingAntInfo}
 import view.drawLogic._
 

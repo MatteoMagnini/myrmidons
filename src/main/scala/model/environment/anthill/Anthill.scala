@@ -1,4 +1,4 @@
-package model.anthill
+package model.environment.anthill
 
 import akka.actor.{Actor, ActorRef, Props}
 import model.Drawable

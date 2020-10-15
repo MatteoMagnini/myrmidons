@@ -131,17 +131,16 @@ with BeforeAndAfterAll{
       val foragingAntInfo3 = foragingAntInfo2.updateEnergy(80)
       "exit from the anthill" in {
 
+        //No assert on hasPriority because it is stochastic.
         val goOutsideCompetence = GoOutside[ForagingAntInfo](defaultBehaviour)
-        assert(goOutsideCompetence.hasPriority(foragingAntInfo3))
         goOutsideCompetence(context,senderRef,foragingAnt,foragingAntInfo3)
         sender.expectMsgType[Move]
         sender expectNoMessage
-
       }
 
       import model.environment.pheromones.FoodPheromoneInfo._
       val foodPheromone = FoodPheromone(Vector2D(4,6),x => x - DELTA,10)
-      val foragingAntInfo4 = foragingAntInfo3.updateFoodPheromones(Seq(foodPheromone))
+      val foragingAntInfo4 = foragingAntInfo3.updateFoodPheromones(Seq(foodPheromone)).updateAnthillCondition(false)
       "follow the food pheromones" in {
 
         val foodPheromoneTaxisCompetence = FoodPheromoneTaxis(defaultBehaviour)

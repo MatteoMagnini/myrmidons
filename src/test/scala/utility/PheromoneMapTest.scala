@@ -77,31 +77,6 @@ class PheromoneMapTest extends AnyWordSpecLike with BeforeAndAfter {
       }
     }
 
-    "full of pheromones" should {
-
-      val p1 = FoodPheromone(Vector2D(3,3), decreasingFunction, startingIntensity)
-      val p2 = FoodPheromone(Vector2D(-3,3), decreasingFunction, startingIntensity)
-      val p3 = FoodPheromone(Vector2D(0,-10), decreasingFunction, startingIntensity)
-      val zero = ZeroVector2D()
-      val finalVector = ((p1.position - zero) * (startingIntensity / (p1.position --> zero))) >>
-        ((p2.position - zero) * (startingIntensity / (p2.position --> zero))) >>
-        ((p3.position - zero) * (startingIntensity / (p3.position --> zero)))
-
-      val map1 = Map[Int,FoodPheromone](1 -> p1, 2 -> p2, 3 -> p3)
-
-      "calculate the weighted sum" in {
-        assert(map1.weightedSum(zero) == finalVector)
-      }
-
-      val p4 = FoodPheromone(Vector2D(0,-10), decreasingFunction, startingIntensity)
-      val map2 = Map(1 -> p1, 2 -> p2, 3 -> p3, 4 -> p4)
-
-      "return the pheromone with the strongest intensity" in {
-        assert(map2.strongest.get == p4)
-      }
-
-    }
-
     "two different pheromones" should {
 
       val dangerPheromone = DangerPheromone(ZeroVector2D(), x => x - DELTA, 10)

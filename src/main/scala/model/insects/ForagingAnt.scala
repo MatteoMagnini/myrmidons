@@ -99,7 +99,7 @@ case class ForagingAnt(override val info: ForagingAntInfo,
 
   private implicit def pheromonesToFoodPheromones(pheromones: Map[Int,Pheromone]): Seq[FoodPheromone] = {
     pheromones.values.toStream.filter(p => p match {
-      case p: FoodPheromone => true
+      case _: FoodPheromone => true
       case _ => false
     }).map(p => p.asInstanceOf[FoodPheromone])
   }
