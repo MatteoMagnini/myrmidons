@@ -6,12 +6,13 @@ package object environment {
 
   val ANTHILL_RADIUS = 15
   val FOOD_AMOUNT = 2000
-  val FOOD_RADIUS: (Int, Int) = (120, 200)
+  val FOOD_RADIUS: (Double, Double) = (120, 200)
   val FORAGING_PERCENTAGE = 0.7
 
   val FOOD_MIN_QUANTITY = 500
   val FOOD_VERTEX = 16
   val FOOD_MIN_SIZE = 5
+  val FOOD_METRIC = 20
 
   val OBSTACLE_TRIANGLE_VERTEX = 3
   val OBSTACLE_SQUARE_VERTEX = 4
