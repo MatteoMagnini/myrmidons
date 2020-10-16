@@ -57,7 +57,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
       val obstacles = if (obstaclesPresence.isDefined) {
         Obstacle.createRandom(obstaclesPresence.get,
-          anthillInfo.position, (50,150), radius = 20).toSeq
+          anthillInfo.position, (50,150), radius = OBSTACLE_RADIUS).toSeq
       }
       else {
         Seq.empty
