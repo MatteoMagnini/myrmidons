@@ -163,7 +163,7 @@ class ForagingAntTest extends TestKit(ActorSystem("ForagingAntTest"))
 
   "Foraging ant" when {
 
-    val food = Food((2.0,2.0), MAX_FOOD * 2, Obstacle((2,2), if (math.sqrt( MAX_FOOD * 2) < 5) 5 else math.sqrt( MAX_FOOD * 2),16))
+    val food = Food((2.0,2.0), MAX_FOOD * 2, Obstacle((2,2), Food.radius( MAX_FOOD.toInt * 2),16))
     val anthillInfo = AnthillInfo(ZeroVector2D())
     val anthill = system.actorOf(Anthill(anthillInfo,senderRef), "anthill2")
     val startingAntPosition = (1,3)
@@ -176,7 +176,7 @@ class ForagingAntTest extends TestKit(ActorSystem("ForagingAntTest"))
         ant ! Clock(1)
         sender.expectMsgType[Move]
         ant ! FoodNear(food.position)
-        ant ! NewPosition(startingAntPosition,ZeroVector2D())
+        ant ! NewPosition(startingAntPosition >> Vector2D(0.1,0),ZeroVector2D())
         val result1 = sender.expectMsgType[UpdateInsect]
         assert(result1.info.asInstanceOf[ForagingAntInfo].foodIsNear)
         sender expectNoMessage
@@ -203,7 +203,7 @@ class ForagingAntTest extends TestKit(ActorSystem("ForagingAntTest"))
             assert(anthillInfo.position --> result2.info.position < anthillInfo.radius)
 
           case d: AddPheromone =>
-            assert(d.foodPheromone.position equals implicitly[Vector2D](startingAntPosition))
+            assert(d.foodPheromone.position equals implicitly[Vector2D](startingAntPosition) >> Vector2D(0.1,0))
             sender.expectMsgType[UpdateInsect]
         }
         sender expectNoMessage

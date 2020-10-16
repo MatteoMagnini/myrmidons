@@ -225,7 +225,7 @@ object Obstacle {
 
   @scala.annotation.tailrec
   private def recursiveJoin(obstacles: List[Obstacle], center: Vector2D, index: Int):Iterable[Obstacle]= {
-    if (index >= obstacles.size) {
+    if (index >= obstacles.size - 1) {
       obstacles
     } else {
       val nextIndex = if (index == obstacles.size - 1) 0 else index + 1

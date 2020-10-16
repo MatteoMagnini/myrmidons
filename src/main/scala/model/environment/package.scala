@@ -16,7 +16,7 @@ package object environment {
   val OBSTACLE_TRIANGLE_VERTEX = 3
   val OBSTACLE_SQUARE_VERTEX = 4
   val OBSTACLE_OCTAGON_VERTEX = 8
-  val OBSTACLE_RADIUS = 10
+  val OBSTACLE_RADIUS = 20
 
 
   implicit def extractOption[X](value: Option[X]): X = value.get
