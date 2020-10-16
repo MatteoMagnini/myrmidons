@@ -11,9 +11,6 @@ import utility.PheromoneSeq._
 import utility.geometry._
 import utility.RichActor._
 
-
-import scala.util.Random
-
 /**
  * Specific competences suitable only for foraging ants
  */
@@ -21,29 +18,25 @@ trait ForagingAntCompetences extends AntCompetences[ForagingAntInfo]
 
 /**
  * Competence forcing a foraging ant to go back to the anthill when its carrying food.
+ *
+ * @param behaviour of the ant
  */
-case class CarryFoodToHome() extends ForagingAntCompetences {
+case class CarryFoodToHome(behaviour: ForagingAntInfo => Receive) extends ForagingAntCompetences {
 
-  override def apply(context: ActorContext,
-                     environment: ActorRef,
-                     insect: ActorRef,
-                     info: ForagingAntInfo,
-                     behaviour: ForagingAntInfo => Receive): Unit =
-    GoBackToHome[ForagingAntInfo]().apply(context,environment,insect,info,behaviour)
+  override def apply(context: ActorContext, environment: ActorRef, insect: ActorRef, info: ForagingAntInfo): Unit =
+    GoBackToHome[ForagingAntInfo](behaviour).apply(context,environment,insect,info)
 
   override def hasPriority(info: ForagingAntInfo): Boolean = info.foodAmount > 0
 }
 
 /**
  * Competence that enables foraging ants to carry food when it find it.
+ *
+ * @param behaviour of the ant
  */
-case class PickFood() extends ForagingAntCompetences {
+case class PickFood(behaviour: ForagingAntInfo => Receive) extends ForagingAntCompetences {
 
-  override def apply(context: ActorContext,
-                     environment: ActorRef,
-                     insect: ActorRef,
-                     info: ForagingAntInfo,
-                     behaviour: ForagingAntInfo => Receive): Unit = {
+  override def apply(context: ActorContext, environment: ActorRef, insect: ActorRef, info: ForagingAntInfo): Unit = {
     environment.tell(TakeFood(MAX_FOOD - info.foodAmount, info.foodPosition.get), insect)
     context >>> behaviour(info.updateEnergy(ENERGY_PICK_FOOD))
   }
@@ -53,11 +46,12 @@ case class PickFood() extends ForagingAntCompetences {
 
 /**
  * A foraging ant leaves the food in the anthill.
+ *
+ * @param behaviour of the ant
  */
-case class StoreFoodInAnthill() extends ForagingAntCompetences {
+case class StoreFoodInAnthill( behaviour: ForagingAntInfo => Receive) extends ForagingAntCompetences {
 
-  override def apply(context: ActorContext, environment: ActorRef, insect: ActorRef,
-                     info: ForagingAntInfo, behaviour: ForagingAntInfo => Receive): Unit = {
+  override def apply(context: ActorContext, environment: ActorRef, insect: ActorRef, info: ForagingAntInfo): Unit = {
     info.anthill.tell(StoreFood(info.foodAmount), insect)
     val data = info.freeFood().updateEnergy(ENERGY_STORE_FOOD)
     environment.tell(UpdateInsect(data), insect)
@@ -68,23 +62,21 @@ case class StoreFoodInAnthill() extends ForagingAntCompetences {
 }
 
 /**
- * Competence that enable a foraging ant to follow the traces of the (food) pheromone.
+ * Competence that enable a foraging ant to follow the traces of (food) pheromones.
+ *
+ * @param behaviour of the ant
  */
-case class FoodPheromoneTaxis() extends ForagingAntCompetences {
+case class FoodPheromoneTaxis(behaviour: ForagingAntInfo => Receive) extends ForagingAntCompetences {
 
-  override def apply(context: ActorContext,
-                     environment: ActorRef,
-                     insect: ActorRef,
-                     info: ForagingAntInfo,
-                     behaviour: ForagingAntInfo => Receive): Unit = {
+  override def apply(context: ActorContext, environment: ActorRef, insect: ActorRef, info: ForagingAntInfo): Unit = {
     val delta = info.foodPheromones.toStream
       .filter(p => p.position --> info.position < FOOD_PHEROMONE_RANGE)
       .weightedSum(info.position)
     val data = info.updateEnergy(ENERGY_FOOD_PHEROMONE_TAXIS)
-    val newDelta = OrientedVector2DWithNoise(delta./\, MAX_VELOCITY, NOISE) >> (data.inertia * 2)
+    val newDelta = OrientedVector2DWithNoise(delta./\, MAX_VELOCITY, NOISE) >> (data.inertia * INERTIA_FACTOR_IN_TAXIS)
     val newDelta2 = OrientedVector2D(newDelta./\, MAX_VELOCITY)
     environment.tell(Move(data.position, newDelta2), insect)
-    context >>> behaviour(data.updateFoodPheromones(Seq.empty)) //TODO: should be correct also data without update
+    context >>> behaviour(data.updateFoodPheromones(Seq.empty))
   }
 
   override def hasPriority(info: ForagingAntInfo): Boolean =
@@ -92,17 +84,15 @@ case class FoodPheromoneTaxis() extends ForagingAntCompetences {
 }
 
 /**
- * A foraging ant drops food pheromones when going back to the anthill while carrying food
+ * A foraging ant drops food pheromones when going back to the anthill while carrying food.
+ *
+ * @param behaviour of the ant
  */
-case class DropFoodPheromone() extends ForagingAntCompetences {
+case class DropFoodPheromone(behaviour: ForagingAntInfo => Receive) extends ForagingAntCompetences {
 
-  private def decreasingFunction: Double => Double = x => x/1.001 - DELTA
+  private def decreasingFunction: Double => Double = x => x * DECREASING_FACTOR - DELTA
 
-  override def apply(context: ActorContext,
-                     environment: ActorRef,
-                     insect: ActorRef,
-                     info: ForagingAntInfo,
-                     behaviour: ForagingAntInfo => Receive): Unit = {
+  override def apply(context: ActorContext, environment: ActorRef, insect: ActorRef, info: ForagingAntInfo): Unit = {
     environment.tell(AddPheromone(FoodPheromone(info.position, decreasingFunction, STARTING_INTENSITY),
       FOOD_PHEROMONE_MERGING_THRESHOLD), insect)
     val data = info.updateEnergy(ENERGY_RANDOM_WALK)
@@ -111,5 +101,5 @@ case class DropFoodPheromone() extends ForagingAntCompetences {
   }
 
   override def hasPriority(info: ForagingAntInfo): Boolean =
-    info.foodAmount > 0 && Random.nextDouble() < Math.pow(info.energy / MAX_ENERGY, 2)
+    info.foodAmount > 0 && random(Math.pow(info.energy / MAX_ENERGY, 2))
 }

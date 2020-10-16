@@ -2,7 +2,7 @@ package utility
 
 import akka.actor.ActorContext
 import model.Drawable
-import model.anthill.AnthillInfo
+import model.environment.anthill.AnthillInfo
 import model.environment.info.InsectReferences
 import model.environment.pheromones.Pheromone
 import utility.geometry.Vector2D
@@ -21,7 +21,9 @@ object Messages {
   case class StartSimulation(nAnts: Int,
                              nEnemies: Int,
                              obstacles: Option[Int] = Some(6),
-                             food: Option[Int] = Some(6)) extends Message
+                             food: Option[Int] = Some(6),
+                             anthillFood: Option[Int] = Some(200)) extends Message
+
 
   /** Message sent from GUI to environment and from environment to ants, to do a step in simulation.
    *

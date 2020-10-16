@@ -1,20 +1,4 @@
-// Copyright (C) 2011-2012 the original author or authors.
-// See the LICENCE.txt file distributed with this work for additional
-// information regarding copyright ownership.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-package model.anthill
+package model.environment.anthill
 
 import akka.actor.{Actor, ActorRef, Props}
 import model.Drawable
@@ -39,7 +23,8 @@ case class AnthillInfo(override val position: Vector2D,
 }
 
 object AnthillInfo {
-  def apply(position: Vector2D, radius: Double = 3, foodAmount: Double = 0, maxFoodAmount: Double = 10000): AnthillInfo =
+  def apply(position: Vector2D, radius: Double = 3, foodAmount: Double = 0,
+            maxFoodAmount: Double = MAX_FOOD_AMOUNT): AnthillInfo =
     new AnthillInfo(position, radius, foodAmount, maxFoodAmount)
 }
 
@@ -66,7 +51,8 @@ case class Anthill(info: AnthillInfo, environment: ActorRef) extends Actor {
       } else {
         val rad = dist /\
         val delta = OrientedVector2DWithNoise(rad, maxSpeed, noise)
-        val delta2 = OrientedVector2D((delta >> (inertia * INERTIA_FACTOR))./\, doubleInRange(MIN_VELOCITY, MAX_VELOCITY))
+        val delta2 = OrientedVector2D((delta >> (inertia * INERTIA_FACTOR))./\,
+          doubleInRange(MIN_VELOCITY, MAX_VELOCITY))
         environment.tell(Move(position, delta2), sender)
       }
 
@@ -89,8 +75,8 @@ case class Anthill(info: AnthillInfo, environment: ActorRef) extends Actor {
       }).toMap
       val nPatrolling = nForaging + (nAnts * (1 - foragingPercentage)).toInt
       val patrollingAnts = (nForaging until nPatrolling).map(i => {
-        i -> context.actorOf(PatrollingAnt(PatrollingAntInfo(
-          self, id = i, position = info.position), sender), s"p-ant-$i")
+        i -> context.actorOf(PatrollingAnt(PatrollingAntInfo(self, id = i, position = info.position),
+          sender), s"p-ant-$i")
       }).toMap
       sender ! NewEntities(foragingAnts ++ patrollingAnts)
   }

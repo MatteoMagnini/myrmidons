@@ -2,7 +2,7 @@ package model.insects
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
-import model.anthill.{Anthill, AnthillInfo}
+import model.environment.anthill.{Anthill, AnthillInfo}
 import model.environment.pheromones.DangerPheromone
 import model.environment.pheromones.DangerPheromoneInfo._
 import model.insects.competences._
@@ -116,7 +116,7 @@ class PatrollingAntTest extends TestKit(ActorSystem("PatrollingAntTest"))
 
       "eat the reserve inside the anthill" in {
         ant ! Clock(3)
-        val finalEnergy = startingEnergy + ENERGY_RANDOM_WALK + ENERGY_RANDOM_WALK + ENERGY_EATING + FOOD_ENERGY_CONVERSION * FOOD_EATEN_PER_STEP
+        val finalEnergy = startingEnergy + 2 * ENERGY_RANDOM_WALK + ENERGY_EATING + FOOD_ENERGY_CONVERSION * FOOD_EATEN_PER_STEP
         val result1 = sender.expectMsgType[UpdateInsect]
         assert(anthillInfo.position --> result1.info.position < anthillInfo.radius)
         assert(result1.info.inertia == ZeroVector2D())
@@ -124,7 +124,5 @@ class PatrollingAntTest extends TestKit(ActorSystem("PatrollingAntTest"))
         sender expectNoMessage
       }
     }
-
   }
-
 }

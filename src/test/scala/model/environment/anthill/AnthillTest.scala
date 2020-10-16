@@ -1,4 +1,4 @@
-package model.anthill
+package model.environment.anthill
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}

@@ -2,7 +2,7 @@ package model.environment
 
 import akka.actor.{Actor, ActorLogging, Props}
 import model.Fights.Fight
-import model.anthill.{Anthill, AnthillInfo}
+import model.environment.anthill.{Anthill, AnthillInfo}
 import model.environment.elements.EnvironmentElements._
 import model.environment.elements.{Food, Obstacle}
 import model.environment.pheromones.Pheromone
@@ -50,8 +50,9 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
   private def initializationBehaviour(state:EnvironmentInfo): Receive = {
 
-    case StartSimulation(nAnts: Int, nEnemies: Int, obstaclesPresence, foodPresence) =>
-      val anthillInfo = AnthillInfo(state.boundary.center, ANTHILL_RADIUS , FOOD_AMOUNT)
+    case StartSimulation(nAnts: Int, nEnemies: Int, obstaclesPresence, foodPresence, anthillFood) =>
+
+      val anthillInfo = AnthillInfo(state.boundary.center, ANTHILL_RADIUS , anthillFood.get)
       val anthill = context.actorOf(Anthill(anthillInfo, self), name = "anthill")
       anthill ! CreateEntities(nAnts, FORAGING_PERCENTAGE)
 

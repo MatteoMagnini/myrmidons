@@ -2,38 +2,46 @@ import java.awt.Color
 
 package object view {
 
-  val ANT_SIZE = 4
-  val PHEROMONE_SIZE = 7
-  val FIGHT_SIZE = 20
+  val ANT_DRAW_SIZE = 4
+  val PHEROMONE_DRAW_SIZE = 7
+  val FIGHT_DRAW_SIZE = 20
   val SET_TO_CENTER = 2
-  val OBSTACLE_SIZE = 20
-  val SIMULATION_SIZE: (Int, Int) = (800, 900)
-  val SIMULATION_BOUNDARY: (Int, Int) = (800, 800)
-  val SETTING_SIZE = 400
-  val MIN_COMPONENT = 6
+  val OBSTACLE_DRAW_SIZE = 20
+
 
   object Colors {
 
-    def ANT_COLOR: Color = Color.BLACK
+    val ANT_COLOR: Color = Color.BLACK
 
-    def OBSTACLE_COLOR: Color = new Color(0.5f, 0.5f, 0.5f)
+    val OBSTACLE_COLOR: Color = new Color(0.5f, 0.5f, 0.5f)
 
-    def ENEMIES_COLOR: Color = Color.RED
+    val PATROLLING_ANT_COLOR: Color = new Color(0.5f, 0, 0)
 
-    def ANTHILL_COLOR_COMPONENT: (Float, Float, Float) = (0f, 0.5f, 0f)
+    val ENEMIES_COLOR: Color = Color.RED
 
-    def PATROLLING_ANT_COLOR = new Color(0.5f, 0, 0)
+    val ANTHILL_COLOR_COMPONENT: (Float, Float, Float) = (0f, 0.5f, 0f)
+    val ANTHILL_COLOR: Color = new Color(ANTHILL_COLOR_COMPONENT._1,
+      ANTHILL_COLOR_COMPONENT._2, ANTHILL_COLOR_COMPONENT._3)
 
-    def FOOD_PHEROMONE_COLOR_COMPONENT: (Float, Float, Float) = (0.0f, 0.9f, 0.02f)
+    val FOOD_PHEROMONE_COLOR_COMPONENT: (Float, Float, Float) = (0.0f, 0.9f, 0.02f)
+    val FOOD_PHEROMONE_COLOR: Color = new Color(FOOD_PHEROMONE_COLOR_COMPONENT._1,
+      FOOD_PHEROMONE_COLOR_COMPONENT._2, FOOD_PHEROMONE_COLOR_COMPONENT._3)
 
-    def DANGER_PHEROMONE_COLOR_COMPONENT: (Float, Float, Float) = (0.5f, 0.0f, 0.5f)
+    val DANGER_PHEROMONE_COLOR_COMPONENT: (Float, Float, Float) = (0.5f, 0.0f, 0.5f)
+    val DANGER_PHEROMONE_COLOR: Color = new Color(DANGER_PHEROMONE_COLOR_COMPONENT._1,
+      DANGER_PHEROMONE_COLOR_COMPONENT._2, DANGER_PHEROMONE_COLOR_COMPONENT._3)
 
+    val FOOD_COLOR_COMPONENT: (Float, Float, Float) = (0f, 0f, 1f)
+    val FOOD_COLOR: Color = new Color(FOOD_COLOR_COMPONENT._1, FOOD_COLOR_COMPONENT._2, FOOD_COLOR_COMPONENT._3)
 
+    /**
+     * Set opacity of anthill object.
+     * @param anthillFood quantity of food in anthill.
+     * @return right color for anthillFood value.
+     */
     def ANTHILL_COLOR(anthillFood: Float): Color = {
       if (anthillFood < 0.3f) ANTHILL_COLOR_SET(0.3f) else ANTHILL_COLOR_SET(anthillFood)
     }
-
-    def FOOD_COLOR_COMPONENT: (Float, Float, Float) = (0f, 0f, 1f)
 
     private def ANTHILL_COLOR_SET(anthillFood: Float): Color = {
       new Color(ANTHILL_COLOR_COMPONENT._1,
@@ -41,10 +49,19 @@ package object view {
         ANTHILL_COLOR_COMPONENT._3, anthillFood)
     }
 
+    /**
+     * Set opacity of pheromone object.
+     * @param intensity intensity of pheromone.
+     * @return right color for food pheromone value.
+     */
     def FOOD_PHEROMONE_COLOR(intensity: Float): Color = {
       if (intensity < 0.3f) FOOD_PHEROMONE_COLOR_SET(0.3f) else FOOD_PHEROMONE_COLOR_SET(intensity)
     }
-
+    /**
+     * Set opacity of pheromone object.
+     * @param intensity intensity of pheromone.
+     * @return right color for danger pheromone value.
+     */
     def DANGER_PHEROMONE_COLOR(intensity: Float): Color = {
       if (intensity < 0.3f) DANGER_PHEROMONE_COLOR_SET(0.3f) else DANGER_PHEROMONE_COLOR_SET(intensity)
     }
@@ -60,7 +77,11 @@ package object view {
         DANGER_PHEROMONE_COLOR_COMPONENT._2,
         DANGER_PHEROMONE_COLOR_COMPONENT._3, intensity)
     }
-
+    /**
+     * Set opacity of food object.
+     * @param quantity quantity of food.
+     * @return right color for food value.
+     */
     def FOOD_COLOR(quantity: Float): Color = {
       if (quantity < 0.4f) FOOD_COLOR_SET(0.4f) else FOOD_COLOR_SET(quantity)
     }
