@@ -1,19 +1,21 @@
 package model.insects
 
 import akka.actor.{ActorRef, Props}
-import model.environment.pheromones.DangerPheromone
+import model.environment.pheromones.{DangerPheromone, Pheromone}
 import model.environment.pheromones.DangerPheromoneInfo._
 import model.insects.Ants.PatrollingAnt._
 import model.insects.competences._
 import model.insects.info.PatrollingAntInfo
 import utility.Messages._
 import utility.RichActor._
+import utility.rTree.RTreeProlog
 
 case class PatrollingAnt (override val info: PatrollingAntInfo,
                      override val environment: ActorRef) extends Insect[PatrollingAntInfo] {
 
   override def receive: Receive = defaultBehaviour(info)
 
+  private val engine = RTreeProlog()
   private val competences = List(Die[PatrollingAntInfo](),
     GoOutside[PatrollingAntInfo](),
     EatFromTheAnthill[PatrollingAntInfo](),
@@ -32,14 +34,19 @@ case class PatrollingAnt (override val info: PatrollingAntInfo,
 
     case NewPosition(p, d) =>
       val newData = data.updatePosition(p).updateInertia(d)
-      environment ! UpdateInsect(newData)
-      context become defaultBehaviour(newData)
+      if(data.position ~~(p,1E-7) && !data.isInsideTheAnthill) {
+        environment ! KillInsect(data)
+      } else {
+        environment ! UpdateInsect(newData)
+      }
+      context >>> defaultBehaviour(newData)
 
     /**
      * Update food pheromones.
      */
-    case DangerPheromones(pheromones) =>
-      context >>> defaultBehaviour(data.updateDangerPheromones(pheromones))
+    case Pheromones(pheromones, tree) =>
+      val ids = engine.query(data.position, tree)
+      context >>> defaultBehaviour(data.updateDangerPheromones(pheromones filterKeys ids.toSet))
 
     /**
      * The ant enters or exits the anthill.
@@ -59,7 +66,8 @@ case class PatrollingAnt (override val info: PatrollingAntInfo,
      * Ant killed in a fight
      */
     case KillInsect(_) =>
-      environment ! AddDangerPheromone(DangerPheromone(data.position, decreasingDangerFunction, dangerIntensity),DANGER_PHEROMONE_MERGING_THRESHOLD)
+      environment ! AddPheromone(DangerPheromone(data.position, decreasingDangerFunction, dangerIntensity),
+        DANGER_PHEROMONE_MERGING_THRESHOLD)
       context >>> defaultBehaviour(data.updateEnergy(-MAX_ENERGY))
 
     /**
@@ -68,6 +76,13 @@ case class PatrollingAnt (override val info: PatrollingAntInfo,
     case Context(_) => sender ! Context(Some(context))
 
     case x => //Discarding useless messages
+  }
+
+  private implicit def pheromonesToFoodPheromones(pheromones: Map[Int,Pheromone]): Seq[DangerPheromone] = {
+    pheromones.values.toStream.filter(p => p match {
+      case p: DangerPheromone => true
+      case _ => false
+    }).map(p => p.asInstanceOf[DangerPheromone])
   }
 }
 

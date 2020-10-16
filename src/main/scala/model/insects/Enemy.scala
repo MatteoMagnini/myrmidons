@@ -23,8 +23,12 @@ class Enemy(override val info: EnemyInfo,
 
     case NewPosition(p, d) =>
       val newData = data.updatePosition(p).updateInertia(d).updateEnergy(info.energy)
-      environment ! UpdateInsect(newData)
-      context become defaultBehaviour(newData)
+      if(data.position ~~(p,1E-7)) {
+        environment ! KillInsect(data)
+      } else {
+        environment ! UpdateInsect(newData)
+      }
+      context >>> defaultBehaviour(newData)
 
     case FoodNear(_) => // println(s"Enemy ${info.id} near food")//TODO: MUST NOT RECEIVE THIS MESSAGE
 
