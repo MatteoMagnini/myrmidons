@@ -98,7 +98,6 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       //val newData = state.updatePheromones(state.pheromones.tick())
       context >>> defaultBehaviour(newData)
 
-
     case Move(position: Vector2D, delta: Vector2D) =>
       CollisionsInterceptor.checkCollisions(sender, state, position, delta)
 
@@ -139,9 +138,10 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
     val totalFoodOnMeanDistance = envFoodAmount / envFoodMeanDistance
     val antHillFoodPercentage = state.anthillInfo.get.foodAmount / state.anthillInfo.get.maxFoodAmount
-    if (totalFoodOnMeanDistance < 20 ) {
+    val foodMetricValue = FOOD_METRIC - (antHillFoodPercentage * 10)
+    if (totalFoodOnMeanDistance < foodMetricValue ) {
       val randomPosition = randomPositionOutObstacleFromCenter(state.obstacles.toList ++ state.foods,
-        state.anthillInfo.position, (80,120))
+        state.anthillInfo.position, FOOD_RADIUS)
 
       val nf = Food(randomPosition, FOOD_MIN_QUANTITY)
       state.updateFood(nf, nf)
