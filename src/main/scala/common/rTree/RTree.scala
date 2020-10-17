@@ -2,15 +2,17 @@ package common.rTree
 
 import model.environment.pheromones.INFLUENCE_RADIUS
 import common.geometry.Vector2D
+import common.rTree.RTree.Tree
 
 object RTree {
 
   type MyRange = (Double, Double)
   case class Node(id: Option[Int], rangeX: MyRange, rangeY: MyRange){
-    def intersects(range: MyRange, rangeY: MyRange): Boolean = {
-      val intersectionRangeX = (math.max(this.rangeX._1, rangeX._1), math.min(this.rangeX._2, rangeX._2))
-      val intersectionRangeY = (math.max(this.rangeY._1, rangeY._1), math.min(this.rangeY._2, rangeY._2))
-      (intersectionRangeX._1 < intersectionRangeX._2) && (intersectionRangeY._1 < intersectionRangeY._2)
+    def intersects(ranges: (MyRange, MyRange)): Boolean = {
+      val rangeX = ranges._1
+      val rangeY = ranges._2
+      (this.rangeX._1 <= rangeX._2) && (rangeX._1 <= this.rangeX._2) &&
+        (this.rangeY._1 <= rangeY._2) && (this.rangeY._1 <= rangeY._2)
     }
   }
 
@@ -24,6 +26,7 @@ object RTree {
     def right: Tree
     def root: Option[Node]
     def size: Int
+    def height: Int
   }
 
   trait TreeImpl extends Tree {
@@ -49,6 +52,11 @@ object RTree {
       case _ => 0
     }
 
+    override def height: Int = this match {
+      case x:NotEmptyTree => 1 + x.l.height
+      case _ => 0
+    }
+
     private def isLeaf(tree:Tree):Boolean = tree match {
       case x:NotEmptyTree => x.l.root.isEmpty || x.r.root.isEmpty
       case _ => false
@@ -63,4 +71,23 @@ object RTree {
     def apply(): Tree = EmptyTree()
     def apply(left: Tree, root: Node, right: Tree): Tree = NotEmptyTree(left, root, right)
   }
+}
+
+object ScalaEngine {
+
+  def query(position: Vector2D,tree: Tree): Seq[Int] = {
+    tree.root match {
+      case Some(r) => if(r intersects position.rangeOfInfluence(DEFAULT_RANGE)){
+        val id = r.id match {
+          case Some(i) => Seq(i)
+          case None => Seq.empty
+        }
+        id ++ query(position, tree.left) ++ query(position, tree.right)
+      } else {
+        Seq.empty
+      }
+      case None => Seq.empty
+    }
+  }
+
 }

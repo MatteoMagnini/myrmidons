@@ -87,6 +87,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   private def defaultBehaviour(state: EnvironmentInfo): Receive = {
 
     case Clock(value: Int) =>
+      //println(s"Pheromones: ${state.pheromones.size}, Tree height: ${state.tree.height}")
       checkAntBirth(state, value)
       state.ants.values.foreach(_ ! Clock(value))
       state.ants.values.foreach(_ ! Pheromones(state.pheromones, state.tree))

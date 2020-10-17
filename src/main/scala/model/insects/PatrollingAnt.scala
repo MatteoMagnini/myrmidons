@@ -8,7 +8,7 @@ import model.insects.competences._
 import model.insects.info.PatrollingAntInfo
 import common.Messages._
 import common.RichActor._
-import common.rTree.RTreeProlog
+import common.rTree.{RTreeProlog, ScalaEngine}
 
 /**
  * A patrolling ant with state and behaviour.
@@ -21,7 +21,8 @@ case class PatrollingAnt (override val info: PatrollingAntInfo,
 
   override def receive: Receive = defaultBehaviour(info)
 
-  private val engine = RTreeProlog()
+  //private val engine = RTreeProlog()
+  private val engine = ScalaEngine
 
   private val competences = List(Die[PatrollingAntInfo](defaultBehaviour),
     GoOutside[PatrollingAntInfo](defaultBehaviour),

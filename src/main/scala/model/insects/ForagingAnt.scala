@@ -8,7 +8,7 @@ import model.insects.competences._
 import model.insects.info.ForagingAntInfo
 import common.Messages._
 import common.RichActor._
-import common.rTree.RTreeProlog
+import common.rTree.{RTreeProlog, ScalaEngine}
 
 /**
   * Ant that performs foraging.
@@ -21,7 +21,9 @@ case class ForagingAnt(override val info: ForagingAntInfo,
 
   override def receive: Receive = defaultBehaviour(info)
 
-  private val engine = RTreeProlog()
+  //private val engine = RTreeProlog()
+  private val engine = ScalaEngine
+
   private val competences = List(Die[ForagingAntInfo](defaultBehaviour),
     GoOutside[ForagingAntInfo](defaultBehaviour),
     StoreFoodInAnthill(defaultBehaviour),
