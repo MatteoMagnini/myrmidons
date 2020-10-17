@@ -6,7 +6,6 @@ import model.environment.{Boundary, Environment}
 import common.Messages.StartSimulation
 import view.actor.uiMessage.{RestartSimulation, ShowAndSaveReport, StopSimulation, setRate}
 import view.actor.{ReportManager, ReportManagerInfo, UiActor, uiActorInfo}
-
 import scala.swing.event.ButtonClicked
 import scala.swing.{Button, FlowPanel, GridPanel, Label, Separator, TextField}
 
