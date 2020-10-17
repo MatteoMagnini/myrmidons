@@ -9,8 +9,6 @@ import utility.geometry.Vectors._
     */
   case class Vector2D(x: Double, y: Double) {
 
-  import TupleOp2._
-
   /** Returns a vector in its opposite form */
   def - : Vector2D = (-x, -y)
 
@@ -92,7 +90,6 @@ import utility.geometry.Vectors._
 
   /** Random vector factory inside a square or rectangle */
   object RandomVector2DInSquare {
-    import TupleOp2._
     /**
       * @param min value of a dimension
       * @param max value of a dimension
@@ -140,18 +137,5 @@ import utility.geometry.Vectors._
       Vector2D(doubleInRange(minX, maxX), doubleInRange(minY, maxY))
   }
 
-
-  /** Implicit conversions for [[utility.geometry.Vector2D]] instances
-    *
-    * {{{
-    * import TupleOp._
-    * val v = (1, 2) >> (3, 4)
-    * }}}
-    */
-  object TupleOp2 {
-    implicit def toVec2D(value: (Double, Double)): Vector2D = Vector2D(value._1, value._2)
-
-    implicit def intToVec2D(value: (Int, Int)): Vector2D = Vector2D(value._1.toDouble, value._2.toDouble)
-  }
 
 

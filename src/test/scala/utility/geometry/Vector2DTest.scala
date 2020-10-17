@@ -5,8 +5,6 @@ import org.scalatest.wordspec.AnyWordSpecLike
 
 class Vector2DTest extends AnyWordSpecLike with BeforeAndAfter {
 
-  import utility.geometry.TupleOp2._
-
   "A vector" when {
 
     val v = (3, -4)

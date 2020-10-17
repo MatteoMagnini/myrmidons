@@ -1,7 +1,6 @@
 package model.environment.elements
 
 import org.scalatest.wordspec
-import utility.geometry.TupleOp2._
 import utility.geometry.Vectors
 
 class FoodTest extends wordspec.AnyWordSpec {

@@ -3,7 +3,6 @@ package model.environment.elements
 
 import model.Drawable
 import utility.geometry.RandomVector2DInCircle
-import utility.geometry.VectorsImplicits._
 import utility.geometry.{Vector2D, Vector3D, Vectors}
 
 

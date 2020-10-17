@@ -19,9 +19,6 @@ rangeDifference(range(_,_),range(_,_), D) :- D is 0.
 % contains(+Range, +Range) --> returns whether a range contains another one
 contains(range(X1,X2),range(Y1,Y2)) :- X1=<Y1, X2>=Y2.
 
-% intersects(+Range, +Range) --> returns whether a range contains another one
-intersects(range(X1,X2),range(Y1,Y2)) :- X1=<Y1; X2>=Y2.
-
 % maxRange(+Range, +Range, -Range) --> returns merge of two range
 mergeRange(range(X1,X2), range(Y1,Y2), range(Z1,Z2)) :- min(X1,Y1,Z1), max(X2,Y2,Z2).
 
@@ -32,7 +29,7 @@ node(Id,RangeX,RangeY).
 nodeContains(node(_,RangeX1, RangeY1),RangeX2,RangeY2) :- contains(RangeX1,RangeX2), contains(RangeY1, RangeY2).
 
 % nodeIntersects(+Node, +Range, +Range) --> returns whether a node intersects a certain interval
-nodeIntersects(node(_,RangeX1, RangeY1),RangeX2,RangeY2) :- intersects(RangeX1,RangeX2), intersects(RangeY1, RangeY2).
+nodeIntersects(node(_,RangeX1, RangeY1),RangeX2,RangeY2) :- contains(RangeX1,RangeX2); contains(RangeY1, RangeY2).
 
 % minDistantNode(+Range, +Range, +Node, +Node, -Node) --> returns whether left node is closer to certain range wrt right node
 leftMinDistantNode(RangeXI,RangeYI, node(_,RangeX1,RangeY1), node(_,RangeX2,RangeY2)) :- 
@@ -178,6 +175,9 @@ query(tree(L,node(_,RangeX, RangeY),R),RangeXI,RangeYI, OTree) :-
 query(tree(L,V,R),RangeXI,RangeYI, tree(L,V,R)) :-
 				nodeIntersects(V,RangeXI,RangeYI), !.
 
+query(tree(L,node(ID, RangeX, RangeY),R),RangeXI,RangeYI, tree(L,node(ID, RangeX, RangeY),R)) :-
+                contains(RangeXI, RangeX), contains(RangeYI, RangeY), !.
+
 % Output subtree when ranges are no more contained in nodes
 query(tree(L,node(ID,RangeX, RangeY),R),RangeXI,RangeYI, tree(L,node(ID,RangeX, RangeY),R)) :-
 				contains(RangeX, RangeXI), contains(RangeY,RangeYI).
@@ -188,8 +188,9 @@ getLeavesList(tree(nil, V, nil), [V]) :- !.
 getLeavesList(tree(L, V, R), List) :- getLeavesList(L, L1), getLeavesList(R, L2), append(L1,L2,List).
 
 % queryToList(+Tree, +RangeX, +RangeY, -List) --> returns result of a query in list format
-queryToList(Tree, Range1, Range2, List) :- query(Tree, Range1, Range2, Otree
-), getLeavesList(Otree, List).
+queryToList(Tree, Range1, Range2, List) :-
+                query(Tree, Range1, Range2, Otree),
+                getLeavesList(Otree, List).
 
 
 %removeWithFix( node(1,range(2,3),range(7,8)),tree(tree(tree(nil,node(1,range(2,3),range(7,8)),nil),node(none,range(2,4),range(5,8)),tree(nil,node(2,range(3,4),range(5,6)),nil)),node(none,range(1,7),range(1,8)),tree(tree(nil,node(3,range(6,7),range(3,4)),nil),node(none,range(1,7),range(1,4)),tree(nil,node(4,range(1,2),range(1,2)),nil))), X).

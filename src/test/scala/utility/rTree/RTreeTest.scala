@@ -3,7 +3,7 @@ package utility.rTree
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.geometry.ZeroVector2D
+import utility.geometry.{Vector2D, ZeroVector2D}
 import utility.rTree.RTree.{Node, Tree}
 
 class RTreeTest extends AnyWordSpecLike with Matchers with BeforeAndAfterAll {
@@ -45,6 +45,7 @@ class RTreeTest extends AnyWordSpecLike with Matchers with BeforeAndAfterAll {
 
   "A one-value tree" when {
     val node = Node(1, (1, 0), (1, 0))
+    val otherNode = Node(2, (2, 3), (2, 3))
     val tree = Tree(Tree(), node, Tree())
 
     "adding a node" should {
@@ -69,6 +70,28 @@ class RTreeTest extends AnyWordSpecLike with Matchers with BeforeAndAfterAll {
       val result = engine.removeNode(node, tree)
       "give as result an empty tree" in {
         assert(result.size == 0)
+      }
+    }
+    "removing a non present node" should {
+      val result  = engine.removeNode(otherNode, tree)
+      "give as result initial tree" in {
+        assert(result == tree)
+      }
+    }
+    import utility.geometry._
+    "queried in a position inside R-tree ranges" should {
+      val position = (1,1)
+      val result = engine.query(position, tree)
+      "give node as result" in {
+        assert(result.length == 1)
+        assert(result.contains(node.id.get))
+      }
+    }
+    "queried in a position outside R-tree range" should {
+      val position = (100,100)
+      val result = engine.query(position, tree)
+      "give node as result" in {
+        assert(result.isEmpty)
       }
     }
   }

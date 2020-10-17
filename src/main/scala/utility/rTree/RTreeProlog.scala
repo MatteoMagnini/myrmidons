@@ -31,6 +31,7 @@ class RTreeProlog(val engine: Prolog) {
     val variable = Variable()
     val ranges: (MyRange, MyRange) = position.rangeOfInfluence(INFLUENCE_RADIUS)
     val goal = new Struct(query, tree, ranges._1, ranges._2, variable)
+    println(goal)
     try {
       engine.solve(goal).getTerm(variable.getName).getAsList.map(_.getAsNode).map(_.id.get)
     } catch {

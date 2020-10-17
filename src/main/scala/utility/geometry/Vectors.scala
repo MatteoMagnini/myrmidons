@@ -1,7 +1,5 @@
 package utility.geometry
 
-import utility.geometry.VectorsImplicits._
-
 object Vectors {
 
   /** Double equivalence with a certain precision check.
@@ -68,12 +66,4 @@ object Vectors {
     l.foldRight(Vector2D(0.0, 0.0))(_ >> _) / l.size
   }
 
-
-}
-
-/** Implicit conversions from [[utility.geometry.Vector2D]] to [[utility.geometry.Vector3D]] and vice versa. */
-object VectorsImplicits {
-  implicit def vec3DToVec2D(value: Vector3D): Vector2D = Vector2D(value.x / value.z, value.y / value.z)
-
-  implicit def vec2DToVec3D(value: Vector2D): Vector3D = Vector3D(value.x, value.y, 1.0)
 }

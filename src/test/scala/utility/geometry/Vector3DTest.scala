@@ -2,7 +2,6 @@ package utility.geometry
 
 import org.scalatest.BeforeAndAfter
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.geometry.TupleOp3._
 class Vector3DTest extends AnyWordSpecLike with BeforeAndAfter {
 
   "A vector" when {

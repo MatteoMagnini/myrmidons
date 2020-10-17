@@ -13,7 +13,6 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import utility.Message
 import utility.Messages._
-import utility.geometry.TupleOp2._
 import utility.geometry._
 import utility.rTree.RTree.Tree
 import utility.rTree.RTreeProlog
