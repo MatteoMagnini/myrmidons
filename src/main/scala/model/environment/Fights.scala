@@ -1,7 +1,8 @@
-package model
+package model.environment
 
+import common.geometry.Vector2D
+import model.Drawable
 import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo, PatrollingAntInfo}
-import utility.geometry.Vector2D
 
 object Fights {
 
@@ -31,8 +32,8 @@ object Fights {
     * @param fights collection of fights
     * @return losers among provided fights
     */
-  def losers[A, B](fights: Iterable[Fight[A, B]])(implicit outcome: FightOutcome[A, B]): Iterable[Either[A,B]] = {
-    fights.map(f => outcome.loser(f.firstFighter, f.secondFighter))
+  def losers[A, B](fights: Iterable[Fight[A, B]])(implicit outcome: FightOutcome[A, B]): Seq[Either[A,B]] = {
+    fights.map(f => outcome.loser(f.firstFighter, f.secondFighter)).toSeq
   }
 
   object InsectFight {
@@ -45,4 +46,3 @@ object Fights {
       }
   }
 }
-

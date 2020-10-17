@@ -1,5 +1,5 @@
-package utility.geometry
-import utility.geometry.Vectors._
+package common.geometry
+import common.geometry.Vectors._
 
 /** A vector in 3-dimensional space.
   *
@@ -9,7 +9,6 @@ import utility.geometry.Vectors._
   */
 case class Vector3D(x: Double, y: Double, z: Double) {
 
-  import TupleOp3._
   def - : Vector3D = (-x, -y, -z)
 
   def >>(delta: Vector3D): Vector3D = (x + delta.x, y + delta.y, z + delta.z)
@@ -57,17 +56,4 @@ case class Vector3D(x: Double, y: Double, z: Double) {
   }
 }
 
-/** Implicit conversion to convert [[utility.geometry.Vector3D]] instances
-  *
-  * {{{
-  * import TupleOp3._
-  * val v = (1, 2, 1) >> (3, 4, 1)
-  * }}}
-  * */
-object TupleOp3 {
-  implicit def toVec3D(value: (Double, Double, Double)): Vector3D = Vector3D(value._1, value._2, value._3)
-
-  implicit def intToVec3D(value: (Int, Int, Int)): Vector3D =
-    Vector3D(value._1.toDouble, value._2.toDouble, value._3.toDouble)
-}
 

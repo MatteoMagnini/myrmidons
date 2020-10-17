@@ -1,4 +1,4 @@
-package utility
+package common
 
 import akka.actor.Actor.Receive
 import akka.actor.ActorContext

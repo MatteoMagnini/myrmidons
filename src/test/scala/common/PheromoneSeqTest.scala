@@ -1,13 +1,13 @@
-package utility
+package common
 
 import model.environment.pheromones.FoodPheromone
 import org.scalatest.BeforeAndAfter
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.geometry.{Vector2D, ZeroVector2D}
+import common.geometry.{Vector2D, ZeroVector2D}
 
 class PheromoneSeqTest extends AnyWordSpecLike with BeforeAndAfter {
 
-  import utility.PheromoneSeq._
+  import common.PheromoneSeq._
 
   "A seq of pheromones" when {
 

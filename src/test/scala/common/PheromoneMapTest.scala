@@ -1,13 +1,13 @@
-package utility
+package common
 
 import model.environment.pheromones.{DangerPheromone, FoodPheromone, Pheromone}
 import org.scalatest.BeforeAndAfter
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.geometry.{Vector2D, ZeroVector2D}
+import common.geometry.{Vector2D, ZeroVector2D}
 
 class PheromoneMapTest extends AnyWordSpecLike with BeforeAndAfter {
 
-  import utility.PheromoneMap._
+  import common.PheromoneMap._
 
   "A map of pheromones" when {
 

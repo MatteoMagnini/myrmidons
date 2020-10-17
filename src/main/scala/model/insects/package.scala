@@ -1,6 +1,6 @@
 package model
 
-import utility.geometry.{Vector2D, ZeroVector2D}
+import common.geometry.{Vector2D, ZeroVector2D}
 import scala.util.Random
 
 package object insects {

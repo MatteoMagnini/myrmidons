@@ -1,4 +1,4 @@
-package model.environment.info
+package model.environment.data
 
 import akka.actor.ActorRef
 import model.environment.anthill.AnthillInfo
@@ -6,10 +6,10 @@ import model.environment.Boundary
 import model.environment.elements.{Food, Obstacle}
 import model.environment.pheromones.Pheromone
 import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo, PatrollingAntInfo}
-import utility.PheromoneMap._
-import utility.rTree.RTree.{Node, Tree}
-import utility.rTree.RTreeProlog
-import utility.rTree.getPheromoneAsNode
+import common.PheromoneMap._
+import common.rTree.RTree.{Node, Tree}
+import common.rTree.RTreeProlog
+import common.rTree.getPheromoneAsNode
 
 /** Internal state of environment. */
 trait EnvironmentInfo {
@@ -139,7 +139,7 @@ object EnvironmentInfo {
     override def emptyInsectInfo(): EnvironmentData =
       this.copy(foragingAntsInfo = Seq.empty, patrollingAntsInfo = Seq.empty, enemiesInfo = Seq.empty)
 
-    import utility.SeqWithReplace._
+    import common.SeqWithReplace._
 
     override def updateFood(food: Food, updatedFood: Food): EnvironmentData =
       if (updatedFood.quantity > 0) {

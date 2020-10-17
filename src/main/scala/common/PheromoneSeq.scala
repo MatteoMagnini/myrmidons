@@ -1,7 +1,7 @@
-package utility
+package common
 
 import model.environment.pheromones.Pheromone
-import utility.geometry.{Vector2D, ZeroVector2D}
+import common.geometry.{Vector2D, ZeroVector2D}
 
 /**
  * Pimp my library pattern.

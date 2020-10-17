@@ -1,7 +1,7 @@
 package model.environment.elements
 
 import model.environment.Boundary
-import utility.geometry.{Vector2D, Vector3D, Vectors}
+import common.geometry.{Vector2D, Vector3D, Vectors}
 
   /** A strategy to define whether a position in inside an environment element
     *
@@ -49,7 +49,6 @@ object EnvironmentElements {
   /**How to check positions in [[model.environment.elements.Obstacle]] */
   implicit object ObstacleHasInside extends EnvironmentElement[Obstacle] {
     override def hasInside(element: Obstacle, coordinate: Vector2D): Boolean = {
-      import utility.geometry.VectorsImplicits._
 
       val maxX = element.points.sortWith((a, b) => a.x > b.x) head
       val stopCheckRay = Vector3D(maxX.x + 1, coordinate.y, 1)

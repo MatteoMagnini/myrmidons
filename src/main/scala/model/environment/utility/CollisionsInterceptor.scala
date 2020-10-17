@@ -1,12 +1,11 @@
-
-package model.environment
+package model.environment.utility
 
 import akka.actor.ActorRef
+import common.Messages.{FoodNear, NewPosition}
+import common.geometry.Vector2D
 import model.environment.elements.EnvironmentElements.{checkHasInside, checkHaveInside}
 import model.environment.elements.{Food, Obstacle}
-import model.environment.info.EnvironmentInfo
-import utility.Messages.{FoodNear, NewPosition}
-import utility.geometry.Vector2D
+import model.environment.data.EnvironmentInfo
 
 private[environment] object CollisionsInterceptor {
 
@@ -124,7 +123,6 @@ private[environment] object CollisionsInterceptor {
         (math.cos(angleTest) * newDelta.x) - (math.sin(angleTest) * newDelta.y),
         (math.sin(angleTest) * newDelta.x) + (math.cos(angleTest) * newDelta.y)
       )
-      import utility.geometry.TupleOp2._
       (intersectionAndDirection.intersectionPoint, orientedDelta, Some(intersectionAndDirectionOpt._2))
     } else {
       (position, (position - newPosition)/((position - newPosition)||), None)

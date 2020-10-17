@@ -1,7 +1,7 @@
 package model.insects.info
 
 import model.Drawable
-import utility.geometry.Vector2D
+import common.geometry.Vector2D
 
 /**
  * The information in common with all kind of insects.

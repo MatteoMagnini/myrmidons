@@ -5,8 +5,8 @@ import akka.testkit.{TestKit, TestProbe}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.Messages._
-import utility.geometry.Vector2D
+import common.Messages._
+import common.geometry.Vector2D
 
 class AnthillTest extends TestKit(ActorSystem("AnthillTest"))
   with AnyWordSpecLike

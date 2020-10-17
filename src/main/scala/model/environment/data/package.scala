@@ -2,7 +2,7 @@ package model.environment
 
 import akka.actor.ActorRef
 
-package object info {
+package object data {
 
   type InsectReferences = Map[Int, ActorRef]
 }

@@ -1,9 +1,18 @@
-package utility.rTree
+package common.rTree
+
+import model.environment.pheromones.INFLUENCE_RADIUS
+import common.geometry.Vector2D
 
 object RTree {
 
   type MyRange = (Double, Double)
-  case class Node(id: Option[Int], rangeX: MyRange, rangeY: MyRange)
+  case class Node(id: Option[Int], rangeX: MyRange, rangeY: MyRange){
+    def intersects(range: MyRange, rangeY: MyRange): Boolean = {
+      val intersectionRangeX = (math.max(this.rangeX._1, rangeX._1), math.min(this.rangeX._2, rangeX._2))
+      val intersectionRangeY = (math.max(this.rangeY._1, rangeY._1), math.min(this.rangeY._2, rangeY._2))
+      (intersectionRangeX._1 < intersectionRangeX._2) && (intersectionRangeY._1 < intersectionRangeY._2)
+    }
+  }
 
   object Node {
     def apply(id: Option[Int], rangeX: MyRange, rangeY: MyRange): Node = new Node(id, rangeX, rangeY)
@@ -44,6 +53,7 @@ object RTree {
       case x:NotEmptyTree => x.l.root.isEmpty || x.r.root.isEmpty
       case _ => false
     }
+
   }
 
   case class EmptyTree() extends TreeImpl

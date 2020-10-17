@@ -1,12 +1,12 @@
-package utility.rTree
+package common.rTree
 
 import model.environment.pheromones.FoodPheromone
 import model.environment.pheromones.FoodPheromoneInfo.{STARTING_INTENSITY, _}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.geometry.{Vector2D, ZeroVector2D}
-import utility.rTree.RTree.{Node, Tree}
+import common.geometry.{Vector2D, ZeroVector2D}
+import common.rTree.RTree.{Node, Tree}
 
 class PheromonesRTreeTest extends AnyWordSpecLike with Matchers with BeforeAndAfterAll {
 
@@ -47,11 +47,10 @@ class PheromonesRTreeTest extends AnyWordSpecLike with Matchers with BeforeAndAf
       val queryResult = engine.query(searchedRange, twoLeavesTree)
 
       "return correct number of ids" in {
-        assert(queryResult.size == 2)
+        assert(queryResult.size == 1)
       }
       "return correct pheromones ids" in {
         assert(queryResult.contains(id1))
-        assert(queryResult.contains(id2))
       }
     }
 
@@ -70,7 +69,6 @@ class PheromonesRTreeTest extends AnyWordSpecLike with Matchers with BeforeAndAf
       "go back to previous tree" in {
         val resultTree = engine.removeNode((id2, pheromone2), twoLeavesTree)
         assert(resultTree == oneLeafTree)
-
       }
     }
   }

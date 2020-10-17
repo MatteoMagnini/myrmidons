@@ -1,4 +1,4 @@
-package utility.rTree
+package common.rTree
 
 import alice.tuprolog.{Prolog, Theory, Var}
 

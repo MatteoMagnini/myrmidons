@@ -1,10 +1,10 @@
-package utility.rTree
+package common.rTree
 
 import alice.tuprolog.{Prolog, Struct}
 import model.environment.pheromones._
-import utility.geometry.Vector2D
-import utility.rTree.PrologFacilities._
-import utility.rTree.RTree.{MyRange, Node, Tree}
+import common.geometry.Vector2D
+import common.rTree.PrologFacilities._
+import common.rTree.RTree.{MyRange, Node, Tree}
 
 class RTreeProlog(val engine: Prolog) {
 

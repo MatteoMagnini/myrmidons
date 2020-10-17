@@ -1,11 +1,9 @@
-package utility.geometry
+package common.geometry
 
 import org.scalatest.BeforeAndAfter
 import org.scalatest.wordspec.AnyWordSpecLike
 
 class Vector2DTest extends AnyWordSpecLike with BeforeAndAfter {
-
-  import utility.geometry.TupleOp2._
 
   "A vector" when {
 

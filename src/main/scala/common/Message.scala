@@ -1,18 +1,22 @@
-package utility
+package common
 
 import akka.actor.ActorContext
 import model.Drawable
 import model.environment.anthill.AnthillInfo
-import model.environment.info.InsectReferences
+import model.environment.data.InsectReferences
 import model.environment.pheromones.Pheromone
-import utility.geometry.Vector2D
+import common.geometry.Vector2D
 import model.insects.info.InsectInfo
-import utility.rTree.RTree.Tree
-import utility.rTree.RTreeProlog
+import common.rTree.RTree.Tree
+import common.rTree.RTreeProlog
 
 trait Message
 
 object Messages {
+
+  val DEFAULT_OBSTACLES = 6
+  val DEFAULT_FOOD = 6
+  val DEFAULT_ANTHILL_FOOD = 200
 
   /** Message sent from GUI to environment, to start simulation.
    *
@@ -20,9 +24,9 @@ object Messages {
    */
   case class StartSimulation(nAnts: Int,
                              nEnemies: Int,
-                             obstacles: Option[Int] = Some(6),
-                             food: Option[Int] = Some(6),
-                             anthillFood: Option[Int] = Some(200)) extends Message
+                             obstacles: Option[Int] = Some(DEFAULT_OBSTACLES),
+                             food: Option[Int] = Some(DEFAULT_FOOD),
+                             anthillFood: Option[Int] = Some(DEFAULT_ANTHILL_FOOD)) extends Message
 
 
   /** Message sent from GUI to environment and from environment to ants, to do a step in simulation.
