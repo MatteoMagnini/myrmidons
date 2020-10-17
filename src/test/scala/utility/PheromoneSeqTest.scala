@@ -46,14 +46,14 @@ class PheromoneSeqTest extends AnyWordSpecLike with BeforeAndAfter {
         assert(seq4.nonEmpty)
         assert(seq4.size == 2)
         assert(seq4.last == FoodPheromone(ZeroVector2D(), decreasingFunction, startingIntensity - DELTA))
-        assert(seq4.take(1).last == p2)
+        assert(seq4.head == p2)
       }
 
       val seq5 = seq4.tick()
 
       "correctly tick with two pheromones" in {
         assert(seq5.last == FoodPheromone(ZeroVector2D(), decreasingFunction, startingIntensity - 2 * DELTA))
-        assert(seq5.take(1).last == FoodPheromone(pos1, decreasingFunction, startingIntensity - DELTA))
+        assert(seq5.head == FoodPheromone(pos1, decreasingFunction, startingIntensity - DELTA))
       }
 
       val pos2 = Vector2D(0.75,1.25)
@@ -64,7 +64,7 @@ class PheromoneSeqTest extends AnyWordSpecLike with BeforeAndAfter {
         assert(seq6.nonEmpty)
         assert(seq6.size == 2)
         assert(seq6.last == FoodPheromone(ZeroVector2D(), decreasingFunction, startingIntensity - 2 * DELTA))
-        assert(seq6.take(1).last == FoodPheromone(pos1, decreasingFunction, 2 * startingIntensity - DELTA))
+        assert(seq6.head == FoodPheromone(pos1, decreasingFunction, 2 * startingIntensity - DELTA))
       }
 
       var seq7 = seq6

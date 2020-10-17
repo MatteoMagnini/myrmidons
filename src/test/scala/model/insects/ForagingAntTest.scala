@@ -15,6 +15,8 @@ import utility.Message
 import utility.Messages._
 import utility.geometry.TupleOp2._
 import utility.geometry._
+import utility.rTree.RTree.Tree
+import utility.rTree.RTreeProlog
 
 class ForagingAntTest extends TestKit(ActorSystem("ForagingAntTest"))
   with AnyWordSpecLike
@@ -92,7 +94,8 @@ class ForagingAntTest extends TestKit(ActorSystem("ForagingAntTest"))
 
       "eat the reserve inside the anthill" in {
         ant ! Clock(3)
-        val finalEnergy = startingEnergy + ENERGY_RANDOM_WALK + ENERGY_RANDOM_WALK + ENERGY_EATING + FOOD_ENERGY_CONVERSION * FOOD_EATEN_PER_STEP
+        val finalEnergy = startingEnergy + ENERGY_RANDOM_WALK + ENERGY_RANDOM_WALK +
+          ENERGY_EATING + FOOD_ENERGY_CONVERSION * FOOD_EATEN_PER_STEP
         val result1 = sender.expectMsgType[UpdateInsect]
         assert(anthillInfo.position --> result1.info.position < anthillInfo.radius)
         assert(result1.info.inertia == ZeroVector2D())
@@ -112,28 +115,31 @@ class ForagingAntTest extends TestKit(ActorSystem("ForagingAntTest"))
         assert(info2.foodPheromones.nonEmpty)
       }
 
+      import utility.rTree.getPheromoneAsNode
       val ant = system.actorOf(ForagingAnt(ForagingAntInfo(senderRef, id = 2),senderRef), "ant-2")
+      val tree = Tree()
+      val engine = RTreeProlog()
 
       "perform food pheromone taxis" in {
-        val pheromones = Seq(FoodPheromone(Vector2D(5,0), x => x - DELTA,startingPheromoneIntensity ))
-        ant ! FoodPheromones(pheromones)
+        val pheromones = Map(1 -> FoodPheromone(Vector2D(5,0), x => x - DELTA,startingPheromoneIntensity ))
+        ant ! Pheromones(pheromones, engine.insertNode((pheromones.head._1,pheromones.head._2),tree))
         ant ! Clock(1)
         val result1 = sender.expectMsgType[Move]
         ant ! NewPosition(result1.start >> result1.delta, result1.delta)
         val result2 = sender.expectMsgType[UpdateInsect]
-        assert(result2.info.position --> pheromones.last.position < result1.start --> pheromones.last.position)
+        assert(result2.info.position --> pheromones.last._2.position < result1.start --> pheromones.last._2.position)
         assert(result2.info.energy == STARTING_ENERGY + ENERGY_FOOD_PHEROMONE_TAXIS)
         sender expectNoMessage
       }
 
       "multiple times" in {
-        val pheromones = Seq(FoodPheromone(Vector2D(8,1),x => x - DELTA, startingPheromoneIntensity))
-        ant ! FoodPheromones(pheromones)
+        val pheromones = Map(1 -> FoodPheromone(Vector2D(8,1),x => x - DELTA, startingPheromoneIntensity))
+        ant ! Pheromones(pheromones, engine.insertNode((pheromones.head._1,pheromones.head._2),tree))
         ant ! Clock(2)
         val result1 = sender.expectMsgType[Move]
         ant ! NewPosition(result1.start >> result1.delta, result1.delta)
         val result2 = sender.expectMsgType[UpdateInsect]
-        assert(result2.info.position --> pheromones.last.position < result1.start --> pheromones.last.position)
+        assert(result2.info.position --> pheromones.last._2.position < result1.start --> pheromones.last._2.position)
         assert(result2.info.energy == STARTING_ENERGY + 2 * ENERGY_FOOD_PHEROMONE_TAXIS)
         sender expectNoMessage
       }
@@ -195,7 +201,7 @@ class ForagingAntTest extends TestKit(ActorSystem("ForagingAntTest"))
             val result2 = sender.expectMsgType[UpdateInsect]
             assert(anthillInfo.position --> result2.info.position < anthillInfo.radius)
 
-          case d: AddFoodPheromone =>
+          case d: AddPheromone =>
             assert(d.foodPheromone.position equals implicitly[Vector2D](startingAntPosition))
             sender.expectMsgType[UpdateInsect]
         }
