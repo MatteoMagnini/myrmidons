@@ -3,7 +3,7 @@ package model.insects.info
 import akka.actor.ActorRef
 import model.environment.pheromones.FoodPheromone
 import model.insects.Ants.ForagingAnt._
-import utility.geometry.{Vector2D, ZeroVector2D}
+import common.geometry.{Vector2D, ZeroVector2D}
 
 /**
  * This class defines a foraging ant state.

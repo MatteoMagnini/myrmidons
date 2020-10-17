@@ -2,8 +2,8 @@
 package model.environment.elements
 
 import model.Drawable
-import utility.geometry.RandomVector2DInCircle
-import utility.geometry.{Vector2D, Vector3D, Vectors}
+import common.geometry.RandomVector2DInCircle
+import common.geometry.{Vector2D, Vector3D, Vectors}
 
 
 /** An implementation of an obstacle.

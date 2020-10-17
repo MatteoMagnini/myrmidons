@@ -2,7 +2,7 @@ package view.scene
 
 
 import model.Drawable
-import model.Fights.Fight
+import model.environment.Fights.Fight
 import model.environment.pheromones.Pheromone
 import model.environment.anthill.AnthillInfo
 import model.environment.elements.Obstacle

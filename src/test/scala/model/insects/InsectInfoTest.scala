@@ -7,7 +7,7 @@ import model.insects.info.ForagingAntInfo
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.geometry._
+import common.geometry._
 
 class InsectInfoTest extends TestKit(ActorSystem("InsectInfoTest"))
   with AnyWordSpecLike

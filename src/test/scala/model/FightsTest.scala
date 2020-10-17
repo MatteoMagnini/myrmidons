@@ -1,10 +1,10 @@
 package model
 
-import model.Fights.Fight
+import model.environment.Fights.Fight
 import model.insects.info.{EnemyInfo, InsectInfo, PatrollingAntInfo}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.geometry.ZeroVector2D
+import common.geometry.ZeroVector2D
 
 import scala.util.Random
 
@@ -20,8 +20,8 @@ class FightsTest extends AnyWordSpecLike with Matchers {
     "happens" should {
 
       "have as loser insect with lower energy" in {
-        import Fights.InsectFight._
-        import Fights._
+        import model.environment.Fights.InsectFight._
+        import model.environment.Fights._
 
         assert(loser(fight) match {
           case Left(x) => x.energy == (antEnergy min insectEnergy)
@@ -32,8 +32,8 @@ class FightsTest extends AnyWordSpecLike with Matchers {
   }
 
   "A collection of fights between insects" when {
-    import Fights.InsectFight._
-    import Fights._
+    import model.environment.Fights.InsectFight._
+    import model.environment.Fights._
 
     val nFights = 5
     val maxEnergy = 100

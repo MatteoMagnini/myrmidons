@@ -1,6 +1,6 @@
 package model.environment.pheromones
 
-import utility.geometry.Vector2D
+import common.geometry.Vector2D
 
 /**
  * A pheromone indicating the presence of a food source.

@@ -1,5 +1,5 @@
 package model.environment.pheromones
-import utility.geometry.Vector2D
+import common.geometry.Vector2D
 
 /**
  * A pheromone indicating danger for an ant.

@@ -3,10 +3,10 @@ package model.insects.competences
 import akka.actor.Actor.Receive
 import akka.actor.{ActorContext, ActorRef}
 import model.insects.info.AntInfo
-import utility.Messages.{AntTowardsAnthill, EatFood, Move}
-import utility.geometry.Vectors._
-import utility.geometry._
-import utility.RichActor._
+import common.Messages.{AntTowardsAnthill, EatFood, Move}
+import common.geometry.Vectors._
+import common.geometry._
+import common.RichActor._
 
 /**
  * Competence for all ants.

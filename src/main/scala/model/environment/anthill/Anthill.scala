@@ -5,9 +5,9 @@ import model.Drawable
 import model.insects.competences._
 import model.insects.info.{ForagingAntInfo, PatrollingAntInfo}
 import model.insects.{ForagingAnt, PatrollingAnt}
-import utility.Messages._
-import utility.geometry.Vectors.doubleInRange
-import utility.geometry._
+import common.Messages._
+import common.geometry.Vectors.doubleInRange
+import common.geometry._
 
 
 case class AnthillInfo(override val position: Vector2D,

@@ -4,13 +4,13 @@ import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
 import model.Drawable
 import model.environment.elements.EnvironmentElements
-import model.environment.info.EnvironmentInfo
+import model.environment.data.EnvironmentInfo
 import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.Messages._
-import utility.geometry.{Vector2D, ZeroVector2D}
+import common.Messages._
+import common.geometry.{Vector2D, ZeroVector2D}
 
 class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
   with AnyWordSpecLike

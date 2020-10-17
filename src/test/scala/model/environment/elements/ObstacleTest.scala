@@ -1,7 +1,7 @@
 package model.environment.elements
 
 import org.scalatest._
-import utility.geometry.{Vector2D, Vectors}
+import common.geometry.{Vector2D, Vectors}
 
 class ObstacleTest  extends wordspec.AnyWordSpec {
 

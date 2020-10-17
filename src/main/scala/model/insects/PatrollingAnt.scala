@@ -6,9 +6,9 @@ import model.environment.pheromones.DangerPheromoneInfo._
 import model.insects.Ants.PatrollingAnt._
 import model.insects.competences._
 import model.insects.info.PatrollingAntInfo
-import utility.Messages._
-import utility.RichActor._
-import utility.rTree.RTreeProlog
+import common.Messages._
+import common.RichActor._
+import common.rTree.RTreeProlog
 
 /**
  * A patrolling ant with state and behaviour.

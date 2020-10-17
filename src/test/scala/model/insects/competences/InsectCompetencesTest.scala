@@ -8,8 +8,8 @@ import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
 import model.insects.{Enemy, ForagingAnt, PatrollingAnt}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.Messages._
-import utility.geometry.{Vector2D, ZeroVector2D}
+import common.Messages._
+import common.geometry.{Vector2D, ZeroVector2D}
 
 class InsectCompetencesTest extends TestKit(ActorSystem("InsectCompetencesTest"))
 with AnyWordSpecLike
