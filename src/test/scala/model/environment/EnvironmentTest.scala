@@ -39,7 +39,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
     case _ => false
   }
 
- /* "Environment without obstacles" when {
+  "Environment without obstacles" when {
     val sender = TestProbe()
     implicit val senderRef: ActorRef = sender.ref
 
@@ -161,7 +161,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
       }
     }
   }
-*/
+
    "Environment" when {
     val sender = TestProbe()
     implicit val senderRef: ActorRef = sender.ref
