@@ -57,7 +57,7 @@ class ObstacleTest  extends wordspec.AnyWordSpec {
       val internalPoint1:Vector2D = (0,1)
       val internalPoint2:Vector2D = (1,0)
       val throughPoint: Vector2D = (-10, -10)
-      val o1 = Obstacle.Square(obstacleCenter)
+      val o1 = Obstacle.Square(obstacleCenter, radius = 10)
 
       "intersection exist and " should {
 
@@ -96,7 +96,7 @@ class ObstacleTest  extends wordspec.AnyWordSpec {
   "two obstacle" when {
     val o1 = Obstacle.Square((0,0))
     val o2 = Obstacle.Square((0,4))
-    val o3 = Obstacle.Square((0,10))
+    val o3 = Obstacle.Square((0,20))
 
     "are overlapped" should{
 

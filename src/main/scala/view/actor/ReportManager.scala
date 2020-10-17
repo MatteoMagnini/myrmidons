@@ -5,7 +5,7 @@ import java.util
 
 import akka.actor.{Actor, ActorLogging, Props}
 import model.Drawable
-import model.anthill.AnthillInfo
+import model.environment.anthill.AnthillInfo
 import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
 import utility.RichActor._
 import view.actor.uiMessage._

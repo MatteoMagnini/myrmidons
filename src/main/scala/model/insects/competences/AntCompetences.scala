@@ -17,6 +17,9 @@ trait AntCompetences[A <: AntInfo[A]] extends InsectCompetences[A]
 
 /**
  * Competence forcing an ant to go back to the anthill when its energy is low.
+ *
+ * @param behaviour of the ant
+ * @tparam A th type of the ant
  */
 case class GoBackToHome[A <: AntInfo[A]](behaviour: A => Receive) extends AntCompetences[A] {
 
@@ -27,16 +30,19 @@ case class GoBackToHome[A <: AntInfo[A]](behaviour: A => Receive) extends AntCom
     context >>> behaviour(data)
   }
 
-  override def hasPriority(info: A): Boolean = info.energy < 40 //TODO: to be parametrized, add new competence for carry food back to home
+  override def hasPriority(info: A): Boolean = info.energy < THRESHOLD_GO_BACK_HOME
 }
 
 /**
  * Competence forcing an insect to exit the anthill when its energy level is high.
+ *
+ * @param behaviour of the ant
+ * @tparam A th type of the ant
  */
 case class GoOutside[A <: AntInfo[A]](behaviour: A => Receive) extends AntCompetences[A] {
 
   override def apply(context: ActorContext, environment: ActorRef, insect: ActorRef, info: A): Unit = {
-    val data = info.updateEnergy(ENERGY_RANDOM_WALK).updateAnthillCondition(false)
+    val data = info.updateEnergy(ENERGY_RANDOM_WALK).updateAnthillCondition(value = false)
     val delta: Vector2D = RandomVector2DInCircle(MIN_VELOCITY, MAX_VELOCITY)
     val deltaWithInertia = OrientedVector2D((delta >> (info.inertia * INERTIA_FACTOR))./\,
       doubleInRange(MIN_VELOCITY, MAX_VELOCITY))
@@ -44,11 +50,15 @@ case class GoOutside[A <: AntInfo[A]](behaviour: A => Receive) extends AntCompet
     context >>> behaviour(data)
   }
 
-  override def hasPriority(info: A): Boolean = info.isInsideTheAnthill && info.energy > 80 //TODO: try something with probability
+  override def hasPriority(info: A): Boolean =
+    info.isInsideTheAnthill && info.energy > THRESHOLD_GO_OUTSIDE && random(probability = 0.5)
 }
 
 /**
  * Eat food from the anthill (if present) when the insect is inside it.
+ *
+ * @param behaviour of the ant
+ * @tparam A th type of the ant
  */
 case class EatFromTheAnthill[A <: AntInfo[A]](behaviour: A => Receive) extends AntCompetences[A] {
 

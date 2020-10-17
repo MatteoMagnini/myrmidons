@@ -1,7 +1,7 @@
 package model.environment.info
 
 import akka.actor.ActorRef
-import model.anthill.AnthillInfo
+import model.environment.anthill.AnthillInfo
 import model.environment.Boundary
 import model.environment.elements.{Food, Obstacle}
 import model.environment.pheromones.Pheromone

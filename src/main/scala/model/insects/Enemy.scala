@@ -30,8 +30,12 @@ class Enemy(override val info: EnemyInfo,
     /** Update position */
     case NewPosition(p, d) =>
       val newData = data.updatePosition(p).updateInertia(d).updateEnergy(info.energy)
-      environment ! UpdateInsect(newData)
-      context become defaultBehaviour(newData)
+      if(data.position ~~(p,1E-7)) {
+        environment ! KillInsect(data)
+      } else {
+        environment ! UpdateInsect(newData)
+      }
+      context >>> defaultBehaviour(newData)
 
     /** Enemy killed in a fight */
     case KillInsect(_) =>

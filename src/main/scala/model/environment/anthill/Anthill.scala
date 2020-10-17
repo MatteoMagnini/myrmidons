@@ -1,4 +1,4 @@
-package model.anthill
+package model.environment.anthill
 
 import akka.actor.{Actor, ActorRef, Props}
 import model.Drawable
@@ -70,7 +70,8 @@ case class Anthill(info: AnthillInfo, environment: ActorRef) extends Actor {
       /** Returns ants and enemies references, creating ants from the center of boundary */
       val nForaging = (nAnts * foragingPercentage).ceil.toInt
       val foragingAnts = (0 until nForaging).map(i => {
-        i -> context.actorOf(ForagingAnt(ForagingAntInfo(self, id = i, position = info.position), sender), s"f-ant-$i")
+        i -> context.actorOf(ForagingAnt(ForagingAntInfo(
+          self, id = i, position = info.position), sender), s"f-ant-$i")
       }).toMap
       val nPatrolling = nForaging + (nAnts * (1 - foragingPercentage)).toInt
       val patrollingAnts = (nForaging until nPatrolling).map(i => {

@@ -9,12 +9,14 @@ import utility.geometry.{OrientedVector2D, OrientedVector2DWithNoise}
 import utility.RichActor._
 
 /**
- * Specific competences suitable only for foraging ants
+ * Specific competences suitable only for foraging ants.
  */
 trait PatrollingAntCompetences extends AntCompetences[PatrollingAntInfo]
 
 /**
  * Competence that enable a foraging ant to follow the traces of (danger) pheromones.
+ *
+ * @param behaviour of the ant
  */
 case class DangerPheromoneTaxis(behaviour: PatrollingAntInfo => Receive) extends PatrollingAntCompetences {
 
@@ -25,7 +27,7 @@ case class DangerPheromoneTaxis(behaviour: PatrollingAntInfo => Receive) extends
       .filter(p => p.position --> info.position < DANGER_PHEROMONE_RANGE)
       .weightedSum(info.position)
     val data = info.updateEnergy(ENERGY_DANGER_PHEROMONE_TAXIS)
-    val newDelta = OrientedVector2DWithNoise(delta./\, MAX_VELOCITY, NOISE) >> (data.inertia * 2)
+    val newDelta = OrientedVector2DWithNoise(delta./\, MAX_VELOCITY, NOISE) >> (data.inertia * INERTIA_FACTOR_IN_TAXIS)
     val newDelta2 = OrientedVector2D(newDelta./\, MAX_VELOCITY)
     environment.tell(Move(data.position, newDelta2), insect)
     context >>> behaviour(data.updateDangerPheromones(Seq.empty))
