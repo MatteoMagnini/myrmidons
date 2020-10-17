@@ -8,8 +8,8 @@ import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
 import model.insects.{Enemy, ForagingAnt, PatrollingAnt}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.Messages._
-import utility.geometry.{Vector2D, ZeroVector2D}
+import common.Messages._
+import common.geometry.{Vector2D, ZeroVector2D}
 
 class InsectCompetencesTest extends TestKit(ActorSystem("InsectCompetencesTest"))
 with AnyWordSpecLike
@@ -34,9 +34,9 @@ with BeforeAndAfterAll{
 
       "should move" in {
 
-        val randomWalkCompetence = RandomWalk[EnemyInfo]()
+        val randomWalkCompetence = RandomWalk[EnemyInfo](defaultBehaviour)
         assert(randomWalkCompetence.hasPriority(insectInfo))
-        randomWalkCompetence(context,senderRef,insect,insectInfo,defaultBehaviour)
+        randomWalkCompetence(context,senderRef,insect,insectInfo)
         sender.expectMsgType[Move]
         sender expectNoMessage
 
@@ -47,9 +47,9 @@ with BeforeAndAfterAll{
 
       "die" in {
 
-        val dieCompetence = Die[EnemyInfo]()
+        val dieCompetence = Die[EnemyInfo](defaultBehaviour)
         assert(dieCompetence.hasPriority(insectInfo))
-        dieCompetence(context,senderRef,insect,insectInfo,defaultBehaviour)
+        dieCompetence(context,senderRef,insect,insectInfo)
         sender.expectMsgType[KillInsect]
         sender expectNoMessage
 
@@ -69,9 +69,9 @@ with BeforeAndAfterAll{
 
       "grab it" in {
 
-        val pickFoodCompetence = PickFood()
+        val pickFoodCompetence = PickFood(defaultBehaviour)
         assert(pickFoodCompetence.hasPriority(foragingAntInfo))
-        pickFoodCompetence(context, senderRef, foragingAnt, foragingAntInfo, defaultBehaviour)
+        pickFoodCompetence(context, senderRef, foragingAnt, foragingAntInfo)
         sender.expectMsgType[TakeFood]
         sender expectNoMessage
 
@@ -82,9 +82,9 @@ with BeforeAndAfterAll{
       //Indirectly testing GoBackToHome because it is called in carryFoodCompetence apply.
       "carry to home" in {
 
-        val carryFoodCompetence = CarryFoodToHome()
+        val carryFoodCompetence = CarryFoodToHome(defaultBehaviour)
         assert(carryFoodCompetence.hasPriority(foragingAntInfo2))
-        carryFoodCompetence(context, senderRef, foragingAnt, foragingAntInfo2, defaultBehaviour)
+        carryFoodCompetence(context, senderRef, foragingAnt, foragingAntInfo2)
         sender.expectMsgType[AntTowardsAnthill]
         sender expectNoMessage
 
@@ -92,10 +92,10 @@ with BeforeAndAfterAll{
 
       "realising food pheromones" in {
 
-        val dropFoodPheromoneCompetence = DropFoodPheromone()
+        val dropFoodPheromoneCompetence = DropFoodPheromone(defaultBehaviour)
         //No assert on hasPriority because it is stochastic.
-        dropFoodPheromoneCompetence(context, senderRef, foragingAnt, foragingAntInfo2, defaultBehaviour)
-        sender.expectMsgType[AddFoodPheromone]
+        dropFoodPheromoneCompetence(context, senderRef, foragingAnt, foragingAntInfo2)
+        sender.expectMsgType[AddPheromone]
         sender.expectMsgType[UpdateInsect]
         sender expectNoMessage
 
@@ -104,9 +104,9 @@ with BeforeAndAfterAll{
       val foragingAntInfo3 = foragingAntInfo2.updateAnthillCondition(true)
       "store to anthill" in {
 
-        val storeFoodInAnthillCompetence = StoreFoodInAnthill()
+        val storeFoodInAnthillCompetence = StoreFoodInAnthill(defaultBehaviour)
         assert(storeFoodInAnthillCompetence.hasPriority(foragingAntInfo3))
-        storeFoodInAnthillCompetence(context, senderRef, foragingAnt, foragingAntInfo3, defaultBehaviour)
+        storeFoodInAnthillCompetence(context, senderRef, foragingAnt, foragingAntInfo3)
         sender.expectMsgType[StoreFood]
         sender.expectMsgType[UpdateInsect]
         sender expectNoMessage
@@ -120,9 +120,9 @@ with BeforeAndAfterAll{
       val foragingAntInfo2 = foragingAntInfo.updateEnergy(-80).updateAnthillCondition(true)
       "eat from the anthill" in {
 
-        val eatFromTheAnthillCompetence = EatFromTheAnthill[ForagingAntInfo]()
+        val eatFromTheAnthillCompetence = EatFromTheAnthill[ForagingAntInfo](defaultBehaviour)
         assert(eatFromTheAnthillCompetence.hasPriority(foragingAntInfo2))
-        eatFromTheAnthillCompetence(context,senderRef,foragingAnt,foragingAntInfo2,defaultBehaviour)
+        eatFromTheAnthillCompetence(context,senderRef,foragingAnt,foragingAntInfo2)
         sender.expectMsgType[EatFood]
         sender expectNoMessage
 
@@ -131,24 +131,24 @@ with BeforeAndAfterAll{
       val foragingAntInfo3 = foragingAntInfo2.updateEnergy(80)
       "exit from the anthill" in {
 
-        val goOutsideCompetence = GoOutside[ForagingAntInfo]()
-        assert(goOutsideCompetence.hasPriority(foragingAntInfo3))
-        goOutsideCompetence(context,senderRef,foragingAnt,foragingAntInfo3,defaultBehaviour)
+        //No assert on hasPriority because it is stochastic.
+        val goOutsideCompetence = GoOutside[ForagingAntInfo](defaultBehaviour)
+        goOutsideCompetence(context,senderRef,foragingAnt,foragingAntInfo3)
         sender.expectMsgType[Move]
         sender expectNoMessage
-
       }
 
       import model.environment.pheromones.FoodPheromoneInfo._
       val foodPheromone = FoodPheromone(Vector2D(4,6),x => x - DELTA,10)
-      val foragingAntInfo4 = foragingAntInfo3.updateFoodPheromones(Seq(foodPheromone))
+      val foragingAntInfo4 = foragingAntInfo3.updateFoodPheromones(Seq(foodPheromone)).updateAnthillCondition(false)
       "follow the food pheromones" in {
 
-        val foodPheromoneTaxisCompetence = FoodPheromoneTaxis()
+        val foodPheromoneTaxisCompetence = FoodPheromoneTaxis(defaultBehaviour)
         assert(foodPheromoneTaxisCompetence.hasPriority(foragingAntInfo4))
-        foodPheromoneTaxisCompetence(context,senderRef,foragingAnt,foragingAntInfo3,defaultBehaviour)
+        foodPheromoneTaxisCompetence(context,senderRef,foragingAnt,foragingAntInfo3)
         val result = sender.expectMsgType[Move]
-        assert((result.start >> result.delta) --> foodPheromone.position < foragingAntInfo4.position --> foodPheromone.position)
+        assert((result.start >> result.delta) --> foodPheromone.position <
+          foragingAntInfo4.position --> foodPheromone.position)
         sender expectNoMessage
       }
     }
@@ -169,11 +169,12 @@ with BeforeAndAfterAll{
       val patrollingAntInfo = PatrollingAntInfo(senderRef).updateDangerPheromones(Seq(dangerPheromone))
       "move towards them" in {
 
-        val dangerPheromoneTaxis = DangerPheromoneTaxis()
+        val dangerPheromoneTaxis = DangerPheromoneTaxis(defaultBehaviour)
         assert(dangerPheromoneTaxis.hasPriority(patrollingAntInfo))
-        dangerPheromoneTaxis(context,senderRef,patrollingAnt,patrollingAntInfo,defaultBehaviour)
+        dangerPheromoneTaxis(context,senderRef,patrollingAnt,patrollingAntInfo)
         val result = sender.expectMsgType[Move]
-        assert((result.start >> result.delta) --> dangerPheromone.position < patrollingAntInfo.position --> dangerPheromone.position)
+        assert((result.start >> result.delta) --> dangerPheromone.position <
+          patrollingAntInfo.position --> dangerPheromone.position)
         sender expectNoMessage
       }
     }

@@ -3,8 +3,22 @@ package model.insects.info
 import akka.actor.ActorRef
 import model.environment.pheromones.FoodPheromone
 import model.insects.Ants.ForagingAnt._
-import utility.geometry.{Vector2D, ZeroVector2D}
+import common.geometry.{Vector2D, ZeroVector2D}
 
+/**
+ * This class defines a foraging ant state.
+ *
+ * @param id the ant identifier
+ * @param position of the ant
+ * @param inertia of the ant
+ * @param energy of the ant
+ * @param time of simulation
+ * @param anthill reference
+ * @param isInsideTheAnthill condition
+ * @param foodAmount carried
+ * @param foodPosition perceived
+ * @param foodPheromones perceived
+ */
 case class ForagingAntInfo(override val id: Int,
                            override val position: Vector2D,
                            override val inertia: Vector2D,
@@ -45,7 +59,8 @@ case class ForagingAntInfo(override val id: Int,
     this.copy(foodAmount = STARTING_FOOD_AMOUNT)
 
   /**
-   * @param position optional new position, None if there is no food nearby, otherwise Some(p) where p is the food position
+   * @param position optional new position, None if there is no food nearby,
+   *                 otherwise Some(p) where p is the food position
    * @return a new ForagingAntInfo with the updated food position
    */
   def updateFoodPosition(position: Option[Vector2D]): ForagingAntInfo =
@@ -63,6 +78,8 @@ case class ForagingAntInfo(override val id: Int,
 }
 
 object ForagingAntInfo {
-  def apply( anthill: ActorRef, id: Int = 0, position: Vector2D = STARTING_POSITION, energy: Double = STARTING_ENERGY, time: Int = STARTING_TIME): ForagingAntInfo =
-    new ForagingAntInfo(id, position, ZeroVector2D(), energy, time, anthill, false, STARTING_FOOD_AMOUNT, None, Seq.empty)
+  def apply( anthill: ActorRef, id: Int = 0, position: Vector2D = STARTING_POSITION,
+             energy: Double = STARTING_ENERGY, time: Int = STARTING_TIME): ForagingAntInfo =
+    new ForagingAntInfo(id, position, ZeroVector2D(), energy, time, anthill,
+      isInsideTheAnthill =  false, STARTING_FOOD_AMOUNT, None, Seq.empty)
 }

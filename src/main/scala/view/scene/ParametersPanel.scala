@@ -1,74 +1,74 @@
 package view.scene
 
-import view.Myrmidons.frame.dispose
-import view._
+
+import view.frame.{SettingFrame, SimulationFrame}
 
 import scala.swing.event.ButtonClicked
-import scala.swing.{BorderPanel, Button, Dimension, GridPanel, Label, MainFrame, TextField}
+import scala.swing.{Button, GridPanel, Label, TextField}
 
-private[view] case class ParametersPanel() extends GridPanel(6, 2) {
-  private val antSize = new Label("Number of Ant (F+G)")
-  private val antSizeInput = new TextField()
-  private val anthillFood = new Label("Number of food in anthill")
-  private val anthillFoodInput = new TextField()
-  private val foodSize = new Label("Number of food")
-  private val foodSizeInput = new TextField()
-  private val obstacleSize = new Label("Number of obstacle")
-  private val obstacleSizeInput = new TextField()
-  private val enemiesSize = new Label("Number of enemies")
-  private val enemiesSizeInput = new TextField()
-  private val setButton = new Button("Set Simulation")
-  private val setDefaultButton = new Button("Set Default")
+trait ParametersPanel extends GridPanel {
+  def frame: SettingFrame
+}
 
-  contents ++= Seq(antSize, antSizeInput, anthillFood, anthillFoodInput, foodSize, foodSizeInput,
-    obstacleSize, obstacleSizeInput, enemiesSize, enemiesSizeInput, setDefaultButton, setButton)
+object ParametersPanel {
 
-  listenTo(setButton, setDefaultButton)
-  reactions += {
-    case ButtonClicked(component) if component == setButton =>
-      showSimulationWithParameters(antSizeInput,
-        anthillFoodInput, foodSizeInput,
-        obstacleSizeInput, enemiesSizeInput)
+  def apply(frame: SettingFrame): ParametersPanel = new ParametersPanelImpl(frame)
 
-    case ButtonClicked(component) if component == setDefaultButton =>
-      showSimulationWithParameters(120, 5000,
-        6, 5, 50)
-      //TODO Decidere default number
-  }
+  /**
+   * Panel to set simulation parameters.
+   *
+   * @param frame Frame where append this panel and dispose when parameters are set.
+   */
+  private[view] class ParametersPanelImpl(override val frame: SettingFrame)
+    extends GridPanel(PARAMETER_GRID._1, PARAMETER_GRID._2) with ParametersPanel {
 
-  private def showSimulationWithParameters(antSizeInput: Int,
-                                           anthillFoodInput: Int, foodSizeInput: Int,
-                                           obstacleSizeInput: Int, enemiesSizeInput: Int): Unit = {
-    dispose()
+    private val antSize = new Label("Number of Ant (F+P)")
+    private val antSizeInput = new TextField()
+    private val anthillFood = new Label("Number of food in anthill")
+    private val anthillFoodInput = new TextField()
+    private val foodSize = new Label("Number of food")
+    private val foodSizeInput = new TextField()
+    private val obstacleSize = new Label("Number of obstacle")
+    private val obstacleSizeInput = new TextField()
+    private val enemiesSize = new Label("Number of enemies")
+    private val enemiesSizeInput = new TextField()
+    private val setButton = new Button("Set Simulation")
+    private val setDefaultButton = new Button("Set Default")
 
-    val frame: MainFrame = new MainFrame {
+    contents ++= Seq(antSize, antSizeInput, anthillFood, anthillFoodInput, foodSize, foodSizeInput,
+      obstacleSize, obstacleSizeInput, enemiesSize, enemiesSizeInput, setDefaultButton, setButton)
 
-      title = "Myrmidons - Ant Simulator"
+    /**
+     * User can chose to set parameter with text field or select default parameter.
+     */
+    listenTo(setButton, setDefaultButton)
+    reactions += {
+      case ButtonClicked(`setButton`) =>
+        showSimulationWithParameters(antSizeInput,
+          anthillFoodInput, foodSizeInput,
+          obstacleSizeInput, enemiesSizeInput)
 
-      val myrmidonsPanel: MyrmidonsPanel = MyrmidonsPanel()
-      val controlPane: ControlPane = ControlPane(myrmidonsPanel)
-      controlPane.setParameters(
-        antSizeInput,
-        anthillFoodInput, foodSizeInput,
-        obstacleSizeInput, enemiesSizeInput)
-
-      val labelPane: LabelPane = LabelPane()
-
-      contents = new BorderPanel {
-        layout += controlPane -> BorderPanel.Position.North
-        layout += myrmidonsPanel -> BorderPanel.Position.Center
-        layout += labelPane -> BorderPanel.Position.South
-      }
-      size = new Dimension(SIMULATION_SIZE._1, SIMULATION_SIZE._2)
-      resizable = false
+      case ButtonClicked(`setDefaultButton`) =>
+        showSimulationWithParameters(DEFAULT_ANT_SIZE, DEFAULT_ANTHILL_FOOD,
+          DEFAULT_FOOD_SIZE, DEFAULT_OBSTACLE_SIZE, DEFAULT_ENEMIES_SIZE)
     }
-    frame.visible = true
+
+    /**
+     * Show new SimulationFrame with parameters.
+     *
+     * @param antSizeInput      how many ant in simulation.
+     * @param anthillFoodInput  how many anthill food  in simulation.
+     * @param foodSizeInput     how many food number in simulation.
+     * @param obstacleSizeInput how many obstacle number in simulation.
+     * @param enemiesSizeInput  how many enemies number in simulation.
+     */
+    private def showSimulationWithParameters(antSizeInput: Int, anthillFoodInput: Int, foodSizeInput: Int,
+                                             obstacleSizeInput: Int, enemiesSizeInput: Int): Unit = {
+      frame.dispose()
+      val simulationFrame = SimulationFrame(antSizeInput, anthillFoodInput, foodSizeInput,
+        obstacleSizeInput, enemiesSizeInput)
+      simulationFrame.visible = true
+    }
   }
 
-  private implicit def numberFrom(component: TextField): Int = {
-    if (component.text == "") {
-      component.text = "MIN_COMPONENT"
-    }
-    component.text.toInt
-  }
 }

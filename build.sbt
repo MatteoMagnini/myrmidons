@@ -13,7 +13,8 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-testkit" % AkkaVersion % Test,
   "org.scala-lang.modules" %% "scala-swing" % "2.1.1",
   "org.jfree" % "jfreechart" % "1.0.14",
-  "it.unibo.alice.tuprolog" % "tuprolog" % "3.3.0"
+  "it.unibo.alice.tuprolog" % "tuprolog" % "3.3.0",
+  "com.google.code.gson" % "gson" % "2.2.4"
 )
 useCoursier := false
 coverageEnabled := true

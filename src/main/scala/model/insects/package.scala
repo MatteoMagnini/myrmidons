@@ -1,7 +1,6 @@
 package model
 
-import utility.geometry.{Vector2D, ZeroVector2D}
-
+import common.geometry.{Vector2D, ZeroVector2D}
 import scala.util.Random
 
 package object insects {
@@ -22,7 +21,7 @@ package object insects {
 
     object PatrollingAnt {
       val MAX_ENERGY = 150.0
-      val DANGER_PHEROMONE_RANGE = 20.0
+      val DANGER_PHEROMONE_RANGE = 10.0
       val FOOD_ENERGY_CONVERSION = 10.0
       val STARTING_ENERGY = 150.0
       val STARTING_TIME = 0

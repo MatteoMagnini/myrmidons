@@ -1,9 +1,22 @@
 package model.insects.info
+
 import akka.actor.ActorRef
 import model.environment.pheromones.DangerPheromone
 import model.insects.Ants.PatrollingAnt._
-import utility.geometry.{Vector2D, ZeroVector2D}
+import common.geometry.{Vector2D, ZeroVector2D}
 
+/**
+ * This class defines a patrolling ant state.
+ *
+ * @param id the ant identifier
+ * @param position of the ant
+ * @param inertia of the ant
+ * @param energy of the ant
+ * @param time of simulation
+ * @param anthill reference
+ * @param isInsideTheAnthill condition
+ * @param dangerPheromones perceived
+ */
 case class PatrollingAntInfo(override val id: Int,
                         override val position: Vector2D,
                         override val inertia: Vector2D,
@@ -56,6 +69,7 @@ case class PatrollingAntInfo(override val id: Int,
 }
 
 object PatrollingAntInfo {
-  def apply( anthill: ActorRef, id: Int = 0, position: Vector2D = STARTING_POSITION, energy: Double = STARTING_ENERGY, time: Int = STARTING_TIME): PatrollingAntInfo =
+  def apply( anthill: ActorRef, id: Int = 0, position: Vector2D = STARTING_POSITION,
+             energy: Double = STARTING_ENERGY, time: Int = STARTING_TIME): PatrollingAntInfo =
     PatrollingAntInfo(id, position, ZeroVector2D(), energy, time, anthill, isInsideTheAnthill = false, Seq.empty)
 }

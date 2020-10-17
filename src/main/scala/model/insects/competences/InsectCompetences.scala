@@ -3,11 +3,10 @@ package model.insects.competences
 import akka.actor.Actor.Receive
 import akka.actor.{ActorContext, ActorRef}
 import model.insects.info.SpecificInsectInfo
-import utility.Messages._
-import utility.geometry.Vectors._
-import utility.geometry._
-import utility.RichActor._
-
+import common.Messages._
+import common.geometry.Vectors._
+import common.geometry._
+import common.RichActor._
 
 /**
  * A competence is the minimal building block to achieve a more complex behaviour.
@@ -18,14 +17,18 @@ import utility.RichActor._
 trait InsectCompetences[A <: SpecificInsectInfo[A]] {
 
   /**
+   * @return behaviour of the insect
+   */
+  def behaviour: A => Receive
+
+  /**
    * Execute the competence.
    * @param context of the insect actor
    * @param environment of the simulation
    * @param insect that perform the competence
    * @param info the state of the insect
-   * @param behaviour of the insect
    */
-  def apply(context: ActorContext, environment: ActorRef, insect: ActorRef, info: A, behaviour: A => Receive): Unit
+  def apply(context: ActorContext, environment: ActorRef, insect: ActorRef, info: A): Unit
 
   /**
    * Check if this competence may be executed.
@@ -39,13 +42,17 @@ trait InsectCompetences[A <: SpecificInsectInfo[A]] {
 
 /**
  * Competence performing a random walk.
+ *
+ * @param behaviour of the insect
+ * @tparam A the type of the insect
  */
-case class RandomWalk[A <: SpecificInsectInfo[A]]() extends InsectCompetences[A] {
+case class RandomWalk[A <: SpecificInsectInfo[A]](behaviour: A => Receive) extends InsectCompetences[A] {
 
-  override def apply(context: ActorContext, environment: ActorRef, insect: ActorRef, info: A, behaviour: A => Receive): Unit = {
+  override def apply(context: ActorContext, environment: ActorRef, insect: ActorRef, info: A): Unit = {
     val data = info.updateEnergy(ENERGY_RANDOM_WALK)
     val delta: Vector2D = RandomVector2DInCircle(MIN_VELOCITY, MAX_VELOCITY)
-    val deltaWithInertia = OrientedVector2D((delta >> (info.inertia * INERTIA_FACTOR))./\, doubleInRange(MIN_VELOCITY, MAX_VELOCITY))
+    val deltaWithInertia = OrientedVector2D((delta >> (info.inertia * INERTIA_FACTOR))./\,
+      doubleInRange(MIN_VELOCITY, MAX_VELOCITY))
     environment.tell(Move(data.position, deltaWithInertia), insect)
     context >>> behaviour(data)
   }
@@ -55,10 +62,13 @@ case class RandomWalk[A <: SpecificInsectInfo[A]]() extends InsectCompetences[A]
 
 /**
  * When energy is 0 the insect dies. Must be the first competence for every insects.
+ *
+ * @param behaviour of the insect
+ * @tparam A the type of the insect
  */
-case class Die[A <: SpecificInsectInfo[A]]() extends InsectCompetences[A] {
+case class Die[A <: SpecificInsectInfo[A]](behaviour: A => Receive) extends InsectCompetences[A] {
 
-  override def apply(context: ActorContext, environment: ActorRef, insect: ActorRef, info: A, behaviour: A => Receive): Unit =
+  override def apply(context: ActorContext, environment: ActorRef, insect: ActorRef, info: A): Unit =
     environment.tell(KillInsect(info), insect)
 
   override def hasPriority(info: A): Boolean = info.energy <= 0
