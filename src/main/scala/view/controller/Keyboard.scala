@@ -32,31 +32,52 @@ class Keyboard(panel: MyrmidonsPanelImpl) extends KeyListener{
         panel.drawEntities()
 
       case UP =>
+        up
       case W =>
-        panel.goNorth()
-        panel.drawEntities()
+        up
 
       case LEFT =>
+        left
       case A =>
-        panel.goEast()
-        panel.drawEntities()
+        left
 
       case DOWN =>
+        down
       case S =>
-        panel.goSouth()
-        panel.drawEntities()
+        down
 
       case RIGHT =>
+        right
       case D =>
-        panel.goWest()
-        panel.drawEntities()
+        right
 
       case _ =>
 
     }
+
   }
 
   override def keyReleased(keyEvent: KeyEvent): Unit = {
 
+  }
+
+  private def up: Unit = {
+    panel.goNorth()
+    panel.drawEntities()
+  }
+
+  private def left: Unit = {
+    panel.goEast()
+    panel.drawEntities()
+  }
+
+  private def down: Unit = {
+    panel.goSouth()
+    panel.drawEntities()
+  }
+
+  private def right: Unit = {
+    panel.goWest()
+    panel.drawEntities()
   }
 }
