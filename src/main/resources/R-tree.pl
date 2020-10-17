@@ -170,6 +170,11 @@ removeWithFix(Node, ITree, OTree) :- remove(Node, ITree, TTree), fixTree(TTree, 
 % query(+Tree, +RangeX, +RangeY, -Tree) --> returns minimal sub-tree of values inside ranges
 % Iterate in branches as long as nodes contain input ranges
 
+query(tree(L,V,R),RangeXI,RangeYI, tree(L,V,R)) :- 
+				nodeIntersects(V,RangeXI,RangeYI),
+				takeRoot(L,V1), nodeIntersects(V1,RangeXI,RangeYI),
+				takeRoot(R,V2), nodeIntersects(V2,RangeXI,RangeYI), !.
+
 query(tree(L,V,R),RangeXI,RangeYI, OTree) :- 
 				nodeIntersects(V,RangeXI,RangeYI),
 				takeRoot(L,V1), nodeIntersects(V1,RangeXI,RangeYI),

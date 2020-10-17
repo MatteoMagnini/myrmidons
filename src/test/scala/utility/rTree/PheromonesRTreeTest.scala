@@ -47,11 +47,10 @@ class PheromonesRTreeTest extends AnyWordSpecLike with Matchers with BeforeAndAf
       val queryResult = engine.query(searchedRange, twoLeavesTree)
 
       "return correct number of ids" in {
-        assert(queryResult.size == 2)
+        assert(queryResult.size == 1)
       }
       "return correct pheromones ids" in {
         assert(queryResult.contains(id1))
-        assert(queryResult.contains(id2))
       }
     }
 
