@@ -4,11 +4,13 @@ import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import utility.geometry.{Vector2D, ZeroVector2D}
-import utility.rTree.RTree.{Node, Tree}
+import utility.rTree.RTree.{MyRange, Node, Tree}
 
 class RTreeTest extends AnyWordSpecLike with Matchers with BeforeAndAfterAll {
 
   val engine = RTreeProlog()
+  def mergedRanges(r1: MyRange, r2: MyRange): MyRange =
+    (if (r1._1 <= r2._1) r1._1 else r2._1, if (r1._2 >= r2._2) r1._2 else r2._2)
 
   "An empty R-Tree" when {
     val tree = Tree()
@@ -61,9 +63,8 @@ class RTreeTest extends AnyWordSpecLike with Matchers with BeforeAndAfterAll {
         assert(result2.contains(addedNode))
       }
       "have as root merged ranges" in {
-        val mergedRange = ((1, 3), (1, 3))
-        assert(result.root.get.rangeX == mergedRange._1)
-        assert(result.root.get.rangeY == mergedRange._2)
+        assert(result.root.get.rangeX == mergedRanges(node.rangeX, addedNode.rangeX))
+        assert(result.root.get.rangeY == mergedRanges(node.rangeY, addedNode.rangeY))
       }
     }
     "removing node" should {
@@ -93,6 +94,54 @@ class RTreeTest extends AnyWordSpecLike with Matchers with BeforeAndAfterAll {
       "give node as result" in {
         assert(result.isEmpty)
       }
+    }
+  }
+
+  "A general R-tree" when {
+    var tree = Tree()
+    val node1 = Node(1, (1,2), (3,4))
+    val node2 = Node(2, (12,13), (15,16))
+    val node3 = Node(3, (23,24), (21,22))
+    val nodes = Seq(node1, node2, node3)
+    tree = engine.insertNode(node1, tree)
+    tree = engine.insertNode(node2, tree)
+    tree = engine.insertNode(node3, tree)
+
+    "adding a node" should {
+      val addedNode = Node(4, (5,6), (7,8))
+      val result = engine.insertNode(addedNode, tree)
+      val leaves = engine.getLeaves(result)
+
+      "contain correct number of nodes" in {
+        assert(leaves.size == nodes.size + 1)
+      }
+      "contain all nodes" in {
+        leaves.contains(addedNode)
+        nodes.foreach(x => assert(leaves.contains(x)))
+      }
+      "have in root bigger range" in {
+        assert(result.root.get.rangeX == mergedRanges(tree.root.get.rangeX, addedNode.rangeX))
+        assert(result.root.get.rangeY == mergedRanges(tree.root.get.rangeY, addedNode.rangeY))
+      }
+    }
+    "removing a node" should {
+      val result = engine.removeNode(node1, tree)
+      println(result)
+      val leaves = engine.getLeaves(result)
+
+      "contain correct number of nodes" in {
+        assert(leaves.size == nodes.size - 1)
+      }
+      "not contain removed node" in {
+        assert(!leaves.contains(node1))
+      }
+      "have in root fixed ranges" in {
+        assert(result.root.get.rangeX == mergedRanges(node2.rangeX, node3.rangeX))
+        assert(result.root.get.rangeY == mergedRanges(node2.rangeY, node3.rangeY))
+      }
+    }
+    "queried" should {
+      val queryPosition = (2,3)
     }
   }
 

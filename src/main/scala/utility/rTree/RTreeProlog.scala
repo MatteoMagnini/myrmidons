@@ -23,7 +23,9 @@ class RTreeProlog(val engine: Prolog) {
   def removeNode(node: Node, tree: Tree): Tree = {
     val variable = Variable()
     val goal = new Struct(remove, node, tree, variable)
+    println("GOAL: " + goal)
     val result = engine.solve(goal).getTerm(variable.getName)
+    println("RESULT: " + result)
     result getAsTree
   }
 
@@ -31,7 +33,6 @@ class RTreeProlog(val engine: Prolog) {
     val variable = Variable()
     val ranges: (MyRange, MyRange) = position.rangeOfInfluence(INFLUENCE_RADIUS)
     val goal = new Struct(query, tree, ranges._1, ranges._2, variable)
-    println(goal)
     try {
       engine.solve(goal).getTerm(variable.getName).getAsList.map(_.getAsNode).map(_.id.get)
     } catch {
@@ -42,6 +43,7 @@ class RTreeProlog(val engine: Prolog) {
   def getLeaves(tree: Tree): Seq[Node] = {
     val variable = Variable()
     val goal = new Struct(getLeavesList, getTreeAsTerm(tree), variable)
+    println(goal)
     val result = engine.solve(goal).getTerm(variable.getName).getAsList
     result.map(_.getAsNode)
   }
