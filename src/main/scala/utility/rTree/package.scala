@@ -36,7 +36,6 @@ package object rTree {
     def getAsTree: Tree = term match {
       case x if x.isCompound =>
         val struct = x.getTerm.asInstanceOf[Struct]
-        println(struct)
         val root = struct.getArg(1).getAsNode
         Tree(struct.getArg(0) getAsTree, root, struct.getArg(2) getAsTree)
       case _ => Tree()

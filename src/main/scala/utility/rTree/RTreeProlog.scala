@@ -23,9 +23,7 @@ class RTreeProlog(val engine: Prolog) {
   def removeNode(node: Node, tree: Tree): Tree = {
     val variable = Variable()
     val goal = new Struct(remove, node, tree, variable)
-    println("GOAL: " + goal)
     val result = engine.solve(goal).getTerm(variable.getName)
-    println("RESULT: " + result)
     result getAsTree
   }
 
@@ -43,7 +41,6 @@ class RTreeProlog(val engine: Prolog) {
   def getLeaves(tree: Tree): Seq[Node] = {
     val variable = Variable()
     val goal = new Struct(getLeavesList, getTreeAsTerm(tree), variable)
-    println(goal)
     val result = engine.solve(goal).getTerm(variable.getName).getAsList
     result.map(_.getAsNode)
   }
