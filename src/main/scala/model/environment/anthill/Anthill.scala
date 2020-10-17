@@ -9,7 +9,6 @@ import common.Messages._
 import common.geometry.Vectors.doubleInRange
 import common.geometry._
 
-
 case class AnthillInfo(override val position: Vector2D,
                        radius: Double,
                        foodAmount: Double,

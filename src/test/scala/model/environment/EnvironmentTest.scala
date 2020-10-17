@@ -39,7 +39,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
     case _ => false
   }
 
-  "Environment without obstacles" when {
+ /* "Environment without obstacles" when {
     val sender = TestProbe()
     implicit val senderRef: ActorRef = sender.ref
 
@@ -120,7 +120,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
     val sender = TestProbe()
     implicit val senderRef: ActorRef = sender.ref
 
-    val nAnts = 10
+    val nAnts = 100
     val environment = system.actorOf(Environment(EnvironmentInfo(boundary)), name = "env-actor-3")
 
     "spawn ants and make them move" should {
@@ -161,22 +161,22 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
       }
     }
   }
-
-  "Environment" when {
+*/
+   "Environment" when {
     val sender = TestProbe()
     implicit val senderRef: ActorRef = sender.ref
 
-    val nAnts = 10
-    val nEnemies = 10
+    val nAnts = 50
+    val nEnemies = 50
     val environment = system.actorOf(Environment(EnvironmentInfo(boundary)), name = "env-actor-5")
 
     "spawn ants and enemies" should {
       environment ! StartSimulation(nAnts, nEnemies)
       sender expectMsg Ready
       environment ! Clock(1)
+      val result = sender.expectMsgType[Repaint]
 
       "receive all their initial positions" in {
-        val result = sender.expectMsgType[Repaint]
         val positionsCount = result.info count insectsFilter
         assert(positionsCount >= nAnts + nEnemies)
       }
@@ -185,12 +185,10 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
       environment ! Clock(2)
       var positions: Seq[Vector2D] = Seq.empty
 
-      "receive all their new positions" in {
+      "receive their new positions" in {
+        /* We cannot assume nothing about number of positions received because of fights between insects */
         val result = sender.expectMsgType[Repaint]
         positions = (result.info filter insectsFilter).map(_.position)
-        assert(positions.size >= nAnts + nEnemies)
-      }
-      "receive no more messages" in {
         sender.expectNoMessage()
       }
       "check that no insect went outside boundary" in {

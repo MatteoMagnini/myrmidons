@@ -1,20 +1,19 @@
 package model.environment
 
 import akka.actor.{Actor, ActorLogging, Props}
-import Fights.Fight
-import model.environment.anthill.{Anthill, AnthillInfo}
-import model.environment.elements.EnvironmentElements._
-import model.environment.elements.{Food, Obstacle}
-import model.environment.data.{EnvironmentInfo, InsectReferences}
-import model.environment.pheromones.Pheromone
-import model.insects.Ants.ForagingAnt._
-import model.insects._
-import model.insects.info.{SpecificInsectInfo, _}
 import common.Messages._
 import common.PheromoneMap._
 import common.RichActor._
 import common.geometry.{RandomVector2DInSquare, Vector2D, ZeroVector2D}
+import model.environment.anthill.{Anthill, AnthillInfo}
+import model.environment.data.{EnvironmentInfo, InsectReferences}
+import model.environment.elements.EnvironmentElements._
+import model.environment.elements.{Food, Obstacle}
+import model.environment.pheromones.Pheromone
 import model.environment.utility.{CollisionsInterceptor, FightsChecker}
+import model.insects.Ants.ForagingAnt._
+import model.insects._
+import model.insects.info.{SpecificInsectInfo, _}
 
 import scala.util.Random
 
@@ -77,7 +76,6 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
         i -> context.actorOf(Enemy(EnemyInfo(id = i, position = randomPosition), self), s"enemy-$i")
       }).toMap
 
-
       context >>> initializationBehaviour(EnvironmentInfo(Some(sender), state.boundary,
         obstacles, foods, anthill, Some(anthillInfo)).addEnemies(enemies))
 
@@ -85,7 +83,6 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       state.gui.get ! Ready
       context >>> defaultBehaviour(state.addAnts(ants))
   }
-
 
   private def defaultBehaviour(state: EnvironmentInfo): Receive = {
 
@@ -97,13 +94,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       state.anthill.get ! Clock(value)
       val newData = checkFoodSpawn(state).updatePheromones(state.pheromones.tick())
       //val newData = state.updatePheromones(state.pheromones.tick())
-      context >>> receiveUpdatesBehaviour(newData)
-
-    case AddPheromone(pheromone: Pheromone, threshold: Double) =>
-      context >>> defaultBehaviour(state.addPheromone(pheromone, threshold))
-  }
-
-  private def receiveUpdatesBehaviour(state: EnvironmentInfo): Receive = {
+      context >>> defaultBehaviour(newData)
 
     case Move(position: Vector2D, delta: Vector2D) =>
       CollisionsInterceptor.checkCollisions(sender, state, position, delta)
@@ -114,7 +105,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
         sender ! TakeFood(delta, position)
         val foo = food.head
         val upFoo = foo - delta
-        context >>> receiveUpdatesBehaviour(state.updateFood(foo, upFoo))
+        context >>> defaultBehaviour(state.updateFood(foo, upFoo))
       } else {
         sender ! TakeFood(0, position)
       }
@@ -125,18 +116,18 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
         && (newState.enemiesInfo.size == newState.enemies.size)) {
         sendInfoToGUI(newState)
       } else {
-        context >>> receiveUpdatesBehaviour(newState)
+        context >>> defaultBehaviour(newState)
       }
 
     case UpdateAnthill(anthillInfo: AnthillInfo) =>
-      context >>> receiveUpdatesBehaviour(state.updateAnthillInfo(Some(anthillInfo)))
+      context >>> defaultBehaviour(state.updateAnthillInfo(Some(anthillInfo)))
 
-    case AntBirth(clock: Int) => context >>> receiveUpdatesBehaviour(createNewAnt(clock, state, 0.2f))
+    case AntBirth(clock: Int) => context >>> defaultBehaviour(createNewAnt(clock, state, 0.2f))
 
     case KillInsect(info: InsectInfo) => killInsect(info, state)
 
     case AddPheromone(pheromone: Pheromone, threshold: Double) =>
-      context >>> receiveUpdatesBehaviour(state.addPheromone(pheromone, threshold))
+      context >>> defaultBehaviour(state.addPheromone(pheromone, threshold))
   }
 
   private def checkFoodSpawn(state: EnvironmentInfo): EnvironmentInfo = {
@@ -192,7 +183,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       && (newState.enemiesInfo.size == newState.enemies.size)) {
       sendInfoToGUI(newState)
     } else {
-      context >>> receiveUpdatesBehaviour(newState)
+      context >>> defaultBehaviour(newState)
     }
   }
 
@@ -207,10 +198,6 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     val pheromones: Seq[Pheromone] = info.pheromones
     info.gui.get ! Repaint(info.anthillInfo.get +: (insect ++ obstacles ++ pheromones ++ fightsChecker.fights).toSeq)
     context >>> defaultBehaviour(info.emptyInsectInfo())
-  }
-
-  private implicit def mapToSeqPheromone(map: Map[Int, Pheromone]): Seq[Pheromone] = {
-    map.values.toSeq
   }
 }
 
