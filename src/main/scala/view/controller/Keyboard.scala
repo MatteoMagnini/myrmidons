@@ -8,46 +8,26 @@ class Keyboard(panel: MyrmidonsPanelImpl) extends KeyListener{
 
   private val PLUS = KeyEvent.VK_ADD
   private val MINUS = KeyEvent.VK_SUBTRACT
-  private val W = KeyEvent.VK_W
-  private val A = KeyEvent.VK_A
-  private val S = KeyEvent.VK_S
-  private val D = KeyEvent.VK_D
   private val UP = KeyEvent.VK_UP
   private val DOWN = KeyEvent.VK_DOWN
   private val RIGHT = KeyEvent.VK_RIGHT
   private val LEFT = KeyEvent.VK_LEFT
 
-  override def keyTyped(keyEvent: KeyEvent): Unit = {
-
-  }
 
   override def keyPressed(keyEvent: KeyEvent): Unit = {
     keyEvent.getKeyCode match {
       case PLUS =>
         panel.zoomIn()
-
       case MINUS =>
         panel.zoomOut()
-
       case UP =>
-        up
-      case W =>
-        up
-
+        panel.goNorth()
       case LEFT =>
-        left
-      case A =>
-        left
-
+        panel.goEast()
       case DOWN =>
-        down
-      case S =>
-        down
-
+        panel.goSouth()
       case RIGHT =>
-        right
-      case D =>
-        right
+        panel.goWest()
 
       case _ =>
 
@@ -59,19 +39,7 @@ class Keyboard(panel: MyrmidonsPanelImpl) extends KeyListener{
 
   }
 
-  private def up: Unit = {
-    panel.goNorth()
-  }
+  override def keyTyped(keyEvent: KeyEvent): Unit = {
 
-  private def left: Unit = {
-    panel.goEast()
-  }
-
-  private def down: Unit = {
-    panel.goSouth()
-  }
-
-  private def right: Unit = {
-    panel.goWest()
   }
 }

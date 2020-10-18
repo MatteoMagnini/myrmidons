@@ -48,7 +48,7 @@ object ControlPanel {
     extends GridPanel(2, 2) with ControlPanel {
 
     private val system = ActorSystem("Myrmidons-system")
-    private val boundary = Boundary(-CENTER._1, CENTER._2, SIMULATION_BOUNDARY.width, SIMULATION_BOUNDARY.height)
+    private val boundary = Boundary(-CENTER._1, CENTER._2, SIMULATION_BOUNDARY._1, SIMULATION_BOUNDARY._2)
     private val stepLabel = new Label("Step:")
     private val populationLabel = new Label("Ants number:")
     private val anthillFoodAmountLabel = new Label("Anthill Food:")

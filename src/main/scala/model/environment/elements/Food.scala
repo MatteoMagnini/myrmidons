@@ -48,6 +48,7 @@ object Food {
                          quantity: Int = FOOD_MIN_QUANTITY)
     : Food = {
       val pos = RandomVector2DInCircle(minRadius, maxRadius, position)
+      println("pos : " + pos)
       Food(Vector2D(pos.x, pos.y), quantity, Obstacle(pos, radius(quantity), FOOD_VERTEX))
     }
 

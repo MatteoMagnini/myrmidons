@@ -47,6 +47,7 @@ object MyrmidonsPanel {
     private var slackX = 0
     private var slackY = 0
 
+
     /**
      * Paint entities of the graphics.
      *
@@ -90,7 +91,6 @@ object MyrmidonsPanel {
     }
 
     def setEntities(info: Seq[Drawable]): (Int, Int) = {
-
       /**
        * For each drawable entity it checks if it has changed since the previous interaction.
        * If not, it does not recreate an object in infoEntities.

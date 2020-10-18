@@ -17,7 +17,7 @@ package object pheromones {
     val DELTA: Double = 4.0
     val DANGER_PHEROMONE_MERGING_THRESHOLD: Double = 3.0
     val STARTING_INTENSITY: Double = 100.0
-    val MAX_INTENSITY: Double = 3000.0
+    val MAX_INTENSITY: Double = 1000.0
     val INTENSITY_FACTOR: Double = 5.0
   }
 }

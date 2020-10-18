@@ -37,7 +37,7 @@ object EnvironmentElements {
   implicit object BoundaryHasInside extends EnvironmentElement[Boundary] {
     override def hasInside(element: Boundary, position: Vector2D): Boolean =
       (position.x >= element.topLeft.x) && (position.x <= element.topRight.x) &&
-        (position.y >= element.topLeft.y) && (position.y <= element.bottomLeft.y)
+        (position.y >= element.bottomLeft.y) && (position.y <= element.topLeft.y )
   }
 
   /**How to check positions in [[model.environment.elements.Food]] */
