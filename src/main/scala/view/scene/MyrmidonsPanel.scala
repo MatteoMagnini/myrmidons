@@ -7,7 +7,7 @@ import model.environment.pheromones.Pheromone
 import model.environment.anthill.AnthillInfo
 import model.environment.elements.Obstacle
 import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo, PatrollingAntInfo}
-import view.controller.{Keyboard, Mouse}
+import view.controller.{Keyboard, Mouse, MouseWheel}
 import view.drawLogic._
 
 import scala.swing.{Graphics2D, Panel}
@@ -79,6 +79,7 @@ object MyrmidonsPanel {
 
     this.peer.addKeyListener(new Keyboard(this))
     this.peer.addMouseListener(new Mouse(this))
+    this.peer.addMouseWheelListener(new MouseWheel(this))
 
     def drawEntities(): Unit = {
       repaint()
