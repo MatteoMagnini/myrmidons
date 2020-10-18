@@ -52,7 +52,7 @@ object SimulationFrame {
       layout += myrmidonsPanel -> BorderPanel.Position.Center
       layout += labelPane -> BorderPanel.Position.South
     }
-    size = new Dimension(SIMULATION_SIZE._1, SIMULATION_SIZE._2)
+    size = new Dimension(SIMULATION_SIZE.width, SIMULATION_SIZE.height)
     resizable = false
   }
 
