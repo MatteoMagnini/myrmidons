@@ -50,7 +50,7 @@ trait EnvironmentInfo {
   def pheromones: Map[Int, Pheromone]
 
   /** RTree for pheromones */
-  def tree: Tree
+  def tree: Tree[Int]
 
   /** Prolog engine */
   def engine: RTreeProlog
@@ -124,7 +124,7 @@ object EnvironmentInfo {
                                            override val anthill: Option[ActorRef],
                                            override val anthillInfo: Option[AnthillInfo],
                                            override val pheromones: Map[Int,Pheromone],
-                                           override val tree: Tree,
+                                           override val tree: Tree[Int],
                                            override val engine: RTreeProlog)
     extends EnvironmentInfo {
 

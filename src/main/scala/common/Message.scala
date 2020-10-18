@@ -42,7 +42,7 @@ object Messages {
    */
   case class Move(start: Vector2D, delta: Vector2D) extends Message
 
-  case class Pheromones(pheromones: Map[Int,Pheromone], tree: Tree) extends Message
+  case class Pheromones(pheromones: Map[Int,Pheromone], tree: Tree[Int]) extends Message
 
   case class AddPheromone(foodPheromone: Pheromone, threshold: Double) extends Message
 

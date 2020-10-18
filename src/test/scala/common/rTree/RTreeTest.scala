@@ -13,7 +13,7 @@ class RTreeTest extends AnyWordSpecLike with Matchers with BeforeAndAfterAll {
     (if (r1._1 <= r2._1) r1._1 else r2._1, if (r1._2 >= r2._2) r1._2 else r2._2)
 
   "An empty R-Tree" when {
-    val tree = Tree()
+    val tree: Tree[Int] = Tree()
     val node = Node(1, (0, 0), (0, 0))
 
     "adding a node" should {
@@ -48,7 +48,7 @@ class RTreeTest extends AnyWordSpecLike with Matchers with BeforeAndAfterAll {
   "A one-value tree" when {
     val node = Node(1, (0, 1), (0, 1))
     val otherNode = Node(2, (2, 3), (2, 3))
-    val tree = Tree(Tree(), node, Tree())
+    val tree: Tree[Int] = Tree(Tree(), node, Tree())
 
     "adding a node" should {
       val addedNode = Node(2, (2, 3), (2, 3))
@@ -98,7 +98,7 @@ class RTreeTest extends AnyWordSpecLike with Matchers with BeforeAndAfterAll {
   }
 
   "A general R-tree" when {
-    var tree = Tree()
+    var tree: Tree[Int] = Tree()
     val node1 = Node(1, (1,2), (3,4))
     val node2 = Node(2, (12,13), (15,16))
     val node3 = Node(3, (23,24), (21,22))

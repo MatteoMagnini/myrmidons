@@ -13,21 +13,21 @@ class RTreeProlog(val engine: Prolog) {
   private val getLeavesList = "getLeavesList"
   private val query = "queryToList"
 
-  def insertNode(node: Node, tree: Tree): Tree = {
+  def insertNode(node: Node[Int], tree: Tree[Int]): Tree[Int] = {
     val variable = Variable()
     val goal = new Struct(insert, node, tree, variable)
     val result = engine.solve(goal).getTerm(variable.getName)
     result getAsTree
   }
 
-  def removeNode(node: Node, tree: Tree): Tree = {
+  def removeNode(node: Node[Int], tree: Tree[Int]): Tree[Int] = {
     val variable = Variable()
     val goal = new Struct(remove, node, tree, variable)
     val result = engine.solve(goal).getTerm(variable.getName)
     result getAsTree
   }
 
-  def query(position: Vector2D, tree: Tree): List[Int] = {
+  def query(position: Vector2D, tree: Tree[Int]): List[Int] = {
     val variable = Variable()
     val ranges: (MyRange, MyRange) = position.rangeOfInfluence(INFLUENCE_RADIUS)
     val goal = new Struct(query, tree, ranges._1, ranges._2, variable)
@@ -38,7 +38,7 @@ class RTreeProlog(val engine: Prolog) {
     }
   }
 
-  def getLeaves(tree: Tree): Seq[Node] = {
+  def getLeaves(tree: Tree[Int]): Seq[Node[Int]] = {
     val variable = Variable()
     val goal = new Struct(getLeavesList, getTreeAsTerm(tree), variable)
     val result = engine.solve(goal).getTerm(variable.getName).getAsList

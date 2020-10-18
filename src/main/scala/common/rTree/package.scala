@@ -30,7 +30,7 @@ package object rTree {
       }
 
     /** Conversion from term to [[Node]] */
-    def getAsNode: Node = {
+    def getAsNode: Node[Int] = {
       val struct = term.getTerm.asInstanceOf[Struct]
       Node(struct.getArg(0).getAsInt, struct.getArg(1) getAsRange, struct.getArg(2) getAsRange)
     }
@@ -42,7 +42,7 @@ package object rTree {
     }
 
     /** Conversion from term to [[Tree]] */
-    def getAsTree: Tree = term match {
+    def getAsTree: Tree[Int] = term match {
       case x if x.isCompound =>
         val struct = x.getTerm.asInstanceOf[Struct]
         val root = struct.getArg(1).getAsNode
@@ -60,7 +60,7 @@ package object rTree {
   }
 
   /** Conversion from node to prolog term */
-  implicit def getNodeAsTerm(n: Node): Term = n.id match {
+  implicit def getNodeAsTerm(n: Node[Int]): Term = n.id match {
     case Some(_) => new Struct(node, TuPrologInt(n.id.get), n.rangeX, n.rangeY)
     case _ => new Struct(node, Term.createTerm(none), n.rangeX, n.rangeY)
   }
@@ -70,13 +70,13 @@ package object rTree {
     new Struct(range, TuPrologDouble(r._1), TuPrologDouble(r._2))
 
   /** Conversion from tree to prolog term */
-  implicit def getTreeAsTerm(t: Tree): Term = t match {
-    case x: NotEmptyTree => new Struct(tree, getTreeAsTerm(t.left), t.root.get, getTreeAsTerm(t.right))
+  implicit def getTreeAsTerm(t: Tree[Int]): Term = t match {
+    case x: NotEmptyTree[Int] => new Struct(tree, getTreeAsTerm(t.left), t.root.get, getTreeAsTerm(t.right))
     case _ => Term.createTerm(nil)
   }
 
   /** Conversion from pheromone with id to prolog term */
-  implicit def getPheromoneAsNode(p: (Int, Pheromone)): Node = {
+  implicit def getPheromoneAsNode(p: (Int, Pheromone)): Node[Int] = {
     val ranges = p._2.position.rangeOfInfluence(INFLUENCE_RADIUS)
     Node(p._1, ranges._1, ranges._2)
   }
