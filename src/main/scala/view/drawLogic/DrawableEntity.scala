@@ -20,6 +20,9 @@ trait DrawableEntity[A] {
 
 object DrawableEntities {
 
+  private val center = CENTER
+  private val ratio = 1//center._2 / center._1
+
   /**
    * Draw simulation elem with its parameters.
    * @param elem simulation element.
@@ -41,7 +44,8 @@ object DrawableEntities {
    */
   def drawEllipse(x: Double, y: Double, w: Double, h: Double, g: Graphics2D,
                   zoom: Double, slackX: Double, slackY: Double): Unit = {
-    val ellipse = new Ellipse2D.Double(x * zoom + slackX, y * zoom + slackY, w * zoom, h * zoom)
+    val ellipse = new Ellipse2D.Double(center._1 + x * zoom * ratio + slackX,
+      center._2 - y * zoom + slackY, w * zoom, h * zoom)
     g.fill(ellipse)
   }
 
@@ -83,8 +87,8 @@ object DrawableEntities {
         case _ => OBSTACLE_COLOR
       })
       val vertex = for (seg <- elem.segments) yield seg._1
-      val xCoordinates = for (v <- vertex) yield Math.round(v.x * zoom + slackX).toInt
-      val yCoordination = for (v <- vertex) yield Math.round((size.height - v.y) * zoom + slackY).toInt
+      val xCoordinates = for (v <- vertex) yield Math.round(center._1 + v.x * zoom * ratio + slackX).toInt
+      val yCoordination = for (v <- vertex) yield Math.round(center._2 - v.y * zoom + slackY).toInt
       val p: Polygon = new Polygon(xCoordinates.toArray, yCoordination.toArray, vertex.size)
       g.drawPolygon(p)
       g.fillPolygon(p)

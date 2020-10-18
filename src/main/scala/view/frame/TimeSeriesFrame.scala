@@ -39,7 +39,7 @@ object TimeSeriesFrame {
     setChartColor(foodChart)
     peer.getContentPane.add(new ChartPanel(insectChart), BorderLayout.NORTH)
     peer.getContentPane.add(new ChartPanel(foodChart), BorderLayout.SOUTH)
-    size = new Dimension(SIMULATION_SIZE._1, SIMULATION_SIZE._2)
+    size = new Dimension(SIMULATION_SIZE.width, SIMULATION_SIZE.height)
     visible = true
 
     /**
