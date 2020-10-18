@@ -7,7 +7,7 @@ import akka.actor.{Actor, ActorLogging, Props}
 import model.Drawable
 import model.environment.anthill.AnthillInfo
 import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
-import utility.RichActor._
+import common.RichActor._
 import view.actor.uiMessage._
 import view.frame.TimeSeriesFrame
 import com.google.gson.GsonBuilder

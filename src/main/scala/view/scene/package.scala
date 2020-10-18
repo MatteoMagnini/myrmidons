@@ -11,6 +11,11 @@ package object scene {
   val PARAMETER_GRID: (Int, Int) = (6, 2)
   val MIN_COMPONENT = "6"
   val SIMULATION_BOUNDARY: (Int, Int) = (800, 800)
+  val MIN_ZOOM = 0.25
+  val MAX_ZOOM = 4.0
+  val ZOOM_STEP = 0.25
+  val MIN_SPACE = 1.0
+  val STEP_LENGTH = 50.0
 
   implicit def numberFrom(component: TextField): Int = {
     if (component.text == "") {

@@ -4,9 +4,9 @@ import akka.actor.Actor.Receive
 import akka.actor.{ActorContext, ActorRef}
 import model.insects.Ants.PatrollingAnt._
 import model.insects.info.PatrollingAntInfo
-import utility.Messages.Move
-import utility.geometry.{OrientedVector2D, OrientedVector2DWithNoise}
-import utility.RichActor._
+import common.Messages.Move
+import common.geometry.{OrientedVector2D, OrientedVector2DWithNoise}
+import common.RichActor._
 
 /**
  * Specific competences suitable only for foraging ants.
@@ -20,7 +20,7 @@ trait PatrollingAntCompetences extends AntCompetences[PatrollingAntInfo]
  */
 case class DangerPheromoneTaxis(behaviour: PatrollingAntInfo => Receive) extends PatrollingAntCompetences {
 
-  import utility.PheromoneSeq._
+  import common.PheromoneSeq._
 
   override def apply(context: ActorContext, environment: ActorRef, insect: ActorRef, info: PatrollingAntInfo): Unit = {
     val delta = info.dangerPheromones.toStream

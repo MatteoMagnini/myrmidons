@@ -10,10 +10,10 @@ import model.insects.info.PatrollingAntInfo
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.Messages._
-import utility.geometry.{Vector2D, ZeroVector2D}
-import utility.rTree.RTree.Tree
-import utility.rTree.RTreeProlog
+import common.Messages._
+import common.geometry.{Vector2D, ZeroVector2D}
+import common.rTree.RTree.Tree
+import common.rTree.RTreeProlog
 
 class PatrollingAntTest extends TestKit(ActorSystem("PatrollingAntTest"))
   with AnyWordSpecLike
@@ -30,7 +30,7 @@ class PatrollingAntTest extends TestKit(ActorSystem("PatrollingAntTest"))
   "A patrolling ant" when {
 
     import model.insects.Ants.PatrollingAnt._
-    import utility.geometry.Vectors._
+    import common.geometry.Vectors._
 
     "performing random walk" should {
 
@@ -64,7 +64,7 @@ class PatrollingAntTest extends TestKit(ActorSystem("PatrollingAntTest"))
       val startingPheromoneIntensity = 10.0
       val startingInfo = PatrollingAntInfo(senderRef)
       val ant = system.actorOf(PatrollingAnt(startingInfo,senderRef), "ant-1")
-      import utility.rTree.getPheromoneAsNode
+      import common.rTree.getPheromoneAsNode
       val tree = Tree()
       val engine = RTreeProlog()
 

@@ -4,13 +4,13 @@ import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
 import model.Drawable
 import model.environment.elements.EnvironmentElements
-import model.environment.info.EnvironmentInfo
+import model.environment.data.EnvironmentInfo
 import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.Messages._
-import utility.geometry.{Vector2D, ZeroVector2D}
+import common.Messages._
+import common.geometry.{Vector2D, ZeroVector2D}
 
 class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
   with AnyWordSpecLike
@@ -120,7 +120,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
     val sender = TestProbe()
     implicit val senderRef: ActorRef = sender.ref
 
-    val nAnts = 10
+    val nAnts = 100
     val environment = system.actorOf(Environment(EnvironmentInfo(boundary)), name = "env-actor-3")
 
     "spawn ants and make them move" should {
@@ -162,21 +162,21 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
     }
   }
 
-  "Environment" when {
+   "Environment" when {
     val sender = TestProbe()
     implicit val senderRef: ActorRef = sender.ref
 
-    val nAnts = 10
-    val nEnemies = 10
+    val nAnts = 50
+    val nEnemies = 50
     val environment = system.actorOf(Environment(EnvironmentInfo(boundary)), name = "env-actor-5")
 
     "spawn ants and enemies" should {
       environment ! StartSimulation(nAnts, nEnemies)
       sender expectMsg Ready
       environment ! Clock(1)
+      val result = sender.expectMsgType[Repaint]
 
       "receive all their initial positions" in {
-        val result = sender.expectMsgType[Repaint]
         val positionsCount = result.info count insectsFilter
         assert(positionsCount >= nAnts + nEnemies)
       }
@@ -185,12 +185,10 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
       environment ! Clock(2)
       var positions: Seq[Vector2D] = Seq.empty
 
-      "receive all their new positions" in {
+      "receive their new positions" in {
+        /* We cannot assume nothing about number of positions received because of fights between insects */
         val result = sender.expectMsgType[Repaint]
         positions = (result.info filter insectsFilter).map(_.position)
-        assert(positions.size >= nAnts + nEnemies)
-      }
-      "receive no more messages" in {
         sender.expectNoMessage()
       }
       "check that no insect went outside boundary" in {

@@ -1,5 +1,6 @@
 package model
 
+import model.environment.pheromones.Pheromone
 import model.insects.info.InsectInfo
 
 package object environment {
@@ -23,5 +24,8 @@ package object environment {
   implicit def extractOption[X](value: Option[X]): X = value.get
 
   implicit def entity2Id[X <: InsectInfo](entity: X): Int = entity.id
+
+  implicit def mapToSeqPheromone(map: Map[Int, Pheromone]): Seq[Pheromone] =
+    map.values.toSeq
 
 }

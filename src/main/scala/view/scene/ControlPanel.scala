@@ -1,12 +1,11 @@
 package view.scene
 
 import akka.actor.{ActorRef, ActorSystem}
-import model.environment.info.EnvironmentInfo
+import model.environment.data.EnvironmentInfo
 import model.environment.{Boundary, Environment}
-import utility.Messages.StartSimulation
+import common.Messages.StartSimulation
 import view.actor.uiMessage.{RestartSimulation, ShowAndSaveReport, StopSimulation, setRate}
 import view.actor.{ReportManager, ReportManagerInfo, UiActor, uiActorInfo}
-
 import scala.swing.event.ButtonClicked
 import scala.swing.{Button, FlowPanel, GridPanel, Label, Separator, TextField}
 

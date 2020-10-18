@@ -2,8 +2,8 @@ package view.actor
 
 import akka.actor.{Actor, ActorLogging, Props, Timers}
 import model.Drawable
-import utility.Messages.{Clock, Ready, Repaint}
-import utility.RichActor._
+import common.Messages.{Clock, Ready, Repaint}
+import common.RichActor._
 import view.actor.uiMessage._
 
 import scala.concurrent.duration.DurationInt

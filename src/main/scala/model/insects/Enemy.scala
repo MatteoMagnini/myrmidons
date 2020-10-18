@@ -4,8 +4,8 @@ import akka.actor.{ActorRef, Props}
 import model.insects.Enemies._
 import model.insects.competences.{Die, RandomWalk}
 import model.insects.info.EnemyInfo
-import utility.Messages._
-import utility.RichActor._
+import common.Messages._
+import common.RichActor._
 
 /**
  * An enemy with state and behaviour.

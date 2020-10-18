@@ -2,11 +2,12 @@ package view.scene
 
 
 import model.Drawable
-import model.Fights.Fight
+import model.environment.Fights.Fight
 import model.environment.pheromones.Pheromone
 import model.environment.anthill.AnthillInfo
 import model.environment.elements.Obstacle
 import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo, PatrollingAntInfo}
+import view.controller.{Keyboard, Mouse, MouseWheel}
 import view.drawLogic._
 
 import scala.swing.{Graphics2D, Panel}
@@ -42,6 +43,9 @@ object MyrmidonsPanel {
 
     private var restartFlag = false
     private var infoEntities: Seq[Any] = Seq.empty
+    private var zoom = 1.0
+    private var slackX = 0
+    private var slackY = 0
 
     /**
      * Paint entities of the graphics.
@@ -57,15 +61,15 @@ object MyrmidonsPanel {
 
         infoEntities.foreach {
 
-          case entity: InsectInfo => draw(entity, graphics, size)
+          case entity: InsectInfo => draw(entity, graphics, size, zoom, slackX, slackY)
 
-          case entity: Obstacle => draw(entity, graphics, size)
+          case entity: Obstacle => draw(entity, graphics, size, zoom, slackX, slackY)
 
-          case entity: AnthillInfo => draw(entity, graphics, size)
+          case entity: AnthillInfo => draw(entity, graphics, size, zoom, slackX, slackY)
 
-          case entity: Pheromone => draw(entity, graphics, size)
+          case entity: Pheromone => draw(entity, graphics, size, zoom, slackX, slackY)
 
-          case entity: Fight[InsectInfo, EnemyInfo] => draw(entity, graphics, size)
+          case entity: Fight[InsectInfo, EnemyInfo] => draw(entity, graphics, size, zoom, slackX, slackY)
 
           case _ =>
         }
@@ -73,6 +77,9 @@ object MyrmidonsPanel {
       }
     }
 
+    this.peer.addKeyListener(new Keyboard(this))
+    this.peer.addMouseListener(new Mouse(this))
+    this.peer.addMouseWheelListener(new MouseWheel(this))
 
     def drawEntities(): Unit = {
       repaint()
@@ -103,6 +110,39 @@ object MyrmidonsPanel {
         case _ => false
       }
       (antsCount, anthillInfo.foodAmount)
+    }
+
+    def zoomIn(): Unit = {
+      zoom = if (zoom >= MAX_ZOOM) {
+        zoom
+      } else {
+        zoom + ZOOM_STEP
+      }
+    }
+
+    def zoomOut(): Unit = {
+      zoom = if (zoom <= MIN_ZOOM){
+        zoom
+      }
+      else {
+        zoom - ZOOM_STEP
+      }
+    }
+
+    def goNorth(): Unit = {
+      slackY += STEP_LENGTH
+    }
+
+    def goEast(): Unit = {
+      slackX += STEP_LENGTH
+    }
+
+    def goSouth(): Unit = {
+      slackY -= STEP_LENGTH
+    }
+
+    def goWest(): Unit = {
+      slackX -= STEP_LENGTH
     }
   }
 

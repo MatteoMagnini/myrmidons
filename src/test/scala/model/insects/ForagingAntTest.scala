@@ -11,13 +11,12 @@ import model.insects.info.ForagingAntInfo
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import utility.Message
-import utility.Messages._
-import utility.geometry.TupleOp2._
-import utility.geometry._
-import utility.rTree.RTree.Tree
-import utility.rTree.RTreeProlog
-import utility.geometry.Vectors._
+import common.Message
+import common.Messages._
+import common.geometry._
+import common.rTree.RTree.Tree
+import common.rTree.RTreeProlog
+import common.geometry.Vectors._
 
 class ForagingAntTest extends TestKit(ActorSystem("ForagingAntTest"))
   with AnyWordSpecLike
@@ -116,7 +115,7 @@ class ForagingAntTest extends TestKit(ActorSystem("ForagingAntTest"))
         assert(info2.foodPheromones.nonEmpty)
       }
 
-      import utility.rTree.getPheromoneAsNode
+      import common.rTree.getPheromoneAsNode
       val ant = system.actorOf(ForagingAnt(ForagingAntInfo(senderRef, id = 2),senderRef), "ant-2")
       val tree = Tree()
       val engine = RTreeProlog()
