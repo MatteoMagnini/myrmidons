@@ -25,11 +25,9 @@ class Keyboard(panel: MyrmidonsPanelImpl) extends KeyListener{
     keyEvent.getKeyCode match {
       case PLUS =>
         panel.zoomIn()
-        panel.drawEntities()
 
       case MINUS =>
         panel.zoomOut()
-        panel.drawEntities()
 
       case UP =>
         up
@@ -63,21 +61,17 @@ class Keyboard(panel: MyrmidonsPanelImpl) extends KeyListener{
 
   private def up: Unit = {
     panel.goNorth()
-    panel.drawEntities()
   }
 
   private def left: Unit = {
     panel.goEast()
-    panel.drawEntities()
   }
 
   private def down: Unit = {
     panel.goSouth()
-    panel.drawEntities()
   }
 
   private def right: Unit = {
     panel.goWest()
-    panel.drawEntities()
   }
 }

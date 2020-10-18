@@ -1,9 +1,9 @@
 package view.controller
 
-import view.scene.MyrmidonsPanel
-import java.awt.event.{MouseEvent, MouseListener}
+import java.awt.event.{MouseEvent, MouseListener, MouseWheelEvent, MouseWheelListener}
+import view.scene.MyrmidonsPanel.MyrmidonsPanelImpl
 
-class Mouse(panel: MyrmidonsPanel) extends MouseListener {
+class Mouse(panel: MyrmidonsPanelImpl) extends MouseListener {
 
   override def mouseClicked(mouseEvent: MouseEvent): Unit =
     panel.requestFocusInWindow
@@ -19,5 +19,17 @@ class Mouse(panel: MyrmidonsPanel) extends MouseListener {
 
   override def mouseExited(mouseEvent: MouseEvent): Unit = {
 
+  }
+}
+
+class MouseWheel(panel: MyrmidonsPanelImpl) extends MouseWheelListener {
+
+  override def mouseWheelMoved(mouseWheelEvent: MouseWheelEvent): Unit = {
+    if (mouseWheelEvent.getWheelRotation < 0) {
+      panel.zoomIn()
+    }
+    else {
+      panel.zoomOut()
+    }
   }
 }
