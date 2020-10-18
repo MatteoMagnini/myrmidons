@@ -59,7 +59,7 @@ object DrawableEntities {
         case _ => FOOD_PHEROMONE_COLOR(pheromoneIntensity)
       })
       drawEllipse(elem.position.x - (PHEROMONE_DRAW_SIZE / SET_TO_CENTER),
-         elem.position.y - (PHEROMONE_DRAW_SIZE / SET_TO_CENTER),
+         elem.position.y + (PHEROMONE_DRAW_SIZE / SET_TO_CENTER),
         PHEROMONE_DRAW_SIZE, PHEROMONE_DRAW_SIZE, g, zoom, slackX, slackY
       )
     }
@@ -75,7 +75,7 @@ object DrawableEntities {
         case _ => ENEMIES_COLOR
       })
       drawEllipse(elem.position.x - (ANT_DRAW_SIZE / SET_TO_CENTER),
-        elem.position.y - (ANT_DRAW_SIZE / SET_TO_CENTER),
+        elem.position.y + (ANT_DRAW_SIZE / SET_TO_CENTER),
         ANT_DRAW_SIZE, ANT_DRAW_SIZE, g, zoom, slackX, slackY)
     }
   }
@@ -118,8 +118,9 @@ object DrawableEntities {
         case Left(x) => g.setColor(Color.black); x
         case Right(x) => g.setColor(Color.red); x
       }
-      drawEllipse(insectLoser.position.x,
-        insectLoser.position.y, FIGHT_DRAW_SIZE, FIGHT_DRAW_SIZE, g, zoom, slackX, slackY)
+      drawEllipse(insectLoser.position.x - FIGHT_DRAW_SIZE / SET_TO_CENTER,
+        insectLoser.position.y + FIGHT_DRAW_SIZE / SET_TO_CENTER,
+        FIGHT_DRAW_SIZE, FIGHT_DRAW_SIZE, g, zoom, slackX, slackY)
     }
   }
 
