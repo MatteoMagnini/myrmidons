@@ -52,13 +52,11 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
     case StartSimulation(nAnts: Int, nEnemies: Int, obstaclesPresence, foodPresence, anthillFood) =>
 
-      println(state.boundary.center)
       val anthillInfo = AnthillInfo(state.boundary.center, ANTHILL_RADIUS, anthillFood.get)
       val anthill = context.actorOf(Anthill(anthillInfo, self), name = "anthill")
       anthill ! CreateEntities(nAnts, FORAGING_PERCENTAGE)
 
       val obstacles = if (obstaclesPresence.isDefined) {
-        print(anthillInfo.position)
         Obstacle.createRandom(obstaclesPresence.get,
           anthillInfo.position, (50, 150), radius = OBSTACLE_RADIUS).toSeq
       }
@@ -89,7 +87,6 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   private def defaultBehaviour(state: EnvironmentInfo): Receive = {
 
     case Clock(value: Int) =>
-      //println(s"Pheromones: ${state.pheromones.size}, Tree height: ${state.tree.height}")
       checkAntBirth(state, value)
       state.ants.values.foreach(_ ! Clock(value))
       state.ants.values.foreach(_ ! Pheromones(state.pheromones, state.tree))

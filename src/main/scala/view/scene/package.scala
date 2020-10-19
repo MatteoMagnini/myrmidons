@@ -1,8 +1,7 @@
 package view
 
-import java.awt.Toolkit
 
-import scala.swing.TextField
+import scala.swing.{Dimension, TextField}
 
 package object scene {
   val DEFAULT_ANT_SIZE: Int = 140
@@ -12,8 +11,8 @@ package object scene {
   val DEFAULT_ENEMIES_SIZE: Int = 50
   val PARAMETER_GRID: (Int, Int) = (6, 2)
   val MIN_COMPONENT = "6"
-  val SIMULATION_BOUNDARY = Toolkit.getDefaultToolkit().getScreenSize
-  val CENTER = (SIMULATION_BOUNDARY.width / 2, SIMULATION_BOUNDARY.height / 2)
+  val SIMULATION_BOUNDARY = new Dimension(SIMULATION_SIZE.width, SIMULATION_SIZE.height - 30)
+  val CENTER = new Dimension(SIMULATION_BOUNDARY.width / 2, SIMULATION_BOUNDARY.height / 2)
   val MIN_ZOOM = 0.25
   val MAX_ZOOM = 4.0
   val ZOOM_STEP = 0.25

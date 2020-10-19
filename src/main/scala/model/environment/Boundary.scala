@@ -23,7 +23,6 @@ trait Boundary {
 object Boundary {
 
   def apply(left: Double, top: Double, width: Int, height: Int): Boundary = {
-    println(s"Boundary: $left, $top, $width, $height")
     new BoundaryImpl(left, top, width, height)
   }
 

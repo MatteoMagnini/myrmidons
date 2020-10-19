@@ -1,5 +1,6 @@
 package view.frame
 
+import view.SIMULATION_SIZE
 import view.scene.{ControlPanel, LabelPanel, MyrmidonsPanel}
 
 import scala.swing.{BorderPanel, Dimension, MainFrame}

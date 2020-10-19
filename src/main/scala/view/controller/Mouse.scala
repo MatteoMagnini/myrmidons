@@ -1,9 +1,11 @@
 package view.controller
 
 import java.awt.event.{MouseEvent, MouseListener, MouseWheelEvent, MouseWheelListener}
-import view.scene.MyrmidonsPanel.MyrmidonsPanelImpl
 
-class Mouse(panel: MyrmidonsPanelImpl) extends MouseListener {
+import view.scene.MyrmidonsPanel
+
+
+class Mouse(panel: MyrmidonsPanel) extends MouseListener {
 
   override def mouseClicked(mouseEvent: MouseEvent): Unit =
     panel.requestFocusInWindow
@@ -17,12 +19,10 @@ class Mouse(panel: MyrmidonsPanelImpl) extends MouseListener {
   override def mouseEntered(mouseEvent: MouseEvent): Unit =
     panel.requestFocusInWindow
 
-  override def mouseExited(mouseEvent: MouseEvent): Unit = {
-
-  }
+  override def mouseExited(mouseEvent: MouseEvent): Unit = {}
 }
 
-class MouseWheel(panel: MyrmidonsPanelImpl) extends MouseWheelListener {
+class MouseWheel(panel: MyrmidonsPanel) extends MouseWheelListener {
 
   override def mouseWheelMoved(mouseWheelEvent: MouseWheelEvent): Unit = {
     if (mouseWheelEvent.getWheelRotation < 0) {
