@@ -13,11 +13,11 @@ trait Boundary {
   /**Four corners of boundary */
   def topLeft: Vector2D = (left, top)
   def topRight: Vector2D = (left + width, top)
-  def bottomLeft: Vector2D = (left, top + height)
-  def bottomRight: Vector2D = (left + width, top + height)
+  def bottomLeft: Vector2D = (left, top - height)
+  def bottomRight: Vector2D = (left + width, top - height)
 
   /**Returns the center of boundary */
-  def center: Vector2D = (left + width / 2, top + height / 2)
+  def center: Vector2D = (left + width / 2, top - height / 2)
 }
 
 object Boundary {

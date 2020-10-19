@@ -188,11 +188,13 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
       "receive their new positions" in {
         /* We cannot assume nothing about number of positions received because of fights between insects */
         val result = sender.expectMsgType[Repaint]
-        positions = (result.info filter insectsFilter).map(_.position)
+        positions = (result.info filter antsFilter).map(_.position)
+        println(positions)
         sender.expectNoMessage()
       }
       "check that no insect went outside boundary" in {
         import EnvironmentElements.BoundaryHasInside
+
         assert(positions.forall(x => elements.EnvironmentElements checkHasInside(boundary, x)))
       }
     }

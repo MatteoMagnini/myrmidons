@@ -4,7 +4,7 @@ import akka.actor.{Actor, ActorLogging, Props}
 import common.Messages._
 import common.PheromoneMap._
 import common.RichActor._
-import common.geometry.{RandomVector2DInSquare, Vector2D, ZeroVector2D}
+import common.geometry.{RandomVector2DInCircle, RandomVector2DInSquare, Vector2D, ZeroVector2D}
 import model.environment.anthill.{Anthill, AnthillInfo}
 import model.environment.data.{EnvironmentInfo, InsectReferences}
 import model.environment.elements.EnvironmentElements._
@@ -29,7 +29,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     import model.environment.elements.EnvironmentElements.ObstacleHasInside
     var randomPosition = ZeroVector2D()
     do {
-      randomPosition = RandomVector2DInSquare(minMax._1, minMax._2)
+      randomPosition = RandomVector2DInCircle(minMax._1, minMax._2)
     }
     while (checkHaveInside(obstacleList, randomPosition).nonEmpty)
     randomPosition
@@ -52,11 +52,13 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
     case StartSimulation(nAnts: Int, nEnemies: Int, obstaclesPresence, foodPresence, anthillFood) =>
 
+      println(state.boundary.center)
       val anthillInfo = AnthillInfo(state.boundary.center, ANTHILL_RADIUS, anthillFood.get)
       val anthill = context.actorOf(Anthill(anthillInfo, self), name = "anthill")
       anthill ! CreateEntities(nAnts, FORAGING_PERCENTAGE)
 
       val obstacles = if (obstaclesPresence.isDefined) {
+        print(anthillInfo.position)
         Obstacle.createRandom(obstaclesPresence.get,
           anthillInfo.position, (50, 150), radius = OBSTACLE_RADIUS).toSeq
       }
@@ -72,7 +74,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
       val enemies = (0 until nEnemies).map(i => {
         val randomPosition = randomPositionOutObstacle(obstacles ++ foods,
-          (state.boundary.topLeft.x, state.boundary.topRight.x))
+          (MIN_DISTANCE_ENEMIES_FROM_ANTHILL,MAX_DISTANCE_ENEMIES_FROM_ANTHILL))
         i -> context.actorOf(Enemy(EnemyInfo(id = i, position = randomPosition), self), s"enemy-$i")
       }).toMap
 

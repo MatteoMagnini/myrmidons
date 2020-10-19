@@ -1,13 +1,16 @@
 package view.scene
 
+import java.awt.event.{ItemEvent, ItemListener}
+
 import akka.actor.{ActorRef, ActorSystem}
 import model.environment.data.EnvironmentInfo
 import model.environment.{Boundary, Environment}
 import common.Messages.StartSimulation
 import view.actor.uiMessage.{RestartSimulation, ShowAndSaveReport, StopSimulation, setRate}
 import view.actor.{ReportManager, ReportManagerInfo, UiActor, uiActorInfo}
+
 import scala.swing.event.ButtonClicked
-import scala.swing.{Button, FlowPanel, GridPanel, Label, Separator, TextField}
+import scala.swing.{Button, CheckBox, FlowPanel, GridPanel, Label, Separator, TextField}
 
 trait ControlPanel extends GridPanel {
 
@@ -75,6 +78,7 @@ object ControlPanel {
     var stepText = new Label("0")
     var antPopulationText = new Label("0")
     var anthillFoodAmount = new Label("0")
+    val pheromoneLayer = new CheckBox("hide pheromones")
 
     this.stopButton.enabled = false
     this.restartButton.enabled = false
@@ -83,7 +87,7 @@ object ControlPanel {
 
     contents ++= Seq(new FlowPanel {
       contents ++= Seq(startButton, stopButton, restartButton, reportButton,
-        timeLabel, timeInput, buttonSetTime)
+        timeLabel, timeInput, buttonSetTime, pheromoneLayer)
     }, new FlowPanel {
       contents ++= Seq(stepLabel,
         stepText,
@@ -92,6 +96,9 @@ object ControlPanel {
     })
 
 
+    pheromoneLayer.peer.addItemListener((_: ItemEvent) => {
+      myrmidonsPanel.hidePheromones(pheromoneLayer.peer.isSelected)
+    })
     listenTo(startButton, stopButton, restartButton, reportButton, buttonSetTime)
 
 

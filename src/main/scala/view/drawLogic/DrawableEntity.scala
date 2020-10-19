@@ -21,7 +21,7 @@ trait DrawableEntity[A] {
 object DrawableEntities {
 
   private val center = CENTER
-  private val ratio = 1//center._2 / center._1
+  private val ratio = 1
 
   /**
    * Draw simulation elem with its parameters.
@@ -44,8 +44,9 @@ object DrawableEntities {
    */
   def drawEllipse(x: Double, y: Double, w: Double, h: Double, g: Graphics2D,
                   zoom: Double, slackX: Double, slackY: Double): Unit = {
+
     val ellipse = new Ellipse2D.Double(center._1 + x * zoom * ratio + slackX,
-      center._2 - y * zoom + slackY, w * zoom, h * zoom)
+      center._2  - y * zoom + slackY, w * zoom, h * zoom)
     g.fill(ellipse)
   }
 
@@ -58,7 +59,7 @@ object DrawableEntities {
         case _ => FOOD_PHEROMONE_COLOR(pheromoneIntensity)
       })
       drawEllipse(elem.position.x - (PHEROMONE_DRAW_SIZE / SET_TO_CENTER),
-        size.height - elem.position.y - (PHEROMONE_DRAW_SIZE / SET_TO_CENTER),
+         elem.position.y + (PHEROMONE_DRAW_SIZE / SET_TO_CENTER),
         PHEROMONE_DRAW_SIZE, PHEROMONE_DRAW_SIZE, g, zoom, slackX, slackY
       )
     }
@@ -74,12 +75,13 @@ object DrawableEntities {
         case _ => ENEMIES_COLOR
       })
       drawEllipse(elem.position.x - (ANT_DRAW_SIZE / SET_TO_CENTER),
-        size.height - elem.position.y - (ANT_DRAW_SIZE / SET_TO_CENTER),
+        elem.position.y + (ANT_DRAW_SIZE / SET_TO_CENTER),
         ANT_DRAW_SIZE, ANT_DRAW_SIZE, g, zoom, slackX, slackY)
     }
   }
 
   implicit object drawObstacle extends DrawableEntity[Obstacle] {
+
     override def draw(elem: Obstacle, g: Graphics2D, size: Dimension,
                       zoom: Double, slackX: Double, slackY: Double): Unit = {
       g.setColor(elem match {
@@ -88,8 +90,8 @@ object DrawableEntities {
       })
       val vertex = for (seg <- elem.segments) yield seg._1
       val xCoordinates = for (v <- vertex) yield Math.round(center._1 + v.x * zoom * ratio + slackX).toInt
-      val yCoordination = for (v <- vertex) yield Math.round(center._2 - v.y * zoom + slackY).toInt
-      val p: Polygon = new Polygon(xCoordinates.toArray, yCoordination.toArray, vertex.size)
+      val yCoordinates = for (v <- vertex) yield Math.round(center._2 - v.y * zoom + slackY).toInt
+      val p: Polygon = new Polygon(xCoordinates.toArray, yCoordinates.toArray, vertex.size)
       g.drawPolygon(p)
       g.fillPolygon(p)
     }
@@ -100,10 +102,10 @@ object DrawableEntities {
                       zoom: Double, slackX: Double, slackY: Double): Unit = {
       val anthillFood: Float = elem.foodAmount / elem.maxFoodAmount
       g.setColor(ANTHILL_COLOR(anthillFood))
-      drawEllipse(elem.position.x - elem.radius * SET_TO_CENTER,
-        size.height - elem.position.y - elem.radius * SET_TO_CENTER,
-        elem.radius * SET_TO_CENTER * SET_TO_CENTER,
-        elem.radius * SET_TO_CENTER * SET_TO_CENTER, g, zoom, slackX, slackY)
+      drawEllipse(elem.position.x - elem.radius *ANTHILL_SIZE_FACTOR ,
+         elem.position.y + elem.radius *ANTHILL_SIZE_FACTOR,
+        elem.radius * SET_TO_CENTER * ANTHILL_SIZE_FACTOR ,
+        elem.radius * SET_TO_CENTER * ANTHILL_SIZE_FACTOR , g, zoom, slackX, slackY)
     }
   }
 
@@ -116,8 +118,9 @@ object DrawableEntities {
         case Left(x) => g.setColor(Color.black); x
         case Right(x) => g.setColor(Color.red); x
       }
-      drawEllipse(insectLoser.position.x,
-        size.height - insectLoser.position.y, FIGHT_DRAW_SIZE, FIGHT_DRAW_SIZE, g, zoom, slackX, slackY)
+      drawEllipse(insectLoser.position.x - FIGHT_DRAW_SIZE / SET_TO_CENTER,
+        insectLoser.position.y + FIGHT_DRAW_SIZE / SET_TO_CENTER,
+        FIGHT_DRAW_SIZE, FIGHT_DRAW_SIZE, g, zoom, slackX, slackY)
     }
   }
 

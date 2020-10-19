@@ -30,6 +30,13 @@ trait MyrmidonsPanel extends Panel {
    * @return number of ant and food of anthill.
    */
   def setEntities(info: Seq[Drawable]): (Int, Int)
+
+  /**
+   * Show or hide pheromones during simulation.
+   *
+   * @param value if true hide the pheromones, if false show them.
+   */
+  def hidePheromones(value: Boolean): Unit
 }
 
 object MyrmidonsPanel {
@@ -43,9 +50,11 @@ object MyrmidonsPanel {
 
     private var restartFlag = false
     private var infoEntities: Seq[Any] = Seq.empty
+    private var showPheromones = true
     private var zoom = 1.0
     private var slackX = 0
     private var slackY = 0
+
 
     /**
      * Paint entities of the graphics.
@@ -67,7 +76,7 @@ object MyrmidonsPanel {
 
           case entity: AnthillInfo => draw(entity, graphics, size, zoom, slackX, slackY)
 
-          case entity: Pheromone => draw(entity, graphics, size, zoom, slackX, slackY)
+          case entity: Pheromone if showPheromones => draw(entity, graphics, size, zoom, slackX, slackY)
 
           case entity: Fight[InsectInfo, EnemyInfo] => draw(entity, graphics, size, zoom, slackX, slackY)
 
@@ -90,7 +99,6 @@ object MyrmidonsPanel {
     }
 
     def setEntities(info: Seq[Drawable]): (Int, Int) = {
-
       /**
        * For each drawable entity it checks if it has changed since the previous interaction.
        * If not, it does not recreate an object in infoEntities.
@@ -144,6 +152,10 @@ object MyrmidonsPanel {
     def goWest(): Unit = {
       slackX -= STEP_LENGTH
     }
+
+    override def hidePheromones(value: Boolean): Unit =
+      showPheromones = !value
+
   }
 
 }

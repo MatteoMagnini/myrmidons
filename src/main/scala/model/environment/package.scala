@@ -20,6 +20,9 @@ package object environment {
   val OBSTACLE_OCTAGON_VERTEX = 8
   val OBSTACLE_RADIUS = 20
 
+  val MIN_DISTANCE_ENEMIES_FROM_ANTHILL = 200
+  val MAX_DISTANCE_ENEMIES_FROM_ANTHILL = 600
+
 
   implicit def extractOption[X](value: Option[X]): X = value.get
 
