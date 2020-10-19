@@ -45,5 +45,4 @@ object Fights {
         case f: ForagingAntInfo => Left(f)
       }
   }
-
 }

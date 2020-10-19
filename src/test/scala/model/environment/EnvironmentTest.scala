@@ -21,7 +21,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
     TestKit.shutdownActorSystem(system)
   }
 
-  val topLeftCorner: (Int, Int) = (0, 0)
+  val topLeftCorner:(Int, Int) = (0,0)
   val width = 100
   val height = 100
   val boundary = Boundary(topLeftCorner._1, topLeftCorner._2, width, height)
@@ -52,21 +52,22 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
       environment ! StartSimulation(nAnts, 0, obstacles = None, food = None)
       sender expectMsg Ready
       environment ! Clock(1)
-      val result = sender.expectMsgType[Repaint]
 
       "receive its initial position" in {
+        val result = sender.expectMsgType[Repaint]
         initialPosition = (result.info find antsFilter get).position
       }
     }
     "make ant move" should {
       environment ! Clock(2)
-      val result = sender.expectMsgType[Repaint]
 
       "receive its new position" in {
+        val result = sender.expectMsgType[Repaint]
         newPosition = (result.info find antsFilter get).position
       }
-      sender.expectNoMessage()
-
+      "receive no more messages" in {
+        sender.expectNoMessage()
+      }
       "check if ant moved" in {
         assert(initialPosition != newPosition)
       }
@@ -88,9 +89,9 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
       environment ! StartSimulation(nAnts, 0, obstacles = None, food = None)
       sender expectMsg Ready
       environment ! Clock(1)
-      val result = sender.expectMsgType[Repaint]
 
       "receive all their positions" in {
+        val result = sender.expectMsgType[Repaint]
         val positionsCount = result.info count antsFilter
         assert(positionsCount >= nAnts)
       }
@@ -98,9 +99,9 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
     "make them move" should {
       environment ! Clock(2)
       var positions: Seq[Vector2D] = Seq.empty
-      val result = sender.expectMsgType[Repaint]
 
       "receive all their new positions" in {
+        val result = sender.expectMsgType[Repaint]
         positions = (result.info filter antsFilter).map(_.position)
         assert(positions.size >= nAnts)
       }
@@ -125,16 +126,15 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
       environment ! StartSimulation(nAnts, 0)
       sender expectMsg Ready
       environment ! Clock(1)
+    }
+    "receive all their positions" in {
       val result = sender.expectMsgType[Repaint]
-
-      "receive all their positions" in {
-        val positionsCount = result.info count antsFilter
-        assert(positionsCount >= nAnts)
-      }
+      val positionsCount = result.info count antsFilter
+      assert(positionsCount >= nAnts)
     }
   }
 
-  "Environment with an ant" when {
+ "Environment with an ant" when {
     val sender = TestProbe()
     implicit val senderRef: ActorRef = sender.ref
 
@@ -161,7 +161,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
     }
   }
 
-  "Environment" when {
+   "Environment" when {
     val sender = TestProbe()
     implicit val senderRef: ActorRef = sender.ref
 
@@ -183,10 +183,10 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
     "make them move" should {
       environment ! Clock(2)
       var positions: Seq[Vector2D] = Seq.empty
-      val result = sender.expectMsgType[Repaint]
 
       "receive their new positions" in {
         /* We cannot assume nothing about number of positions received because of fights between insects */
+        val result = sender.expectMsgType[Repaint]
         positions = (result.info filter antsFilter).map(_.position)
         println(positions)
         sender.expectNoMessage()
