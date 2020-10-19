@@ -8,9 +8,9 @@ object Fights {
 
   /** A fight between two entities
     *
-    * @param firstFighter first entity
+    * @param firstFighter  first entity
     * @param secondFighter second entity
-    * @param position position where the fight takes place
+    * @param position      position where the fight takes place
     */
   case class Fight[A, B](firstFighter: A, secondFighter: B, position: Vector2D) extends Drawable
 
@@ -32,7 +32,7 @@ object Fights {
     * @param fights collection of fights
     * @return losers among provided fights
     */
-  def losers[A, B](fights: Iterable[Fight[A, B]])(implicit outcome: FightOutcome[A, B]): Seq[Either[A,B]] = {
+  def losers[A, B](fights: Iterable[Fight[A, B]])(implicit outcome: FightOutcome[A, B]): Seq[Either[A, B]] = {
     fights.map(f => outcome.loser(f.firstFighter, f.secondFighter)).toSeq
   }
 
@@ -45,4 +45,5 @@ object Fights {
         case f: ForagingAntInfo => Left(f)
       }
   }
+
 }

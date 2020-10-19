@@ -1,23 +1,30 @@
 package model.environment.utility
 
-import model.environment.Fights
-import model.environment.Fights.Fight
+import model.environment.Fights.InsectFight._
+import model.environment.Fights.{Fight, _}
 import model.insects.info.{EnemyInfo, InsectInfo}
 
 class FightsChecker(val fights: Iterable[Fight[InsectInfo, EnemyInfo]]) {
 
   def checkFights: (Seq[InsectInfo], Seq[EnemyInfo]) = {
-    import Fights.InsectFight._
-    import Fights._
-    var ants:Seq[InsectInfo] = Seq.empty
-    var enemies:Seq[EnemyInfo] = Seq.empty
-    // TODO: other refactoring: try method fold
-    losers(fights).foreach {
-      case Left(ant) => ants = ants :+ ant
-      case Right(enemy) => enemies = enemies :+ enemy
+    def _checkFights(fights: Seq[Either[InsectInfo, EnemyInfo]]): (Seq[InsectInfo], Seq[EnemyInfo]) = {
+      fights match {
+        case h :: t => h.fold(x => (x +: _checkFights(t)._1, _checkFights(t)._2),
+          y => (_checkFights(t)._1, y +: _checkFights(t)._2))
+        case _ => (Seq.empty, Seq.empty)
+      }
     }
-    (ants, enemies)
+    _checkFights(losers(fights))
   }
+
+  /*def checkFights: (Seq[InsectInfo], Seq[EnemyInfo]) = {
+    var ants: Seq[InsectInfo] = Seq.empty
+    var enemies: Seq[EnemyInfo] = Seq.empty
+    losers(fights).foreach(f => f.fold(
+      ant => ants = ants :+ ant,
+      enemy => enemies = enemies :+ enemy))
+    (ants, enemies)
+  }*/
 }
 
 object FightsChecker {

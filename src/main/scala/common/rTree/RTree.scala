@@ -10,7 +10,7 @@ object RTree {
 
   /** A node of r-tree
     *
-    * @param id identifier of node
+    * @param id     identifier of node
     * @param rangeX range along x coordinate
     * @param rangeY range along y coordinate
     * @tparam A type of element to be put in tree (id field)
@@ -43,19 +43,19 @@ object RTree {
     */
   sealed trait Tree[A] {
 
-    /** Left branch of tree*/
+    /** Left branch of tree */
     def left: Tree[A]
 
-    /** Right branch of tree*/
+    /** Right branch of tree */
     def right: Tree[A]
 
-    /** Root of tree*/
+    /** Root of tree */
     def root: Option[Node[A]]
 
-    /** Size of tree*/
+    /** Size of tree */
     def size: Int
 
-    /** Height of tree*/
+    /** Height of tree */
     def height: Int
   }
 
@@ -115,7 +115,7 @@ object ScalaEngine {
   /** Query over an r-tree
     *
     * @param position reference position in which query is done
-    * @param tree r-tree to be queried
+    * @param tree     r-tree to be queried
     * @return list of leaves id that respond to query
     */
   def query(position: Vector2D, tree: Tree[Int]): Seq[Int] = {
@@ -133,6 +133,7 @@ object ScalaEngine {
         case None => Seq.empty
       }
     }
+
     _query(position.rangeOfInfluence(DEFAULT_RANGE), tree)
   }
 }
