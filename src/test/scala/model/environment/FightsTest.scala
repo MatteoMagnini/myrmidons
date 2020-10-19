@@ -15,7 +15,7 @@ class FightsTest extends AnyWordSpecLike with Matchers {
   "A fight between foraging ant and insect" when {
     val ant = ForagingAntInfo(null)
     val insect = EnemyInfo()
-    val fight: Fight[InsectInfo, EnemyInfo] = Fight(ant, insect, ZeroVector2D())
+    val fight: Fight[InsectInfo, EnemyInfo] = Fight(ant, insect)
 
     "happens" should {
 
@@ -32,7 +32,7 @@ class FightsTest extends AnyWordSpecLike with Matchers {
       _ <- 0 to nFights
       ant: InsectInfo = ForagingAntInfo(null)
       enemy: EnemyInfo = EnemyInfo()
-    } yield Fight(ant.asInstanceOf[InsectInfo], enemy, ZeroVector2D())
+    } yield Fight(ant.asInstanceOf[InsectInfo], enemy)
 
     "happens" should {
 
@@ -53,7 +53,7 @@ class FightsTest extends AnyWordSpecLike with Matchers {
     val ant = PatrollingAntInfo(null, energy = antEnergy)
     val insectEnergy = 10
     val insect = EnemyInfo(energy = insectEnergy)
-    val fight: Fight[InsectInfo, EnemyInfo] = Fight(ant, insect, ZeroVector2D())
+    val fight: Fight[InsectInfo, EnemyInfo] = Fight(ant, insect)
 
     "happens" should {
 
@@ -77,7 +77,7 @@ class FightsTest extends AnyWordSpecLike with Matchers {
       ant: InsectInfo = PatrollingAntInfo(null, energy = antEnergy)
       insectEnergy = Random.nextInt(maxEnergy)
       enemy: EnemyInfo = EnemyInfo(energy = insectEnergy)
-    } yield Fight(ant.asInstanceOf[InsectInfo], enemy, ZeroVector2D())
+    } yield Fight(ant.asInstanceOf[InsectInfo], enemy)
 
     "happens" should {
 

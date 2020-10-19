@@ -10,9 +10,10 @@ object Fights {
     *
     * @param firstFighter  first entity
     * @param secondFighter second entity
-    * @param position      position where the fight takes place
     */
-  case class Fight[A, B](firstFighter: A, secondFighter: B, position: Vector2D) extends Drawable
+  case class Fight[A, B](firstFighter: A, secondFighter: B)
+
+  case class InsectsFight(fight: Fight[InsectInfo, EnemyInfo], override val position: Vector2D) extends Drawable
 
   /** A fight outcome: defines how to determine who lost the fight */
   trait FightOutcome[A, B] {
@@ -44,5 +45,7 @@ object Fights {
         case p: PatrollingAntInfo => if (p.energy < secondFighter.energy) Left(p) else Right(secondFighter)
         case f: ForagingAntInfo => Left(f)
       }
+
   }
+
 }

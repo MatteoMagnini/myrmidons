@@ -8,7 +8,7 @@ import model.insects.info.{EnemyInfo, InsectInfo}
   *
   * @param fights fights to deal with
   */
-class FightsChecker(val fights: Iterable[Fight[InsectInfo, EnemyInfo]]) {
+class FightsChecker(val fights: Iterable[InsectsFight]) {
 
   /** Check losers of a collection of fights
     *
@@ -22,7 +22,7 @@ class FightsChecker(val fights: Iterable[Fight[InsectInfo, EnemyInfo]]) {
         case _ => (Seq.empty, Seq.empty)
       }
     }
-    _checkFights(losers(fights))
+    _checkFights(losers(fights.map(_.fight)))
   }
 }
 
@@ -38,11 +38,11 @@ object FightsChecker {
     * @return fights between insects
     */
   private def findFights(antsInfo: Iterable[InsectInfo], enemiesInfo: Iterable[EnemyInfo])
-  : Iterable[Fight[InsectInfo, EnemyInfo]] =
+  : Iterable[InsectsFight] =
     for {
       ant <- antsInfo
       enemy <- enemiesInfo
       if ant.position ~~ enemy.position
-    } yield Fight(ant, enemy, ant.position)
+    } yield InsectsFight(Fight(ant, enemy), ant.position)
 
 }
