@@ -11,21 +11,21 @@ import common.rTree.RTree.{Node, Tree}
 class PheromonesRTreeTest extends AnyWordSpecLike with Matchers with BeforeAndAfterAll {
 
   val engine = RTreeProlog()
-  val decreasingFunction: scala.Double => scala.Double = x => x - DELTA
+  val decreasingFunction: Double => Double = x => x - DELTA
 
   "Prolog engine" when {
 
     val id1 = 1
     val pheromone1 = FoodPheromone(ZeroVector2D(), decreasingFunction, STARTING_INTENSITY)
-    val initialRTree = Tree()
-    var oneLeafTree = Tree()
-    var twoLeavesTree = Tree()
+    val initialRTree: Tree[Int] = Tree()
+    var oneLeafTree: Tree[Int]  = Tree()
+    var twoLeavesTree: Tree[Int]  = Tree()
 
     "adding a node to an empty tree" should {
       oneLeafTree = engine.insertNode((id1, pheromone1), initialRTree)
 
       "add it in the root" in {
-        assert(implicitly[Node]((id1, pheromone1)) == oneLeafTree.root.get)
+        assert(implicitly[Node[Int]]((id1, pheromone1)) == oneLeafTree.root.get)
       }
     }
 
@@ -36,9 +36,9 @@ class PheromonesRTreeTest extends AnyWordSpecLike with Matchers with BeforeAndAf
       twoLeavesTree = engine.insertNode((id2, pheromone2), oneLeafTree)
 
       "add a level in the tree" in {
-        val leaves: Seq[Node] = engine.getLeaves(twoLeavesTree)
-        assert(leaves.contains(implicitly[Node]((id1, pheromone1))))
-        assert(leaves.contains(implicitly[Node]((id2, pheromone2))))
+        val leaves: Seq[Node[Int]] = engine.getLeaves(twoLeavesTree)
+        assert(leaves.contains(implicitly[Node[Int]]((id1, pheromone1))))
+        assert(leaves.contains(implicitly[Node[Int]]((id2, pheromone2))))
       }
     }
 

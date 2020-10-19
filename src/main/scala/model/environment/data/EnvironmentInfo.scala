@@ -29,12 +29,13 @@ trait EnvironmentInfo {
   /** References to ant actors */
   def ants: InsectReferences
 
-  /**Highest used Id*/
+  /** Highest used Id */
   def maxAntId: Int
 
   /** Ants information */
   def foragingAntsInfo: Iterable[ForagingAntInfo]
 
+  /** Ants information */
   def patrollingAntsInfo: Iterable[PatrollingAntInfo]
 
   /** References to enemy actors */
@@ -50,18 +51,15 @@ trait EnvironmentInfo {
   def pheromones: Map[Int, Pheromone]
 
   /** RTree for pheromones */
-  def tree: Tree
-
-  /** Prolog engine */
-  def engine: RTreeProlog
+  def tree: Tree[Int]
 
   /** Reference to anthill */
   def anthill: Option[ActorRef]
 
-  /** Returns updated pheromones*/
-  def updatePheromones(pheromones: Map[Int,Pheromone]): EnvironmentInfo
+  /** Returns updated pheromones */
+  def updatePheromones(pheromones: Map[Int, Pheromone]): EnvironmentInfo
 
-  /** Add pheromones*/
+  /** Add pheromones */
   def addPheromone(pheromone: Pheromone, threshold: Double): EnvironmentInfo
 
   /** Returns updated insect information */
@@ -92,25 +90,25 @@ object EnvironmentInfo {
   def apply(boundary: Boundary): EnvironmentInfo =
     EnvironmentData(None, boundary, Seq.empty, Seq.empty,
       Map.empty, 0, Seq.empty, Seq.empty, Map.empty,
-      Seq.empty, None, None, Map[Int,Pheromone](), Tree(), RTreeProlog())
+      Seq.empty, None, None, Map[Int, Pheromone](), Tree())
 
   def apply(gui: Option[ActorRef], boundary: Boundary, obstacles: Seq[Obstacle], foods: Seq[Food],
             anthill: ActorRef, anthillInfo: Option[AnthillInfo]): EnvironmentInfo =
     EnvironmentData(gui, boundary, obstacles, foods,
       Map.empty, 0, Seq.empty, Seq.empty, Map.empty,
-      Seq.empty, Some(anthill), anthillInfo, Map.empty, Tree(), RTreeProlog())
+      Seq.empty, Some(anthill), anthillInfo, Map.empty, Tree())
 
 
   /** Internal state of environment.
-   *
-   * @param gui         reference to gui actor
-   * @param boundary    boundary constrains of environment
-   * @param obstacles   obstacles in environment
-   * @param ants        references to ant actors
-   * @param foragingAntsInfo    ants information
-   * @param anthill     references to anthill actor
-   * @param anthillInfo anthill information
-   */
+    *
+    * @param gui              reference to gui actor
+    * @param boundary         boundary constrains of environment
+    * @param obstacles        obstacles in environment
+    * @param ants             references to ant actors
+    * @param foragingAntsInfo ants information
+    * @param anthill          references to anthill actor
+    * @param anthillInfo      anthill information
+    */
   private[this] case class EnvironmentData(override val gui: Option[ActorRef],
                                            override val boundary: Boundary,
                                            override val obstacles: Seq[Obstacle],
@@ -123,10 +121,11 @@ object EnvironmentInfo {
                                            override val enemiesInfo: Seq[EnemyInfo],
                                            override val anthill: Option[ActorRef],
                                            override val anthillInfo: Option[AnthillInfo],
-                                           override val pheromones: Map[Int,Pheromone],
-                                           override val tree: Tree,
-                                           override val engine: RTreeProlog)
+                                           override val pheromones: Map[Int, Pheromone],
+                                           override val tree: Tree[Int]
+                                          )
     extends EnvironmentInfo {
+    private[this] val engine = RTreeProlog()
 
     /** Returns ant info, adding ant information */
     override def updateInsectInfo(insectInfo: InsectInfo): EnvironmentData = insectInfo match {
@@ -143,7 +142,7 @@ object EnvironmentInfo {
 
     override def updateFood(food: Food, updatedFood: Food): EnvironmentData =
       if (updatedFood.quantity > 0) {
-        this.copy(foods = (foods filter(f => !(f equals food))) :+ updatedFood)
+        this.copy(foods = (foods filter (f => !(f equals food))) :+ updatedFood)
       } else {
         this.copy(foods = foods remove food)
       }
@@ -166,22 +165,23 @@ object EnvironmentInfo {
 
     def addEnemies(newEnemies: InsectReferences): EnvironmentInfo = this.copy(enemies = enemies ++ newEnemies)
 
-    override def updatePheromones(newPheromones: Map[Int,Pheromone]): EnvironmentInfo = {
+    override def updatePheromones(newPheromones: Map[Int, Pheromone]): EnvironmentInfo = {
       val ids = pheromones.keys filterNot newPheromones.keys.toSet
       var newTree = tree
-      ids.foreach(id => newTree = engine.removeNode((id,pheromones(id)),newTree))
+      ids.foreach(id => newTree = engine.removeNode((id, pheromones(id)), newTree))
       this.copy(pheromones = newPheromones, tree = newTree)
     }
 
     override def addPheromone(pheromone: Pheromone, threshold: Double): EnvironmentInfo = {
       val newMap = pheromones.add(pheromone, threshold)
-      val newTree = if(newMap.size > pheromones.size) {
-        engine.insertNode((pheromones.nextKey, pheromone),tree)
+      val newTree = if (newMap.size > pheromones.size) {
+        engine.insertNode((pheromones.nextKey, pheromone), tree)
       } else {
         tree
       }
       this.copy(pheromones = newMap,
-      tree = newTree)
+        tree = newTree)
     }
   }
+
 }

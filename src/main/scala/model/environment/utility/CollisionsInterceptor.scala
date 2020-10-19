@@ -10,19 +10,19 @@ import model.environment.data.EnvironmentInfo
 private[environment] object CollisionsInterceptor {
 
   /**
-   * Extension of Environment move function. His job is check
-   * if the new position of selected by insect fall inside an
-   * obstacle and in that case must recalculate new insect position
-   * keep mind the bouncing on obstacle and obstacle form.
-   *
-   * @param entity ActorRef of insect that need the position
-   *               check
-   * @param state state of environment, with updated information
-   *              of obstacle and/or food
-   * @param position actual insect position
-   * @param delta insect shift (direction and magnitude)
-   *
-   * */
+    * Extension of Environment move function. His job is check
+    * if the new position of selected by insect fall inside an
+    * obstacle and in that case must recalculate new insect position
+    * keep mind the bouncing on obstacle and obstacle form.
+    *
+    * @param entity   ActorRef of insect that need the position
+    *                 check
+    * @param state    state of environment, with updated information
+    *                 of obstacle and/or food
+    * @param position actual insect position
+    * @param delta    insect shift (direction and magnitude)
+    *
+    **/
   def checkCollisions(entity: ActorRef, state: EnvironmentInfo, position: Vector2D, delta: Vector2D): Unit = {
     val newPosition = position >> delta
     import model.environment.elements.EnvironmentElements.FoodHasInside
@@ -36,43 +36,44 @@ private[environment] object CollisionsInterceptor {
         val obstacle = checkHaveInside(of, newPosition)
         if (obstacle.nonEmpty) {
           val bouncedPosition = recursionCheck(of, obstacle, position, newPosition)
-          if(bouncedPosition._3){
-            val nearestFood: Food = state.foods.toList.sortWith((a, b) =>  //TODO: Not correct in all case
-            position --> a.position < position --> b.position).head
+          if (bouncedPosition._3) {
+            val nearestFood: Food = state.foods.toList.sortWith((a, b) => //TODO: Not correct in all case
+              position --> a.position < position --> b.position).head
             entity ! FoodNear(nearestFood.position)
           }
           entity ! NewPosition(bouncedPosition._1, bouncedPosition._2)
         } else {
-        entity ! NewPosition(newPosition, newPosition - position)
+          entity ! NewPosition(newPosition, newPosition - position)
         }
-      } else {entity ! NewPosition(position - delta, delta -)}
+      } else {
+        entity ! NewPosition(position - delta, delta -)
+      }
     } else {
       entity ! NewPosition(position, delta)
     }
   }
 
   /**
-   * when a new insect position fall inside an obstacle, this
-   * function calculate new bounced position and ricursively check
-   * that it fall outside another obstacle. If fall inside other
-   * obstacle, calculate a bounced position on second obstacle
-   *
-   * @param obstacles list of all obstacle present inside the map
-   * @param obstacle list of obstacle where new insect position fall in
-   * @param position of the insect
-   * @param newPosition new shifted position (position>>delta)
-   *
-   * @return (position, delta, isFood)
-   *         1: the new bounced position
-   *         2: the new delta of insect
-   *         3: a flag that define if the obstacle is a food or not
-   * */
+    * when a new insect position fall inside an obstacle, this
+    * function calculate new bounced position and recursively check
+    * that it fall outside another obstacle. If fall inside other
+    * obstacle, calculate a bounced position on second obstacle
+    *
+    * @param obstacles   list of all obstacle present inside the map
+    * @param obstacle    list of obstacle where new insect position fall in
+    * @param position    of the insect
+    * @param newPosition new shifted position (position>>delta)
+    * @return (position, delta, isFood)
+    *         1: the new bounced position
+    *         2: the new delta of insect
+    *         3: a flag that define if the obstacle is a food or not
+    **/
   @scala.annotation.tailrec
-  private def recursionCheck(obstacles:Iterable[Obstacle],
+  private def recursionCheck(obstacles: Iterable[Obstacle],
                              obstacle: Iterable[Obstacle],
                              position: Vector2D,
                              newPosition: Vector2D)
-  :(Vector2D, Vector2D, Boolean) = {
+  : (Vector2D, Vector2D, Boolean) = {
     val res = handleObstacleIntersection(obstacle, position, newPosition)
     val intersection = res._1
     val delta = res._2
@@ -88,24 +89,24 @@ private[environment] object CollisionsInterceptor {
   }
 
   /**
-   * This function calculates the intersection point of insect and the obstacles
-   * passed by arguments.
-   * It also calculate new delta orientation
-   *
-   * @param obstacle list of obstacle where new insect position fall in
-   * @param position of the insect
-   * @return (position, delta, isFood)
-   *         1: the new bounced position
-   *         2: the new delta of insect
-   *         3: obstacle on which an insect is bounced
-   * */
+    * This function calculates the intersection point of insect and the obstacles
+    * passed by arguments.
+    * It also calculate new delta orientation
+    *
+    * @param obstacle list of obstacle where new insect position fall in
+    * @param position of the insect
+    * @return (position, delta, isFood)
+    *         1: the new bounced position
+    *         2: the new delta of insect
+    *         3: obstacle on which an insect is bounced
+    **/
   private def handleObstacleIntersection(obstacle: Iterable[Obstacle],
                                          position: Vector2D,
                                          newPosition: Vector2D)
   : (Vector2D, Vector2D, Option[Obstacle]) = {
 
     val intersectionOnOverlappedObstacle = (for (f <- obstacle)
-      yield (f.findIntersectionInformation(position, newPosition),f)).toList
+      yield (f.findIntersectionInformation(position, newPosition), f)).toList
 
     val intersectionAndDirectionOpt = intersectionOnOverlappedObstacle
       .filter(_._1.nonEmpty)
@@ -125,7 +126,7 @@ private[environment] object CollisionsInterceptor {
       )
       (intersectionAndDirection.intersectionPoint, orientedDelta, Some(intersectionAndDirectionOpt._2))
     } else {
-      (position, (position - newPosition)/((position - newPosition)||), None)
+      (position, (position - newPosition) / ((position - newPosition) ||), None)
     }
   }
 }

@@ -1,10 +1,10 @@
 package common
 
 import alice.tuprolog.{Struct, Term}
-import model.environment.pheromones._
 import common.geometry.Vector2D
 import common.rTree.PrologFacilities.{TuPrologDouble, TuPrologInt}
-import common.rTree.RTree.{MyRange, Node, NotEmptyTree, Tree}
+import common.rTree.RTree.{Range, Node, NotEmptyTree, Tree}
+import model.environment.pheromones._
 
 package object rTree {
 
@@ -15,26 +15,34 @@ package object rTree {
   val none = "none"
   val DEFAULT_RANGE = 10
 
-  implicit class RichTerm(term: Term){
+  /** Pimping prolog Term to extract tree instances
+    *
+    * @param term prolog term
+    */
+  implicit class RichTerm(term: Term) {
 
+    /** Conversion from term to integer */
     def getAsInt: Option[Int] =
       try {
         Some(term.toString.toInt)
       } catch {
-        case _:Exception => None
+        case _: Exception => None
       }
 
-    def getAsNode: Node = {
+    /** Conversion from term to [[Node]] */
+    def getAsNode: Node[Int] = {
       val struct = term.getTerm.asInstanceOf[Struct]
       Node(struct.getArg(0).getAsInt, struct.getArg(1) getAsRange, struct.getArg(2) getAsRange)
     }
 
+    /** Conversion from term to [[Range]] */
     def getAsRange: (Double, Double) = {
       val struct = term.getTerm.asInstanceOf[Struct]
       (struct.getArg(0).toString.toDouble, struct.getArg(1).toString.toDouble)
     }
 
-    def getAsTree: Tree = term match {
+    /** Conversion from term to [[Tree]] */
+    def getAsTree: Tree[Int] = term match {
       case x if x.isCompound =>
         val struct = x.getTerm.asInstanceOf[Struct]
         val root = struct.getArg(1).getAsNode
@@ -42,6 +50,7 @@ package object rTree {
       case _ => Tree()
     }
 
+    /** Conversion from term to list of terms */
     def getAsList: List[Term] = term match {
       case x if x.isCompound =>
         val struct = x.getTerm.asInstanceOf[Struct]
@@ -50,29 +59,43 @@ package object rTree {
     }
   }
 
-  implicit def getNodeAsTerm(n: Node): Term = n.id match {
+  /** Conversion from node to prolog term */
+  implicit def getNodeAsTerm(n: Node[Int]): Term = n.id match {
     case Some(_) => new Struct(node, TuPrologInt(n.id.get), n.rangeX, n.rangeY)
     case _ => new Struct(node, Term.createTerm(none), n.rangeX, n.rangeY)
   }
 
-  implicit def getRangeAsTerm(r: MyRange): Term =
+  /** Conversion from range to prolog term */
+  implicit def getRangeAsTerm(r: Range): Term =
     new Struct(range, TuPrologDouble(r._1), TuPrologDouble(r._2))
 
-  implicit def getTreeAsTerm(t: Tree): Term = t match {
-    case x: NotEmptyTree => new Struct(tree, getTreeAsTerm(t.left), t.root.get, getTreeAsTerm(t.right))
+  /** Conversion from tree to prolog term */
+  implicit def getTreeAsTerm(t: Tree[Int]): Term = t match {
+    case x: NotEmptyTree[Int] => new Struct(tree, getTreeAsTerm(t.left), t.root.get, getTreeAsTerm(t.right))
     case _ => Term.createTerm(nil)
   }
 
-  implicit def getPheromoneAsNode(p: (Int,Pheromone)): Node = {
+  /** Conversion from pheromone with id to prolog term */
+  implicit def getPheromoneAsNode(p: (Int, Pheromone)): Node[Int] = {
     val ranges = p._2.position.rangeOfInfluence(INFLUENCE_RADIUS)
     Node(p._1, ranges._1, ranges._2)
   }
 
-  implicit def toOption[X](value:X): Option[X] = Some(value)
+  implicit def toOption[X](value: X): Option[X] = Some(value)
 
+  /** Pimping [[Vector2D]] to have a function to create a range from a position
+    *
+    * @param p input position
+    */
   implicit class RichPosition(p: Vector2D) {
-    def rangeOfInfluence(influence: Double): (MyRange, MyRange) = {
+
+    /**
+      * @param influence width of created range
+      * @return range around position
+      */
+    def rangeOfInfluence(influence: Double): (Range, Range) = {
       ((p.x - influence, p.x + influence), (p.y - influence, p.y + influence))
     }
   }
+
 }

@@ -19,7 +19,6 @@ class Obstacle(val points: List[Vector2D]) extends Drawable {
   var segments: List[(Vector2D, Vector2D, Vector3D)] = List()
 
   if (points.size < 3) {
-    print(points.size)
     throw new IllegalArgumentException("points list must have more than 2 elements")
   }
   //get a line given two points

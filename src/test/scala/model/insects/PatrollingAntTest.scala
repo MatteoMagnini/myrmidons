@@ -65,7 +65,7 @@ class PatrollingAntTest extends TestKit(ActorSystem("PatrollingAntTest"))
       val startingInfo = PatrollingAntInfo(senderRef)
       val ant = system.actorOf(PatrollingAnt(startingInfo,senderRef), "ant-1")
       import common.rTree.getPheromoneAsNode
-      val tree = Tree()
+      val tree: Tree[Int] = Tree()
       val engine = RTreeProlog()
 
       "perform danger pheromones taxis" in {
