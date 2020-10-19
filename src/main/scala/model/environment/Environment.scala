@@ -4,7 +4,7 @@ import akka.actor.{Actor, ActorLogging, Props}
 import common.Messages._
 import common.PheromoneMap._
 import common.RichActor._
-import common.geometry.{RandomVector2DInCircle, RandomVector2DInSquare, Vector2D, ZeroVector2D}
+import common.geometry.{RandomVector2DInCircle, Vector2D, ZeroVector2D}
 import model.environment.anthill.{Anthill, AnthillInfo}
 import model.environment.data.{EnvironmentInfo, InsectReferences}
 import model.environment.elements.EnvironmentElements._
@@ -51,13 +51,11 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
     case StartSimulation(nAnts: Int, nEnemies: Int, obstaclesPresence, foodPresence, anthillFood) =>
 
-      println(state.boundary.center)
       val anthillInfo = AnthillInfo(state.boundary.center, ANTHILL_RADIUS, anthillFood.get)
       val anthill = context.actorOf(Anthill(anthillInfo, self), name = "anthill")
       anthill ! CreateAnts(nAnts, FORAGING_PERCENTAGE)
 
       val obstacles = if (obstaclesPresence.isDefined) {
-        print(anthillInfo.position)
         Obstacle.createRandom(obstaclesPresence.get,
           anthillInfo.position, (50, 150), radius = OBSTACLE_RADIUS).toSeq
       }
@@ -88,14 +86,12 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   private def defaultBehaviour(state: EnvironmentInfo): Receive = {
 
     case Clock(value: Int) =>
-      //println(s"Pheromones: ${state.pheromones.size}, Tree height: ${state.tree.height}")
       randomSpawnAnt(state, value)
       state.ants.values.foreach(_ ! Clock(value))
       state.ants.values.foreach(_ ! Pheromones(state.pheromones, state.tree))
       state.enemies.values.foreach(_ ! Clock(value))
       state.anthill.get ! Clock(value)
       val newData = checkFoodSpawn(state).updatePheromones(state.pheromones.tick())
-      //val newData = state.updatePheromones(state.pheromones.tick())
       context >>> defaultBehaviour(newData)
 
     case Move(position: Vector2D, delta: Vector2D) =>
@@ -124,7 +120,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     case UpdateAnthill(anthillInfo: AnthillInfo) =>
       context >>> defaultBehaviour(state.updateAnthillInfo(Some(anthillInfo)))
 
-    case AntBirth(clock: Int) => context >>> defaultBehaviour(createNewAnt(clock, state, 0.2f))
+    case AntBirth(clock: Int) => context >>> defaultBehaviour(createNewAnt(clock, state, PATROLLING_ANT_PROBABILITY))
 
     case KillInsect(info: InsectInfo) => killInsect(info, state)
 

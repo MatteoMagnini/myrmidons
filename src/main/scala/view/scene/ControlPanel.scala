@@ -1,11 +1,11 @@
 package view.scene
 
-import java.awt.event.{ItemEvent, ItemListener}
+import java.awt.event.ItemEvent
 
 import akka.actor.{ActorRef, ActorSystem}
+import common.Messages.StartSimulation
 import model.environment.data.EnvironmentInfo
 import model.environment.{Boundary, Environment}
-import common.Messages.StartSimulation
 import view.actor.uiMessage.{RestartSimulation, ShowAndSaveReport, StopSimulation, setRate}
 import view.actor.{ReportManager, ReportManagerInfo, UiActor, uiActorInfo}
 
@@ -51,7 +51,7 @@ object ControlPanel {
     extends GridPanel(2, 2) with ControlPanel {
 
     private val system = ActorSystem("Myrmidons-system")
-    private val boundary = Boundary(-CENTER._1, CENTER._2, SIMULATION_BOUNDARY.width, SIMULATION_BOUNDARY.height)
+    private val boundary = Boundary(-CENTER.width, CENTER.height, SIMULATION_BOUNDARY.width, SIMULATION_BOUNDARY.height)
     private val stepLabel = new Label("Step:")
     private val populationLabel = new Label("Ants number:")
     private val anthillFoodAmountLabel = new Label("Anthill Food:")
@@ -78,7 +78,7 @@ object ControlPanel {
     var stepText = new Label("0")
     var antPopulationText = new Label("0")
     var anthillFoodAmount = new Label("0")
-    val pheromoneLayer = new CheckBox("hide pheromones")
+    val pheromoneLayer = new CheckBox("Hide pheromones")
 
     this.stopButton.enabled = false
     this.restartButton.enabled = false
@@ -86,14 +86,13 @@ object ControlPanel {
 
 
     contents ++= Seq(new FlowPanel {
-      contents ++= Seq(startButton, stopButton, restartButton, reportButton,
-        timeLabel, timeInput, buttonSetTime, pheromoneLayer)
-    }, new FlowPanel {
-      contents ++= Seq(stepLabel,
-        stepText,
-        populationLabel, antPopulationText, new Separator(),
-        anthillFoodAmountLabel, anthillFoodAmount)
-    })
+      contents ++= Seq(startButton, stopButton, restartButton,
+        reportButton, timeLabel, timeInput, buttonSetTime, pheromoneLayer)
+    },
+      new FlowPanel {
+        contents ++= Seq(stepLabel, stepText, populationLabel, antPopulationText,
+          new Separator(), anthillFoodAmountLabel, anthillFoodAmount)
+      })
 
 
     pheromoneLayer.peer.addItemListener((_: ItemEvent) => {

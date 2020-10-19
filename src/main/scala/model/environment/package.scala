@@ -23,6 +23,7 @@ package object environment {
   val MIN_DISTANCE_ENEMIES_FROM_ANTHILL = 200
   val MAX_DISTANCE_ENEMIES_FROM_ANTHILL = 600
 
+  val PATROLLING_ANT_PROBABILITY = 0.2
 
   implicit def extractOption[X](value: Option[X]): X = value.get
 
