@@ -1,4 +1,6 @@
-import java.awt.Color
+import java.awt.{Color, Dimension, Toolkit}
+
+import org.apache.commons.lang3.SystemUtils
 
 package object view {
 
@@ -7,7 +9,12 @@ package object view {
   val FIGHT_DRAW_SIZE = 20
   val SET_TO_CENTER = 2
   val OBSTACLE_DRAW_SIZE = 20
-
+  var checkedSize: Dimension = Toolkit.getDefaultToolkit.getScreenSize
+  if(SystemUtils.IS_OS_LINUX){
+    checkedSize  = new Dimension(checkedSize.width, checkedSize.height - 30)
+  }
+  val SIMULATION_SIZE: Dimension = checkedSize
+  val CENTER: (Int, Int) = (SIMULATION_SIZE.width /2, SIMULATION_SIZE.height / 2)
 
   object Colors {
 

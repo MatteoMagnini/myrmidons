@@ -24,7 +24,8 @@ private[view] class UiActor(state: uiActorInfo)
       timers.startSingleTimer(state.currentState, StepOver, state.rate.millis)
 
     case Repaint(info: Seq[Drawable]) =>
-      if (state.currentState % REPORT_INC_CLOCK == 0) state.control.reportManager.tell(ReportInfo(info), self)
+      if (state.currentState % REPORT_INC_CLOCK == 0)
+        state.control.reportManager.tell(ReportInfo(info), self)
       val entitiesProperties = state.setEntities(info)
       state.drawEntities()
       state.setControl(state.currentState, entitiesProperties)

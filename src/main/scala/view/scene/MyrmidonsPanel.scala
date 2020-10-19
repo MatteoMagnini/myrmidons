@@ -3,9 +3,9 @@ package view.scene
 
 import model.Drawable
 import model.environment.Fights.Fight
-import model.environment.pheromones.Pheromone
 import model.environment.anthill.AnthillInfo
 import model.environment.elements.Obstacle
+import model.environment.pheromones.Pheromone
 import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo, PatrollingAntInfo}
 import view.controller.{Keyboard, Mouse, MouseWheel}
 import view.drawLogic._
@@ -37,6 +37,19 @@ trait MyrmidonsPanel extends Panel {
    * @param value if true hide the pheromones, if false show them.
    */
   def hidePheromones(value: Boolean): Unit
+
+  def zoomIn(): Unit
+
+  def zoomOut(): Unit
+
+  def goNorth(): Unit
+
+  def goEast(): Unit
+
+  def goSouth(): Unit
+
+  def goWest(): Unit
+
 }
 
 object MyrmidonsPanel {
@@ -54,7 +67,6 @@ object MyrmidonsPanel {
     private var zoom = 1.0
     private var slackX = 0
     private var slackY = 0
-
 
     /**
      * Paint entities of the graphics.
@@ -86,9 +98,9 @@ object MyrmidonsPanel {
       }
     }
 
-    this.peer.addKeyListener(new Keyboard(this))
-    this.peer.addMouseListener(new Mouse(this))
-    this.peer.addMouseWheelListener(new MouseWheel(this))
+    peer.addKeyListener(new Keyboard(this))
+    peer.addMouseListener(new Mouse(this))
+    peer.addMouseWheelListener(new MouseWheel(this))
 
     def drawEntities(): Unit = {
       repaint()
@@ -129,7 +141,7 @@ object MyrmidonsPanel {
     }
 
     def zoomOut(): Unit = {
-      zoom = if (zoom <= MIN_ZOOM){
+      zoom = if (zoom <= MIN_ZOOM) {
         zoom
       }
       else {
@@ -137,25 +149,15 @@ object MyrmidonsPanel {
       }
     }
 
-    def goNorth(): Unit = {
-      slackY += STEP_LENGTH
-    }
+    def goNorth(): Unit = slackY += STEP_LENGTH
 
-    def goEast(): Unit = {
-      slackX += STEP_LENGTH
-    }
+    def goEast(): Unit = slackX += STEP_LENGTH
 
-    def goSouth(): Unit = {
-      slackY -= STEP_LENGTH
-    }
+    def goSouth(): Unit = slackY -= STEP_LENGTH
 
-    def goWest(): Unit = {
-      slackX -= STEP_LENGTH
-    }
+    def goWest(): Unit = slackX -= STEP_LENGTH
 
-    override def hidePheromones(value: Boolean): Unit =
-      showPheromones = !value
-
+    override def hidePheromones(value: Boolean): Unit = showPheromones = !value
   }
 
 }

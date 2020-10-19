@@ -27,7 +27,6 @@ object TimeSeriesFrame {
 
     centerOnScreen()
     title = "Myrmidons - Report"
-
     val insectChart: JFreeChart = ChartFactory.createTimeSeriesChart(
       "Myrmidons -  Insect number plotter ", "LogicTime", "Value",
       setInsectSeries(), true, true, true)
@@ -39,7 +38,7 @@ object TimeSeriesFrame {
     setChartColor(foodChart)
     peer.getContentPane.add(new ChartPanel(insectChart), BorderLayout.NORTH)
     peer.getContentPane.add(new ChartPanel(foodChart), BorderLayout.SOUTH)
-    size = new Dimension(SIMULATION_SIZE.width, SIMULATION_SIZE.height)
+    size = new Dimension(TIME_SERIES_SIZE, TIME_SERIES_SIZE)
     visible = true
 
     /**
