@@ -1,41 +1,65 @@
 package common.rTree
 
 import common.geometry.Vector2D
-import common.rTree.RTree.Tree
+import common.rTree.RTree.{Range, Tree}
 
 object RTree {
 
-  type MyRange = (Double, Double)
+  /** Define a new type, describing a range: lower bound coordinate and upper bound coordinate */
+  type Range = (Double, Double)
 
-  case class Node[A](id: Option[A], rangeX: MyRange, rangeY: MyRange) {
+  /** A node of r-tree
+    *
+    * @param id identifier of node
+    * @param rangeX range along x coordinate
+    * @param rangeY range along y coordinate
+    * @tparam A type of element to be put in tree (id field)
+    */
+  case class Node[A](id: Option[A], rangeX: Range, rangeY: Range) {
 
-    def intersects(ranges: (MyRange, MyRange)): Boolean = {
-      val rangeX = ranges._1
-      val rangeY = ranges._2
-      (this.rangeX._1 <= rangeX._2) && (rangeX._1 <= this.rangeX._2) &&
-        (this.rangeY._1 <= rangeY._2) && (this.rangeY._1 <= rangeY._2)
+    /** Checks if two ranges in 2D space are intersected
+      *
+      * @param otherRanges ranges to be compared
+      * @return whether ranges are intersected
+      */
+    def intersects(otherRanges: (Range, Range)): Boolean = {
+      val otherRangeX = otherRanges._1
+      val otherRangeY = otherRanges._2
+      (rangeX._1 < otherRangeX._2) && (otherRangeX._1 < rangeX._2) &&
+        (rangeY._1 < otherRangeY._2) && (otherRangeY._1 < rangeY._2)
     }
   }
 
+  /** Factory methods to create a node: with or without defined id (for not leaves nodes) */
   object Node {
-    def apply[A](id: Option[A], rangeX: MyRange, rangeY: MyRange): Node[A] = new Node(id, rangeX, rangeY)
+    def apply[A](id: Option[A], rangeX: Range, rangeY: Range): Node[A] = new Node(id, rangeX, rangeY)
 
-    def apply[A](rangeX: MyRange, rangeY: MyRange): Node[A] = new Node[A](None, rangeX, rangeY)
+    def apply[A](rangeX: Range, rangeY: Range): Node[A] = new Node[A](None, rangeX, rangeY)
   }
 
+  /** Generic r-tree
+    *
+    * @tparam A type of values stored in r-tree
+    */
   sealed trait Tree[A] {
 
+    /** Left branch of tree*/
     def left: Tree[A]
 
+    /** Right branch of tree*/
     def right: Tree[A]
 
+    /** Root of tree*/
     def root: Option[Node[A]]
 
+    /** Size of tree*/
     def size: Int
 
+    /** Height of tree*/
     def height: Int
   }
 
+  /** An implementation of r-tree */
   trait TreeImpl[A] extends Tree[A] {
 
     override def left: Tree[A] = this match {
@@ -59,6 +83,7 @@ object RTree {
       case _ => 0
     }
 
+    /* essendo albero non bilanciato, non è sempre vero... */
     override def height: Int = this match {
       case x: NotEmptyTree[A] => 1 + x.l.height
       case _ => 0
@@ -68,13 +93,15 @@ object RTree {
       case x: NotEmptyTree[A] => x.l.root.isEmpty || x.r.root.isEmpty
       case _ => false
     }
-
   }
 
+  /** Empty tree */
   case class EmptyTree[A]() extends TreeImpl[A]
 
+  /** Not-empty tree */
   case class NotEmptyTree[A](l: Tree[A], node: Node[A], r: Tree[A]) extends TreeImpl[A]
 
+  /** Factory methods to create an r-tree */
   object Tree {
     def apply[A](): Tree[A] = EmptyTree()
 
@@ -85,19 +112,27 @@ object RTree {
 
 object ScalaEngine {
 
+  /** Query over an r-tree
+    *
+    * @param position reference position in which query is done
+    * @param tree r-tree to be queried
+    * @return list of leaves id that respond to query
+    */
   def query(position: Vector2D, tree: Tree[Int]): Seq[Int] = {
-    tree.root match {
-      case Some(r) => if (r intersects position.rangeOfInfluence(DEFAULT_RANGE)) {
-        val id = r.id match {
-          case Some(i) => Seq(i)
-          case None => Seq.empty
-        }
-        id ++ query(position, tree.left) ++ query(position, tree.right)
-      } else {
-        Seq.empty
-      }
-      case None => Seq.empty
-    }
-  }
 
+    def _query(queriedRange: (Range, Range), tree: Tree[Int]): Seq[Int] = {
+      tree.root match {
+        case Some(r) => if (r intersects queriedRange) {
+          r.id match {
+            case Some(i) => i +: _query(queriedRange, tree.left) ++: _query(queriedRange, tree.right)
+            case None => _query(queriedRange, tree.left) ++ _query(queriedRange, tree.right)
+          }
+        } else {
+          Seq.empty
+        }
+        case None => Seq.empty
+      }
+    }
+    _query(position.rangeOfInfluence(DEFAULT_RANGE), tree)
+  }
 }

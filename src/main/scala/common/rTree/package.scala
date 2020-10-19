@@ -3,7 +3,7 @@ package common
 import alice.tuprolog.{Struct, Term}
 import common.geometry.Vector2D
 import common.rTree.PrologFacilities.{TuPrologDouble, TuPrologInt}
-import common.rTree.RTree.{MyRange, Node, NotEmptyTree, Tree}
+import common.rTree.RTree.{Range, Node, NotEmptyTree, Tree}
 import model.environment.pheromones._
 
 package object rTree {
@@ -35,7 +35,7 @@ package object rTree {
       Node(struct.getArg(0).getAsInt, struct.getArg(1) getAsRange, struct.getArg(2) getAsRange)
     }
 
-    /** Conversion from term to [[MyRange]] */
+    /** Conversion from term to [[Range]] */
     def getAsRange: (Double, Double) = {
       val struct = term.getTerm.asInstanceOf[Struct]
       (struct.getArg(0).toString.toDouble, struct.getArg(1).toString.toDouble)
@@ -66,7 +66,7 @@ package object rTree {
   }
 
   /** Conversion from range to prolog term */
-  implicit def getRangeAsTerm(r: MyRange): Term =
+  implicit def getRangeAsTerm(r: Range): Term =
     new Struct(range, TuPrologDouble(r._1), TuPrologDouble(r._2))
 
   /** Conversion from tree to prolog term */
@@ -93,7 +93,7 @@ package object rTree {
       * @param influence width of created range
       * @return range around position
       */
-    def rangeOfInfluence(influence: Double): (MyRange, MyRange) = {
+    def rangeOfInfluence(influence: Double): (Range, Range) = {
       ((p.x - influence, p.x + influence), (p.y - influence, p.y + influence))
     }
   }

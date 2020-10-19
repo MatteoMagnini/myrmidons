@@ -4,12 +4,12 @@ import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import common.geometry.ZeroVector2D
-import common.rTree.RTree.{MyRange, Node, Tree}
+import common.rTree.RTree.{Range, Node, Tree}
 
 class RTreeTest extends AnyWordSpecLike with Matchers with BeforeAndAfterAll {
 
   val engine = RTreeProlog()
-  def mergedRanges(r1: MyRange, r2: MyRange): MyRange =
+  def mergedRanges(r1: Range, r2: Range): Range =
     (if (r1._1 <= r2._1) r1._1 else r2._1, if (r1._2 >= r2._2) r1._2 else r2._2)
 
   "An empty R-Tree" when {
@@ -142,12 +142,15 @@ class RTreeTest extends AnyWordSpecLike with Matchers with BeforeAndAfterAll {
     "queried" should {
       val queryPosition = (2,3)
       val result = engine.query(queryPosition, tree)
-
       "give correct number of nodes in output" in {
         assert(result.size == 1)
       }
       "give correct nodes as output" in {
         assert(result.contains(node1.id.get))
+      }
+      "give correct result even using scala engine" in {
+        val scalaResult = ScalaEngine.query(queryPosition, tree)
+        assert(scalaResult == result)
       }
     }
   }
