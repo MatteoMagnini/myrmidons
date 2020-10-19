@@ -52,18 +52,17 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
       environment ! StartSimulation(nAnts, 0, obstacles = None, food = None)
       sender expectMsg Ready
       environment ! Clock(1)
+      val result = sender.expectMsgType[Repaint]
 
       "receive its initial position" in {
-        val result = sender.expectMsgType[Repaint]
-        println(result.info)
         initialPosition = (result.info find antsFilter get).position
       }
     }
     "make ant move" should {
       environment ! Clock(2)
+      val result = sender.expectMsgType[Repaint]
 
       "receive its new position" in {
-        val result = sender.expectMsgType[Repaint]
         newPosition = (result.info find antsFilter get).position
       }
       "receive no more messages" in {

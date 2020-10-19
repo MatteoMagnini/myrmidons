@@ -97,9 +97,9 @@ object Messages {
    */
   case class UpdateAnthillCondition(antIsInsideTheAnthill: Boolean) extends Message
 
-  case class CreateEntities(nAnts: Int, foragingProbability: Double) extends Message
+  case class CreateAnts(nAnts: Int, foragingProbability: Double) extends Message
 
-  case class NewEntities(ants: InsectReferences) extends Message
+  case class NewAnts(ants: InsectReferences) extends Message
   /**
    * Message from GUI to create new ants with RandomPosition.
    *

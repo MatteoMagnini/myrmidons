@@ -4,6 +4,10 @@ import model.environment.Fights.InsectFight._
 import model.environment.Fights.{Fight, _}
 import model.insects.info.{EnemyInfo, InsectInfo}
 
+/**
+  *
+  * @param fights
+  */
 class FightsChecker(val fights: Iterable[Fight[InsectInfo, EnemyInfo]]) {
 
   def checkFights: (Seq[InsectInfo], Seq[EnemyInfo]) = {
@@ -16,15 +20,6 @@ class FightsChecker(val fights: Iterable[Fight[InsectInfo, EnemyInfo]]) {
     }
     _checkFights(losers(fights))
   }
-
-  /*def checkFights: (Seq[InsectInfo], Seq[EnemyInfo]) = {
-    var ants: Seq[InsectInfo] = Seq.empty
-    var enemies: Seq[EnemyInfo] = Seq.empty
-    losers(fights).foreach(f => f.fold(
-      ant => ants = ants :+ ant,
-      enemy => enemies = enemies :+ enemy))
-    (ants, enemies)
-  }*/
 }
 
 object FightsChecker {
