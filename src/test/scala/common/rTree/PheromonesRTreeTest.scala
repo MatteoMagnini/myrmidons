@@ -11,7 +11,7 @@ import common.rTree.RTree.{Node, Tree}
 class PheromonesRTreeTest extends AnyWordSpecLike with Matchers with BeforeAndAfterAll {
 
   val engine = RTreeProlog()
-  val decreasingFunction: scala.Double => scala.Double = x => x - DELTA
+  val decreasingFunction: Double => Double = x => x - DELTA
 
   "Prolog engine" when {
 

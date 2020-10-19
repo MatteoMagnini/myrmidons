@@ -55,7 +55,6 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
 
       "receive its initial position" in {
         val result = sender.expectMsgType[Repaint]
-        println(result.info)
         initialPosition = (result.info find antsFilter get).position
       }
     }
