@@ -1,13 +1,13 @@
 package model.environment.anthill
 
 import akka.actor.{Actor, ActorRef, Props}
+import common.Messages._
+import common.geometry.Vectors.doubleInRange
+import common.geometry._
 import model.Drawable
 import model.insects.competences._
 import model.insects.info.{ForagingAntInfo, PatrollingAntInfo}
 import model.insects.{ForagingAnt, PatrollingAnt}
-import common.Messages._
-import common.geometry.Vectors.doubleInRange
-import common.geometry._
 
 case class AnthillInfo(override val position: Vector2D,
                        radius: Double,
@@ -49,24 +49,16 @@ case class Anthill(info: AnthillInfo, environment: ActorRef) extends Actor {
         environment.tell(Move(position, ZeroVector2D()), sender)
       } else {
         val rad = dist /\
-        val delta = OrientedVector2DWithNoise(rad, maxSpeed, noise)
-        val delta2 = OrientedVector2D((delta >> (inertia * INERTIA_FACTOR))./\,
+        val unboundedDelta = OrientedVector2DWithNoise(rad, maxSpeed, noise)
+        val delta = OrientedVector2D((unboundedDelta >> (inertia * INERTIA_FACTOR))./\,
           doubleInRange(MIN_VELOCITY, MAX_VELOCITY))
-        environment.tell(Move(position, delta2), sender)
+        environment.tell(Move(position, delta), sender)
       }
 
-    case Clock(value) =>
-    /*  val antBirthValue = data.foodAmount / data.maxFoodAmount * Random.nextDouble()
-      /* Random birth of ants */
-      if (antBirthValue > 0.2) {
-        environment ! AntBirth(value)
-        self ! StoreFood(if (data.foodAmount < 10) - data.foodAmount else - 10)
-      }*/
-    environment ! UpdateAnthill(data)
+    case Clock(_) =>
+      environment ! UpdateAnthill(data)
 
-    case CreateEntities(nAnts: Int, foragingPercentage: Double) =>
-
-      /** Returns ants and enemies references, creating ants from the center of boundary */
+    case CreateAnts(nAnts: Int, foragingPercentage: Double) =>
       val nForaging = (nAnts * foragingPercentage).ceil.toInt
       val foragingAnts = (0 until nForaging).map(i => {
         i -> context.actorOf(ForagingAnt(ForagingAntInfo(
@@ -77,7 +69,7 @@ case class Anthill(info: AnthillInfo, environment: ActorRef) extends Actor {
         i -> context.actorOf(PatrollingAnt(PatrollingAntInfo(self, id = i, position = info.position),
           sender), s"p-ant-$i")
       }).toMap
-      sender ! NewEntities(foragingAnts ++ patrollingAnts)
+      sender ! NewAnts(foragingAnts ++ patrollingAnts)
   }
 }
 

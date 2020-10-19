@@ -1,93 +1,139 @@
 package common.rTree
 
-import model.environment.pheromones.INFLUENCE_RADIUS
 import common.geometry.Vector2D
-import common.rTree.RTree.Tree
+import common.rTree.RTree.{Range, Tree}
 
 object RTree {
 
-  type MyRange = (Double, Double)
-  case class Node(id: Option[Int], rangeX: MyRange, rangeY: MyRange){
-    def intersects(ranges: (MyRange, MyRange)): Boolean = {
-      val rangeX = ranges._1
-      val rangeY = ranges._2
-      (this.rangeX._1 <= rangeX._2) && (rangeX._1 <= this.rangeX._2) &&
-        (this.rangeY._1 <= rangeY._2) && (this.rangeY._1 <= rangeY._2)
+  /** Define a new type, describing a range: lower bound coordinate and upper bound coordinate */
+  type Range = (Double, Double)
+
+  /** A node of r-tree
+    *
+    * @param id     identifier of node
+    * @param rangeX range along x coordinate
+    * @param rangeY range along y coordinate
+    * @tparam A type of element to be put in tree (id field)
+    */
+  case class Node[A](id: Option[A], rangeX: Range, rangeY: Range) {
+
+    /** Checks if two ranges in 2D space are intersected
+      *
+      * @param otherRanges ranges to be compared
+      * @return whether ranges are intersected
+      */
+    def intersects(otherRanges: (Range, Range)): Boolean = {
+      val otherRangeX = otherRanges._1
+      val otherRangeY = otherRanges._2
+      (rangeX._1 < otherRangeX._2) && (otherRangeX._1 < rangeX._2) &&
+        (rangeY._1 < otherRangeY._2) && (otherRangeY._1 < rangeY._2)
     }
   }
 
+  /** Factory methods to create a node: with or without defined id (for not leaves nodes) */
   object Node {
-    def apply(id: Option[Int], rangeX: MyRange, rangeY: MyRange): Node = new Node(id, rangeX, rangeY)
-    def apply(rangeX: MyRange, rangeY: MyRange): Node = new Node(None, rangeX, rangeY)
+    def apply[A](id: Option[A], rangeX: Range, rangeY: Range): Node[A] = new Node(id, rangeX, rangeY)
+
+    def apply[A](rangeX: Range, rangeY: Range): Node[A] = new Node[A](None, rangeX, rangeY)
   }
 
-  sealed trait Tree {
-    def left: Tree
-    def right: Tree
-    def root: Option[Node]
+  /** Generic r-tree
+    *
+    * @tparam A type of values stored in r-tree
+    */
+  sealed trait Tree[A] {
+
+    /** Left branch of tree */
+    def left: Tree[A]
+
+    /** Right branch of tree */
+    def right: Tree[A]
+
+    /** Root of tree */
+    def root: Option[Node[A]]
+
+    /** Size of tree */
     def size: Int
+
+    /** Height of tree */
     def height: Int
   }
 
-  trait TreeImpl extends Tree {
+  /** An implementation of r-tree */
+  trait TreeImpl[A] extends Tree[A] {
 
-    override def left: Tree = this match {
-      case x: NotEmptyTree => x.l
-      case  _ => EmptyTree()
+    override def left: Tree[A] = this match {
+      case x: NotEmptyTree[A] => x.l
+      case _ => EmptyTree()
     }
 
-    override def right: Tree = this match {
-      case x:NotEmptyTree => x.r
-      case  _ => EmptyTree()
+    override def right: Tree[A] = this match {
+      case x: NotEmptyTree[A] => x.r
+      case _ => EmptyTree()
     }
 
-    override def root: Option[Node] = this match {
-      case x:NotEmptyTree => Some(x.node)
+    override def root: Option[Node[A]] = this match {
+      case x: NotEmptyTree[A] => Some(x.node)
       case _ => None
     }
 
     override def size: Int = this match {
-      case x:NotEmptyTree if isLeaf(x) => 1 + x.l.size + x.r.size
-      case x:NotEmptyTree => x.l.size + x.r.size
+      case x: NotEmptyTree[A] if isLeaf(x) => 1 + x.l.size + x.r.size
+      case x: NotEmptyTree[A] => x.l.size + x.r.size
       case _ => 0
     }
 
+    /* essendo albero non bilanciato, non è sempre vero... */
     override def height: Int = this match {
-      case x:NotEmptyTree => 1 + x.l.height
+      case x: NotEmptyTree[A] => 1 + x.l.height
       case _ => 0
     }
 
-    private def isLeaf(tree:Tree):Boolean = tree match {
-      case x:NotEmptyTree => x.l.root.isEmpty || x.r.root.isEmpty
+    private def isLeaf(tree: Tree[A]): Boolean = tree match {
+      case x: NotEmptyTree[A] => x.l.root.isEmpty || x.r.root.isEmpty
       case _ => false
     }
-
   }
 
-  case class EmptyTree() extends TreeImpl
-  case class NotEmptyTree(l: Tree, node: Node, r: Tree) extends TreeImpl
+  /** Empty tree */
+  case class EmptyTree[A]() extends TreeImpl[A]
 
+  /** Not-empty tree */
+  case class NotEmptyTree[A](l: Tree[A], node: Node[A], r: Tree[A]) extends TreeImpl[A]
+
+  /** Factory methods to create an r-tree */
   object Tree {
-    def apply(): Tree = EmptyTree()
-    def apply(left: Tree, root: Node, right: Tree): Tree = NotEmptyTree(left, root, right)
+    def apply[A](): Tree[A] = EmptyTree()
+
+    def apply[A](left: Tree[A], root: Node[A], right: Tree[A]): Tree[A] = NotEmptyTree(left, root, right)
   }
+
 }
 
 object ScalaEngine {
 
-  def query(position: Vector2D,tree: Tree): Seq[Int] = {
-    tree.root match {
-      case Some(r) => if(r intersects position.rangeOfInfluence(DEFAULT_RANGE)){
-        val id = r.id match {
-          case Some(i) => Seq(i)
-          case None => Seq.empty
-        }
-        id ++ query(position, tree.left) ++ query(position, tree.right)
-      } else {
-        Seq.empty
-      }
-      case None => Seq.empty
-    }
-  }
+  /** Query over an r-tree
+    *
+    * @param position reference position in which query is done
+    * @param tree     r-tree to be queried
+    * @return list of leaves id that respond to query
+    */
+  def query(position: Vector2D, tree: Tree[Int]): Seq[Int] = {
 
+    def _query(queriedRange: (Range, Range), tree: Tree[Int]): Seq[Int] = {
+      tree.root match {
+        case Some(r) => if (r intersects queriedRange) {
+          r.id match {
+            case Some(i) => i +: _query(queriedRange, tree.left) ++: _query(queriedRange, tree.right)
+            case None => _query(queriedRange, tree.left) ++ _query(queriedRange, tree.right)
+          }
+        } else {
+          Seq.empty
+        }
+        case None => Seq.empty
+      }
+    }
+
+    _query(position.rangeOfInfluence(DEFAULT_RANGE), tree)
+  }
 }

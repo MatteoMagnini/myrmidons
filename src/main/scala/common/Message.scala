@@ -42,7 +42,7 @@ object Messages {
    */
   case class Move(start: Vector2D, delta: Vector2D) extends Message
 
-  case class Pheromones(pheromones: Map[Int,Pheromone], tree: Tree) extends Message
+  case class Pheromones(pheromones: Map[Int,Pheromone], tree: Tree[Int]) extends Message
 
   case class AddPheromone(foodPheromone: Pheromone, threshold: Double) extends Message
 
@@ -97,9 +97,9 @@ object Messages {
    */
   case class UpdateAnthillCondition(antIsInsideTheAnthill: Boolean) extends Message
 
-  case class CreateEntities(nAnts: Int, foragingProbability: Double) extends Message
+  case class CreateAnts(nAnts: Int, foragingProbability: Double) extends Message
 
-  case class NewEntities(ants: InsectReferences) extends Message
+  case class NewAnts(ants: InsectReferences) extends Message
   /**
    * Message from GUI to create new ants with RandomPosition.
    *

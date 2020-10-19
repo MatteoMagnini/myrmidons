@@ -25,11 +25,11 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
   override def receive: Receive = initializationBehaviour(state)
 
-  def randomPositionOutObstacle(obstacleList: Seq[Obstacle], minMax: (Double, Double)): Vector2D = {
+  def getPositionOutObstacle(obstacleList: Seq[Obstacle], min: Double, max: Double): Vector2D = {
     import model.environment.elements.EnvironmentElements.ObstacleHasInside
     var randomPosition = ZeroVector2D()
     do {
-      randomPosition = RandomVector2DInCircle(minMax._1, minMax._2)
+      randomPosition = RandomVector2DInCircle(min, max)
     }
     while (checkHaveInside(obstacleList, randomPosition).nonEmpty)
     randomPosition
@@ -37,16 +37,15 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
   def randomPositionOutObstacleFromCenter(obstacleList: Seq[Obstacle],
                                           center: Vector2D,
-                                          minMax: (Double, Double)): Vector2D = {
+                                          min: Double, max: Double): Vector2D = {
     import model.environment.elements.EnvironmentElements.ObstacleHasInside
     var randomPosition = ZeroVector2D()
     do {
-      randomPosition = common.geometry.RandomVector2DInCircle(minMax, center)
+      randomPosition = common.geometry.RandomVector2DInCircle(min, max, center)
     }
     while (checkHaveInside(obstacleList, randomPosition).nonEmpty)
     randomPosition
   }
-
 
   private def initializationBehaviour(state: EnvironmentInfo): Receive = {
 
@@ -54,7 +53,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
       val anthillInfo = AnthillInfo(state.boundary.center, ANTHILL_RADIUS, anthillFood.get)
       val anthill = context.actorOf(Anthill(anthillInfo, self), name = "anthill")
-      anthill ! CreateEntities(nAnts, FORAGING_PERCENTAGE)
+      anthill ! CreateAnts(nAnts, FORAGING_PERCENTAGE)
 
       val obstacles = if (obstaclesPresence.isDefined) {
         Obstacle.createRandom(obstaclesPresence.get,
@@ -71,15 +70,15 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       }
 
       val enemies = (0 until nEnemies).map(i => {
-        val randomPosition = randomPositionOutObstacle(obstacles ++ foods,
-          (MIN_DISTANCE_ENEMIES_FROM_ANTHILL,MAX_DISTANCE_ENEMIES_FROM_ANTHILL))
+        val randomPosition = getPositionOutObstacle(obstacles ++ foods,
+          MIN_DISTANCE_ENEMIES_FROM_ANTHILL, MAX_DISTANCE_ENEMIES_FROM_ANTHILL)
         i -> context.actorOf(Enemy(EnemyInfo(id = i, position = randomPosition), self), s"enemy-$i")
       }).toMap
 
       context >>> initializationBehaviour(EnvironmentInfo(Some(sender), state.boundary,
         obstacles, foods, anthill, Some(anthillInfo)).addEnemies(enemies))
 
-    case NewEntities(ants: InsectReferences) =>
+    case NewAnts(ants: InsectReferences) =>
       state.gui.get ! Ready
       context >>> defaultBehaviour(state.addAnts(ants))
   }
@@ -87,7 +86,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   private def defaultBehaviour(state: EnvironmentInfo): Receive = {
 
     case Clock(value: Int) =>
-      checkAntBirth(state, value)
+      randomSpawnAnt(state, value)
       state.ants.values.foreach(_ ! Clock(value))
       state.ants.values.foreach(_ ! Pheromones(state.pheromones, state.tree))
       state.enemies.values.foreach(_ ! Clock(value))
@@ -140,7 +139,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     val foodMetricValue = FOOD_METRIC - (antHillFoodPercentage * 10)
     if (totalFoodOnMeanDistance < foodMetricValue) {
       val randomPosition = randomPositionOutObstacleFromCenter(state.obstacles.toList ++ state.foods,
-        state.anthillInfo.position, FOOD_RADIUS)
+        state.anthillInfo.position, FOOD_RADIUS._1, FOOD_RADIUS._2)
       val nf = Food(randomPosition, FOOD_MIN_QUANTITY)
       state.updateFood(nf, nf)
     } else {
@@ -148,7 +147,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     }
   }
 
-  private def checkAntBirth(state: EnvironmentInfo, clock: Int): Unit = {
+  private def randomSpawnAnt(state: EnvironmentInfo, clock: Int): Unit = {
     val antHillFoodPercentage = state.anthillInfo.get.foodAmount / state.anthillInfo.get.maxFoodAmount
     val scaleFactor = 2.2 / MAX_FOOD
     if (Random.nextDouble() < (antHillFoodPercentage * scaleFactor)) {

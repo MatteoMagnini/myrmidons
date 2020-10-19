@@ -24,7 +24,7 @@ trait Pheromone extends Drawable {
   /**
    * Apply the decreasing function.
    *
-   * @return the new pheromone if it is not compleatly evaporated
+   * @return the new pheromone if it is not completely evaporated
    */
   def decrease: Option[Pheromone]
 
