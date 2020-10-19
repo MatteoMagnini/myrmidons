@@ -98,7 +98,7 @@ object MyrmidonsPanel {
       }
     }
 
-    peer.addKeyListener(new Keyboard(this))
+    peer.addKeyListener(Keyboard(this))
     peer.addMouseListener(new Mouse(this))
     peer.addMouseWheelListener(new MouseWheel(this))
 
