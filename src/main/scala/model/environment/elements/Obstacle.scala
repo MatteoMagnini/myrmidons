@@ -1,9 +1,8 @@
 
 package model.environment.elements
 
-import model.Drawable
-import common.geometry.RandomVector2DInCircle
 import common.geometry.{Vector2D, Vector3D, Vectors}
+import model.Drawable
 
 
 /** An implementation of an obstacle.
@@ -14,8 +13,6 @@ import common.geometry.{Vector2D, Vector3D, Vectors}
 class Obstacle(val points: List[Vector2D]) extends Drawable {
 
   override val position: Vector2D = Vectors.findCentroid(points)
-
-
   var segments: List[(Vector2D, Vector2D, Vector3D)] = List()
 
   if (points.size < 3) {
@@ -29,8 +26,7 @@ class Obstacle(val points: List[Vector2D]) extends Drawable {
     segments ::= (points(before), points(i), line)
   })
 
-
-  def maxDistanceFromCenter(): Double ={
+  private def maxDistanceFromCenter(): Double = {
     points.sortWith((p1, p2) => (p1 --> position) < (p2 --> position)).head --> position
   }
 
@@ -55,12 +51,6 @@ class Obstacle(val points: List[Vector2D]) extends Drawable {
     val antPath: (Vector2D, Vector2D, Vector3D) = (oldPosition, newPosition, oldPosition X newPosition)
     var intersections: List[IntersectionResult] = List()
 
-    /*
-    * Calculate intersection between insect line and obstacle border line,
-    * then check if intersection fall inside ant segment. If this check result
-    * true, then the calculated intersection is the result with angle between
-    * form border and ant path.
-    * */
     segments.indices foreach (i => {
       val intersectionPoint = Vectors.findIntersectionPoint(segments(i), antPath)
       if (intersectionPoint != Option.empty) {
@@ -85,22 +75,21 @@ class Obstacle(val points: List[Vector2D]) extends Drawable {
    * Given obstacle b, eliminate overlapped vertex and join other vertex in a single obstacle
    *
    * @param b obstacle to join.
-   *
    * @return An Option of obstacle that is defined if join is well done, otherwise return None
-   * */
-  def ><(b:Obstacle): Option[Obstacle] = {
-    if(this.isInstanceOf[Food] != b.isInstanceOf[Food]) {
+   **/
+  def ><(b: Obstacle): Option[Obstacle] = {
+    if (this.isInstanceOf[Food] != b.isInstanceOf[Food]) {
       throw new IllegalArgumentException(s"$this and $b are different objects")
     }
 
-    if(this equals b) {
+    if (this equals b) {
       Some(this)
     } else {
       val newPointList = (this ->| b).toList
       if (newPointList.nonEmpty) {
         val centroid = Vectors.findCentroid(newPointList)
         val ordered = newPointList.sortWith((a, b) => ((a - centroid) /\) < ((b - centroid) /\))
-        Some(Obstacle(ordered))
+        Some(ObstacleFactory(ordered))
       } else {
         None
       }
@@ -111,33 +100,31 @@ class Obstacle(val points: List[Vector2D]) extends Drawable {
    * Check the overlap between this obstacle and b
    *
    * @param b obstacle to check overlap
-   *
    * @return if overlapping are found, return a list of no overlapped vertex. Otherwise return an empty list
-   * */
-  def ->|(b:Obstacle): Iterable[Vector2D] = {
+   **/
+  def ->|(b: Obstacle): Iterable[Vector2D] = {
     import model.environment.elements.EnvironmentElements._
     val freePointOfA = points.filter(p => !checkHasInside(b, p))
     val freePointOfB = b.points.filter(p => !checkHasInside(this, p))
 
-    val overlappedPoint = points.filter(p => b.points.exists(p2 => p.~~(p2,1E-4)))
+    val overlappedPoint = points.filter(p => b.points.exists(p2 => p.~~(p2, 1E-4)))
 
-    if((freePointOfA.size < points.size)
+    if ((freePointOfA.size < points.size)
       || (freePointOfB.size < b.points.size)
       || overlappedPoint.nonEmpty
       || (position --> b.position < math.min(maxDistanceFromCenter(), b.maxDistanceFromCenter()))) {
-      freePointOfA.diff(overlappedPoint)++ freePointOfB
+      freePointOfA.diff(overlappedPoint) ++ freePointOfB
     } else {
       List.empty
     }
   }
-
 
   def canEqual(other: Any): Boolean = other.isInstanceOf[Obstacle]
 
   override def equals(other: Any): Boolean = other match {
     case that: Obstacle =>
       ((that canEqual this)
-        && position ~~(that.position, 1E-7)
+        && position ~~ (that.position, 1E-7)
         && this.points.size == that.points.size
         )
     case _ => false
@@ -146,96 +133,6 @@ class Obstacle(val points: List[Vector2D]) extends Drawable {
   override def hashCode(): Int = {
     val state = Seq(position, points.head)
     state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
-  }
-}
-
-/**
- * Obstacle factory.
- **/
-object Obstacle {
-  import model.environment._
-  /**
-   * Obstacle by vertex list.
-   **/
-  def apply(points: List[Vector2D]): Obstacle = new Obstacle(points)
-
-  /**
-   * Obstacle by position and number of sides
-   **/
-  def apply(position: Vector2D, radius: Double = OBSTACLE_RADIUS, nSides: Int): Obstacle = {
-
-    val angle = 2 * math.Pi / nSides
-
-    val vertex = for {
-      a <- 0 until nSides
-    }
-      yield Vector2D(math.cos(angle * a) * radius, math.sin(angle * a) * radius) >> position
-
-    Obstacle(vertex.toList)
-  }
-
-  /**
-   * Factory for regular triangle
-   * */
-  def Triangle(position: Vector2D, radius: Double = OBSTACLE_RADIUS): Obstacle = {
-    Obstacle(position, radius, OBSTACLE_TRIANGLE_VERTEX)
-  }
-
-  /**
-   * Factory for Square
-   * */
-  def Square(position: Vector2D, radius: Double = OBSTACLE_RADIUS): Obstacle = {
-    Obstacle(position, radius, OBSTACLE_SQUARE_VERTEX)
-  }
-
-  /**
-   * Factory for Octagon
-   * */
-  def Octagon(position: Vector2D, radius: Double = OBSTACLE_RADIUS): Obstacle = {
-    Obstacle(position, radius, OBSTACLE_OCTAGON_VERTEX)
-  }
-
-  /**
-   * Create random random obstacles.
-   *
-   * @param nObstacle number of obstacle to join
-   * @param center center of spawn
-   * @param minMaxDistanceFromCenter (min,Max) distance from center that delimit area to spawn object
-   *
-   * @return list of spawned obstacle, this list should have size < of nObstacle because someone could be joined
-   * */
-  def createRandom(nObstacle:Int,
-                   center: Vector2D,
-                   minMaxDistanceFromCenter: (Double, Double),
-                   radius: Double = OBSTACLE_RADIUS)
-  : Iterable[Obstacle] = {
-    val obstacles = for {i <- 0 until nObstacle
-      random = scala.util.Random.nextInt(OBSTACLE_RADIUS) + OBSTACLE_TRIANGLE_VERTEX
-      obstacle = Obstacle(
-        RandomVector2DInCircle(minMaxDistanceFromCenter, center),
-        radius,
-        random
-      )
-    } yield obstacle
-
-    recursiveJoin(obstacles.toList, center, 0)
-  }
-
-  @scala.annotation.tailrec
-  private def recursiveJoin(obstacles: List[Obstacle], center: Vector2D, index: Int):Iterable[Obstacle]= {
-    if (index >= obstacles.size - 1) {
-      obstacles
-    } else {
-      val nextIndex = if (index == obstacles.size - 1) 0 else index + 1
-      val orderedObstacle = obstacles.sortWith((a, b) => ((a.position - center) /\) < ((b.position - center) /\))
-      val joinedObstacle = orderedObstacle(index) >< orderedObstacle(nextIndex)
-
-      if (joinedObstacle.isDefined) {
-        val obsDiffJoined = orderedObstacle diff List(orderedObstacle(index), orderedObstacle(nextIndex))
-        val newObstacleList = joinedObstacle.head +: obsDiffJoined
-        recursiveJoin(newObstacleList, center, index)
-      } else {recursiveJoin(orderedObstacle, center, index + 1)}
-    }
   }
 }
 

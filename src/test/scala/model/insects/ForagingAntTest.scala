@@ -12,7 +12,7 @@ import common.message.SharedMessage.Clock
 import common.rTree.RTree.Tree
 import common.rTree.RTreeProlog
 import model.environment.anthill.{Anthill, AnthillInfo}
-import model.environment.elements.{Food, Obstacle}
+import model.environment.elements.{Food, Obstacle, ObstacleFactory}
 import model.environment.pheromones.FoodPheromone
 import model.insects.Ants.ForagingAnt._
 import model.insects.competences._
@@ -165,12 +165,13 @@ class ForagingAntTest extends TestKit(ActorSystem("ForagingAntTest"))
 
   "Foraging ant" when {
 
-    val food = Food((2.0, 2.0), MAX_FOOD * 2, Obstacle((2, 2), Food.radius(MAX_FOOD.toInt * 2), 16))
+    val food = Food((2.0, 2.0), MAX_FOOD * 2, ObstacleFactory((2, 2), Food.radius(MAX_FOOD.toInt * 2), 16))
     val anthillInfo = AnthillInfo(ZeroVector2D())
     val anthill = system.actorOf(Anthill(anthillInfo, senderRef), "anthill2")
     val startingAntPosition = (1, 3)
     val startingEnergy = 80
-    val ant = system.actorOf(ForagingAnt(ForagingAntInfo(anthill, position = startingAntPosition, energy = startingEnergy), senderRef), "ant-4")
+    val ant = system.actorOf(ForagingAnt(
+      ForagingAntInfo(anthill, position = startingAntPosition, energy = startingEnergy), senderRef), "ant-4")
 
     "touching food" should {
 

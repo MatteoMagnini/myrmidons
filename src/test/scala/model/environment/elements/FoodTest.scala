@@ -5,7 +5,7 @@ import common.geometry.Vectors
 
 class FoodTest extends wordspec.AnyWordSpec {
   "A food" when {
-    val f = Food((10,15), 100, Obstacle((10,15),Food.radius(100), 16))
+    val f = Food((10,15), 100, ObstacleFactory((10,15),Food.radius(100), 16))
     "create with 100 of quantity" should {
       "have 100 of availability" in {
         assert(f.quantity === 100)
