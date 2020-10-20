@@ -6,10 +6,10 @@ import model.environment.pheromones.FoodPheromone
 import model.environment.pheromones.FoodPheromoneInfo._
 import model.insects.Ants.ForagingAnt._
 import model.insects.info.ForagingAntInfo
-import common.Messages._
 import common.PheromoneSeq._
 import common.geometry._
 import common.RichActor._
+import common.message.InsectMessage.{AddPheromone, Move, StoreFood, TakeFood, UpdateInsect}
 
 /**
  * Specific competences suitable only for foraging ants

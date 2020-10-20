@@ -6,8 +6,10 @@ import model.insects.info.EnemyInfo
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import common.Messages.{Clock, Move, NewPosition, UpdateInsect}
 import common.geometry.ZeroVector2D
+import common.message.EnvironmentMessage.NewPosition
+import common.message.InsectMessage.{Move, UpdateInsect}
+import common.message.SharedMessage.Clock
 
 class EnemyTest extends TestKit(ActorSystem("InsectTest"))
   with AnyWordSpecLike

@@ -5,8 +5,11 @@ import akka.testkit.{TestKit, TestProbe}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import common.Messages._
 import common.geometry.Vector2D
+import common.message.AnthillMessage.UpdateAnthill
+import common.message.EnvironmentMessage.AntBirth
+import common.message.InsectMessage.{EatFood, StoreFood}
+import common.message.SharedMessage.Clock
 
 class AnthillTest extends TestKit(ActorSystem("AnthillTest"))
   with AnyWordSpecLike

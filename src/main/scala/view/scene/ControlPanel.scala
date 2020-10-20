@@ -3,7 +3,7 @@ package view.scene
 import java.awt.event.ItemEvent
 
 import akka.actor.{ActorRef, ActorSystem}
-import common.Messages.StartSimulation
+import common.message.SharedMessage.StartSimulation
 import model.environment.data.EnvironmentInfo
 import model.environment.{Boundary, Environment}
 import view.actor.uiMessage.{RestartSimulation, ShowAndSaveReport, StopSimulation, setRate}
@@ -171,7 +171,7 @@ object ControlPanel {
      */
     private def tellStart(): Unit = {
       environment.tell(StartSimulation(antSize, enemiesSize, obstacles = Some(obstacleSize),
-        food = Some(foodSize), anthillFood = Some(anthillFood)), uiActor)
+        food = Some(foodSize), anthillFood = anthillFood), uiActor)
     }
 
 
