@@ -1,10 +1,13 @@
 package model.environment
 
 import akka.actor.{Actor, ActorLogging, Props}
-import common.Messages._
 import common.PheromoneMap._
 import common.RichActor._
 import common.geometry.{RandomVector2DInCircle, Vector2D, ZeroVector2D}
+import common.message.AnthillMessage.{NewAnts, UpdateAnthill}
+import common.message.EnvironmentMessage._
+import common.message.InsectMessage._
+import common.message.SharedMessage.{Clock, StartSimulation}
 import model.environment.anthill.{Anthill, AnthillInfo}
 import model.environment.data.{EnvironmentInfo, InsectReferences}
 import model.environment.elements.EnvironmentElements._
@@ -51,7 +54,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
     case StartSimulation(nAnts: Int, nEnemies: Int, obstaclesPresence, foodPresence, anthillFood) =>
 
-      val anthillInfo = AnthillInfo(state.boundary.center, ANTHILL_RADIUS, anthillFood.get)
+      val anthillInfo = AnthillInfo(state.boundary.center, ANTHILL_RADIUS, anthillFood)
       val anthill = context.actorOf(Anthill(anthillInfo, self), name = "anthill")
       anthill ! CreateAnts(nAnts, FORAGING_PERCENTAGE)
 

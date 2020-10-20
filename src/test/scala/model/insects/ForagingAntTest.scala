@@ -2,10 +2,13 @@ package model.insects
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
-import common.Message
-import common.Messages._
 import common.geometry.Vectors._
 import common.geometry._
+import common.message.AnthillMessage.{UpdateAnthill, UpdateAnthillCondition}
+import common.message.EnvironmentMessage.{FoodNear, NewPosition, Pheromones}
+import common.message.InsectMessage.{AddPheromone, KillInsect, Move, TakeFood, UpdateInsect}
+import common.message.Message
+import common.message.SharedMessage.Clock
 import common.rTree.RTree.Tree
 import common.rTree.RTreeProlog
 import model.environment.anthill.{Anthill, AnthillInfo}
@@ -202,7 +205,7 @@ class ForagingAntTest extends TestKit(ActorSystem("ForagingAntTest"))
             assert(anthillInfo.position --> result2.info.position < anthillInfo.radius)
 
           case d: AddPheromone =>
-            assert(d.foodPheromone.position equals implicitly[Vector2D](startingAntPosition) >> Vector2D(0.1, 0))
+            assert(d.pheromone.position equals implicitly[Vector2D](startingAntPosition) >> Vector2D(0.1, 0))
             sender.expectMsgType[UpdateInsect]
         }
         sender expectNoMessage

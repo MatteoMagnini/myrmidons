@@ -1,14 +1,17 @@
 package model.insects
 
 import akka.actor.{ActorRef, Props}
-import model.environment.pheromones.{DangerPheromone, FoodPheromone, Pheromone}
+import common.RichActor._
+import common.message.AnthillMessage.UpdateAnthillCondition
+import common.message.EnvironmentMessage.{FoodNear, NewPosition, Pheromones}
+import common.message.InsectMessage._
+import common.message.SharedMessage.{Clock, Context}
+import common.rTree.ScalaEngine
 import model.environment.pheromones.DangerPheromoneInfo._
+import model.environment.pheromones.{DangerPheromone, FoodPheromone, Pheromone}
 import model.insects.Ants.ForagingAnt._
 import model.insects.competences._
 import model.insects.info.ForagingAntInfo
-import common.Messages._
-import common.RichActor._
-import common.rTree.{RTreeProlog, ScalaEngine}
 
 /**
   * Ant that performs foraging.

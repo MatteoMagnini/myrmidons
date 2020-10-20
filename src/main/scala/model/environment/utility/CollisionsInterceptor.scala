@@ -1,8 +1,8 @@
 package model.environment.utility
 
 import akka.actor.ActorRef
-import common.Messages.{FoodNear, NewPosition}
 import common.geometry.Vector2D
+import common.message.EnvironmentMessage.{FoodNear, NewPosition}
 import model.environment.elements.EnvironmentElements.{checkHasInside, checkHaveInside}
 import model.environment.elements.{Food, Obstacle}
 import model.environment.data.EnvironmentInfo

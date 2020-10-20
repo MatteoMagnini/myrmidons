@@ -1,14 +1,17 @@
 package model.insects
 
 import akka.actor.{ActorRef, Props}
-import model.environment.pheromones.{DangerPheromone, Pheromone}
+import common.RichActor._
+import common.message.AnthillMessage.UpdateAnthillCondition
+import common.message.EnvironmentMessage.{NewPosition, Pheromones}
+import common.message.InsectMessage.{AddPheromone, EatFood, KillInsect, UpdateInsect}
+import common.message.SharedMessage.{Clock, Context}
+import common.rTree.ScalaEngine
 import model.environment.pheromones.DangerPheromoneInfo._
+import model.environment.pheromones.{DangerPheromone, Pheromone}
 import model.insects.Ants.PatrollingAnt._
 import model.insects.competences._
 import model.insects.info.PatrollingAntInfo
-import common.Messages._
-import common.RichActor._
-import common.rTree.{RTreeProlog, ScalaEngine}
 
 /**
  * A patrolling ant with state and behaviour.

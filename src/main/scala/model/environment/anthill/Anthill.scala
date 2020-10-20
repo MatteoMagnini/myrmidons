@@ -1,9 +1,12 @@
 package model.environment.anthill
 
 import akka.actor.{Actor, ActorRef, Props}
-import common.Messages._
 import common.geometry.Vectors.doubleInRange
 import common.geometry._
+import common.message.AnthillMessage.{NewAnts, UpdateAnthill, UpdateAnthillCondition}
+import common.message.EnvironmentMessage.CreateAnts
+import common.message.InsectMessage.{AntTowardsAnthill, EatFood, Move, StoreFood}
+import common.message.SharedMessage.Clock
 import model.Drawable
 import model.insects.competences._
 import model.insects.info.{ForagingAntInfo, PatrollingAntInfo}

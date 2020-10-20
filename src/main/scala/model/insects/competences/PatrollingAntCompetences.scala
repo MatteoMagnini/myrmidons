@@ -4,9 +4,9 @@ import akka.actor.Actor.Receive
 import akka.actor.{ActorContext, ActorRef}
 import model.insects.Ants.PatrollingAnt._
 import model.insects.info.PatrollingAntInfo
-import common.Messages.Move
 import common.geometry.{OrientedVector2D, OrientedVector2DWithNoise}
 import common.RichActor._
+import common.message.InsectMessage.Move
 
 /**
  * Specific competences suitable only for foraging ants.
