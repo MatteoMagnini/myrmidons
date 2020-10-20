@@ -4,8 +4,10 @@ import akka.actor.{ActorRef, Props}
 import model.insects.Enemies._
 import model.insects.competences.{Die, RandomWalk}
 import model.insects.info.EnemyInfo
-import common.Messages._
 import common.RichActor._
+import common.message.EnvironmentMessage.NewPosition
+import common.message.InsectMessage.{KillInsect, UpdateInsect}
+import common.message.SharedMessage.{Clock, Context}
 
 /**
  * An enemy with state and behaviour.

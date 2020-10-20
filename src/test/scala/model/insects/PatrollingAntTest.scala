@@ -10,8 +10,10 @@ import model.insects.info.PatrollingAntInfo
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import common.Messages._
 import common.geometry.{Vector2D, ZeroVector2D}
+import common.message.EnvironmentMessage.{NewPosition, Pheromones}
+import common.message.InsectMessage.{Move, UpdateInsect}
+import common.message.SharedMessage.Clock
 import common.rTree.RTree.Tree
 import common.rTree.RTreeProlog
 

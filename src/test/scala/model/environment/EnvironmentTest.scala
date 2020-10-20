@@ -9,8 +9,9 @@ import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import common.Messages._
 import common.geometry.{Vector2D, ZeroVector2D}
+import common.message.EnvironmentMessage.{AntBirth, Ready, Repaint}
+import common.message.SharedMessage._
 
 class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
   with AnyWordSpecLike
@@ -49,7 +50,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
 
     "spawn an ant" should {
       val nAnts = 1
-      environment ! StartSimulation(nAnts, 0, obstacles = None, food = None)
+      environment ! StartSimulation(nAnts,0,None,None,0.0)
       sender expectMsg Ready
       environment ! Clock(1)
       val result1 = sender.expectMsgType[Repaint]
@@ -86,7 +87,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
     val nAnts = 10
 
     "spawn multiple ants" should {
-      environment ! StartSimulation(nAnts, 0, obstacles = None, food = None)
+      environment ! StartSimulation(nAnts, 0, obstacles = None, food = None, 0.0)
       sender expectMsg Ready
       environment ! Clock(1)
       val result1 = sender.expectMsgType[Repaint]
@@ -123,7 +124,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
     val environment = system.actorOf(Environment(EnvironmentInfo(boundary)), name = "env-actor-3")
 
     "spawn ants and make them move" should {
-      environment ! StartSimulation(nAnts, 0)
+      environment ! StartSimulation(nAnts, 0, None, None, 0.0)
       sender expectMsg Ready
       environment ! Clock(1)
       val result = sender.expectMsgType[Repaint]
@@ -145,7 +146,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
     var nAntsPostBirth = 0
 
     "other ants born" should {
-      environment ! StartSimulation(nAnts, 0)
+      environment ! StartSimulation(nAnts, 0, None, None, 0.0)
       sender expectMsg Ready
       environment ! Clock(1)
       val result = sender.expectMsgType[Repaint]
@@ -171,7 +172,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
     val environment = system.actorOf(Environment(EnvironmentInfo(boundary)), name = "env-actor-5")
 
     "spawn ants and enemies" should {
-      environment ! StartSimulation(nAnts, nEnemies)
+      environment ! StartSimulation(nAnts, nEnemies, None, None, 0.0)
       sender expectMsg Ready
       environment ! Clock(1)
       val result = sender.expectMsgType[Repaint]

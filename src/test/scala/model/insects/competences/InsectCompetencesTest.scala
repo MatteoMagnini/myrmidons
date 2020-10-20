@@ -3,13 +3,14 @@ package model.insects.competences
 import akka.actor.Actor.Receive
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
+import common.geometry.{Vector2D, ZeroVector2D}
+import common.message.InsectMessage._
+import common.message.SharedMessage.Context
 import model.environment.pheromones.{DangerPheromone, FoodPheromone}
 import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
 import model.insects.{Enemy, ForagingAnt, PatrollingAnt}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.wordspec.AnyWordSpecLike
-import common.Messages._
-import common.geometry.{Vector2D, ZeroVector2D}
 
 class InsectCompetencesTest extends TestKit(ActorSystem("InsectCompetencesTest"))
 with AnyWordSpecLike

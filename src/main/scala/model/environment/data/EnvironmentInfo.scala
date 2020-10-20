@@ -12,7 +12,7 @@ import common.rTree.RTreeProlog
 import common.rTree.getPheromoneAsNode
 
 /** Internal state of environment. */
-trait EnvironmentInfo {
+sealed trait EnvironmentInfo {
 
   /** Reference to gui actor */
   def gui: Option[ActorRef]

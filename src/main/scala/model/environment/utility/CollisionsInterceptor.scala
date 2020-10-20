@@ -1,8 +1,8 @@
 package model.environment.utility
 
 import akka.actor.ActorRef
-import common.Messages.{FoodNear, NewPosition}
 import common.geometry.Vector2D
+import common.message.EnvironmentMessage.{FoodNear, NewPosition}
 import model.environment.elements.EnvironmentElements.{checkHasInside, checkHaveInside}
 import model.environment.elements.{Food, Obstacle}
 import model.environment.data.EnvironmentInfo
@@ -27,26 +27,20 @@ private[environment] object CollisionsInterceptor {
     val newPosition = position >> delta
     import model.environment.elements.EnvironmentElements.FoodHasInside
     if (checkHaveInside(state.foods, position).isEmpty) {
-      /*Checking boundary*/
-      import model.environment.elements.EnvironmentElements.BoundaryHasInside
-      if (checkHasInside(state.boundary, newPosition)) {
-        /*Checking obstacles*/
-        import model.environment.elements.EnvironmentElements.ObstacleHasInside
-        val of = state.obstacles ++ state.foods
-        val obstacle = checkHaveInside(of, newPosition)
-        if (obstacle.nonEmpty) {
-          val bouncedPosition = recursionCheck(of, obstacle, position, newPosition)
-          if (bouncedPosition._3) {
-            val nearestFood: Food = state.foods.toList.sortWith((a, b) => //TODO: Not correct in all case
-              position --> a.position < position --> b.position).head
-            entity ! FoodNear(nearestFood.position)
-          }
-          entity ! NewPosition(bouncedPosition._1, bouncedPosition._2)
-        } else {
-          entity ! NewPosition(newPosition, newPosition - position)
+      /*Checking obstacles*/
+      import model.environment.elements.EnvironmentElements.ObstacleHasInside
+      val of = state.obstacles ++ state.foods
+      val obstacle = checkHaveInside(of, newPosition)
+      if (obstacle.nonEmpty) {
+        val bouncedPosition = recursionCheck(of, obstacle, position, newPosition)
+        if (bouncedPosition._3) {
+          val nearestFood: Food = state.foods.toList.sortWith((a, b) =>
+            position --> a.position < position --> b.position).head
+          entity ! FoodNear(nearestFood.position)
         }
+        entity ! NewPosition(bouncedPosition._1, bouncedPosition._2)
       } else {
-        entity ! NewPosition(position - delta, delta -)
+        entity ! NewPosition(newPosition, newPosition - position)
       }
     } else {
       entity ! NewPosition(position, delta)
