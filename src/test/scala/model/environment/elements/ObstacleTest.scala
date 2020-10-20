@@ -8,14 +8,14 @@ class ObstacleTest  extends wordspec.AnyWordSpec {
   "An obstacle" when {
     "created " must {
       "have 3 or more vertex" in {
-        assertThrows[IllegalArgumentException](Obstacle((0,0), nSides = 2))
-        val o = Obstacle((0,0), nSides = 3)
+        assertThrows[IllegalArgumentException](ObstacleFactory((0,0), nSides = 2))
+        val o = ObstacleFactory((0,0), nSides = 3)
         assert(o.points.size == 3)
       }
     }
 
     "have a regular triangle form" should {
-      val o1 = Obstacle.Triangle((0,0))
+      val o1 = ObstacleFactory.Triangle((0,0))
       assert(o1.points.size == 3)
 
       "have similar angle between two vertex" in {
@@ -56,7 +56,7 @@ class ObstacleTest  extends wordspec.AnyWordSpec {
       val internalPoint1:Vector2D = (0,1)
       val internalPoint2:Vector2D = (1,0)
       val throughPoint: Vector2D = (-10, -10)
-      val o1 = Obstacle.Square(obstacleCenter, radius = 10)
+      val o1 = ObstacleFactory.Square(obstacleCenter, radius = 10)
 
       "intersection exist and " should {
 
@@ -93,9 +93,9 @@ class ObstacleTest  extends wordspec.AnyWordSpec {
   }
 
   "two obstacle" when {
-    val o1 = Obstacle.Square((0,0))
-    val o2 = Obstacle.Square((0,4))
-    val o3 = Obstacle.Square((0,20))
+    val o1 = ObstacleFactory.Square((0,0))
+    val o2 = ObstacleFactory.Square((0,4))
+    val o3 = ObstacleFactory.Square((0,30))
 
     "are overlapped" should{
 
@@ -114,19 +114,19 @@ class ObstacleTest  extends wordspec.AnyWordSpec {
     }
 
     "are equals" in {
-      assert(o1.equals(Obstacle.Square((0,0))))
-      assert(!o1.equals(Obstacle.Triangle((0,0))))
+      assert(o1.equals(ObstacleFactory.Square((0,0))))
+      assert(!o1.equals(ObstacleFactory.Triangle((0,0))))
     }
 
     "are different" in {
       assert(!o1.equals(o2))
-      assert(!o1.equals(Obstacle.Triangle((0,0))))
+      assert(!o1.equals(ObstacleFactory.Triangle((0,0))))
     }
   }
 
   "an obstacle and a food" should {
-    val o1 = Obstacle.Square((0,0))
-    val food = Food((4,4),10, Obstacle((4,4),Food.radius(10),16))
+    val o1 = ObstacleFactory.Square((0,0))
+    val food = Food((4,4),10, ObstacleFactory((4,4),Food.radius(10),16))
     "not join" in {
       assertThrows[IllegalArgumentException](o1 >< food)
     }
@@ -134,7 +134,7 @@ class ObstacleTest  extends wordspec.AnyWordSpec {
 
   "Random creation " should {
     "create obstacle and return joined obstacle" in {
-      val ol = Obstacle.createRandom(20, (0,0), (50,100))
+      val ol = ObstacleFactory.createRandom(20, (0,0), (50,100))
       assert(ol.size <= 20)
     }
   }

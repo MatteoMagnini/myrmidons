@@ -19,7 +19,7 @@ case class Food(override val position: Vector2D, quantity: Double, o: Obstacle) 
   def +(newQuantity: Double): Food = {
     Food(position,
       quantity + newQuantity,
-      Obstacle(position,
+      ObstacleFactory(position,
         Food.radius(math.round(quantity + newQuantity).toInt),
         points.size)
     )
@@ -49,13 +49,13 @@ object Food {
                        maxRadius: Double,
                        quantity: Int = FOOD_MIN_QUANTITY): Food = {
     val pos = RandomVector2DInCircle(minRadius, maxRadius, position)
-    Food(Vector2D(pos.x, pos.y), quantity, Obstacle(pos, radius(quantity), FOOD_VERTEX))
+    Food(Vector2D(pos.x, pos.y), quantity, ObstacleFactory(pos, radius(quantity), FOOD_VERTEX))
   }
 
   def apply(position: Vector2D, quantity: Double, o: Obstacle): Food = new Food(position, quantity, o)
 
   def apply(position: Vector2D, quantity: Double): Food =
-    Food(position, quantity, Obstacle(position, radius(quantity.toInt), FOOD_VERTEX))
+    Food(position, quantity, ObstacleFactory(position, radius(quantity.toInt), FOOD_VERTEX))
 
   def radius(quantity: Int): Double = if (math.sqrt(quantity) < FOOD_MIN_SIZE) FOOD_MIN_SIZE else math.sqrt(quantity)
 }

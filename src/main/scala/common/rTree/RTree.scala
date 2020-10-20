@@ -54,9 +54,6 @@ object RTree {
 
     /** Size of tree */
     def size: Int
-
-    /** Height of tree */
-    def height: Int
   }
 
   /** An implementation of r-tree */
@@ -80,12 +77,6 @@ object RTree {
     override def size: Int = this match {
       case x: NotEmptyTree[A] if isLeaf(x) => 1 + x.l.size + x.r.size
       case x: NotEmptyTree[A] => x.l.size + x.r.size
-      case _ => 0
-    }
-
-    /* essendo albero non bilanciato, non è sempre vero... */
-    override def height: Int = this match {
-      case x: NotEmptyTree[A] => 1 + x.l.height
       case _ => 0
     }
 
