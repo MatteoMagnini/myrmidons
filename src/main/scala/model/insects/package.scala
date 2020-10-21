@@ -9,7 +9,7 @@ package object insects {
 
     object ForagingAnt {
       val MAX_ENERGY = 100.0
-      val FOOD_PHEROMONE_RANGE = 10.0
+      val FOOD_PHEROMONE_RANGE = 15.0
       val DANGER_PHEROMONE_RANGE = 5.0
       val MAX_FOOD = 10.0
       val FOOD_ENERGY_CONVERSION = 10.0
@@ -21,7 +21,7 @@ package object insects {
 
     object PatrollingAnt {
       val MAX_ENERGY = 150.0
-      val DANGER_PHEROMONE_RANGE = 10.0
+      val DANGER_PHEROMONE_RANGE = 20.0
       val FOOD_ENERGY_CONVERSION = 10.0
       val STARTING_ENERGY = 150.0
       val STARTING_TIME = 0
