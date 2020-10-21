@@ -2,11 +2,11 @@ package view.scene
 
 
 import model.Drawable
-import model.environment.Fights.Fight
+import model.environment.Fights.InsectsFight
 import model.environment.anthill.AnthillInfo
 import model.environment.elements.Obstacle
 import model.environment.pheromones.Pheromone
-import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo, PatrollingAntInfo}
+import model.insects.info.{ForagingAntInfo, InsectInfo, PatrollingAntInfo}
 import view.controller.{Keyboard, Mouse, MouseWheel}
 import view.drawLogic._
 
@@ -90,7 +90,7 @@ object MyrmidonsPanel {
 
           case entity: Pheromone if showPheromones => draw(entity, graphics, size, zoom, slackX, slackY)
 
-          case entity: Fight[InsectInfo, EnemyInfo] => draw(entity, graphics, size, zoom, slackX, slackY)
+          case entity: InsectsFight => draw(entity.fight, graphics, size, zoom, slackX, slackY)
 
           case _ =>
         }
