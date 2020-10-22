@@ -166,34 +166,24 @@ fixTree(tree(L, node(_,RangeX1, RangeY1), R), Tree) :-
 removeWithFix(Node, ITree, OTree) :- remove(Node, ITree, TTree), fixTree(TTree, OTree).
 
 
-%------------- QUERY ---------------
-% query(+Tree, +RangeX, +RangeY, -Tree) --> returns minimal sub-tree of values inside ranges
-% Iterate in branches as long as nodes contain input ranges
-
-query(tree(L,V,R),RangeXI,RangeYI, tree(L,V,R)) :- 
-				nodeIntersects(V,RangeXI,RangeYI),
-				takeRoot(L,V1), nodeIntersects(V1,RangeXI,RangeYI),
-				takeRoot(R,V2), nodeIntersects(V2,RangeXI,RangeYI), !.
-
-query(tree(L,V,R),RangeXI,RangeYI, OTree) :- 
-				nodeIntersects(V,RangeXI,RangeYI),
-				takeRoot(L,V1), nodeIntersects(V1,RangeXI,RangeYI),
-				query(L, RangeXI,RangeYI, OTree), !.
-
-query(tree(L,V,R),RangeXI,RangeYI, OTree) :- 
-				nodeIntersects(V,RangeXI,RangeYI),
-				takeRoot(R,V1), nodeIntersects(V1,RangeXI,RangeYI),
-				query(R, RangeXI,RangeYI, OTree), !.
-
-% Output subtree when ranges are no more contained in nodes
-query(tree(L,V,R),RangeXI,RangeYI, tree(L,V,R)) :-
-				nodeIntersects(V,RangeXI,RangeYI).
-
 % getLeavesList(+Tree, -List) --> returns a list containing leaves of a tree
 getLeavesList(nil, nil).
 getLeavesList(tree(nil, V, nil), [V]) :- !.
 getLeavesList(tree(L, V, R), List) :- getLeavesList(L, L1), getLeavesList(R, L2), append(L1,L2,List).
 
-% queryToList(+Tree, +RangeX, +RangeY, -List) --> returns result of a query in list format
-queryToList(Tree, Range1, Range2, List) :- query(Tree, Range1, Range2, Otree), getLeavesList(Otree, List).
-
+
+%------------- QUERY ---------------
+% query(+Tree, +RangeX, +RangeY, -Tree) --> returns list of nodes that respond to query
+query(nil, RangeX1, RangeY1, nil).
+
+query(tree(L,V,R), RangeXI,RangeYI, [V]) :- 
+				nodeIntersects(V,RangeXI,RangeYI),
+				isLeaf(V, tree(L,V,R)), !.
+
+query(tree(L,V,R), RangeXI,RangeYI, List) :- 
+				nodeIntersects(V,RangeXI,RangeYI),
+				query(L,RangeXI,RangeYI,L1),
+				query(R,RangeXI,RangeYI,L2),
+				append(L1, L2, List), !.
+
+query(tree(L,V,R), RangeX1, RangeY1, []).

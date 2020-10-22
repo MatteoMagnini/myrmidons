@@ -2,7 +2,7 @@ package model.environment
 
 package object pheromones {
 
-  val INFLUENCE_RADIUS = 10.0
+  val INFLUENCE_RADIUS = 20.0
 
   object FoodPheromoneInfo {
     val DELTA: Double = 1.0

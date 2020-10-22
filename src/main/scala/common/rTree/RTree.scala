@@ -2,6 +2,7 @@ package common.rTree
 
 import common.geometry.Vector2D
 import common.rTree.RTree.{Range, Tree}
+import model.environment.pheromones._
 
 object RTree {
 
@@ -125,6 +126,6 @@ object ScalaEngine {
       }
     }
 
-    _query(position.rangeOfInfluence(DEFAULT_RANGE), tree)
+    _query(position.rangeOfInfluence(INFLUENCE_RADIUS), tree)
   }
 }
