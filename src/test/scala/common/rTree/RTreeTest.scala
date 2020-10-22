@@ -38,9 +38,11 @@ class RTreeTest extends AnyWordSpecLike with Matchers with BeforeAndAfterAll {
 
     "queried" should {
       val prologResult = engine.query(ZeroVector2D(), tree)
+      val scalaResult = ScalaEngine.query(ZeroVector2D(), tree)
 
       "give an empty tree as result" in {
         assert(prologResult.isEmpty)
+        assert(scalaResult.isEmpty)
       }
     }
   }
@@ -82,17 +84,27 @@ class RTreeTest extends AnyWordSpecLike with Matchers with BeforeAndAfterAll {
     import common.geometry._
     "queried in a position inside R-tree ranges" should {
       val position = (1,1)
-      val result = engine.query(position, tree)
+      val prologResult = engine.query(position, tree)
+      val scalaResult = ScalaEngine.query(position, tree)
+
       "give node as result" in {
-        assert(result.length == 1)
-        assert(result.contains(node.id.get))
+        assert(prologResult.size == 1)
+        assert(prologResult.contains(node.id.get))
+      }
+      "give same result with both scala and prolog engine" in {
+        assert(scalaResult == prologResult)
       }
     }
     "queried in a position outside R-tree range" should {
       val position = (100,100)
-      val result = engine.query(position, tree)
+      val prologResult = engine.query(position, tree)
+      val scalaResult = ScalaEngine.query(position, tree)
+
       "give node as result" in {
-        assert(result.isEmpty)
+        assert(prologResult.isEmpty)
+      }
+      "give same result with both scala and prolog engine" in {
+        assert(scalaResult == prologResult)
       }
     }
   }
@@ -141,16 +153,11 @@ class RTreeTest extends AnyWordSpecLike with Matchers with BeforeAndAfterAll {
     }
     "queried" should {
       val queryPosition = (2,3)
-      val result = engine.query(queryPosition, tree)
-      "give correct number of nodes in output" in {
-        assert(result.size == 1)
-      }
-      "give correct nodes as output" in {
-        assert(result.contains(node1.id.get))
-      }
-      "give correct result even using scala engine" in {
-        val scalaResult = ScalaEngine.query(queryPosition, tree)
-        assert(scalaResult == result)
+      val prologResult = engine.query(queryPosition, tree)
+      val scalaResult = ScalaEngine.query(queryPosition, tree)
+
+      "give same result with both scala and prolog engine" in {
+        assert(scalaResult == prologResult)
       }
     }
   }

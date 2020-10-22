@@ -13,7 +13,6 @@ package object rTree {
   val tree = "tree"
   val nil = "nil"
   val none = "none"
-  val DEFAULT_RANGE = 10
 
   /** Pimping prolog Term to extract tree instances
     *

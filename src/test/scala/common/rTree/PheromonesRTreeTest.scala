@@ -1,12 +1,12 @@
 package common.rTree
 
+import common.geometry.{Vector2D, ZeroVector2D}
+import common.rTree.RTree.{Node, Tree}
 import model.environment.pheromones.FoodPheromone
 import model.environment.pheromones.FoodPheromoneInfo.{STARTING_INTENSITY, _}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import common.geometry.{Vector2D, ZeroVector2D}
-import common.rTree.RTree.{Node, Tree}
 
 class PheromonesRTreeTest extends AnyWordSpecLike with Matchers with BeforeAndAfterAll {
 
@@ -18,8 +18,8 @@ class PheromonesRTreeTest extends AnyWordSpecLike with Matchers with BeforeAndAf
     val id1 = 1
     val pheromone1 = FoodPheromone(ZeroVector2D(), decreasingFunction, STARTING_INTENSITY)
     val initialRTree: Tree[Int] = Tree()
-    var oneLeafTree: Tree[Int]  = Tree()
-    var twoLeavesTree: Tree[Int]  = Tree()
+    var oneLeafTree: Tree[Int] = Tree()
+    var twoLeavesTree: Tree[Int] = Tree()
 
     "adding a node to an empty tree" should {
       oneLeafTree = engine.insertNode((id1, pheromone1), initialRTree)
@@ -44,13 +44,11 @@ class PheromonesRTreeTest extends AnyWordSpecLike with Matchers with BeforeAndAf
 
     "searching near node" should {
       val searchedRange = Vector2D(10, 10)
-      val queryResult = engine.query(searchedRange, twoLeavesTree)
+      val prologResult = engine.query(searchedRange, twoLeavesTree)
+      val scalaResult = ScalaEngine.query(searchedRange, twoLeavesTree)
 
-      "return correct number of ids" in {
-        assert(queryResult.size == 1)
-      }
-      "return correct pheromones ids" in {
-        assert(queryResult.contains(id1))
+      "return same result in both methods" in {
+        assert(prologResult == scalaResult)
       }
     }
 

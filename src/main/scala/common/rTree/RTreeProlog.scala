@@ -15,7 +15,7 @@ class RTreeProlog(val engine: Prolog) {
   private val insert = "insert"
   private val remove = "removeWithFix"
   private val getLeavesList = "getLeavesList"
-  private val query = "queryToList"
+  private val query = "query"
 
   /** Inserts a node in a tree
     *
@@ -27,6 +27,7 @@ class RTreeProlog(val engine: Prolog) {
     val variable = Variable()
     val goal = new Struct(insert, node, tree, variable)
     val result = engine.solve(goal).getTerm(variable.getName)
+    println(result)
     result getAsTree
   }
 
