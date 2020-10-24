@@ -3,34 +3,34 @@ package model.environment.utility
 import akka.actor.ActorRef
 import common.geometry.Vector2D
 import common.message.EnvironmentMessage.{FoodNear, NewPosition}
-import model.environment.elements.EnvironmentElements.{checkHasInside, checkHaveInside}
-import model.environment.elements.{Food, Obstacle}
 import model.environment.data.EnvironmentInfo
+import model.environment.elements.EnvironmentElements.checkPositionIsInsideMoreObstacle
+import model.environment.elements.{Food, Obstacle}
 
 private[environment] object CollisionsInterceptor {
 
   /**
-    * Extension of Environment move function. His job is check
-    * if the new position of selected by insect fall inside an
-    * obstacle and in that case must recalculate new insect position
-    * keep mind the bouncing on obstacle and obstacle form.
-    *
-    * @param entity   ActorRef of insect that need the position
-    *                 check
-    * @param state    state of environment, with updated information
-    *                 of obstacle and/or food
-    * @param position actual insect position
-    * @param delta    insect shift (direction and magnitude)
-    *
-    **/
+   * Extension of Environment move function. His job is check
+   * if the new position of selected by insect fall inside an
+   * obstacle and in that case must recalculate new insect position
+   * keep mind the bouncing on obstacle and obstacle form.
+   *
+   * @param entity   ActorRef of insect that need the position
+   *                 check
+   * @param state    state of environment, with updated information
+   *                 of obstacle and/or food
+   * @param position actual insect position
+   * @param delta    insect shift (direction and magnitude)
+   *
+   **/
   def checkCollisions(entity: ActorRef, state: EnvironmentInfo, position: Vector2D, delta: Vector2D): Unit = {
     val newPosition = position >> delta
     import model.environment.elements.EnvironmentElements.FoodHasInside
-    if (checkHaveInside(state.foods, position).isEmpty) {
+    if (checkPositionIsInsideMoreObstacle(state.foods, position).isEmpty) {
       /*Checking obstacles*/
       import model.environment.elements.EnvironmentElements.ObstacleHasInside
       val of = state.obstacles ++ state.foods
-      val obstacle = checkHaveInside(of, newPosition)
+      val obstacle = checkPositionIsInsideMoreObstacle(of, newPosition)
       if (obstacle.nonEmpty) {
         val bouncedPosition = recursionCheck(of, obstacle, position, newPosition)
         if (bouncedPosition._3) {
@@ -48,20 +48,20 @@ private[environment] object CollisionsInterceptor {
   }
 
   /**
-    * when a new insect position fall inside an obstacle, this
-    * function calculate new bounced position and recursively check
-    * that it fall outside another obstacle. If fall inside other
-    * obstacle, calculate a bounced position on second obstacle
-    *
-    * @param obstacles   list of all obstacle present inside the map
-    * @param obstacle    list of obstacle where new insect position fall in
-    * @param position    of the insect
-    * @param newPosition new shifted position (position>>delta)
-    * @return (position, delta, isFood)
-    *         1: the new bounced position
-    *         2: the new delta of insect
-    *         3: a flag that define if the obstacle is a food or not
-    **/
+   * when a new insect position fall inside an obstacle, this
+   * function calculate new bounced position and recursively check
+   * that it fall outside another obstacle. If fall inside other
+   * obstacle, calculate a bounced position on second obstacle
+   *
+   * @param obstacles   list of all obstacle present inside the map
+   * @param obstacle    list of obstacle where new insect position fall in
+   * @param position    of the insect
+   * @param newPosition new shifted position (position>>delta)
+   * @return (position, delta, isFood)
+   *         1: the new bounced position
+   *         2: the new delta of insect
+   *         3: a flag that define if the obstacle is a food or not
+   **/
   @scala.annotation.tailrec
   private def recursionCheck(obstacles: Iterable[Obstacle],
                              obstacle: Iterable[Obstacle],
@@ -74,7 +74,7 @@ private[environment] object CollisionsInterceptor {
 
     val bouncedPos = intersection >> delta
     import model.environment.elements.EnvironmentElements.ObstacleHasInside
-    val o = checkHaveInside(obstacles, bouncedPos)
+    val o = checkPositionIsInsideMoreObstacle(obstacles, bouncedPos)
     if (o.isEmpty) {
       (bouncedPos, delta, res._3.get.isInstanceOf[Food])
     } else {
@@ -83,17 +83,17 @@ private[environment] object CollisionsInterceptor {
   }
 
   /**
-    * This function calculates the intersection point of insect and the obstacles
-    * passed by arguments.
-    * It also calculate new delta orientation
-    *
-    * @param obstacle list of obstacle where new insect position fall in
-    * @param position of the insect
-    * @return (position, delta, isFood)
-    *         1: the new bounced position
-    *         2: the new delta of insect
-    *         3: obstacle on which an insect is bounced
-    **/
+   * This function calculates the intersection point of insect and the obstacles
+   * passed by arguments.
+   * It also calculate new delta orientation
+   *
+   * @param obstacle list of obstacle where new insect position fall in
+   * @param position of the insect
+   * @return (position, delta, isFood)
+   *         1: the new bounced position
+   *         2: the new delta of insect
+   *         3: obstacle on which an insect is bounced
+   **/
   private def handleObstacleIntersection(obstacle: Iterable[Obstacle],
                                          position: Vector2D,
                                          newPosition: Vector2D)

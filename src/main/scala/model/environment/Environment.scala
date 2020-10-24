@@ -44,14 +44,14 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
           Food.createRandomFood(anthillInfo.position, MIN_FOOD_RADIUS, MAX_FOOD_RADIUS))
       }
 
-      val enemies = createEnemies(context, obstacles ++ foods, nEnemies)
+      val enemies = createEnemies(context, obstacles ++ foods, nEnemies, anthillInfo.position)
 
       context >>> initializationBehaviour(EnvironmentInfo(Some(sender), state.boundary,
         obstacles, foods, anthill, Some(anthillInfo)).addEnemies(enemies))
 
     case NewAnts(ants: InsectReferences) =>
       state.gui.get ! Ready
-      context >>> defaultBehaviour(state.addAnts(ants))
+      context >>> defaultBehaviour(state.createStartingAnts(ants))
   }
 
   private def defaultBehaviour(state: EnvironmentInfo): Receive = {
@@ -66,7 +66,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       context >>> defaultBehaviour(checkFoodSpawn(state).updatePheromones(state.pheromones.tick()))
 
     case Move(position: Vector2D, delta: Vector2D) =>
-      if (checkHasInside(state.boundary, position >> delta)) {
+      if (checkPositionIsInsideObstacle(state.boundary, position >> delta)) {
         CollisionsInterceptor.checkCollisions(sender, state, position, delta)
       } else {
         sender ! NewPosition(position - delta, delta -)

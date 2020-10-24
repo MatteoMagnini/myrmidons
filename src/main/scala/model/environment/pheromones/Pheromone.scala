@@ -29,7 +29,7 @@ trait Pheromone extends Drawable {
   def decrease: Option[Pheromone]
 
   /**
-   * Attempt to merge two pheromones if they are very close and are of the same type
+   * Attempt to merge two pheromones if they are very close and are of the same type.
    *
    * @param pheromone the second pheromone
    * @param threshold the threshold under which apply the merge

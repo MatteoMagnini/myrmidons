@@ -4,7 +4,6 @@ package model.environment.elements
 import common.geometry.{Vector2D, Vector3D, Vectors}
 import model.Drawable
 
-
 /** An implementation of an obstacle.
  * It can accept every polygonal obstacle form.
  *
@@ -18,7 +17,7 @@ class Obstacle(val points: List[Vector2D]) extends Drawable {
   if (points.size < 3) {
     throw new IllegalArgumentException("points list must have more than 2 elements")
   }
-  //get a line given two points
+
   points.indices foreach (i => {
     val before = if (i == 0) points.length - 1 else i - 1
     val product = points(before) X points(i)
@@ -26,28 +25,18 @@ class Obstacle(val points: List[Vector2D]) extends Drawable {
     segments ::= (points(before), points(i), line)
   })
 
-  private def maxDistanceFromCenter(): Double = {
-    points.sortWith((p1, p2) => (p1 --> position) < (p2 --> position)).head --> position
-  }
 
-  /**
-   * Find the intersection point of a segment defined by two point
-   * (oldPosition, newPosition) with an obstacle border.
+  /** Find the intersection point of a segment with an obstacle border.
    *
    * @param oldPosition of the object
    * @param newPosition of the object (must be inside the obstacle)
    * @throws IllegalArgumentException if newPosition is outside the
    *                                  obstacle
    * @return an instance of IntersectionResult case class with the
-   *         position of intersection and the smallest angle formed
-   *         between obstacle border line and object trajectory.
-   *         If return a zero position and an angle with value of
-   *         Double.MaxValue, then there are no valid intersection
-   *         or something wrong happened
+   *         position of intersection and his angle.
    **/
   def findIntersectionInformation(oldPosition: Vector2D, newPosition: Vector2D): Option[IntersectionResult] = {
 
-    // ant path definition
     val antPath: (Vector2D, Vector2D, Vector3D) = (oldPosition, newPosition, oldPosition X newPosition)
     var intersections: List[IntersectionResult] = List()
 
@@ -63,29 +52,27 @@ class Obstacle(val points: List[Vector2D]) extends Drawable {
       Option.empty
     }
     else {
-      Some(intersections.sortWith(
-        (a, b) =>
-          (a.intersectionPoint --> oldPosition) < (b.intersectionPoint --> oldPosition)
-      ).head
+      Some(intersections.sortWith((a, b) =>
+        (a.intersectionPoint --> oldPosition) < (b.intersectionPoint --> oldPosition)).head
       )
     }
   }
 
   /**
-   * Given obstacle b, eliminate overlapped vertex and join other vertex in a single obstacle
+   * Given obstacle, eliminate overlapped vertices and join other vertices in a single obstacle
    *
-   * @param b obstacle to join.
+   * @param obstacle obstacle to join.
    * @return An Option of obstacle that is defined if join is well done, otherwise return None
    **/
-  def ><(b: Obstacle): Option[Obstacle] = {
-    if (this.isInstanceOf[Food] != b.isInstanceOf[Food]) {
-      throw new IllegalArgumentException(s"$this and $b are different objects")
+  def ><(obstacle: Obstacle): Option[Obstacle] = {
+    if (this.isInstanceOf[Food] != obstacle.isInstanceOf[Food]) {
+      throw new IllegalArgumentException(s"$this and $obstacle are different objects")
     }
 
-    if (this equals b) {
+    if (this equals obstacle) {
       Some(this)
     } else {
-      val newPointList = (this ->| b).toList
+      val newPointList = (this ->| obstacle).toList
       if (newPointList.nonEmpty) {
         val centroid = Vectors.findCentroid(newPointList)
         val ordered = newPointList.sortWith((a, b) => ((a - centroid) /\) < ((b - centroid) /\))
@@ -96,23 +83,21 @@ class Obstacle(val points: List[Vector2D]) extends Drawable {
     }
   }
 
-  /**
-   * Check the overlap between this obstacle and b
+  /** Check the overlap between this and other obstacle.
    *
-   * @param b obstacle to check overlap
-   * @return if overlapping are found, return a list of no overlapped vertex. Otherwise return an empty list
+   * @param obstacle obstacle to check overlap
+   * @return if overlaps, return a list of no overlapped vertices. Otherwise return an empty list
    **/
-  def ->|(b: Obstacle): Iterable[Vector2D] = {
+  def ->|(obstacle: Obstacle): Iterable[Vector2D] = {
     import model.environment.elements.EnvironmentElements._
-    val freePointOfA = points.filter(p => !checkHasInside(b, p))
-    val freePointOfB = b.points.filter(p => !checkHasInside(this, p))
-
-    val overlappedPoint = points.filter(p => b.points.exists(p2 => p.~~(p2, 1E-4)))
+    val freePointOfA = points.filter(p => !checkPositionIsInsideObstacle(obstacle, p))
+    val freePointOfB = obstacle.points.filter(p => !checkPositionIsInsideObstacle(this, p))
+    val overlappedPoint = points.filter(p => obstacle.points.exists(p2 => p.~~(p2, 1E-4)))
 
     if ((freePointOfA.size < points.size)
-      || (freePointOfB.size < b.points.size)
+      || (freePointOfB.size < obstacle.points.size)
       || overlappedPoint.nonEmpty
-      || (position --> b.position < math.min(maxDistanceFromCenter(), b.maxDistanceFromCenter()))) {
+      || (position --> obstacle.position < math.min(maxDistanceFromCenter(), obstacle.maxDistanceFromCenter()))) {
       freePointOfA.diff(overlappedPoint) ++ freePointOfB
     } else {
       List.empty
@@ -133,6 +118,10 @@ class Obstacle(val points: List[Vector2D]) extends Drawable {
   override def hashCode(): Int = {
     val state = Seq(position, points.head)
     state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
+  }
+
+  private def maxDistanceFromCenter(): Double = {
+    points.sortWith((point1, point2) => (point1 --> position) < (point2 --> position)).head --> position
   }
 }
 

@@ -11,25 +11,14 @@ import common.geometry.Vector2D
 case class DangerPheromone(override val position: Vector2D,
                            override val decreasingFunction: Double => Double,
                            override val intensity: Double) extends Pheromone {
+  private val engine = new PheromoneOperationSolver[DangerPheromone]()
 
   override def decrease: Option[DangerPheromone] =
-    if (decreasingFunction(intensity) <= 0) {
-      None
-    } else {
-      Some(DangerPheromone(position, decreasingFunction, decreasingFunction(intensity)))
-    }
+    engine.decrease(DangerPheromone.apply, this)
 
-  override def merge(pheromone: Pheromone, threshold: Double = 1E-10): Option[DangerPheromone] = pheromone match {
-    case p: DangerPheromone =>
-      if (position --> p.position > threshold) {
-        None
-      }
-      else {
-        Some(DangerPheromone(position, decreasingFunction, this.intensity + p.intensity))
-      }
+  override def merge(pheromone: Pheromone, threshold: Double = 1E-10): Option[DangerPheromone] =
+    engine.merge(DangerPheromone.apply, this, pheromone, threshold, intensity)
 
-    case _ => None
-  }
 }
 
 object DangerPheromone {

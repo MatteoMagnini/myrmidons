@@ -75,7 +75,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
       }
       "check if ant didn't go outside boundary" in {
         import model.environment.elements.EnvironmentElements.BoundaryHasInside
-        assert(EnvironmentElements checkHasInside(boundary, newPosition))
+        assert(EnvironmentElements checkPositionIsInsideObstacle(boundary, newPosition))
       }
     }
   }
@@ -112,7 +112,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
       }
       "check that no ant went outside boundary" in {
         import EnvironmentElements.BoundaryHasInside
-        assert(positions.forall(x => elements.EnvironmentElements checkHasInside(boundary, x)))
+        assert(positions.forall(x => elements.EnvironmentElements checkPositionIsInsideObstacle(boundary, x)))
       }
     }
   }
@@ -195,7 +195,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
       }
       "check that no insect went outside boundary" in {
         import EnvironmentElements.BoundaryHasInside
-        assert(positions.forall(x => elements.EnvironmentElements checkHasInside(boundary, x)))
+        assert(positions.forall(x => elements.EnvironmentElements checkPositionIsInsideObstacle(boundary, x)))
       }
 
     }

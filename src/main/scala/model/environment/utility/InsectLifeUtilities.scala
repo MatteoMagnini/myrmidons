@@ -1,6 +1,7 @@
 package model.environment.utility
 
 import akka.actor.{ActorContext, ActorRef}
+import common.geometry.Vector2D
 import common.message.SharedMessage.Clock
 import model.environment.{MAX_DISTANCE_ENEMIES_FROM_ANTHILL, MIN_DISTANCE_ENEMIES_FROM_ANTHILL}
 import model.environment.data.{EnvironmentInfo, InsectReferences}
@@ -38,9 +39,9 @@ object InsectLifeUtilities {
   }
 
   private[environment] def createEnemies(context: ActorContext,
-                                         obstacles: Seq[Obstacle], nEnemies: Int): InsectReferences =
+                                         obstacles: Seq[Obstacle], nEnemies: Int, center: Vector2D): InsectReferences =
     (0 until nEnemies).map(i => {
-    val randomPosition = ObstacleFactory.getPositionOutObstacle(obstacles,
+    val randomPosition = ObstacleFactory.randomPositionOutObstacleFromCenter(obstacles, center,
       MIN_DISTANCE_ENEMIES_FROM_ANTHILL, MAX_DISTANCE_ENEMIES_FROM_ANTHILL)
     i -> context.actorOf(Enemy(EnemyInfo(id = i, position = randomPosition), context.self), s"enemy-$i")
   }).toMap

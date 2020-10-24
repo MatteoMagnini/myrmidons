@@ -37,9 +37,6 @@ object Vector2DFactory {
       OrientedVector2D(scala.util.Random.nextDouble() * 2 * math.Pi, doubleInRange(minRadius, maxRadius)) >> center
     }
 
-    def apply(minMaxRadius: (Double, Double), center: Vector2D): Vector2D = {
-      RandomVector2DInCircle(minMaxRadius._1, minMaxRadius._2, center)
-    }
   }
 
   /** Random vector factory inside a square or rectangle */
