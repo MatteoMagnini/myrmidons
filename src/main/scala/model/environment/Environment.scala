@@ -8,6 +8,7 @@ import common.message.AnthillMessage.{NewAnts, UpdateAnthill}
 import common.message.EnvironmentMessage._
 import common.message.InsectMessage._
 import common.message.SharedMessage.{Clock, StartSimulation}
+import model.environment.Fights.DeadInsect
 import model.environment.anthill.{Anthill, AnthillInfo}
 import model.environment.data.{EnvironmentInfo, InsectReferences}
 import model.environment.elements.EnvironmentElements._
@@ -135,15 +136,15 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   }
 
   private def sendInfoToGUI(info: EnvironmentInfo): Unit = {
-    val fightsChecker = FightsChecker(info.foragingAntsInfo ++ info.patrollingAntsInfo, info.enemiesInfo)
+    val fightsChecker = FightsChecker(info.foragingAntsInfo, info.patrollingAntsInfo, info.enemiesInfo)
     val fights = fightsChecker.checkFights
-    fights._1.foreach(ant => info.ants(ant) ! KillInsect(ant))
-    fights._2.foreach(enemy => info.enemies(enemy) ! KillInsect(enemy))
+    fights._1.foreach(ant => info.ants(ant.insect) ! KillInsect(ant.insect))
+    fights._2.foreach(enemy => info.enemies(enemy.insect) ! KillInsect(enemy.insect))
 
     val obstacles = info.obstacles ++ info.foods
     val insect = info.foragingAntsInfo ++ info.patrollingAntsInfo ++ info.enemiesInfo
     val pheromones: Seq[Pheromone] = info.pheromones
-    info.gui.get ! Repaint(info.anthillInfo.get +: (insect ++ obstacles ++ pheromones ++ fightsChecker.fights).toSeq)
+    info.gui.get ! Repaint(info.anthillInfo.get +: (insect ++ obstacles ++ pheromones ++ fights._1 ++ fights._2).toSeq)
     context >>> defaultBehaviour(info.emptyInsectInfo())
   }
 }

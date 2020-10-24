@@ -2,7 +2,7 @@ package view.scene
 
 
 import model.Drawable
-import model.environment.Fights.InsectsFight
+import model.environment.Fights.{DeadAnt, DeadEnemy, DeadInsect}
 import model.environment.anthill.AnthillInfo
 import model.environment.elements.Obstacle
 import model.environment.pheromones.Pheromone
@@ -90,7 +90,7 @@ object MyrmidonsPanel {
 
           case entity: Pheromone if showPheromones => draw(entity, graphics, size, zoom, slackX, slackY)
 
-          case entity: InsectsFight => draw(entity.fight, graphics, size, zoom, slackX, slackY)
+          case entity: DeadInsect => draw(entity, graphics, size, zoom, slackX, slackY)
 
           case _ =>
         }

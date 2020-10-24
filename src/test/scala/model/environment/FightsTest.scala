@@ -12,7 +12,7 @@ import scala.util.Random
 
 class FightsTest extends AnyWordSpecLike with Matchers {
 
-  "A fight between foraging ant and insect" when {
+  /*"A fight between foraging ant and insect" when {
     val ant = ForagingAntInfo(null)
     val insect = EnemyInfo()
     val fight: Fight[InsectInfo, EnemyInfo] = Fight(ant, insect)
@@ -109,6 +109,6 @@ class FightsTest extends AnyWordSpecLike with Matchers {
         assert(fightsChecker.checkFights._2.isEmpty)
       }
     }
-  }
+  }*/
 }
 

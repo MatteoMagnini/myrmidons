@@ -27,7 +27,6 @@ class RTreeProlog(val engine: Prolog) {
     val variable = Variable()
     val goal = new Struct(insert, node, tree, variable)
     val result = engine.solve(goal).getTerm(variable.getName)
-    println(result)
     result getAsTree
   }
 
