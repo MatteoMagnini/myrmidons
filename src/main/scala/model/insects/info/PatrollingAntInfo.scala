@@ -58,7 +58,7 @@ case class PatrollingAntInfo(override val id: Int,
   /**
     * @return a new InsectInfo with the incremented time
     */
-  override def incTime(): PatrollingAntInfo =
+  override def incrementTime(): PatrollingAntInfo =
     this.copy(time = time + 1)
 
   /**

@@ -3,6 +3,7 @@ package view.actor
 
 import model.environment.anthill.AnthillInfo
 import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
+import view.actor.InfoReport.InfoReportImpl
 
 
 trait ReportManagerInfo {
@@ -15,13 +16,13 @@ trait ReportManagerInfo {
 
   def enemies: Seq[EnemyInfo]
 
-  def history: Map[Int, (Int, Int, Int, Int)]
+  def history: Seq[InfoReport]
 
   def anthill: Option[AnthillInfo]
 
   def currentSize: (Int, Int, Int)
 
-  def updateHistory(update: Map[Int, (Int, Int, Int, Int)]): ReportManagerInfo
+  def updateHistory(update: InfoReport): ReportManagerInfo
 
   def setState(foraging: Seq[ForagingAntInfo], patrolling: Seq[PatrollingAntInfo],
                enemies: Seq[EnemyInfo]): ReportManagerInfo
@@ -34,10 +35,10 @@ object ReportManagerInfo {
 
 
   def apply(): ReportManagerInfo =
-    ReportManagerData(0, Seq.empty, Seq.empty, Seq.empty, Map.empty, None, (0, 0, 0))
+    ReportManagerData(0, Seq.empty, Seq.empty, Seq.empty, Seq.empty, None, (0, 0, 0))
 
   def apply(currentClock: Int, foragingAnt: Seq[ForagingAntInfo], patrollingAnt: Seq[PatrollingAntInfo],
-            enemies: Seq[EnemyInfo], history: Map[Int, (Int, Int, Int, Int)],
+            enemies: Seq[EnemyInfo], history: Seq[InfoReport],
             anthill: Option[AnthillInfo], currentSize: (Int, Int, Int)): ReportManagerInfo =
     ReportManagerData(currentClock, foragingAnt, patrollingAnt, enemies, history, anthill,
       currentSize)
@@ -46,14 +47,14 @@ object ReportManagerInfo {
                                              override val foragingAnt: Seq[ForagingAntInfo],
                                              override val patrollingAnt: Seq[PatrollingAntInfo],
                                              override val enemies: Seq[EnemyInfo],
-                                             override val history: Map[Int, (Int, Int, Int, Int)],
+                                             override val history: Seq[InfoReport],
                                              override val anthill: Option[AnthillInfo],
                                              override val currentSize: (Int, Int, Int)
                                             ) extends ReportManagerInfo {
 
 
-    override def updateHistory(update: Map[Int, (Int, Int, Int, Int)]): ReportManagerInfo =
-      this.copy(history = history ++ update)
+    override def updateHistory(update: InfoReport): ReportManagerInfo =
+      this.copy(history = history :+ update)
 
 
     override def setState(foraging: Seq[ForagingAntInfo], patrolling: Seq[PatrollingAntInfo],

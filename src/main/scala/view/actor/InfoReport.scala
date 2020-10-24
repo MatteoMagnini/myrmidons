@@ -18,14 +18,13 @@ object InfoReport {
     InfoReportImpl(clock, foragingAntSize,
       patrollingAntSize, enemiesSize, anthillFoodSize)
 
-  /**
-   * Info into history list to be collect in json file.
+  /** Info into history list to be collect in json file.
    *
-   * @param clock           current clock value.
-   * @param foragingAntSize current foraging ant size value.
+   * @param clock             current clock value.
+   * @param foragingAntSize   current foraging ant size value.
    * @param patrollingAntSize current patrolling ant size value.
-   * @param enemiesSize current enemies size value.
-   * @param anthillFoodSize current anthill food size value.
+   * @param enemiesSize       current enemies size value.
+   * @param anthillFoodSize   current anthill food size value.
    */
   private[view] case class InfoReportImpl(override val clock: Int,
                                           override val foragingAntSize: Int,

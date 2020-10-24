@@ -4,10 +4,7 @@ import akka.actor.{Actor, ActorLogging, ActorRef}
 import model.insects.competences.InsectCompetences
 import model.insects.info.SpecificInsectInfo
 
-/**
- * An insect is an entity with its own behaviour.
- * For this reason it extends Actor, it has its own control flow and is reactive to inputs (messages).
- * It also holds the information (state) of the insect.
+/** An insect is an entity with its own behaviour, it has its own control flow and is reactive to inputs.
  *
  * @tparam A the type of the insect
  */

@@ -103,7 +103,7 @@ class InsectInfoTest extends TestKit(ActorSystem("InsectInfoTest"))
       }
 
       val newTime = 1
-      val info8 = info7.incTime()
+      val info8 = info7.incrementTime()
 
       "correct update time" in {
         assert(checkAll(info8, position = newPosition, energy = newEnergy, inertia = newInertia,

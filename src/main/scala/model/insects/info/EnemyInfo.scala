@@ -28,7 +28,7 @@ case class EnemyInfo(override val id: Int,
   override def updateEnergy(delta: Double): EnemyInfo =
     this.copy(energy = if (energy + delta > MAX_ENERGY) MAX_ENERGY else energy + delta)
 
-  override def incTime(): EnemyInfo =
+  override def incrementTime(): EnemyInfo =
     this.copy(time = time + 1)
 }
 

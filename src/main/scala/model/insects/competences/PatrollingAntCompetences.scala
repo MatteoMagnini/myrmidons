@@ -8,13 +8,12 @@ import common.message.InsectMessage.Move
 import model.insects.Ants.PatrollingAnt._
 import model.insects.info.PatrollingAntInfo
 
-/**
- * Specific competences suitable only for foraging ants.
+/** Specific competences suitable only for foraging ants.
+ *
  */
 trait PatrollingAntCompetences extends AntCompetences[PatrollingAntInfo]
 
-/**
- * Competence that enable a foraging ant to follow the traces of (danger) pheromones.
+/** Competence that enable a foraging ant to follow the traces of (danger) pheromones.
  *
  * @param behaviour of the ant
  */

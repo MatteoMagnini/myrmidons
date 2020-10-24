@@ -11,26 +11,24 @@ import model.environment.pheromones.FoodPheromoneInfo._
 import model.insects.Ants.ForagingAnt._
 import model.insects.info.ForagingAntInfo
 
-/**
- * Specific competences suitable only for foraging ants
+/** Specific competences suitable only for foraging ants
+ *
  */
 trait ForagingAntCompetences extends AntCompetences[ForagingAntInfo]
 
-/**
- * Competence forcing a foraging ant to go back to the anthill when its carrying food.
+/** Competence forcing a foraging ant to go back to the anthill when its carrying food.
  *
  * @param behaviour of the ant
  */
 case class CarryFoodToHome(behaviour: ForagingAntInfo => Receive) extends ForagingAntCompetences {
 
   override def apply(context: ActorContext, environment: ActorRef, insect: ActorRef, info: ForagingAntInfo): Unit =
-    GoBackToHome[ForagingAntInfo](behaviour).apply(context,environment,insect,info)
+    GoBackToHome[ForagingAntInfo](behaviour).apply(context, environment, insect, info)
 
   override def hasPriority(info: ForagingAntInfo): Boolean = info.foodAmount > 0
 }
 
-/**
- * Competence that enables foraging ants to carry food when it find it.
+/** Competence that enables foraging ants to carry food when it find it.
  *
  * @param behaviour of the ant
  */
@@ -44,12 +42,11 @@ case class PickFood(behaviour: ForagingAntInfo => Receive) extends ForagingAntCo
   override def hasPriority(info: ForagingAntInfo): Boolean = info.foodIsNear && info.foodAmount < MAX_FOOD
 }
 
-/**
- * A foraging ant leaves the food in the anthill.
+/** A foraging ant leaves the food in the anthill.
  *
  * @param behaviour of the ant
  */
-case class StoreFoodInAnthill( behaviour: ForagingAntInfo => Receive) extends ForagingAntCompetences {
+case class StoreFoodInAnthill(behaviour: ForagingAntInfo => Receive) extends ForagingAntCompetences {
 
   override def apply(context: ActorContext, environment: ActorRef, insect: ActorRef, info: ForagingAntInfo): Unit = {
     info.anthill.tell(StoreFood(info.foodAmount), insect)
@@ -61,8 +58,7 @@ case class StoreFoodInAnthill( behaviour: ForagingAntInfo => Receive) extends Fo
   override def hasPriority(info: ForagingAntInfo): Boolean = info.isInsideTheAnthill && info.foodAmount > 0
 }
 
-/**
- * Competence that enable a foraging ant to follow the traces of (food) pheromones.
+/** Competence that enable a foraging ant to follow the traces of (food) pheromones.
  *
  * @param behaviour of the ant
  */
@@ -83,8 +79,7 @@ case class FoodPheromoneTaxis(behaviour: ForagingAntInfo => Receive) extends For
     info.foodPheromones.toStream.exists(p => p.position --> info.position < FOOD_PHEROMONE_RANGE)
 }
 
-/**
- * A foraging ant drops food pheromones when going back to the anthill while carrying food.
+/** A foraging ant drops food pheromones when going back to the anthill while carrying food.
  *
  * @param behaviour of the ant
  */

@@ -9,15 +9,13 @@ import common.geometry._
 import common.message.InsectMessage.{AntTowardsAnthill, EatFood, Move}
 import model.insects.info.AntInfo
 
-/**
- * Competence for all ants.
+/** Competence for all ants.
  *
  * @tparam A th type of the ant
  */
 trait AntCompetences[A <: AntInfo[A]] extends InsectCompetences[A]
 
-/**
- * Competence forcing an ant to go back to the anthill when its energy is low.
+/** Competence forcing an ant to go back to the anthill when its energy is low.
  *
  * @param behaviour of the ant
  * @tparam A th type of the ant
@@ -34,8 +32,7 @@ case class GoBackToHome[A <: AntInfo[A]](behaviour: A => Receive) extends AntCom
   override def hasPriority(info: A): Boolean = info.energy < THRESHOLD_GO_BACK_HOME
 }
 
-/**
- * Competence forcing an insect to exit the anthill when its energy level is high.
+/** Competence forcing an insect to exit the anthill when its energy level is high.
  *
  * @param behaviour of the ant
  * @tparam A th type of the ant
@@ -55,8 +52,7 @@ case class GoOutside[A <: AntInfo[A]](behaviour: A => Receive) extends AntCompet
     info.isInsideTheAnthill && info.energy > THRESHOLD_GO_OUTSIDE && random(probability = 0.5)
 }
 
-/**
- * Eat food from the anthill (if present) when the insect is inside it.
+/** Eat food from the anthill (if present) when the insect is inside it.
  *
  * @param behaviour of the ant
  * @tparam A th type of the ant

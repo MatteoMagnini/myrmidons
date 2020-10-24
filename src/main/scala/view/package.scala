@@ -10,11 +10,11 @@ package object view {
   val SET_TO_CENTER = 2
   val OBSTACLE_DRAW_SIZE = 20
   var checkedSize: Dimension = Toolkit.getDefaultToolkit.getScreenSize
-  if(SystemUtils.IS_OS_LINUX){
-    checkedSize  = new Dimension(checkedSize.width, checkedSize.height - 30)
+  if (SystemUtils.IS_OS_LINUX) {
+    checkedSize = new Dimension(checkedSize.width, checkedSize.height - 30)
   }
   val SIMULATION_SIZE: Dimension = checkedSize
-  val CENTER: (Int, Int) = (SIMULATION_SIZE.width /2, SIMULATION_SIZE.height / 2)
+  val CENTER: (Int, Int) = (SIMULATION_SIZE.width / 2, SIMULATION_SIZE.height / 2)
 
   object Colors {
 
@@ -43,6 +43,7 @@ package object view {
 
     /**
      * Set opacity of anthill object.
+     *
      * @param anthillFood quantity of food in anthill.
      * @return right color for anthillFood value.
      */
@@ -58,14 +59,17 @@ package object view {
 
     /**
      * Set opacity of pheromone object.
+     *
      * @param intensity intensity of pheromone.
      * @return right color for food pheromone value.
      */
     def FOOD_PHEROMONE_COLOR(intensity: Float): Color = {
       if (intensity < 0.3f) FOOD_PHEROMONE_COLOR_SET(0.3f) else FOOD_PHEROMONE_COLOR_SET(intensity)
     }
+
     /**
      * Set opacity of pheromone object.
+     *
      * @param intensity intensity of pheromone.
      * @return right color for danger pheromone value.
      */
@@ -84,8 +88,10 @@ package object view {
         DANGER_PHEROMONE_COLOR_COMPONENT._2,
         DANGER_PHEROMONE_COLOR_COMPONENT._3, intensity)
     }
+
     /**
      * Set opacity of food object.
+     *
      * @param quantity quantity of food.
      * @return right color for food value.
      */
