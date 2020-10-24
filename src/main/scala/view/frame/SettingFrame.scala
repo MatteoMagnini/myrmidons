@@ -3,14 +3,14 @@ package view.frame
 import view.scene.ParametersPanel
 
 import scala.swing.{BorderPanel, Dimension, MainFrame}
-trait SettingFrame extends MainFrame{}
-object SettingFrame{
+
+trait SettingFrame extends MainFrame {}
+
+object SettingFrame {
 
   def apply(): SettingFrame = new SettingFrameImpl()
-  /**
-   *
-   */
-  private[view] class SettingFrameImpl () extends SettingFrame {
+
+  private[view] class SettingFrameImpl() extends SettingFrame {
     title = "Myrmidons - Set Parameters"
     val settingPanel: ParametersPanel = ParametersPanel(this)
     contents = new BorderPanel {
@@ -20,4 +20,5 @@ object SettingFrame{
     resizable = false
     visible = true
   }
+
 }

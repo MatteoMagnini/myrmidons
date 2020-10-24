@@ -41,16 +41,16 @@ private[view] class ReportManager(state: ReportManagerInfo) extends Actor with A
         case _ =>
       }
 
-      self ! UpdateHistory()
+      self ! UpdateHistory
       context >>> defaultBehaviour(state.saveInfo(foragingAnts, patrollingAnts, enemies, anthill))
 
 
-    case UpdateHistory() =>
+    case UpdateHistory =>
       context >>> defaultBehaviour(state.updateHistory(InfoReport(state.currentClock, state.foragingAnt.size,
         state.patrollingAnt.size, state.enemies.size, state.anthill.get.foodAmount.toInt)))
 
 
-    case ShowAndSaveReport() =>
+    case ShowAndSaveReport =>
       val historyToFile = new util.ArrayList[util.ArrayList[InfoReport]]()
       val historyElement = new util.ArrayList[InfoReport]()
       val orderHistory = state.history.sortBy(_.clock)
@@ -61,8 +61,7 @@ private[view] class ReportManager(state: ReportManagerInfo) extends Actor with A
       frameTimeSeries.visible = true
   }
 
-  /**
-   * Write history in json file.
+  /** Write history in json file.
    * The gson library requires the use of util.ArrayList to store collections in a json object.
    *
    * @param list list of list information.

@@ -4,9 +4,7 @@ import java.awt.event.{KeyEvent, KeyListener}
 import view.scene.MyrmidonsPanel
 
 trait Keyboard extends KeyListener {
-  /** Panel which key listener is applied. */
   def myrmidonsPanel: MyrmidonsPanel
-
 }
 
 object Keyboard {
@@ -23,7 +21,8 @@ object Keyboard {
     private val LEFT = KeyEvent.VK_LEFT
 
     /**
-     *  For each event panel will draw entities in different way.
+     * For each event panel will draw entities in different way.
+     *
      * @param keyEvent a key event happened in panel.
      */
     override def keyPressed(keyEvent: KeyEvent): Unit = {

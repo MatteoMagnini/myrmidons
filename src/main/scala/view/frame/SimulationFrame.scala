@@ -26,8 +26,8 @@ object SimulationFrame {
     new SimulationFrameImpl(antSizeInput, anthillFoodInput,
       foodSizeInput, obstacleSizeInput, enemiesSizeInput)
 
-  /**
-   * Frame that contains labels, control and panel where entities will be draw.
+  /** Frame that contains labels, control and panel where entities will be draw.
+   *
    *
    * @param antSizeInput      Parameters for ant size.
    * @param anthillFoodInput  Parameters for anthill food  size.

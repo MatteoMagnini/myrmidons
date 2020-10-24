@@ -1,7 +1,6 @@
 package view
 
 
-
 package object drawLogic {
 
   val ANTHILL_SIZE_FACTOR = 2

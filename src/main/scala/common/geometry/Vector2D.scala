@@ -27,10 +27,10 @@ case class Vector2D(x: Double, y: Double) {
   /** Returns the norm of the vector */
   def || : Double = math.sqrt(x * x + y * y)
 
-  /** Returns the angle of the vector */
+  /** Returns vector orientation in angle */
   def /\ : Double = math.atan2(y, x)
 
-  /** TODO SIMO COMMENTA! */
+  /** Returns the angle between two vectors */
   def ^(s: Vector2D): Double = {
     val numeratorCos = (s.x * x) + (s.y * y)
     val denominator = (this ||) * (s ||)

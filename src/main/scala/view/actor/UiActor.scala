@@ -9,8 +9,8 @@ import view.actor.uiMessage._
 
 import scala.concurrent.duration.DurationInt
 
-/**
- * Gui Actor that manage clock simulation and simulation control.
+/** Gui Actor that manage clock simulation and simulation control.
+ *
  * @param state uiActor state.
  */
 
@@ -35,7 +35,7 @@ private[view] class UiActor(state: uiActorInfo)
       if (state.stopFlag) {
         timers.startSingleTimer(state.currentState, StepOver, state.rate.millis)
       }
-      context >>> defaultBehaviour(state.incCurrentState)
+      context >>> defaultBehaviour(state.incrementCurrentState)
 
     case StepOver =>
       state.control.environment.tell(Clock(state.currentState), self)
@@ -46,7 +46,7 @@ private[view] class UiActor(state: uiActorInfo)
       timers.cancel(state.currentState)
       context >>> defaultBehaviour(state.stopSimulation)
 
-    case RestartSimulation() =>
+    case RestartSimulation =>
       timers.startSingleTimer(state.currentState, StepOver, state.rate.millis)
       context >>> defaultBehaviour(state.startSimulation)
 

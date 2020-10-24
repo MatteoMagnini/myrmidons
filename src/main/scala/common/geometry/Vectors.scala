@@ -9,7 +9,7 @@ object Vectors {
    * @param y         value to check
    * @param precision to consider in number matching
    * @return true if the value are similar, otherwise false
-   * */
+   **/
   def ~=(x: Double, y: Double, precision: Double = 1E-1): Boolean = (x - y).abs < precision
 
   /** Random value in range.
@@ -22,13 +22,12 @@ object Vectors {
     min + (max - min) * scala.util.Random.nextDouble()
 
   /** Find intersection point of two line.
-   * TODO SIMO CAMBIA DESCRIZIONE SEGMENTI
    *
-   * @param firstSegment  (startSegPoint, stopSegPoint, lineVector)
-   * @param secondSegment (startSegPoint, stopSegPoint, lineVector)
+   * @param firstSegment  first vector representation:(starting point, ending point, line)
+   * @param secondSegment second vector representation:(starting point, ending point, line)
    * @return intersection point if present
    *
-   **/
+   * */
   def findIntersectionPoint(firstSegment: (Vector2D, Vector2D, Vector3D),
                             secondSegment: (Vector2D, Vector2D, Vector3D)): Option[Vector2D] = {
     val crossIntersection = firstSegment._3 X secondSegment._3

@@ -18,8 +18,7 @@ object TimeSeriesFrame {
 
   def apply(history: Seq[InfoReport]): TimeSeriesFrame = new TimeSeriesFrameImpl(history)
 
-  /**
-   * Main frame that contains time series report of simulation.
+  /** Main frame that contains time series report of simulation.
    *
    * @param history simulation history until the Repaint button click.
    */
@@ -42,8 +41,7 @@ object TimeSeriesFrame {
     size = new Dimension(TIME_SERIES_SIZE, TIME_SERIES_SIZE)
     visible = true
 
-    /**
-     * Create time series collection with insect number history from simulation data.
+    /** Create time series collection with insect number history from simulation data.
      *
      * @return insect number series.
      */

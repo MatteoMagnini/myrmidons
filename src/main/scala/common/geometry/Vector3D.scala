@@ -10,7 +10,7 @@ import common.geometry.Vectors._
  */
 case class Vector3D(x: Double, y: Double, z: Double) {
 
-  /** TODO COMMENT SIMON */
+
   def - : Vector3D = (-x, -y, -z)
 
   def >>(delta: Vector3D): Vector3D = (x + delta.x, y + delta.y, z + delta.z)
@@ -48,7 +48,11 @@ case class Vector3D(x: Double, y: Double, z: Double) {
   }
 
 
-  /** Cross product between two vectors * */
+  /** Cross product between two vectors.
+   *
+   * @param other vector 3D
+   * @return cross product
+   */
   def X(other: Vector3D): Vector3D = {
     val newX = (y * other.z) - (z * other.y)
     val newY = (z * other.x) - (x * other.z)

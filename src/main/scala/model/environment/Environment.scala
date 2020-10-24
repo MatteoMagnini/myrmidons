@@ -56,14 +56,15 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
   private def defaultBehaviour(state: EnvironmentInfo): Receive = {
     case Clock(value: Int) =>
-      if (randomSpawnAnt(state, value)) {
+      if (randomSpawnAnt(state)) {
         self ! AntBirth(value)
       }
       state.ants.values.foreach(_ ! Clock(value))
       state.ants.values.foreach(_ ! Pheromones(state.pheromones, state.tree))
       state.enemies.values.foreach(_ ! Clock(value))
       state.anthill.get ! Clock(value)
-      context >>> defaultBehaviour(checkFoodSpawn(state).updatePheromones(state.pheromones.tick()))
+      val newState = if (value % 100 == 0) checkFoodSpawn(state) else state
+      context >>> defaultBehaviour(newState.updatePheromones(newState.pheromones.tick()))
 
     case Move(position: Vector2D, delta: Vector2D) =>
       if (checkPositionIsInsideObstacle(state.boundary, position >> delta)) {
@@ -73,14 +74,10 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       }
 
     case TakeFood(delta, position) =>
-
-      /** TODO XK NON USI FIND? COS'È FOO E UPFOO */
-      val food = state.foods.filter(f => f.position ~~ (position, 1E-7))
+      val food = state.foods.find(f => f.position ~~ (position, 1E-7))
       if (food.nonEmpty) {
         sender ! TakeFood(delta, position)
-        val foo = food.head
-        val upFoo = foo - delta
-        context >>> defaultBehaviour(state.updateFood(foo, upFoo))
+        context >>> defaultBehaviour(state.updateFood(food, food - delta))
       } else {
         sender ! TakeFood(0, position)
       }
@@ -116,10 +113,6 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   }
 
   private def checkFoodSpawn(state: EnvironmentInfo): EnvironmentInfo = {
-
-    /**
-     * TODO SIMO MA XK NON LO FACCIAMO SOLO CON UN RANDOM?
-     */
     val foodDistance = state.foods.foldRight(0.0)(_.position --> state.anthillInfo.position + _)
     val foodMeanDistance = foodDistance / state.foods.size
     val anthillFoodPercentage = state.anthillInfo.get.foodAmount / state.anthillInfo.get.maxFoodAmount
@@ -129,8 +122,8 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
         state.obstacles.toList ++ state.foods,
         state.anthillInfo.position,
         MIN_FOOD_RADIUS, MAX_FOOD_RADIUS)
-      val nf = Food(randomPosition, FOOD_MIN_QUANTITY)
-      state.updateFood(nf, nf)
+      val newFood = Food(randomPosition, FOOD_MIN_QUANTITY)
+      state.updateFood(newFood, newFood)
     } else {
       state
     }

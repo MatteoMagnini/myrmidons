@@ -13,16 +13,23 @@ import scala.util.Random
 
 
 object InsectLifeUtilities {
-  /** Stochastic spawn on ant.
+  /** Stochastic spawn of ant.
    *
    * @param state environment information.
-   * @param clock current time clock
    * @return true if ant has to be spawn
    */
-  private[environment] def randomSpawnAnt(state: EnvironmentInfo, clock: Int): Boolean = {
+  private[environment] def randomSpawnAnt(state: EnvironmentInfo): Boolean = {
     val antHillFoodPercentage = state.anthillInfo.get.foodAmount / state.anthillInfo.get.maxFoodAmount
-    val scaleFactor = 2.2 / MAX_FOOD
+    val scaleFactor = ANT_SPAWN_FACTOR / MAX_FOOD
     Random.nextDouble() < (antHillFoodPercentage * scaleFactor)
+  }
+
+  /** Stochastic spawn of enemies.
+   *
+   * @return true if enemy has to be spawn
+   */
+  private[environment] def randomSpawnEnemies(): Boolean = {
+    Random.nextDouble() < ENEMIES_SPAWN_PROBABILITY
   }
 
   /** Creation new ant.
