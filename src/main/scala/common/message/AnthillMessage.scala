@@ -23,8 +23,7 @@ object AnthillMessage {
   /**
    * Message sent from anthill to ants when they reach it.
    *
-   * @param antIsInsideTheAnthill true if the ant is inside, false otherwise
    */
-  case class UpdateAnthillCondition(antIsInsideTheAnthill: Boolean) extends Message
+  case object UpdateAnthillCondition extends Message
 
 }

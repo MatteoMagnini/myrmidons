@@ -43,7 +43,7 @@ case class ForagingAntInfo(override val id: Int,
   override def incTime(): ForagingAntInfo =
     this.copy(time = time + 1)
 
-  override def updateAnthillCondition(value: Boolean): ForagingAntInfo =
+  override def antEntersAnthill(value: Boolean): ForagingAntInfo =
     this.copy(isInsideTheAnthill = value)
 
   /**

@@ -61,8 +61,8 @@ case class PatrollingAnt (override val info: PatrollingAntInfo,
       context >>> defaultBehaviour(data.updateDangerPheromones(pheromones filterKeys ids.toSet))
 
     /** The ant enters or exits the anthill */
-    case UpdateAnthillCondition(value) =>
-      context >>> defaultBehaviour(data.updateAnthillCondition(value))
+    case UpdateAnthillCondition =>
+      context >>> defaultBehaviour(data.antEntersAnthill(true))
 
     /** Ant killed in a fight */
     case KillInsect(_) =>

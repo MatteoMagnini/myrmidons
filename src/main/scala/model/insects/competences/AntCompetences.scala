@@ -43,7 +43,7 @@ case class GoBackToHome[A <: AntInfo[A]](behaviour: A => Receive) extends AntCom
 case class GoOutside[A <: AntInfo[A]](behaviour: A => Receive) extends AntCompetences[A] {
 
   override def apply(context: ActorContext, environment: ActorRef, insect: ActorRef, info: A): Unit = {
-    val data = info.updateEnergy(ENERGY_RANDOM_WALK).updateAnthillCondition(value = false)
+    val data = info.updateEnergy(ENERGY_RANDOM_WALK).antEntersAnthill(value = false)
     val delta: Vector2D = RandomVector2DInCircle(MIN_VELOCITY, MAX_VELOCITY)
     val deltaWithInertia = OrientedVector2D((delta >> (info.inertia * INERTIA_FACTOR))./\,
       doubleInRange(MIN_VELOCITY, MAX_VELOCITY))

@@ -103,7 +103,7 @@ with BeforeAndAfterAll{
 
       }
 
-      val foragingAntInfo3 = foragingAntInfo2.updateAnthillCondition(true)
+      val foragingAntInfo3 = foragingAntInfo2.antEntersAnthill(true)
       "store to anthill" in {
 
         val storeFoodInAnthillCompetence = StoreFoodInAnthill(defaultBehaviour)
@@ -119,7 +119,7 @@ with BeforeAndAfterAll{
     //From now on competences are for all kind of ants (except from FoodPheromoneTaxis).
     "energy is low" should {
 
-      val foragingAntInfo2 = foragingAntInfo.updateEnergy(-80).updateAnthillCondition(true)
+      val foragingAntInfo2 = foragingAntInfo.updateEnergy(-80).antEntersAnthill(true)
       "eat from the anthill" in {
 
         val eatFromTheAnthillCompetence = EatFromTheAnthill[ForagingAntInfo](defaultBehaviour)
@@ -142,7 +142,7 @@ with BeforeAndAfterAll{
 
       import model.environment.pheromones.FoodPheromoneInfo._
       val foodPheromone = FoodPheromone(Vector2D(4,6),x => x - DELTA,10)
-      val foragingAntInfo4 = foragingAntInfo3.updateFoodPheromones(Seq(foodPheromone)).updateAnthillCondition(false)
+      val foragingAntInfo4 = foragingAntInfo3.updateFoodPheromones(Seq(foodPheromone)).antEntersAnthill(false)
       "follow the food pheromones" in {
 
         val foodPheromoneTaxisCompetence = FoodPheromoneTaxis(defaultBehaviour)

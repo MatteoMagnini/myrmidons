@@ -31,7 +31,7 @@ case class PatrollingAntInfo(override val id: Int,
     * @param value the new condition
     * @return a new AntInfo with the updated anthill condition
     */
-  override def updateAnthillCondition(value: Boolean): PatrollingAntInfo =
+  override def antEntersAnthill(value: Boolean): PatrollingAntInfo =
     this.copy(isInsideTheAnthill = value)
 
   /**

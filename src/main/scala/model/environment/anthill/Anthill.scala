@@ -3,57 +3,36 @@ package model.environment.anthill
 import akka.actor.{Actor, ActorRef, Props}
 import common.geometry.Vector2DFactory.{OrientedVector2D, OrientedVector2DWithNoise, ZeroVector2D}
 import common.geometry.Vectors.doubleInRange
-import common.geometry._
 import common.message.AnthillMessage.{NewAnts, UpdateAnthill, UpdateAnthillCondition}
 import common.message.EnvironmentMessage.CreateAnts
 import common.message.InsectMessage.{AntTowardsAnthill, EatFood, Move, StoreFood}
 import common.message.SharedMessage.Clock
-import model.Drawable
 import model.insects.competences._
 import model.insects.info.{ForagingAntInfo, PatrollingAntInfo}
 import model.insects.{ForagingAnt, PatrollingAnt}
 
-case class AnthillInfo(override val position: Vector2D,
-                       radius: Double,
-                       foodAmount: Double,
-                       maxFoodAmount: Double) extends Drawable {
-
-  def incFood(delta: Double): AnthillInfo =
-    this.copy(foodAmount = if (foodAmount + delta > maxFoodAmount) maxFoodAmount else foodAmount + delta)
-
-  def decFood(delta: Double): AnthillInfo =
-    this.copy(foodAmount = if (foodAmount - delta < 0) 0 else foodAmount - delta)
-}
-
-object AnthillInfo {
-  def apply(position: Vector2D, radius: Double = 3, foodAmount: Double = 0,
-            maxFoodAmount: Double = MAX_FOOD_AMOUNT): AnthillInfo =
-    new AnthillInfo(position, radius, foodAmount, maxFoodAmount)
-}
-
-case class Anthill(info: AnthillInfo, environment: ActorRef) extends Actor {
+class Anthill(info: AnthillInfo, environment: ActorRef) extends Actor {
 
   override def receive: Receive = defaultBehaviour(info)
 
   def defaultBehaviour(data: AnthillInfo): Receive = {
 
     case StoreFood(delta) =>
-      context become defaultBehaviour(data.incFood(delta))
+      context become defaultBehaviour(data.incrementFood(delta))
 
     case EatFood(delta) =>
       val newDelta = if (data.foodAmount > delta) delta else data.foodAmount
-      val newData = data.decFood(newDelta)
+      val newData = data.decrementFood(newDelta)
       sender ! EatFood(newDelta)
       context become defaultBehaviour(newData)
 
     case AntTowardsAnthill(position, maxSpeed, inertia, noise, antIsIn) =>
       val dist = info.position - position
       if (!antIsIn && dist.|| <= data.radius) {
-        sender ! UpdateAnthillCondition(true)
+        sender ! UpdateAnthillCondition
         environment.tell(Move(position, ZeroVector2D()), sender)
       } else {
-        val rad = dist /\
-        val unboundedDelta = OrientedVector2DWithNoise(rad, maxSpeed, noise)
+        val unboundedDelta = OrientedVector2DWithNoise(dist /\, maxSpeed, noise)
         val delta = OrientedVector2D((unboundedDelta >> (inertia * INERTIA_FACTOR))./\,
           doubleInRange(MIN_VELOCITY, MAX_VELOCITY))
         environment.tell(Move(position, delta), sender)

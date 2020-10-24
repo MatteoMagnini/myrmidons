@@ -64,7 +64,7 @@ class InsectInfoTest extends TestKit(ActorSystem("InsectInfoTest"))
         assert(checkAll(info2, position = newPosition))
       }
 
-      val info3 = info2.updateAnthillCondition(true)
+      val info3 = info2.antEntersAnthill(true)
 
       "correct update anthill condition" in {
         assert(checkAll(info3, position = newPosition, isInsideTheAnthill = true))

@@ -217,7 +217,7 @@ class ForagingAntTest extends TestKit(ActorSystem("ForagingAntTest"))
     "near anthill while carrying food" should {
 
       "store food into the anthill" in {
-        ant.tell(UpdateAnthillCondition(true), anthill)
+        ant.tell(UpdateAnthillCondition, anthill)
         ant ! Clock(4)
         val result1 = sender.expectMsgType[UpdateInsect]
         assert(result1.info.asInstanceOf[ForagingAntInfo].foodAmount == 0)
