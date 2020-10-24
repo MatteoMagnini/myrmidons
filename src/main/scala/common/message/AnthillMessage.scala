@@ -12,7 +12,7 @@ object AnthillMessage {
    */
   case class NewAnts(ants: InsectReferences) extends Message
 
-  /** When anthill update is needs.
+  /** When anthill update is needed.
    * Message sent from anthill to environment when anthill information change.
    *
    * @param info anthill information

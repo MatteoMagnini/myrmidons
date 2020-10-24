@@ -33,14 +33,14 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
       val obstacles = if (obstaclesPresence.isDefined) {
         ObstacleFactory.createRandom(obstaclesPresence.get,
-          anthillInfo.position, OBSTACLE_RADIUS_MIN_MAX, radius = OBSTACLE_RADIUS).toSeq
+          anthillInfo.position, MIN_OBSTACLE_RADIUS, MAX_OBSTACLE_RADIUS, radius = OBSTACLE_RADIUS).toSeq
       }
       else {
         Seq.empty
       }
       val foods = if (foodPresence.isDefined) {
         (0 until foodPresence).map(_ =>
-          Food.createRandomFood(anthillInfo.position, FOOD_RADIUS._1, FOOD_RADIUS._2))
+          Food.createRandomFood(anthillInfo.position, MIN_FOOD_RADIUS, MAX_FOOD_RADIUS))
       } else {Seq.empty}
 
       val enemies = InsectLifeUtilities.createEnemies(context, obstacles ++ foods, nEnemies)
@@ -126,7 +126,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       val randomPosition = ObstacleFactory.randomPositionOutObstacleFromCenter(
         state.obstacles.toList ++ state.foods,
         state.anthillInfo.position,
-        FOOD_RADIUS._1, FOOD_RADIUS._2)
+        MIN_FOOD_RADIUS, MAX_FOOD_RADIUS)
       val nf = Food(randomPosition, FOOD_MIN_QUANTITY)
       state.updateFood(nf, nf)
     } else {

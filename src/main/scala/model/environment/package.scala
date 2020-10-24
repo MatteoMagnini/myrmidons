@@ -7,7 +7,8 @@ package object environment {
 
   val ANTHILL_RADIUS = 15
   val FOOD_AMOUNT = 2000
-  val FOOD_RADIUS: (Double, Double) = (100.0, 500.0)
+  val MIN_FOOD_RADIUS = 100.00
+  val MAX_FOOD_RADIUS = 500.00
   val FORAGING_PERCENTAGE = 0.7
 
   val FOOD_MIN_QUANTITY = 500
@@ -15,7 +16,9 @@ package object environment {
   val FOOD_MIN_SIZE = 5
   val FOOD_METRIC = 18
 
-  val OBSTACLE_RADIUS_MIN_MAX: (Double, Double) = (100.0, 600.0)
+
+  val MIN_OBSTACLE_RADIUS = 100.00
+  val MAX_OBSTACLE_RADIUS = 600.00
   val OBSTACLE_TRIANGLE_VERTEX = 3
   val OBSTACLE_SQUARE_VERTEX = 4
   val OBSTACLE_OCTAGON_VERTEX = 8
@@ -29,7 +32,7 @@ package object environment {
 
   implicit def extractOption[X](value: Option[X]): X = value.get
 
-  implicit def entity2Id[X <: InsectInfo](entity: X): Int = entity.id
+  implicit def entityToId[X <: InsectInfo](entity: X): Int = entity.id
 
   implicit def mapToSeqPheromone(map: Map[Int, Pheromone]): Seq[Pheromone] =
     map.values.toSeq

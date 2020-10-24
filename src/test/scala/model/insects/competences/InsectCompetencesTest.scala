@@ -3,7 +3,8 @@ package model.insects.competences
 import akka.actor.Actor.Receive
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
-import common.geometry.{Vector2D, ZeroVector2D}
+import common.geometry.Vector2D
+import common.geometry.Vector2DFactory.ZeroVector2D
 import common.message.InsectMessage._
 import common.message.SharedMessage.Context
 import model.environment.pheromones.{DangerPheromone, FoodPheromone}

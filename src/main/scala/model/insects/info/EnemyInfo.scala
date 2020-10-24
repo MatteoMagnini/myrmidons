@@ -1,7 +1,8 @@
 package model.insects.info
 
+import common.geometry.Vector2D
+import common.geometry.Vector2DFactory.ZeroVector2D
 import model.insects.Enemies._
-import common.geometry.{Vector2D, ZeroVector2D}
 
 /**
  * This class defines an enemy state.

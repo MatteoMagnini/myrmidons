@@ -1,9 +1,10 @@
 package model.insects.info
 
 import akka.actor.ActorRef
+import common.geometry.Vector2D
+import common.geometry.Vector2DFactory.ZeroVector2D
 import model.environment.pheromones.DangerPheromone
 import model.insects.Ants.PatrollingAnt._
-import common.geometry.{Vector2D, ZeroVector2D}
 
 /**
  * This class defines a patrolling ant state.

@@ -5,11 +5,11 @@ import alice.tuprolog.{Prolog, Theory, Var}
 /** Utility class of prolog helpers */
 object PrologFacilities {
 
-  /** Returns a prolog instance, after reading provided theories
-    *
-    * @param resource path where theories are written
-    * @return a prolog engine
-    */
+  /** Returns a prolog instance, after reading provided theories.
+   *
+   * @param resource path where theories are written
+   * @return a prolog engine
+   */
   def getEngine(resource: String): Prolog = {
     val engine = new Prolog()
     val file = scala.io.Source.fromResource(resource)

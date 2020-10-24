@@ -2,11 +2,12 @@ package model.insects.competences
 
 import akka.actor.Actor.Receive
 import akka.actor.{ActorContext, ActorRef}
-import model.insects.info.SpecificInsectInfo
+import common.RichActor._
+import common.geometry.Vector2DFactory.{OrientedVector2D, RandomVector2DInCircle}
 import common.geometry.Vectors._
 import common.geometry._
-import common.RichActor._
 import common.message.InsectMessage.{KillInsect, Move}
+import model.insects.info.SpecificInsectInfo
 
 /**
  * A competence is the minimal building block to achieve a more complex behaviour.

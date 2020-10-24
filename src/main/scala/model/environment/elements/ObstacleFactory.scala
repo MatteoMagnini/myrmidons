@@ -1,6 +1,7 @@
 package model.environment.elements
 
-import common.geometry.{RandomVector2DInCircle, Vector2D, ZeroVector2D}
+import common.geometry.Vector2D
+import common.geometry.Vector2DFactory.{RandomVector2DInCircle, ZeroVector2D}
 import model.environment.elements.EnvironmentElements.checkHaveInside
 
 /**
@@ -47,21 +48,22 @@ object ObstacleFactory {
   /**
    * Create random random obstacles.
    *
-   * @param nObstacle                number of obstacle to join
-   * @param center                   center of spawn
-   * @param minMaxDistanceFromCenter (min,Max) distance from center that delimit area to spawn object
+   * @param nObstacle number of obstacle to join
+   * @param center    center of spawn
+   *                  TODO
    * @return list of spawned obstacle, this list should have size < of nObstacle because someone could be joined
    **/
   def createRandom(nObstacle: Int,
                    center: Vector2D,
-                   minMaxDistanceFromCenter: (Double, Double),
+                   minDistance: Double,
+                   maxDistance: Double,
                    radius: Double = OBSTACLE_RADIUS,
-                   obstacleVertex: Int = OBSTACLE_DEFAULT_VERTEX )
+                   obstacleVertex: Int = OBSTACLE_DEFAULT_VERTEX)
   : Iterable[Obstacle] = {
-    val obstacles = for {i <- 0 until nObstacle
+    val obstacles = for {_ <- 0 until nObstacle
                          random = scala.util.Random.nextInt(obstacleVertex) + OBSTACLE_TRIANGLE_VERTEX
                          obstacle = ObstacleFactory(
-                           RandomVector2DInCircle(minMaxDistanceFromCenter, center),
+                           RandomVector2DInCircle(minDistance, maxDistance, center),
                            radius,
                            random)
                          } yield obstacle
@@ -104,7 +106,7 @@ object ObstacleFactory {
     import model.environment.elements.EnvironmentElements.ObstacleHasInside
     var randomPosition = ZeroVector2D()
     do {
-      randomPosition = common.geometry.RandomVector2DInCircle(min, max, center)
+      randomPosition = RandomVector2DInCircle(min, max, center)
     }
     while (checkHaveInside(obstacleList, randomPosition).nonEmpty)
     randomPosition

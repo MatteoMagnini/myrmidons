@@ -1,9 +1,10 @@
 package model.environment
 
+import common.geometry.Vector2D
+import common.geometry.Vector2DFactory.ZeroVector2D
 import model.environment.pheromones.FoodPheromone
 import org.scalatest.BeforeAndAfter
 import org.scalatest.wordspec.AnyWordSpecLike
-import common.geometry.{Vector2D, ZeroVector2D}
 
 class PheromoneTest extends AnyWordSpecLike with BeforeAndAfter {
 
@@ -40,6 +41,7 @@ class PheromoneTest extends AnyWordSpecLike with BeforeAndAfter {
         assert(p4.get.position == pos1)
         assert(p4.get.intensity == 2 * startingIntensity - DELTA)
       }
+
 
       val p5 = FoodPheromone(ZeroVector2D(), decreasingFunction, startingIntensity)
       val p6 = p4.get.merge(p5, threshold)

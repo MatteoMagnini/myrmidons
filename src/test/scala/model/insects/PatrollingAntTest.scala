@@ -2,6 +2,13 @@ package model.insects
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
+import common.geometry.Vector2D
+import common.geometry.Vector2DFactory.ZeroVector2D
+import common.message.EnvironmentMessage.{NewPosition, Pheromones}
+import common.message.InsectMessage.{Move, UpdateInsect}
+import common.message.SharedMessage.Clock
+import common.rTree.RTree.Tree
+import common.rTree.RTreeProlog
 import model.environment.anthill.{Anthill, AnthillInfo}
 import model.environment.pheromones.DangerPheromone
 import model.environment.pheromones.DangerPheromoneInfo._
@@ -10,12 +17,6 @@ import model.insects.info.PatrollingAntInfo
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import common.geometry.{Vector2D, ZeroVector2D}
-import common.message.EnvironmentMessage.{NewPosition, Pheromones}
-import common.message.InsectMessage.{Move, UpdateInsect}
-import common.message.SharedMessage.Clock
-import common.rTree.RTree.Tree
-import common.rTree.RTreeProlog
 
 class PatrollingAntTest extends TestKit(ActorSystem("PatrollingAntTest"))
   with AnyWordSpecLike
@@ -31,8 +32,8 @@ class PatrollingAntTest extends TestKit(ActorSystem("PatrollingAntTest"))
 
   "A patrolling ant" when {
 
-    import model.insects.Ants.PatrollingAnt._
     import common.geometry.Vectors._
+    import model.insects.Ants.PatrollingAnt._
 
     "performing random walk" should {
 
@@ -85,7 +86,7 @@ class PatrollingAntTest extends TestKit(ActorSystem("PatrollingAntTest"))
 
     "an ant has low energy" should {
 
-      val anthillInfo = AnthillInfo(ZeroVector2D(),foodAmount = 10)
+      val anthillInfo = AnthillInfo(ZeroVector2D(), foodAmount = 10)
       val anthill = system.actorOf(Anthill(anthillInfo,senderRef), "anthill")
       val startingPosition = Vector2D(3.2,0)
       val startingEnergy = 38

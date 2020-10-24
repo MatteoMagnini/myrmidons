@@ -1,6 +1,7 @@
 package model.environment.anthill
 
 import akka.actor.{Actor, ActorRef, Props}
+import common.geometry.Vector2DFactory.{OrientedVector2D, OrientedVector2DWithNoise, ZeroVector2D}
 import common.geometry.Vectors.doubleInRange
 import common.geometry._
 import common.message.AnthillMessage.{NewAnts, UpdateAnthill, UpdateAnthillCondition}

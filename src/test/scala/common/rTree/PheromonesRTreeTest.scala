@@ -1,6 +1,7 @@
 package common.rTree
 
-import common.geometry.{Vector2D, ZeroVector2D}
+import common.geometry.Vector2D
+import common.geometry.Vector2DFactory.ZeroVector2D
 import common.rTree.RTree.{Node, Tree}
 import model.environment.pheromones.FoodPheromone
 import model.environment.pheromones.FoodPheromoneInfo.{STARTING_INTENSITY, _}

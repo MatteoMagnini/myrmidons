@@ -2,11 +2,12 @@ package model.insects.competences
 
 import akka.actor.Actor.Receive
 import akka.actor.{ActorContext, ActorRef}
-import model.insects.info.AntInfo
+import common.RichActor._
+import common.geometry.Vector2DFactory.{OrientedVector2D, RandomVector2DInCircle, ZeroVector2D}
 import common.geometry.Vectors._
 import common.geometry._
-import common.RichActor._
 import common.message.InsectMessage.{AntTowardsAnthill, EatFood, Move}
+import model.insects.info.AntInfo
 
 /**
  * Competence for all ants.

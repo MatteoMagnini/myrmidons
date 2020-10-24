@@ -1,6 +1,8 @@
 package model.environment.elements
 
-import common.geometry.{RandomVector2DInCircle, Vector2D}
+import common.geometry.Vector2D
+import common.geometry.Vector2DFactory.RandomVector2DInCircle
+
 
 /** A food source.
   *

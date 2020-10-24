@@ -2,14 +2,14 @@ package model.insects.competences
 
 import akka.actor.Actor.Receive
 import akka.actor.{ActorContext, ActorRef}
+import common.PheromoneSeq._
+import common.RichActor._
+import common.geometry.Vector2DFactory.{OrientedVector2D, OrientedVector2DWithNoise}
+import common.message.InsectMessage._
 import model.environment.pheromones.FoodPheromone
 import model.environment.pheromones.FoodPheromoneInfo._
 import model.insects.Ants.ForagingAnt._
 import model.insects.info.ForagingAntInfo
-import common.PheromoneSeq._
-import common.geometry._
-import common.RichActor._
-import common.message.InsectMessage.{AddPheromone, Move, StoreFood, TakeFood, UpdateInsect}
 
 /**
  * Specific competences suitable only for foraging ants

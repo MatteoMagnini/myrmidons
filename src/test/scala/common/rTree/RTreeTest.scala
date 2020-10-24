@@ -1,10 +1,10 @@
 package common.rTree
 
+import common.geometry.Vector2DFactory.ZeroVector2D
+import common.rTree.RTree.{Node, Range, Tree}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import common.geometry.ZeroVector2D
-import common.rTree.RTree.{Range, Node, Tree}
 
 class RTreeTest extends AnyWordSpecLike with Matchers with BeforeAndAfterAll {
 

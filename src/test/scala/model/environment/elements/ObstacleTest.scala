@@ -134,7 +134,7 @@ class ObstacleTest  extends wordspec.AnyWordSpec {
 
   "Random creation " should {
     "create obstacle and return joined obstacle" in {
-      val ol = ObstacleFactory.createRandom(20, (0,0), (50,100))
+      val ol = ObstacleFactory.createRandom(20, (0,0), 50,100)
       assert(ol.size <= 20)
     }
   }

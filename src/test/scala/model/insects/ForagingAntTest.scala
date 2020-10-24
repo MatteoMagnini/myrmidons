@@ -2,17 +2,18 @@ package model.insects
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
+import common.geometry.Vector2DFactory.ZeroVector2D
 import common.geometry.Vectors._
 import common.geometry._
 import common.message.AnthillMessage.{UpdateAnthill, UpdateAnthillCondition}
 import common.message.EnvironmentMessage.{FoodNear, NewPosition, Pheromones}
-import common.message.InsectMessage.{AddPheromone, KillInsect, Move, TakeFood, UpdateInsect}
+import common.message.InsectMessage._
 import common.message.Message
 import common.message.SharedMessage.Clock
 import common.rTree.RTree.Tree
 import common.rTree.RTreeProlog
 import model.environment.anthill.{Anthill, AnthillInfo}
-import model.environment.elements.{Food, Obstacle, ObstacleFactory}
+import model.environment.elements.{Food, ObstacleFactory}
 import model.environment.pheromones.FoodPheromone
 import model.insects.Ants.ForagingAnt._
 import model.insects.competences._

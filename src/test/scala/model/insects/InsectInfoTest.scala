@@ -2,12 +2,13 @@ package model.insects
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
+import common.geometry.Vector2DFactory.{RandomVector2DInSquare, ZeroVector2D}
+import common.geometry._
 import model.environment.pheromones.FoodPheromone
 import model.insects.info.ForagingAntInfo
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import common.geometry._
 
 class InsectInfoTest extends TestKit(ActorSystem("InsectInfoTest"))
   with AnyWordSpecLike
