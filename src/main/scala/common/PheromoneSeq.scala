@@ -1,7 +1,8 @@
 package common
 
+import common.geometry.Vector2D
+import common.geometry.Vector2DFactory.ZeroVector2D
 import model.environment.pheromones.Pheromone
-import common.geometry.{Vector2D, ZeroVector2D}
 
 /**
  * Pimp my library pattern.
@@ -23,4 +24,5 @@ object PheromoneSeq {
         seq.toStream.map(e => (e.position - position) * (e.intensity / (e.position --> position))).reduce(_ >> _)
       }
   }
+
 }

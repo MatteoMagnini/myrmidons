@@ -1,9 +1,10 @@
 package model.insects.info
 
 import akka.actor.ActorRef
+import common.geometry.Vector2D
+import common.geometry.Vector2DFactory.ZeroVector2D
 import model.environment.pheromones.DangerPheromone
 import model.insects.Ants.PatrollingAnt._
-import common.geometry.{Vector2D, ZeroVector2D}
 
 /**
  * This class defines a patrolling ant state.
@@ -30,7 +31,7 @@ case class PatrollingAntInfo(override val id: Int,
     * @param value the new condition
     * @return a new AntInfo with the updated anthill condition
     */
-  override def updateAnthillCondition(value: Boolean): PatrollingAntInfo =
+  override def antEntersAnthill(value: Boolean): PatrollingAntInfo =
     this.copy(isInsideTheAnthill = value)
 
   /**
@@ -57,7 +58,7 @@ case class PatrollingAntInfo(override val id: Int,
   /**
     * @return a new InsectInfo with the incremented time
     */
-  override def incTime(): PatrollingAntInfo =
+  override def incrementTime(): PatrollingAntInfo =
     this.copy(time = time + 1)
 
   /**

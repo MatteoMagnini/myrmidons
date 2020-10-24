@@ -12,7 +12,7 @@ import common.message.SharedMessage.{Clock, Context}
 /**
  * An enemy with state and behaviour.
  *
- * @param info of the enemy
+ * @param info        of the enemy
  * @param environment of the simulation
  */
 class Enemy(override val info: EnemyInfo,
@@ -24,29 +24,24 @@ class Enemy(override val info: EnemyInfo,
 
   private def defaultBehaviour(data: EnemyInfo): Receive = {
 
-    /** Execute competence */
     case Clock(t) if t == data.time + 1 =>
-      val newData = data.incTime()
-      subsumption(newData,competences)(context, environment, self, newData)
+      val newData = data.incrementTime()
+      subsumption(newData, competences)(context, environment, self, newData)
 
-    /** Update position */
-    case NewPosition(p, d) =>
-      val newData = data.updatePosition(p).updateInertia(d).updateEnergy(info.energy)
-      if(data.position ~~(p,1E-7)) {
+    case NewPosition(position, delta) =>
+      val newData = data.updatePosition(position).updateInertia(delta)
+      if (data.position ~~ (position, 1E-7)) {
         environment ! KillInsect(data)
       } else {
         environment ! UpdateInsect(newData)
       }
       context >>> defaultBehaviour(newData)
 
-    /** Enemy killed in a fight */
     case KillInsect(_) =>
       context >>> defaultBehaviour(data.updateEnergy(-MAX_ENERGY))
 
-    /** Just for tests */
     case Context(_) => sender ! Context(Some(context))
 
-    /** Ignore the rest */
     case _ => //Do nothing
   }
 }

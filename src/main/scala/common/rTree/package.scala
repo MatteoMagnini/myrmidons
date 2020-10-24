@@ -3,7 +3,7 @@ package common
 import alice.tuprolog.{Struct, Term}
 import common.geometry.Vector2D
 import common.rTree.PrologFacilities.{TuPrologDouble, TuPrologInt}
-import common.rTree.RTree.{Range, Node, NotEmptyTree, Tree}
+import common.rTree.RTree.{Node, NotEmptyTree, Range, Tree}
 import model.environment.pheromones._
 
 package object rTree {
@@ -15,9 +15,9 @@ package object rTree {
   val none = "none"
 
   /** Pimping prolog Term to extract tree instances
-    *
-    * @param term prolog term
-    */
+   *
+   * @param term prolog term
+   */
   implicit class RichTerm(term: Term) {
 
     /** Conversion from term to integer */
@@ -28,19 +28,19 @@ package object rTree {
         case _: Exception => None
       }
 
-    /** Conversion from term to [[Node]] */
+    /** Conversion from term to [[Node]]*/
     def getAsNode: Node[Int] = {
       val struct = term.getTerm.asInstanceOf[Struct]
       Node(struct.getArg(0).getAsInt, struct.getArg(1) getAsRange, struct.getArg(2) getAsRange)
     }
 
-    /** Conversion from term to [[Range]] */
+    /** Conversion from term to [[Range]]*/
     def getAsRange: (Double, Double) = {
       val struct = term.getTerm.asInstanceOf[Struct]
       (struct.getArg(0).toString.toDouble, struct.getArg(1).toString.toDouble)
     }
 
-    /** Conversion from term to [[Tree]] */
+    /** Conversion from term to [[Tree]]*/
     def getAsTree: Tree[Int] = term match {
       case x if x.isCompound =>
         val struct = x.getTerm.asInstanceOf[Struct]
@@ -83,17 +83,17 @@ package object rTree {
   implicit def toOption[X](value: X): Option[X] = Some(value)
 
   /** Pimping [[Vector2D]] to have a function to create a range from a position
-    *
-    * @param p input position
-    */
-  implicit class RichPosition(p: Vector2D) {
+   *
+   * @param position input position
+   */
+  implicit class RichPosition(position: Vector2D) {
 
     /**
-      * @param influence width of created range
-      * @return range around position
-      */
+     * @param influence width of created range
+     * @return range around position
+     */
     def rangeOfInfluence(influence: Double): (Range, Range) = {
-      ((p.x - influence, p.x + influence), (p.y - influence, p.y + influence))
+      ((position.x - influence, position.x + influence), (position.y - influence, position.y + influence))
     }
   }
 

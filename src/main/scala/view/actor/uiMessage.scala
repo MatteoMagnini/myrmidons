@@ -9,17 +9,17 @@ object uiMessage {
   /**
    * When user click to stop button the simulation timer is stopped.
    */
-  case class StopSimulation() extends uiMessage
+  case object StopSimulation extends uiMessage
 
   /**
    * When user click to restart button the simulation timer resumes.
    */
-  case class RestartSimulation() extends uiMessage
+  case object RestartSimulation extends uiMessage
 
   /**
    * Auto message when timer is expired. The message Clock to environment is sent.
    */
-  case class StepOver() extends uiMessage
+  case object StepOver extends uiMessage
 
   /**
    * Every 20 clock information of simulation are store by this message to ReportManager actor.
@@ -31,7 +31,7 @@ object uiMessage {
   /**
    * When user click report button, information are collect in file and show in plot.
    */
-  case class ShowAndSaveReport() extends uiMessage
+  case object ShowAndSaveReport extends uiMessage
 
   /**
    * The report manager actor filter information and save size of entities.
@@ -43,7 +43,7 @@ object uiMessage {
   /**
    * Report manager actor store in history all information until that moment.
    */
-  case class UpdateHistory() extends uiMessage
+  case object UpdateHistory extends uiMessage
 
   /**
    * When user insert number of rate and click set rate button the timer rate is change.

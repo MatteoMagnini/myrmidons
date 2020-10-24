@@ -10,19 +10,19 @@ object RTree {
   type Range = (Double, Double)
 
   /** A node of r-tree
-    *
-    * @param id     identifier of node
-    * @param rangeX range along x coordinate
-    * @param rangeY range along y coordinate
-    * @tparam A type of element to be put in tree (id field)
-    */
+   *
+   * @param id     identifier of node
+   * @param rangeX range along x coordinate
+   * @param rangeY range along y coordinate
+   * @tparam A type of element to be put in tree (id field)
+   */
   case class Node[A](id: Option[A], rangeX: Range, rangeY: Range) {
 
     /** Checks if two ranges in 2D space are intersected
-      *
-      * @param otherRanges ranges to be compared
-      * @return whether ranges are intersected
-      */
+     *
+     * @param otherRanges ranges to be compared
+     * @return whether ranges are intersected
+     */
     def intersects(otherRanges: (Range, Range)): Boolean = {
       val otherRangeX = otherRanges._1
       val otherRangeY = otherRanges._2
@@ -39,9 +39,9 @@ object RTree {
   }
 
   /** Generic r-tree
-    *
-    * @tparam A type of values stored in r-tree
-    */
+   *
+   * @tparam A type of values stored in r-tree
+   */
   sealed trait Tree[A] {
 
     /** Left branch of tree */
@@ -105,11 +105,11 @@ object RTree {
 object ScalaEngine {
 
   /** Query over an r-tree
-    *
-    * @param position reference position in which query is done
-    * @param tree     r-tree to be queried
-    * @return list of leaves id that respond to query
-    */
+   *
+   * @param position reference position in which query is done
+   * @param tree     r-tree to be queried
+   * @return list of leaves id that respond to query
+   */
   def query(position: Vector2D, tree: Tree[Int]): Seq[Int] = {
 
     def _query(queriedRange: (Range, Range), tree: Tree[Int]): Seq[Int] = {

@@ -7,10 +7,10 @@ import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo, PatrollingAnt
 object Fights {
 
   /** A fight between two entities
-    *
-    * @param firstFighter  first entity
-    * @param secondFighter second entity
-    */
+   *
+   * @param firstFighter  first entity
+   * @param secondFighter second entity
+   */
   case class Fight[A, B](firstFighter: A, secondFighter: B)
 
   case class InsectsFight(fight: Fight[InsectInfo, EnemyInfo], override val position: Vector2D) extends Drawable
@@ -21,18 +21,18 @@ object Fights {
   }
 
   /** Given a fight, returns loser of it
-    *
-    * @param fight a fight
-    * @return loser in provided fight
-    */
+   *
+   * @param fight a fight
+   * @return loser in provided fight
+   */
   def loser[A, B](fight: Fight[A, B])(implicit outcome: FightOutcome[A, B]): Either[A, B] =
     outcome.loser(fight.firstFighter, fight.secondFighter)
 
   /** Given a collection of fights, returns losers of each
-    *
-    * @param fights collection of fights
-    * @return losers among provided fights
-    */
+   *
+   * @param fights collection of fights
+   * @return losers among provided fights
+   */
   def losers[A, B](fights: Iterable[Fight[A, B]])(implicit outcome: FightOutcome[A, B]): Seq[Either[A, B]] = {
     fights.map(f => outcome.loser(f.firstFighter, f.secondFighter)).toSeq
   }

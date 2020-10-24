@@ -13,8 +13,8 @@ import view.frame.TimeSeriesFrame
 import com.google.gson.GsonBuilder
 import scala.collection.immutable.ListMap
 
-/**
- * Actor that manage save and report information.
+/** Actor that manage save and report information.
+ *
  * @param state ReportManger state.
  */
 private[view] class ReportManager(state: ReportManagerInfo) extends Actor with ActorLogging {
@@ -41,37 +41,35 @@ private[view] class ReportManager(state: ReportManagerInfo) extends Actor with A
         case _ =>
       }
 
-      self ! UpdateHistory()
+      self ! UpdateHistory
       context >>> defaultBehaviour(state.saveInfo(foragingAnts, patrollingAnts, enemies, anthill))
 
 
-    case UpdateHistory() =>
-      val history = Map(state.currentClock -> (state.foragingAnt.size,
-        state.patrollingAnt.size, state.enemies.size, state.anthill.get.foodAmount.toInt))
-      context >>> defaultBehaviour(state.updateHistory(history))
+    case UpdateHistory =>
+      context >>> defaultBehaviour(state.updateHistory(InfoReport(state.currentClock, state.foragingAnt.size,
+        state.patrollingAnt.size, state.enemies.size, state.anthill.get.foodAmount.toInt)))
 
 
-    case ShowAndSaveReport() =>
+    case ShowAndSaveReport =>
       val historyToFile = new util.ArrayList[util.ArrayList[InfoReport]]()
       val historyElement = new util.ArrayList[InfoReport]()
-      /** Order history by clock value  */
-      val orderHistory = ListMap(state.history.toSeq.sortBy(_._1): _*)
-      orderHistory.foreach { x => historyElement.add(InfoReport(x._1, x._2._1, x._2._2, x._2._3, x._2._4))}
+      val orderHistory = state.history.sortBy(_.clock)
+      orderHistory.foreach { x => historyElement.add(x) }
       historyToFile.add(historyElement)
       writeFile(historyToFile)
       val frameTimeSeries = TimeSeriesFrame(state.history)
       frameTimeSeries.visible = true
   }
 
-  /**
-   * Write history in json file.
+  /** Write history in json file.
    * The gson library requires the use of util.ArrayList to store collections in a json object.
+   *
    * @param list list of list information.
    */
   def writeFile(list: util.ArrayList[util.ArrayList[InfoReport]]): Unit = {
     val writer = new PrintWriter(new FileWriter(REPORT_NAME, false))
     val gson = new GsonBuilder().setPrettyPrinting().create
-    list.forEach { x =>writer.write(gson.toJson(x))}
+    list.forEach { x => writer.write(gson.toJson(x)) }
     writer.close()
   }
 }

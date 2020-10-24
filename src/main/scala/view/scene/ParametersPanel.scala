@@ -14,8 +14,7 @@ object ParametersPanel {
 
   def apply(frame: SettingFrame): ParametersPanel = new ParametersPanelImpl(frame)
 
-  /**
-   * Panel to set simulation parameters.
+  /** Panel to set simulation parameters.
    *
    * @param frame Frame where append this panel and dispose when parameters are set.
    */

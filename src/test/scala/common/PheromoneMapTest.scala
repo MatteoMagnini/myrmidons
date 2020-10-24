@@ -1,9 +1,10 @@
 package common
 
+import common.geometry.Vector2D
+import common.geometry.Vector2DFactory.ZeroVector2D
 import model.environment.pheromones.{DangerPheromone, FoodPheromone, Pheromone}
 import org.scalatest.BeforeAndAfter
 import org.scalatest.wordspec.AnyWordSpecLike
-import common.geometry.{Vector2D, ZeroVector2D}
 
 class PheromoneMapTest extends AnyWordSpecLike with BeforeAndAfter {
 

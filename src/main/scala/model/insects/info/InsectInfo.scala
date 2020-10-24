@@ -60,6 +60,6 @@ trait SpecificInsectInfo[A <: SpecificInsectInfo[A]] extends InsectInfo {
   /**
    * @return a new InsectInfo with the incremented time
    */
-  def incTime(): A
+  def incrementTime(): A
 }
 

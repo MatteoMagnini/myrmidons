@@ -4,14 +4,14 @@ import model.environment.pheromones.Pheromone
 
 /**
  * Pimp my library pattern.
- * A rich map for pheromone objects.
+ * A rich map for [[Pheromone]] objects.
  */
 object PheromoneMap {
 
-  implicit class PheromoneMap[A <: Pheromone](map: Map[Int, A]){
+  implicit class PheromoneMap[A <: Pheromone](map: Map[Int, A]) {
 
     /**
-     * Call decrease function over all pheromones.
+     * Call decrease function over all [[Pheromone]] instances.
      *
      * @return the new map with updated pheromones
      */
@@ -22,29 +22,29 @@ object PheromoneMap {
 
     /**
      * @param newElement to be added
-     * @param threshold under which merge
+     * @param threshold  under which merge
      * @return the new map
      */
     def add(newElement: A, threshold: Double = 1E-10): Map[Int, A] =
-      merge(newElement,threshold)
+      merge(newElement, threshold)
 
     /**
      * @return the next key
      */
     def nextKey: Int =
-      if(map.isEmpty) {
+      if (map.isEmpty) {
         1
       } else {
         map.keys.max + 1
       }
 
-    private def merge(newElement: A, threshold: Double): Map[Int,A] =
+    private def merge(newElement: A, threshold: Double): Map[Int, A] =
       recursiveMerge(newElement, threshold, map)
 
     @scala.annotation.tailrec
-    private def recursiveMerge(newElement: A, threshold: Double, recMap: Map[Int,A]): Map[Int,A] =
+    private def recursiveMerge(newElement: A, threshold: Double, recMap: Map[Int, A]): Map[Int, A] =
       if (recMap.nonEmpty) {
-        recMap.last._2.merge(newElement,threshold) match {
+        recMap.last._2.merge(newElement, threshold) match {
           case Some(x) if x.isInstanceOf[A] => map + (recMap.last._1 -> x.asInstanceOf[A])
           case None => recursiveMerge(newElement, threshold, recMap.take(recMap.size - 1))
         }
@@ -52,4 +52,5 @@ object PheromoneMap {
         map + (nextKey -> newElement)
       }
   }
+
 }

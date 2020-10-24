@@ -1,5 +1,6 @@
 package common.geometry
 
+import common.geometry.Vector2DFactory.RandomVector2DInSquare
 import org.scalatest.BeforeAndAfter
 import org.scalatest.wordspec.AnyWordSpecLike
 
@@ -61,7 +62,6 @@ class Vector2DTest extends AnyWordSpecLike with BeforeAndAfter {
       val min = 0.3
       val max = 1.4
       val r = RandomVector2DInSquare(min, max)
-      println(r)
 
       "have its dimensions inside the range" in {
         assert(r.x >= min && r.x <= max && r.y >= min && r.y <= max )

@@ -21,7 +21,7 @@ trait uiActorInfo {
 
   def startSimulation: uiActorInfo
 
-  def incCurrentState: uiActorInfo
+  def incrementCurrentState: uiActorInfo
 
   def drawEntities(): Unit
 
@@ -51,12 +51,12 @@ object uiActorInfo {
 
     override def startSimulation: uiActorInfo = this.copy(stopFlag = true)
 
-    override def incCurrentState: uiActorInfo = this.copy(currentState = currentState + 1)
+    override def incrementCurrentState: uiActorInfo = this.copy(currentState = currentState + 1)
 
     override def setEntities(info: Seq[Drawable]): (Int, Int) = panel.setEntities(info)
 
-    /**
-     * Set in ControlPanel its label which refers simulation info.
+    /** Set in ControlPanel its label which refers simulation info.
+     *
      * @param currentState current state of simulation.
      * @param entitiesProperties current number of entities.
      */

@@ -42,8 +42,8 @@ trait ControlPanel extends GridPanel {
 object ControlPanel {
   def apply(myrmidonsPanel: MyrmidonsPanel): ControlPanel = new ControlPanelImpl(myrmidonsPanel)
 
-  /**
-   * GridPane with simulation control button.
+  /** GridPane with simulation control button.
+   *
    *
    * @param myrmidonsPanel panel to pass at actor to draw entities.
    */
@@ -102,7 +102,7 @@ object ControlPanel {
 
 
     reactions += {
-      /**
+      /*
        * When startButton is pressed the UiActor tell to Environment that the simulation
        * can be start with parameters.
        */
@@ -115,10 +115,10 @@ object ControlPanel {
         if (!startFlag) {
           tellStart()
         } else {
-          uiActor.tell(RestartSimulation(), uiActor)
+          uiActor.tell(RestartSimulation, uiActor)
         }
 
-      /**
+      /*
        * When stopButton is pressed the UiActor tell to self StopSimulation.
        * The timer will be stopped.
        */
@@ -130,7 +130,7 @@ object ControlPanel {
         this.reportButton.enabled = true
         uiActor.tell(StopSimulation, uiActor)
 
-      /**
+      /*
        * When restartButton is pressed environment and reportManager actor will be recreated.
        */
       case ButtonClicked(`restartButton`) =>
@@ -151,13 +151,13 @@ object ControlPanel {
         environment = environmentRestart
         tellStart()
 
-      /**
+      /*
        * When reportButton is pressed new frame will be show with report.
        */
       case ButtonClicked(`reportButton`) =>
-        reportManager.tell(ShowAndSaveReport(), uiActor)
+        reportManager.tell(ShowAndSaveReport, uiActor)
 
-      /**
+      /*
        * When buttonSetTime is pressed uiActor tell to self to set rate of timer.
        */
       case ButtonClicked(`buttonSetTime`) =>
