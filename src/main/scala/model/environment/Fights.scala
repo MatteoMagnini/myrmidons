@@ -18,10 +18,10 @@ object Fights {
     def loser(firstFighter: A, secondFighter: B): Either[A, B]
   }
 
-  /** Given a fight, returns loser of it
+  /** Given a fight, returns loser and position of it
     *
     * @param fight a fight
-    * @return loser in provided fight
+    * @return loser in provided fight and its position
     */
   def loser[A, B](fight: Fight[A, B])(implicit outcome: FightOutcome[A, B]): (Either[A, B], Vector2D) =
     (outcome.loser(fight.firstFighter, fight.secondFighter), fight.position)
@@ -29,21 +29,12 @@ object Fights {
   /** Given a collection of fights, returns losers of each
     *
     * @param fights collection of fights
-    * @return losers among provided fights
+    * @return losers among provided fights and their positions
     */
   def losers[A, B](fights: Iterable[Fight[A, B]])(implicit outcome: FightOutcome[A, B])
   : Seq[(Either[A, B], Vector2D)] = {
     fights.map(f => (outcome.loser(f.firstFighter, f.secondFighter), f.position)).toSeq
   }
-
-  /** Dead insect in a fight */
-  sealed trait DeadInsect extends Drawable {
-    def insect: InsectInfo
-  }
-
-  case class DeadAnt(override val insect: InsectInfo, override val position: Vector2D) extends DeadInsect
-
-  case class DeadEnemy(override val insect: EnemyInfo, override val position: Vector2D) extends DeadInsect
 
   object InsectFight {
 

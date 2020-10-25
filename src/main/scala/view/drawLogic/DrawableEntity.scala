@@ -4,11 +4,11 @@ package view.drawLogic
 import java.awt.geom.Ellipse2D
 import java.awt.{Color, Polygon}
 
-import model.environment.Fights.{DeadAnt, DeadEnemy, DeadInsect, Fight}
 import model.environment.anthill.AnthillInfo
 import model.environment.elements.{Food, Obstacle}
 import model.environment.pheromones.{DangerPheromone, DangerPheromoneInfo, Pheromone}
-import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo, PatrollingAntInfo}
+import model.environment.utility.{DeadAnt, DeadEnemy, DeadInsect}
+import model.insects.info.{ForagingAntInfo, InsectInfo, PatrollingAntInfo}
 import view.Colors.{ENEMIES_COLOR, _}
 import view._
 
@@ -24,25 +24,24 @@ object DrawableEntities {
   private val ratio = 1
 
   /** Draw simulation elem with its parameters.
-   *
-   *
-   * @param elem    simulation element.
-   * @param graphic graphic.
-   * @param size    panel size.
-   * @tparam T Entities type.
-   */
+    *
+    * @param elem    simulation element.
+    * @param graphic graphic.
+    * @param size    panel size.
+    * @tparam T Entities type.
+    */
   def draw[T: DrawableEntity](elem: T, graphic: Graphics2D, size: Dimension,
                               zoom: Double, slackX: Double, slackY: Double): Unit =
     implicitly[DrawableEntity[T]].draw(elem, graphic, size, zoom, slackX, slackY)
 
   /** Draw ellipse in panel.
-   *
-   * @param x position in x.
-   * @param y position in y.
-   * @param w weight.
-   * @param h height.
-   * @param g graphics.
-   */
+    *
+    * @param x position in x.
+    * @param y position in y.
+    * @param w weight.
+    * @param h height.
+    * @param g graphics.
+    */
   def drawEllipse(x: Double, y: Double, w: Double, h: Double, g: Graphics2D,
                   zoom: Double, slackX: Double, slackY: Double): Unit = {
 
@@ -114,8 +113,8 @@ object DrawableEntities {
     override def draw(elem: DeadInsect, g: Graphics2D, size: Dimension,
                       zoom: Double, slackX: Double, slackY: Double): Unit = {
       elem match {
-        case x:DeadAnt => g.setColor(Color.black)
-        case x:DeadEnemy => g.setColor(Color.red)
+        case x: DeadAnt => g.setColor(Color.black)
+        case x: DeadEnemy => g.setColor(Color.red)
       }
 
       drawEllipse(elem.position.x - FIGHT_DRAW_SIZE / SET_TO_CENTER,
@@ -124,14 +123,14 @@ object DrawableEntities {
     }
   }
 
- /* implicit object drawDeadEnemy extends DrawableEntity[DeadEnemy] {
-    override def draw(elem: DeadEnemy, g: Graphics2D, size: Dimension,
-                      zoom: Double, slackX: Double, slackY: Double): Unit = {
-      g.setColor(Color.red)
-      drawEllipse(elem.position.x - FIGHT_DRAW_SIZE / SET_TO_CENTER,
-        elem.insect.position.y + FIGHT_DRAW_SIZE / SET_TO_CENTER,
-        FIGHT_DRAW_SIZE, FIGHT_DRAW_SIZE, g, zoom, slackX, slackY)
-    }
-  }*/
+  /* implicit object drawDeadEnemy extends DrawableEntity[DeadEnemy] {
+     override def draw(elem: DeadEnemy, g: Graphics2D, size: Dimension,
+                       zoom: Double, slackX: Double, slackY: Double): Unit = {
+       g.setColor(Color.red)
+       drawEllipse(elem.position.x - FIGHT_DRAW_SIZE / SET_TO_CENTER,
+         elem.insect.position.y + FIGHT_DRAW_SIZE / SET_TO_CENTER,
+         FIGHT_DRAW_SIZE, FIGHT_DRAW_SIZE, g, zoom, slackX, slackY)
+     }
+   }*/
 
 }

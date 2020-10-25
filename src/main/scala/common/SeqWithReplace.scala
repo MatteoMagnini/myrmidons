@@ -1,7 +1,7 @@
 package common
 
 /**
- * Pimping [[scala.Seq]] with remove and replace functions.
+ * Pimping sequence with remove and replace functions.
  */
 object SeqWithReplace {
 

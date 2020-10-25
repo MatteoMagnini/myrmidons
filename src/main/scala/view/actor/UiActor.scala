@@ -14,7 +14,7 @@ import scala.concurrent.duration.DurationInt
  * @param state uiActor state.
  */
 
-private[view] class UiActor(state: uiActorInfo)
+class UiActor(state: uiActorInfo)
   extends Actor with ActorLogging with Timers {
 
   override def receive: Receive = defaultBehaviour(state)

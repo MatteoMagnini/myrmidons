@@ -1,11 +1,10 @@
 package view.scene
 
-
 import model.Drawable
-import model.environment.Fights.{DeadAnt, DeadEnemy, DeadInsect}
 import model.environment.anthill.AnthillInfo
 import model.environment.elements.Obstacle
 import model.environment.pheromones.Pheromone
+import model.environment.utility.DeadInsect
 import model.insects.info.{ForagingAntInfo, InsectInfo, PatrollingAntInfo}
 import view.controller.{Keyboard, Mouse, MouseWheel}
 import view.drawLogic._
@@ -14,28 +13,28 @@ import scala.swing.{Graphics2D, Panel}
 
 trait MyrmidonsPanel extends Panel {
   /**
-   * Recall paintComponent of scala.swing.
-   */
+    * Recall paintComponent of scala.swing.
+    */
   def drawEntities(): Unit
 
   /**
-   * When restart button is clicked the panel will be cleared.
-   */
+    * When restart button is clicked the panel will be cleared.
+    */
   def clear(): Unit
 
   /**
-   * Set all new position of entities in next frame.
-   *
-   * @param info Seq of all the entities that will be draw in panel.
-   * @return number of ant and food of anthill.
-   */
+    * Set all new position of entities in next frame.
+    *
+    * @param info Seq of all the entities that will be draw in panel.
+    * @return number of ant and food of anthill.
+    */
   def setEntities(info: Seq[Drawable]): (Int, Int)
 
   /**
-   * Show or hide pheromones during simulation.
-   *
-   * @param value if true hide the pheromones, if false show them.
-   */
+    * Show or hide pheromones during simulation.
+    *
+    * @param value if true hide the pheromones, if false show them.
+    */
   def hidePheromones(value: Boolean): Unit
 
   def zoomIn(): Unit
@@ -57,8 +56,8 @@ object MyrmidonsPanel {
   def apply(): MyrmidonsPanel = new MyrmidonsPanelImpl()
 
   /** Panel that contains the drawn entities.
-   *
-   */
+    *
+    */
   private[view] class MyrmidonsPanelImpl() extends MyrmidonsPanel {
 
     private var restartFlag = false
@@ -69,9 +68,9 @@ object MyrmidonsPanel {
     private var slackY = 0
 
     /** Paint entities of the graphics.
-     *
-     * @param graphics object for rendering.
-     */
+      *
+      * @param graphics object for rendering.
+      */
     override def paintComponent(graphics: Graphics2D) {
 
       graphics.clearRect(0, 0, size.width, size.height)
