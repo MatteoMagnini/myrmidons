@@ -36,7 +36,7 @@ object FightsChecker {
             patrollingAntInfo: Iterable[PatrollingAntInfo],
             enemiesInfo: Iterable[EnemyInfo]): FightsChecker =
     new FightsChecker(findFights(foragingAntsInfo, enemiesInfo),
-      findFights(patrollingAntInfo, enemiesInfo))
+                      findFights(patrollingAntInfo, enemiesInfo))
 
   /** Given a collection of ants and a collection of enemies, find fights between them
     *
