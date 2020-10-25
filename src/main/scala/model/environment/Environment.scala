@@ -8,7 +8,6 @@ import common.message.AnthillMessage.{NewAnts, UpdateAnthill}
 import common.message.EnvironmentMessage._
 import common.message.InsectMessage._
 import common.message.SharedMessage.{Clock, StartSimulation}
-import model.environment.Fights.DeadInsect
 import model.environment.anthill.{Anthill, AnthillInfo}
 import model.environment.data.{EnvironmentInfo, InsectReferences}
 import model.environment.elements.EnvironmentElements.{BoundaryHasInside, _}
@@ -19,9 +18,9 @@ import model.environment.utility.{CollisionsInterceptor, FightsChecker}
 import model.insects.info.{SpecificInsectInfo, _}
 
 /** Environment actor
- *
- * @param state environment internal state
- */
+  *
+  * @param state environment internal state
+  */
 class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
   override def receive: Receive = initializationBehaviour(state)

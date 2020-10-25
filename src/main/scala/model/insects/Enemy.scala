@@ -9,8 +9,7 @@ import common.message.EnvironmentMessage.NewPosition
 import common.message.InsectMessage.{KillInsect, UpdateInsect}
 import common.message.SharedMessage.{Clock, Context}
 
-/**
- * An enemy with state and behaviour.
+/** An enemy with state and behaviour.
  *
  * @param info        of the enemy
  * @param environment of the simulation

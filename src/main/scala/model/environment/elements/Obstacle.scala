@@ -30,8 +30,6 @@ class Obstacle(val points: List[Vector2D]) extends Drawable {
    *
    * @param oldPosition of the object
    * @param newPosition of the object (must be inside the obstacle)
-   * @throws IllegalArgumentException if newPosition is outside the
-   *                                  obstacle
    * @return an instance of IntersectionResult case class with the
    *         position of intersection and his angle.
    **/

@@ -3,15 +3,14 @@ package common
 import model.environment.pheromones.Pheromone
 
 /**
- * Pimp my library pattern.
- * A rich map for [[Pheromone]] objects.
+ * A rich map for [[model.environment.pheromones.Pheromone]] objects.
  */
 object PheromoneMap {
 
   implicit class PheromoneMap[A <: Pheromone](map: Map[Int, A]) {
 
     /**
-     * Call decrease function over all [[Pheromone]] instances.
+     * Call decrease function over all [[model.environment.pheromones.Pheromone]] instances.
      *
      * @return the new map with updated pheromones
      */

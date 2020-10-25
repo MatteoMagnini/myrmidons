@@ -32,7 +32,7 @@ object Boundary {
     new BoundaryImpl(left, top, width, height)
   }
 
-  /** Environment boundary implementation
+  /** [[model.environment.Boundary]] implementation
    *
    * @param left   x-coordinate of top left corner
    * @param top    y-coordinate of top left corner

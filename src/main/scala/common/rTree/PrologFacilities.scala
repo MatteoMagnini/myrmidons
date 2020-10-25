@@ -5,7 +5,7 @@ import alice.tuprolog.{Prolog, Theory, Var}
 /** Utility class of prolog helpers */
 object PrologFacilities {
 
-  /** Returns a prolog instance, after reading provided theories.
+  /** Returns a [[alice.tuprolog.Prolog]] instance, after reading provided theories.
    *
    * @param resource path where theories are written
    * @return a prolog engine

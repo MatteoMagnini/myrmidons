@@ -47,12 +47,14 @@ object Fights {
 
   object InsectFight {
 
-    /** An implementation of [[model.environment.Fights.FightOutcome]], in the case of a fight between foraging ants and enemies. */
+    /** An implementation of [[model.environment.Fights.FightOutcome]],
+      * in case of a fight between foraging ants and enemies. */
     implicit val foragingInsectFight: FightOutcome[ForagingAntInfo, EnemyInfo] =
       (firstFighter: ForagingAntInfo, _: EnemyInfo) => Left(firstFighter)
 
 
-    /** An implementation of [[model.environment.Fights.FightOutcome]], in the case of a fight between patrolling ants and enemies. */
+    /** An implementation of [[model.environment.Fights.FightOutcome]],
+      * in case of a fight between patrolling ants and enemies. */
     implicit val patrollingInsectFight: FightOutcome[PatrollingAntInfo, EnemyInfo] =
       (firstFighter: PatrollingAntInfo, secondFighter: EnemyInfo) =>
         if (firstFighter.energy < secondFighter.energy) Left(firstFighter) else Right(secondFighter)

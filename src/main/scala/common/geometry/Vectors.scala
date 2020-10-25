@@ -4,30 +4,30 @@ object Vectors {
 
 
   /** Equivalence with a certain precision check.
-   *
-   * @param x         default value
-   * @param y         value to check
-   * @param precision to consider in number matching
-   * @return true if the value are similar, otherwise false
-   **/
+    *
+    * @param x         default value
+    * @param y         value to check
+    * @param precision to consider in number matching
+    * @return true if the value are similar, otherwise false
+    * */
   def ~=(x: Double, y: Double, precision: Double = 1E-1): Boolean = (x - y).abs < precision
 
   /** Random value in range.
-   *
-   * @param min lower bound of range
-   * @param max upper bound of range
-   * @return a random value
-   */
+    *
+    * @param min lower bound of range
+    * @param max upper bound of range
+    * @return a random value
+    */
   def doubleInRange(min: Double, max: Double): Double =
     min + (max - min) * scala.util.Random.nextDouble()
 
   /** Find intersection point of two line.
-   *
-   * @param firstSegment  first vector representation:(starting point, ending point, line)
-   * @param secondSegment second vector representation:(starting point, ending point, line)
-   * @return intersection point if present
-   *
-   * */
+    *
+    * @param firstSegment  first vector representation:(starting point, ending point, line)
+    * @param secondSegment second vector representation:(starting point, ending point, line)
+    * @return intersection point if present
+    *
+    **/
   def findIntersectionPoint(firstSegment: (Vector2D, Vector2D, Vector3D),
                             secondSegment: (Vector2D, Vector2D, Vector3D)): Option[Vector2D] = {
     val crossIntersection = firstSegment._3 X secondSegment._3
@@ -44,13 +44,12 @@ object Vectors {
     }
   }
 
-  /**
-   * Angle between the two segment.
-   *
-   * @param firstSegment  (startSegPoint, stopSegPoint, lineVector)
-   * @param secondSegment (startSegPoint, stopSegPoint, lineVector)
-   * @return angle
-   **/
+  /** Angle between the two segments.
+    *
+    * @param firstSegment  first vector representation:(starting point, ending point, line)
+    * @param secondSegment second vector representation:(starting point, ending point, line)
+    * @return angle
+    * */
   def findIntersectionAngle(firstSegment: (Vector2D, Vector2D, Vector3D),
                             secondSegment: (Vector2D, Vector2D, Vector3D)): Double = {
     val seg1Vector: Vector2D = firstSegment._2 - firstSegment._1
@@ -59,10 +58,10 @@ object Vectors {
   }
 
   /** The centroid of the shape.
-   *
-   * @param verticesList list of vertices position.
-   * @return centroid
-   */
+    *
+    * @param verticesList list of vertices position.
+    * @return centroid
+    */
   def findCentroid(verticesList: List[Vector2D]): Vector2D = {
     verticesList.foldRight(Vector2D(0.0, 0.0))(_ >> _) / verticesList.size
   }

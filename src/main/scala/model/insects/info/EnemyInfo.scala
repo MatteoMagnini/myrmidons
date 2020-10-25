@@ -4,15 +4,14 @@ import common.geometry.Vector2D
 import common.geometry.Vector2DFactory.ZeroVector2D
 import model.insects.Enemies._
 
-/**
- * This class defines an enemy state.
- *
- * @param id of the enemy
- * @param position of the enemy
- * @param inertia of the enemy
- * @param energy of the enemy
- * @param time of simulation
- */
+/** Enemy state.
+  *
+  * @param id       of the enemy
+  * @param position of the enemy
+  * @param inertia  of the enemy
+  * @param energy   of the enemy
+  * @param time     of simulation
+  */
 case class EnemyInfo(override val id: Int,
                      override val position: Vector2D,
                      override val inertia: Vector2D,

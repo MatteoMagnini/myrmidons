@@ -11,13 +11,14 @@ import model.insects.{Enemy, ForagingAnt}
 
 import scala.util.Random
 
-
+/** Births and deaths function utilities. */
 object InsectLifeUtilities {
+
   /** Stochastic spawn of ant.
-   *
-   * @param state environment information.
-   * @return true if ant has to be spawn
-   */
+    *
+    * @param state environment information.
+    * @return true if ant has to be spawn
+    */
   private[environment] def randomSpawnAnt(state: EnvironmentInfo): Boolean = {
     val antHillFoodPercentage = state.anthillInfo.get.foodAmount / state.anthillInfo.get.maxFoodAmount
     val scaleFactor = ANT_SPAWN_FACTOR / MAX_FOOD
@@ -25,21 +26,21 @@ object InsectLifeUtilities {
   }
 
   /** Stochastic spawn of enemies.
-   *
-   * @return true if enemy has to be spawn
-   */
+    *
+    * @return true if enemy has to be spawn
+    */
   private[environment] def randomSpawnEnemies(): Boolean = {
     Random.nextDouble() < ENEMIES_SPAWN_PROBABILITY
   }
 
   /** Creation new ant.
-   *
-   * @param clock             current clock
-   * @param context           actor context
-   * @param state             environment information
-   * @param patrollingAntProb probability of spawn patrolling ant
-   * @return
-   */
+    *
+    * @param clock             current clock
+    * @param context           actor context
+    * @param state             environment information
+    * @param patrollingAntProb probability of spawn patrolling ant
+    * @return
+    */
   private[environment] def createNewAnt(clock: Int, context: ActorContext,
                                         state: EnvironmentInfo, patrollingAntProb: Double): ActorRef = {
     val antId = state.maxAntId + 1
@@ -60,13 +61,13 @@ object InsectLifeUtilities {
   }
 
   /** Create enemies.
-   *
-   * @param context   actor context
-   * @param obstacles list of obstacles
-   * @param nEnemies  number of enemies
-   * @param center    center of simulation
-   * @return
-   */
+    *
+    * @param context   actor context
+    * @param obstacles list of obstacles
+    * @param nEnemies  number of enemies
+    * @param center    center of simulation
+    * @return
+    */
   private[environment] def createEnemies(context: ActorContext,
                                          obstacles: Seq[Obstacle], nEnemies: Int, center: Vector2D): InsectReferences =
     (0 until nEnemies).map(i => {
@@ -76,12 +77,12 @@ object InsectLifeUtilities {
     }).toMap
 
   /** Kill insect.
-   *
-   * @param context actor context
-   * @param state   environment state
-   * @param info    insect information
-   * @return
-   */
+    *
+    * @param context actor context
+    * @param state   environment state
+    * @param info    insect information
+    * @return
+    */
   private[environment] def killInsect(context: ActorContext,
                                       state: EnvironmentInfo, info: InsectInfo): EnvironmentInfo = {
     context.stop(context.sender())

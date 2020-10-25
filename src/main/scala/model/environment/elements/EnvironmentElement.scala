@@ -3,7 +3,7 @@ package model.environment.elements
 import model.environment.Boundary
 import common.geometry.{Vector2D, Vector3D, Vectors}
 
-/** A strategy to define whether a position in inside an environment element
+/** A strategy to define whether a position in inside an environment element.
   *
   * @tparam A type of element
   */
@@ -13,7 +13,7 @@ trait EnvironmentElement[A] {
 
 object EnvironmentElements {
 
-  /** Returns, if exists, element having inside position
+  /** Returns, if exists, element having inside position.
     *
     * @param elements collection of elements to check
     * @param position position against which compare elements
@@ -23,7 +23,7 @@ object EnvironmentElements {
   def checkPositionIsInsideMoreObstacle[T: EnvironmentElement](elements: Iterable[T], position: Vector2D): Iterable[T] =
     elements.filter(x => implicitly[EnvironmentElement[T]].hasInside(x, position))
 
-  /** Returns whether element has inside a position
+  /** Returns whether element has inside a position.
     *
     * @param element  element to check
     * @param position position against which compare element

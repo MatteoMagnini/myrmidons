@@ -28,19 +28,19 @@ package object rTree {
         case _: Exception => None
       }
 
-    /** Conversion from term to [[Node]]*/
+    /** Conversion from term to [[common.rTree.RTree.Node]]*/
     def getAsNode: Node[Int] = {
       val struct = term.getTerm.asInstanceOf[Struct]
       Node(struct.getArg(0).getAsInt, struct.getArg(1) getAsRange, struct.getArg(2) getAsRange)
     }
 
-    /** Conversion from term to [[Range]]*/
+    /** Conversion from term to [[common.rTree.RTree.Range]]*/
     def getAsRange: (Double, Double) = {
       val struct = term.getTerm.asInstanceOf[Struct]
       (struct.getArg(0).toString.toDouble, struct.getArg(1).toString.toDouble)
     }
 
-    /** Conversion from term to [[Tree]]*/
+    /** Conversion from term to [[common.rTree.RTree.Tree]]*/
     def getAsTree: Tree[Int] = term match {
       case x if x.isCompound =>
         val struct = x.getTerm.asInstanceOf[Struct]
@@ -82,7 +82,7 @@ package object rTree {
 
   implicit def toOption[X](value: X): Option[X] = Some(value)
 
-  /** Pimping [[Vector2D]] to have a function to create a range from a position
+  /** Pimping [[common.geometry.Vector2D]] to have a function to create a range from a position
    *
    * @param position input position
    */

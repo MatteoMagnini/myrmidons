@@ -6,7 +6,8 @@ import akka.actor.ActorContext
 object SharedMessage {
 
   /**
-   * Message sent from GUI to environment and from environment to ants, to do a step in simulation.
+   * Message sent from [[view.actor.UiActor]] to [[model.environment.Environment]]
+   * and from [[model.environment.Environment]] to ants, to do a step in simulation.
    *
    * @param value clock value
    */
@@ -18,9 +19,8 @@ object SharedMessage {
    */
   case class Context(context: Option[ActorContext]) extends Message
 
-
   /**
-   * Message sent from GUI to environment, to start simulation.
+   * Message sent from [[view.actor.UiActor]] to [[model.environment.Environment]], to start simulation.
    *
    * @param nAnts       number of ants.
    * @param nEnemies    number of enemies.

@@ -5,8 +5,7 @@ import common.geometry.Vector2DFactory.ZeroVector2D
 import model.environment.pheromones.Pheromone
 
 /**
- * Pimp my library pattern.
- * A rich seq for pheromone objects.
+ * A rich sequence for [[model.environment.pheromones.Pheromone]] objects.
  */
 object PheromoneSeq {
 

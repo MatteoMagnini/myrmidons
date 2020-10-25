@@ -13,8 +13,7 @@ import model.insects.Ants.ForagingAnt._
 import model.insects.competences._
 import model.insects.info.ForagingAntInfo
 
-/**
- * Ant that performs foraging.
+/** Ant that performs foraging.
  *
  * @param info        its state.
  * @param environment the environment where it performs actions.

@@ -15,8 +15,7 @@ trait Insect[A <: SpecificInsectInfo[A]] extends Actor with ActorLogging {
 
   def environment: ActorRef
 
-  /**
-   * Use of the subsumption architecture to model the final emerging behaviour by selecting one competence per clock.
+  /** Use of the subsumption architecture to model the final emerging behaviour by selecting one competence per clock.
    *
    * @param info the insect's state
    * @param competences a set of competences that the ant is able to perform

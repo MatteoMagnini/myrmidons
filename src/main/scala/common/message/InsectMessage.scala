@@ -7,8 +7,8 @@ import model.insects.info.InsectInfo
 object InsectMessage {
 
   /** When an insect die.
-   * Message sent from insect to environment when insect energy is zero.
-   * Message sent from environment to insect when it loose a fight.
+   * Message sent from [[model.insects.Insect]] to [[model.environment.Environment]] when insect energy is zero.
+   * Message sent from [[model.environment.Environment]] to [[model.insects.Insect]] when it loose a fight.
    *
    * @param info insect information
    */
@@ -16,14 +16,14 @@ object InsectMessage {
 
 
   /** When insect update is needs.
-   * Message sent from insect to environment when insect information change.
+   * Message sent from [[model.insects.Insect]] to [[model.environment.Environment]] when insect information change.
    *
    * @param info ant information
    */
   case class UpdateInsect(info: InsectInfo) extends Message
 
   /** When insect ask environment to move.
-   * Message sent from insect to environment when it want to move.
+   * Message sent from [[model.insects.Insect]] to [[model.environment.Environment]] when it want to move.
    *
    * @param start initial position
    * @param delta shift vector
@@ -31,7 +31,8 @@ object InsectMessage {
   case class Move(start: Vector2D, delta: Vector2D) extends Message
 
   /** When ant drop pheromone.
-   * Message sent form ants to environment when they drop pheromone in simulation space.
+   * Message sent form [[model.insects.Ant]] to [[model.environment.Environment]]
+   * when they drop pheromone in simulation space.
    *
    * @param pheromone pheromone type to drop.
    * @param threshold threshold for merge pheromone if is near pheromone.
@@ -39,8 +40,8 @@ object InsectMessage {
   case class AddPheromone(pheromone: Pheromone, threshold: Double) extends Message
 
   /** When ant takes food from food source.
-   * Message sent from ant to environment when it want to take food from food source.
-   * Message sent from environment to ant to approve the food action.
+   * Message sent from [[model.insects.Ant]] to [[model.environment.Environment]] when it want to take food from food source.
+   * Message sent from [[model.environment.Environment]] to [[model.insects.Ant]] to approve the food action.
    *
    * @param delta    taken food quantity
    * @param position food position
@@ -48,14 +49,14 @@ object InsectMessage {
   case class TakeFood(delta: Double, position: Vector2D) extends Message
 
   /** When ant store food in the anthill.
-   * Message sent from ant to anthill when it want to deposit food.
+   * Message sent from [[model.insects.Ant]] to [[model.environment.anthill.Anthill]] when it want to deposit food.
    *
    * @param delta stored food quantity
    */
   case class StoreFood(delta: Double) extends Message
 
   /** When ant eat food from the anthill.
-   * Message sent from ant to anthill when it eat food.
+   * Message sent from [[model.insects.Ant]] to [[model.environment.anthill.Anthill]] when it eat food.
    *
    * @param delta food amount
    */
@@ -63,7 +64,7 @@ object InsectMessage {
 
 
   /** When ant want to back home.
-   * Message sent from ant to anthill when it want to return to home.
+   * Message sent from [[model.insects.Ant]] to [[model.environment.anthill.Anthill]] when it want to return to home.
    *
    * @param position the ant position
    * @param maxSpeed ant max velocity
