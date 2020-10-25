@@ -2,16 +2,17 @@ package model.environment
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
+import common.geometry.Vector2D
+import common.geometry.Vector2DFactory.ZeroVector2D
+import common.message.EnvironmentMessage.{AntBirth, Ready, Repaint}
+import common.message.SharedMessage._
 import model.Drawable
-import model.environment.elements.EnvironmentElements
 import model.environment.data.EnvironmentInfo
+import model.environment.elements.EnvironmentElements
 import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import common.geometry.{Vector2D, ZeroVector2D}
-import common.message.EnvironmentMessage.{AntBirth, Ready, Repaint}
-import common.message.SharedMessage._
 
 class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
   with AnyWordSpecLike
@@ -74,7 +75,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
       }
       "check if ant didn't go outside boundary" in {
         import model.environment.elements.EnvironmentElements.BoundaryHasInside
-        assert(EnvironmentElements checkHasInside(boundary, newPosition))
+        assert(EnvironmentElements checkPositionIsInsideObstacle(boundary, newPosition))
       }
     }
   }
@@ -111,7 +112,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
       }
       "check that no ant went outside boundary" in {
         import EnvironmentElements.BoundaryHasInside
-        assert(positions.forall(x => elements.EnvironmentElements checkHasInside(boundary, x)))
+        assert(positions.forall(x => elements.EnvironmentElements checkPositionIsInsideObstacle(boundary, x)))
       }
     }
   }
@@ -194,7 +195,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
       }
       "check that no insect went outside boundary" in {
         import EnvironmentElements.BoundaryHasInside
-        assert(positions.forall(x => elements.EnvironmentElements checkHasInside(boundary, x)))
+        assert(positions.forall(x => elements.EnvironmentElements checkPositionIsInsideObstacle(boundary, x)))
       }
 
     }

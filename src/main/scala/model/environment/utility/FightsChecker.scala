@@ -26,7 +26,6 @@ class FightsChecker(val foragingFights: Iterable[Fight[ForagingAntInfo, EnemyInf
         case _ => (Seq.empty, Seq.empty)
       }
     }
-
     _checkFights(losers(foragingFights) ++ losers(patrollingFights))
   }
 }

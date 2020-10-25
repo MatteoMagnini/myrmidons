@@ -1,7 +1,10 @@
 package model.environment.elements
 
-import common.geometry.{RandomVector2DInCircle, Vector2D, ZeroVector2D}
-import model.environment.elements.EnvironmentElements.checkHaveInside
+import common.geometry.Vector2D
+import common.geometry.Vector2DFactory.{RandomVector2DInCircle, ZeroVector2D}
+import model.environment.elements.EnvironmentElements.checkPositionIsInsideMoreObstacle
+
+import scala.util._
 
 /**
  * Obstacle factory.
@@ -10,36 +13,26 @@ object ObstacleFactory {
 
   import model.environment._
 
-  /**
-   * Obstacle by vertex list.
-   **/
+  /** Obstacle by vertices list. */
   def apply(points: List[Vector2D]): Obstacle = new Obstacle(points)
 
-  /**
-   * Obstacle by position and number of sides
-   **/
+  /** Obstacle by position and number of sides  */
   def apply(position: Vector2D, radius: Double = OBSTACLE_RADIUS, nSides: Int): Obstacle = {
 
     val angle = 2 * math.Pi / nSides
-
     val vertex = for {
       a <- 0 until nSides
-    }
-      yield Vector2D(math.cos(angle * a) * radius, math.sin(angle * a) * radius) >> position
+    } yield Vector2D(math.cos(angle * a) * radius, math.sin(angle * a) * radius) >> position
 
     ObstacleFactory(vertex.toList)
   }
 
-  /**
-   * Factory for regular triangle
-   **/
+  /** Factory for regular triangle */
   def Triangle(position: Vector2D, radius: Double = OBSTACLE_RADIUS): Obstacle = {
     ObstacleFactory(position, radius, OBSTACLE_TRIANGLE_VERTEX)
   }
 
-  /**
-   * Factory for Square
-   **/
+  /** Factory for Square */
   def Square(position: Vector2D, radius: Double = OBSTACLE_RADIUS): Obstacle = {
     ObstacleFactory(position, radius, OBSTACLE_SQUARE_VERTEX)
   }
@@ -47,23 +40,17 @@ object ObstacleFactory {
   /**
    * Create random random obstacles.
    *
-   * @param nObstacle                number of obstacle to join
-   * @param center                   center of spawn
-   * @param minMaxDistanceFromCenter (min,Max) distance from center that delimit area to spawn object
+   * @param nObstacle number of obstacle to join
+   * @param center    center of spawn
    * @return list of spawned obstacle, this list should have size < of nObstacle because someone could be joined
    **/
-  def createRandom(nObstacle: Int,
-                   center: Vector2D,
-                   minMaxDistanceFromCenter: (Double, Double),
-                   radius: Double = OBSTACLE_RADIUS,
-                   obstacleVertex: Int = OBSTACLE_DEFAULT_VERTEX )
+  def createRandom(nObstacle: Int, center: Vector2D, minDistance: Double, maxDistance: Double,
+                   radius: Double = OBSTACLE_RADIUS, obstacleVertex: Int = OBSTACLE_DEFAULT_VERTEX)
   : Iterable[Obstacle] = {
-    val obstacles = for {i <- 0 until nObstacle
-                         random = scala.util.Random.nextInt(obstacleVertex) + OBSTACLE_TRIANGLE_VERTEX
-                         obstacle = ObstacleFactory(
-                           RandomVector2DInCircle(minMaxDistanceFromCenter, center),
-                           radius,
-                           random)
+    val obstacles = for {_ <- 0 until nObstacle
+                         random = Random.nextInt(obstacleVertex) + OBSTACLE_TRIANGLE_VERTEX
+                         obstacle = ObstacleFactory(RandomVector2DInCircle(minDistance, maxDistance, center),
+                           radius, random)
                          } yield obstacle
 
     recursiveJoin(obstacles.toList, center, 0)
@@ -88,25 +75,22 @@ object ObstacleFactory {
     }
   }
 
-  def getPositionOutObstacle(obstacleList: Seq[Obstacle], min: Double, max: Double): Vector2D = {
-    import model.environment.elements.EnvironmentElements.ObstacleHasInside
-    var randomPosition = ZeroVector2D()
-    do {
-      randomPosition = RandomVector2DInCircle(min, max)
-    }
-    while (checkHaveInside(obstacleList, randomPosition).nonEmpty)
-    randomPosition
-  }
-
-  def randomPositionOutObstacleFromCenter(obstacleList: Seq[Obstacle],
-                                          center: Vector2D,
+  /** Random position out of present obstacles.
+   *
+   * @param obstacleList obstacles
+   * @param min          min radius
+   * @param max          max radius
+   * @param center       center of spawn area
+   * @return position
+   */
+  def randomPositionOutObstacleFromCenter(obstacleList: Seq[Obstacle], center: Vector2D,
                                           min: Double, max: Double): Vector2D = {
     import model.environment.elements.EnvironmentElements.ObstacleHasInside
     var randomPosition = ZeroVector2D()
     do {
-      randomPosition = common.geometry.RandomVector2DInCircle(min, max, center)
+      randomPosition = RandomVector2DInCircle(min, max, center)
     }
-    while (checkHaveInside(obstacleList, randomPosition).nonEmpty)
+    while (checkPositionIsInsideMoreObstacle(obstacleList, randomPosition).nonEmpty)
     randomPosition
   }
 }

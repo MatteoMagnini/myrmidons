@@ -20,7 +20,7 @@ object EnvironmentElements {
     * @tparam T context bound
     * @return if exists, element that have position inside of it
     */
-  def checkHaveInside[T: EnvironmentElement](elements: Iterable[T], position: Vector2D): Iterable[T] =
+  def checkPositionIsInsideMoreObstacle[T: EnvironmentElement](elements: Iterable[T], position: Vector2D): Iterable[T] =
     elements.filter(x => implicitly[EnvironmentElement[T]].hasInside(x, position))
 
   /** Returns whether element has inside a position
@@ -30,7 +30,7 @@ object EnvironmentElements {
     * @tparam T context bound
     * @return if element has position inside of it
     */
-  def checkHasInside[T: EnvironmentElement](element: T, position: Vector2D): Boolean =
+  def checkPositionIsInsideObstacle[T: EnvironmentElement](element: T, position: Vector2D): Boolean =
     implicitly[EnvironmentElement[T]].hasInside(element, position)
 
   /** How to check positions in [[model.environment.Boundary]] */

@@ -57,4 +57,11 @@ object EnvironmentMessage {
    */
   case class AntBirth(clock: Int) extends Message
 
+  /**
+   * Message sent from environment to environment to check enemy birth and its born.
+   *
+   * @param clock logic time
+   */
+  case class EnemyBirth(clock: Int) extends Message
+
 }

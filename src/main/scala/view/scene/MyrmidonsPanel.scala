@@ -56,8 +56,8 @@ object MyrmidonsPanel {
 
   def apply(): MyrmidonsPanel = new MyrmidonsPanelImpl()
 
-  /**
-   * Panel that contains the drawn entities.
+  /** Panel that contains the drawn entities.
+   *
    */
   private[view] class MyrmidonsPanelImpl() extends MyrmidonsPanel {
 
@@ -68,8 +68,7 @@ object MyrmidonsPanel {
     private var slackX = 0
     private var slackY = 0
 
-    /**
-     * Paint entities of the graphics.
+    /** Paint entities of the graphics.
      *
      * @param graphics object for rendering.
      */
@@ -111,13 +110,13 @@ object MyrmidonsPanel {
     }
 
     def setEntities(info: Seq[Drawable]): (Int, Int) = {
-      /**
+      /*
        * For each drawable entity it checks if it has changed since the previous interaction.
        * If not, it does not recreate an object in infoEntities.
        */
       info.foreach(x => infoEntities = singletonSeq(x).head +: infoEntities)
 
-      /**
+      /*
        * Return info for set anthill food an ants size labels.
        */
       val anthillInfo: AnthillInfo = infoEntities.find {

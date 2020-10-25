@@ -23,19 +23,20 @@ object DrawableEntities {
   private val center = CENTER
   private val ratio = 1
 
-  /**
-   * Draw simulation elem with its parameters.
-   * @param elem simulation element.
+  /** Draw simulation elem with its parameters.
+   *
+   *
+   * @param elem    simulation element.
    * @param graphic graphic.
-   * @param size panel size.
+   * @param size    panel size.
    * @tparam T Entities type.
    */
   def draw[T: DrawableEntity](elem: T, graphic: Graphics2D, size: Dimension,
                               zoom: Double, slackX: Double, slackY: Double): Unit =
     implicitly[DrawableEntity[T]].draw(elem, graphic, size, zoom, slackX, slackY)
 
-  /**
-   * Draw ellipse in panel.
+  /** Draw ellipse in panel.
+   *
    * @param x position in x.
    * @param y position in y.
    * @param w weight.
@@ -46,7 +47,7 @@ object DrawableEntities {
                   zoom: Double, slackX: Double, slackY: Double): Unit = {
 
     val ellipse = new Ellipse2D.Double(center._1 + x * zoom * ratio + slackX,
-      center._2  - y * zoom + slackY, w * zoom, h * zoom)
+      center._2 - y * zoom + slackY, w * zoom, h * zoom)
     g.fill(ellipse)
   }
 
@@ -59,7 +60,7 @@ object DrawableEntities {
         case _ => FOOD_PHEROMONE_COLOR(pheromoneIntensity)
       })
       drawEllipse(elem.position.x - (PHEROMONE_DRAW_SIZE / SET_TO_CENTER),
-         elem.position.y + (PHEROMONE_DRAW_SIZE / SET_TO_CENTER),
+        elem.position.y + (PHEROMONE_DRAW_SIZE / SET_TO_CENTER),
         PHEROMONE_DRAW_SIZE, PHEROMONE_DRAW_SIZE, g, zoom, slackX, slackY
       )
     }
@@ -102,10 +103,10 @@ object DrawableEntities {
                       zoom: Double, slackX: Double, slackY: Double): Unit = {
       val anthillFood: Float = elem.foodAmount / elem.maxFoodAmount
       g.setColor(ANTHILL_COLOR(anthillFood))
-      drawEllipse(elem.position.x - elem.radius *ANTHILL_SIZE_FACTOR ,
-         elem.position.y + elem.radius *ANTHILL_SIZE_FACTOR,
-        elem.radius * SET_TO_CENTER * ANTHILL_SIZE_FACTOR ,
-        elem.radius * SET_TO_CENTER * ANTHILL_SIZE_FACTOR , g, zoom, slackX, slackY)
+      drawEllipse(elem.position.x - elem.radius * ANTHILL_SIZE_FACTOR,
+        elem.position.y + elem.radius * ANTHILL_SIZE_FACTOR,
+        elem.radius * SET_TO_CENTER * ANTHILL_SIZE_FACTOR,
+        elem.radius * SET_TO_CENTER * ANTHILL_SIZE_FACTOR, g, zoom, slackX, slackY)
     }
   }
 

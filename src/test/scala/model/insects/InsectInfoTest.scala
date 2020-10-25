@@ -2,12 +2,13 @@ package model.insects
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
+import common.geometry.Vector2DFactory.{RandomVector2DInSquare, ZeroVector2D}
+import common.geometry._
 import model.environment.pheromones.FoodPheromone
 import model.insects.info.ForagingAntInfo
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import common.geometry._
 
 class InsectInfoTest extends TestKit(ActorSystem("InsectInfoTest"))
   with AnyWordSpecLike
@@ -63,7 +64,7 @@ class InsectInfoTest extends TestKit(ActorSystem("InsectInfoTest"))
         assert(checkAll(info2, position = newPosition))
       }
 
-      val info3 = info2.updateAnthillCondition(true)
+      val info3 = info2.antEntersAnthill(true)
 
       "correct update anthill condition" in {
         assert(checkAll(info3, position = newPosition, isInsideTheAnthill = true))
@@ -102,7 +103,7 @@ class InsectInfoTest extends TestKit(ActorSystem("InsectInfoTest"))
       }
 
       val newTime = 1
-      val info8 = info7.incTime()
+      val info8 = info7.incrementTime()
 
       "correct update time" in {
         assert(checkAll(info8, position = newPosition, energy = newEnergy, inertia = newInertia,

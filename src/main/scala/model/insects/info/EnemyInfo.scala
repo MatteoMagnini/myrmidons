@@ -1,7 +1,8 @@
 package model.insects.info
 
+import common.geometry.Vector2D
+import common.geometry.Vector2DFactory.ZeroVector2D
 import model.insects.Enemies._
-import common.geometry.{Vector2D, ZeroVector2D}
 
 /**
  * This class defines an enemy state.
@@ -27,7 +28,7 @@ case class EnemyInfo(override val id: Int,
   override def updateEnergy(delta: Double): EnemyInfo =
     this.copy(energy = if (energy + delta > MAX_ENERGY) MAX_ENERGY else energy + delta)
 
-  override def incTime(): EnemyInfo =
+  override def incrementTime(): EnemyInfo =
     this.copy(time = time + 1)
 }
 

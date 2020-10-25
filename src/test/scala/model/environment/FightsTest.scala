@@ -1,6 +1,6 @@
 package model.environment
 
-import common.geometry.ZeroVector2D
+import common.geometry.Vector2DFactory.ZeroVector2D
 import model.environment.Fights.InsectFight._
 import model.environment.Fights.{Fight, loser, _}
 import model.environment.utility.FightsChecker

@@ -2,8 +2,8 @@ package model.insects.info
 
 import akka.actor.ActorRef
 
-/**
- * The information in common with all kind of ants.
+/** The information in common with all kind of ants.
+ *
  *
  * @tparam A the specific type of ant
  */
@@ -23,6 +23,6 @@ trait AntInfo[A <: AntInfo[A]] extends SpecificInsectInfo[A] {
    * @param value the new condition
    * @return a new AntInfo with the updated anthill condition
    */
-  def updateAnthillCondition(value: Boolean): A
+  def antEntersAnthill(value: Boolean): A
 
 }

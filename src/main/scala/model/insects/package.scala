@@ -1,6 +1,8 @@
 package model
 
-import common.geometry.{Vector2D, ZeroVector2D}
+import common.geometry.Vector2D
+import common.geometry.Vector2DFactory.ZeroVector2D
+
 import scala.util.Random
 
 package object insects {
@@ -31,8 +33,8 @@ package object insects {
   }
 
   object Enemies {
-    val MIN_ENERGY = 50
-    val MAX_ENERGY = 70
+    val MIN_ENERGY = 100
+    val MAX_ENERGY = 150
     val STARTING_TIME = 0
     val ENERGY: Double = MIN_ENERGY + (MAX_ENERGY - MIN_ENERGY) * Random.nextDouble()
     val STARTING_POSITION: Vector2D = ZeroVector2D()

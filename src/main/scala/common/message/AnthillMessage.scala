@@ -12,7 +12,7 @@ object AnthillMessage {
    */
   case class NewAnts(ants: InsectReferences) extends Message
 
-  /** When anthill update is needs.
+  /** When anthill update is needed.
    * Message sent from anthill to environment when anthill information change.
    *
    * @param info anthill information
@@ -23,8 +23,7 @@ object AnthillMessage {
   /**
    * Message sent from anthill to ants when they reach it.
    *
-   * @param antIsInsideTheAnthill true if the ant is inside, false otherwise
    */
-  case class UpdateAnthillCondition(antIsInsideTheAnthill: Boolean) extends Message
+  case object UpdateAnthillCondition extends Message
 
 }

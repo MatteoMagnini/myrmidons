@@ -2,14 +2,14 @@ package model.insects.competences
 
 import akka.actor.Actor.Receive
 import akka.actor.{ActorContext, ActorRef}
-import model.insects.info.SpecificInsectInfo
+import common.RichActor._
+import common.geometry.Vector2DFactory.{OrientedVector2D, RandomVector2DInCircle}
 import common.geometry.Vectors._
 import common.geometry._
-import common.RichActor._
 import common.message.InsectMessage.{KillInsect, Move}
+import model.insects.info.SpecificInsectInfo
 
-/**
- * A competence is the minimal building block to achieve a more complex behaviour.
+/** A competence is the minimal building block to achieve a more complex behaviour.
  * An insect competence is the more general one. Every type of insect can perform it.
  *
  * @tparam A the type of the insect
@@ -21,17 +21,16 @@ trait InsectCompetences[A <: SpecificInsectInfo[A]] {
    */
   def behaviour: A => Receive
 
-  /**
-   * Execute the competence.
-   * @param context of the insect actor
+  /** Execute the competence.
+   *
+   * @param context     of the insect actor
    * @param environment of the simulation
-   * @param insect that perform the competence
-   * @param info the state of the insect
+   * @param insect      that perform the competence
+   * @param info        the state of the insect
    */
   def apply(context: ActorContext, environment: ActorRef, insect: ActorRef, info: A): Unit
 
-  /**
-   * Check if this competence may be executed.
+  /** Check if this competence has to be executed.
    *
    * @param info the insect's state.
    * @return true if this competence has priority over the all its less important competences.
@@ -40,8 +39,7 @@ trait InsectCompetences[A <: SpecificInsectInfo[A]] {
 
 }
 
-/**
- * Competence performing a random walk.
+/** Competence performing a random walk.
  *
  * @param behaviour of the insect
  * @tparam A the type of the insect
@@ -60,8 +58,7 @@ case class RandomWalk[A <: SpecificInsectInfo[A]](behaviour: A => Receive) exten
   override def hasPriority(info: A): Boolean = true
 }
 
-/**
- * When energy is 0 the insect dies. Must be the first competence for every insects.
+/** When energy is 0 the insect dies. Must be the first competence for every insects.
  *
  * @param behaviour of the insect
  * @tparam A the type of the insect

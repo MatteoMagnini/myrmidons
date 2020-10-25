@@ -1,15 +1,14 @@
 package model.environment.data
 
 import akka.actor.ActorRef
-import model.environment.anthill.AnthillInfo
+import common.PheromoneMap._
+import common.rTree.RTree.Tree
+import common.rTree.{RTreeProlog, getPheromoneAsNode}
 import model.environment.Boundary
+import model.environment.anthill.AnthillInfo
 import model.environment.elements.{Food, Obstacle}
 import model.environment.pheromones.Pheromone
 import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo, PatrollingAntInfo}
-import common.PheromoneMap._
-import common.rTree.RTree.Tree
-import common.rTree.RTreeProlog
-import common.rTree.getPheromoneAsNode
 
 /** Internal state of environment. */
 sealed trait EnvironmentInfo {
@@ -82,8 +81,10 @@ sealed trait EnvironmentInfo {
   /** Add an ant reference */
   def addAnt(id: Int, ant: ActorRef): EnvironmentInfo
 
-  def addAnts(ants: InsectReferences): EnvironmentInfo
+  /** Add starting ants */
+  def createStartingAnts(ants: InsectReferences): EnvironmentInfo
 
+  /** Add enemies */
   def addEnemies(ants: InsectReferences): EnvironmentInfo
 
 }
@@ -103,15 +104,15 @@ object EnvironmentInfo {
 
 
   /** Internal state of environment.
-    *
-    * @param gui              reference to gui actor
-    * @param boundary         boundary constrains of environment
-    * @param obstacles        obstacles in environment
-    * @param ants             references to ant actors
-    * @param foragingAntsInfo ants information
-    * @param anthill          references to anthill actor
-    * @param anthillInfo      anthill information
-    */
+   *
+   * @param gui              reference to gui actor
+   * @param boundary         boundary constrains of environment
+   * @param obstacles        obstacles in environment
+   * @param ants             references to ant actors
+   * @param foragingAntsInfo ants information
+   * @param anthill          references to anthill actor
+   * @param anthillInfo      anthill information
+   */
   private[this] case class EnvironmentData(override val gui: Option[ActorRef],
                                            override val boundary: Boundary,
                                            override val obstacles: Seq[Obstacle],
@@ -163,7 +164,7 @@ object EnvironmentInfo {
     override def addAnt(id: Int, ant: ActorRef): EnvironmentInfo =
       this.copy(ants = ants + (id -> ant), maxAntId = maxAntId + 1)
 
-    override def addAnts(newAnts: Map[Int, ActorRef]): EnvironmentInfo =
+    override def createStartingAnts(newAnts: Map[Int, ActorRef]): EnvironmentInfo =
       this.copy(ants = ants ++ newAnts, maxAntId = maxAntId + newAnts.size)
 
     def addEnemies(newEnemies: InsectReferences): EnvironmentInfo = this.copy(enemies = enemies ++ newEnemies)
@@ -177,13 +178,11 @@ object EnvironmentInfo {
 
     override def addPheromone(pheromone: Pheromone, threshold: Double): EnvironmentInfo = {
       val newMap = pheromones.add(pheromone, threshold)
-      val newTree = if (newMap.size > pheromones.size) {
+      this.copy(pheromones = newMap, tree = if (newMap.size > pheromones.size) {
         engine.insertNode((pheromones.nextKey, pheromone), tree)
       } else {
         tree
-      }
-      this.copy(pheromones = newMap,
-        tree = newTree)
+      })
     }
   }
 

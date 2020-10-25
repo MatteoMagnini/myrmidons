@@ -16,15 +16,14 @@ import model.insects.info.PatrollingAntInfo
 /**
  * A patrolling ant with state and behaviour.
  *
- * @param info of the ant
+ * @param info        of the ant
  * @param environment of the simulation
  */
-case class PatrollingAnt (override val info: PatrollingAntInfo,
-                     override val environment: ActorRef) extends Insect[PatrollingAntInfo] {
+case class PatrollingAnt(override val info: PatrollingAntInfo,
+                         override val environment: ActorRef) extends Ant[PatrollingAntInfo] {
 
   override def receive: Receive = defaultBehaviour(info)
 
-  //private val engine = RTreeProlog()
   private val engine = ScalaEngine
 
   private val competences = List(Die[PatrollingAntInfo](defaultBehaviour),
@@ -40,59 +39,50 @@ case class PatrollingAnt (override val info: PatrollingAntInfo,
 
   private def defaultBehaviour(data: PatrollingAntInfo): Receive = {
 
-    /** Execute competence */
     case Clock(t) if t == data.time + 1 =>
-      val newData = data.incTime()
+      val newData = data.incrementTime()
       subsumption(newData, competences)(context, environment, self, newData)
 
-    /** Update position */
-    case NewPosition(p, d) =>
-      val newData = data.updatePosition(p).updateInertia(d)
-      if(data.position ~~(p,1E-7) && !data.isInsideTheAnthill) {
+    case NewPosition(position, delta) =>
+      val newData = data.updatePosition(position).updateInertia(delta)
+      if (data.position ~~ (position, 1E-7) && !data.isInsideTheAnthill) {
         environment ! KillInsect(data)
       } else {
         environment ! UpdateInsect(newData)
       }
       context >>> defaultBehaviour(newData)
 
-    /** Update food pheromones */
     case Pheromones(pheromones, tree) =>
       val ids = engine.query(data.position, tree)
       context >>> defaultBehaviour(data.updateDangerPheromones(pheromones filterKeys ids.toSet))
 
-    /** The ant enters or exits the anthill */
-    case UpdateAnthillCondition(value) =>
-      context >>> defaultBehaviour(data.updateAnthillCondition(value))
 
-    /** Ant killed in a fight */
+    case UpdateAnthillCondition =>
+      context >>> defaultBehaviour(data.antEntersAnthill(true))
+
     case KillInsect(_) =>
       environment ! AddPheromone(DangerPheromone(data.position, decreasingDangerFunction, dangerIntensity),
         DANGER_PHEROMONE_MERGING_THRESHOLD)
       context >>> defaultBehaviour(data.updateEnergy(-MAX_ENERGY))
 
-    /** Just for tests */
     case Context(_) => sender ! Context(Some(context))
 
-    /** Ignore the rest */
     case _ => //Do nothing
   }
 
   private def waitConfirm(data: PatrollingAntInfo): Receive = {
 
-    /** Eat food from the environment */
     case EatFood(amount) =>
       val newData = data.updateEnergy(amount * FOOD_ENERGY_CONVERSION)
       environment ! UpdateInsect(newData)
       context >>> defaultBehaviour(newData)
 
-    /** Just for tests */
     case Context(_) => sender ! Context(Some(context))
 
-    /** Ignore the rest */
     case _ => // Do nothing
   }
 
-  private implicit def pheromonesToFoodPheromones(pheromones: Map[Int,Pheromone]): Seq[DangerPheromone] = {
+  private implicit def pheromonesToFoodPheromones(pheromones: Map[Int, Pheromone]): Seq[DangerPheromone] = {
     pheromones.values.toStream.filter(p => p match {
       case _: DangerPheromone => true
       case _ => false

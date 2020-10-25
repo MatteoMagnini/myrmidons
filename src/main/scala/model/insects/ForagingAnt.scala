@@ -6,7 +6,7 @@ import common.message.AnthillMessage.UpdateAnthillCondition
 import common.message.EnvironmentMessage.{FoodNear, NewPosition, Pheromones}
 import common.message.InsectMessage._
 import common.message.SharedMessage.{Clock, Context}
-import common.rTree.ScalaEngine
+import common.rTree.{ScalaEngine, tree}
 import model.environment.pheromones.DangerPheromoneInfo._
 import model.environment.pheromones.{DangerPheromone, FoodPheromone, Pheromone}
 import model.insects.Ants.ForagingAnt._
@@ -14,17 +14,16 @@ import model.insects.competences._
 import model.insects.info.ForagingAntInfo
 
 /**
-  * Ant that performs foraging.
-  *
-  * @param info its state.
-  * @param environment the environment where it performs actions.
-  */
+ * Ant that performs foraging.
+ *
+ * @param info        its state.
+ * @param environment the environment where it performs actions.
+ */
 case class ForagingAnt(override val info: ForagingAntInfo,
-                       override val environment: ActorRef) extends Insect[ForagingAntInfo] {
+                       override val environment: ActorRef) extends Ant[ForagingAntInfo] {
 
   override def receive: Receive = defaultBehaviour(info)
 
-  //private val engine = RTreeProlog()
   private val engine = ScalaEngine
 
   private val competences = List(Die[ForagingAntInfo](defaultBehaviour),
@@ -43,70 +42,58 @@ case class ForagingAnt(override val info: ForagingAntInfo,
 
   private def defaultBehaviour(data: ForagingAntInfo): Receive = {
 
-    /** Execute competence */
     case Clock(t) if t == data.time + 1 =>
-      val newData = data.incTime()
+      val newData = data.incrementTime()
       subsumption(newData, competences)(context, environment, self, newData)
 
-    /** The environment confirms the new position */
-    case NewPosition(p, d) =>
-      val newData = data.updatePosition(p).updateInertia(d)
-      if(data.position ~~(p,1E-7) && !data.isInsideTheAnthill) {
+    case NewPosition(position, delta) =>
+      val newData = data.updatePosition(position).updateInertia(delta)
+      if (data.position ~~ (position, 1E-7) && !data.isInsideTheAnthill) {
         environment ! KillInsect(data)
       } else {
         environment ! UpdateInsect(newData)
       }
       context >>> defaultBehaviour(newData)
 
-    /** Update food pheromones */
     case Pheromones(pheromones, tree) =>
       val ids = engine.query(data.position, tree)
       context >>> defaultBehaviour(data.updateFoodPheromones(pheromones filterKeys ids.toSet))
 
-    /** The ant perceive food in its proximity */
     case FoodNear(position) =>
       val newData = data.updateFoodPosition(Some(position))
       context >>> defaultBehaviour(newData)
 
-    /** The ant enters or exits the anthill */
-    case UpdateAnthillCondition(value) =>
-      context >>> defaultBehaviour(data.updateAnthillCondition(value))
+    case UpdateAnthillCondition =>
+      context >>> defaultBehaviour(data.antEntersAnthill(true))
 
-    /** Ant killed in a fight */
     case KillInsect(_) =>
       environment ! AddPheromone(DangerPheromone(data.position, decreasingDangerFunction, dangerIntensity),
         DANGER_PHEROMONE_MERGING_THRESHOLD)
       context >>> defaultBehaviour(data.updateEnergy(-MAX_ENERGY))
 
-    /** Just for tests */
     case Context(_) => sender ! Context(Some(context))
 
-    /** Ignore the rest */
     case _ => // Do nothing
   }
 
   private def waitConfirm(data: ForagingAntInfo): Receive = {
 
-    /** Take food from a food source in the environment */
     case TakeFood(delta, _) =>
       val newData = data.incFood(delta).updateFoodPosition(None)
       environment ! UpdateInsect(newData)
       context >>> defaultBehaviour(newData)
 
-    /** Eat food from the environment */
     case EatFood(amount) =>
       val newData = data.updateEnergy(amount * FOOD_ENERGY_CONVERSION)
       environment ! UpdateInsect(newData)
       context >>> defaultBehaviour(newData)
 
-    /** Just for tests */
     case Context(_) => sender ! Context(Some(context))
 
-    /** Ignore the rest */
     case _ => // Do nothing
   }
 
-  private implicit def pheromonesToFoodPheromones(pheromones: Map[Int,Pheromone]): Seq[FoodPheromone] = {
+  private implicit def pheromonesToFoodPheromones(pheromones: Map[Int, Pheromone]): Seq[FoodPheromone] = {
     pheromones.values.toStream.filter(p => p match {
       case _: FoodPheromone => true
       case _ => false

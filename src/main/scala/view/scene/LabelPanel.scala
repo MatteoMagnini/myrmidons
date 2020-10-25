@@ -10,8 +10,8 @@ object LabelPanel {
 
   def apply(): LabelPanel = new LabelPanelImpl()
 
-  /**
-   * FlowPanel with short legend to understand color entities.
+  /** FlowPanel with short legend to understand color entities.
+   *
    */
   private[view] class LabelPanelImpl() extends LabelPanel {
 
@@ -25,7 +25,7 @@ object LabelPanel {
     private val dangerousPheromone = new Label("DangerousPheromone")
     private val separator = new Separator()
 
-    /**
+    /*
      * Each label refers to entities colors in simulation.
      */
 
