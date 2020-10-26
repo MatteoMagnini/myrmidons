@@ -62,8 +62,8 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
         self ! AntBirth(value)
       }
       if(Random.nextDouble() < 0.1) self ! EnemyBirth(value)
-      state.ants.values.foreach(_ ! Clock(value))
       state.ants.values.foreach(_ ! Pheromones(state.pheromones, state.tree))
+      state.ants.values.foreach(_ ! Clock(value))
       state.enemies.values.foreach(_ ! Clock(value))
       state.anthill.get ! Clock(value)
       val newState = if (value % 100 == 0) checkFoodSpawn(state) else state
