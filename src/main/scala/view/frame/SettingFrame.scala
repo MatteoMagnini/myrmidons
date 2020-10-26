@@ -19,6 +19,7 @@ object SettingFrame {
     size = new Dimension(SETTING_SIZE, SETTING_SIZE)
     resizable = false
     visible = true
+    centerOnScreen()
   }
 
 }

@@ -8,7 +8,7 @@ import org.jfree.chart.{ChartFactory, ChartPanel, JFreeChart}
 import org.jfree.data.time.{TimeSeries, TimeSeriesCollection, Year}
 import view.actor.InfoReport
 
-import scala.swing.{Dimension, MainFrame}
+import scala.swing.MainFrame
 
 trait TimeSeriesFrame extends MainFrame {
   def history: Seq[InfoReport]
@@ -36,10 +36,15 @@ object TimeSeriesFrame {
 
     setChartColor(insectChart)
     setChartColor(foodChart)
-    peer.getContentPane.add(new ChartPanel(insectChart), BorderLayout.NORTH)
-    peer.getContentPane.add(new ChartPanel(foodChart), BorderLayout.SOUTH)
-    size = new Dimension(TIME_SERIES_SIZE, TIME_SERIES_SIZE)
+    val chartInsects = new ChartPanel(insectChart)
+    chartInsects.setPreferredSize(CHART_SIZE)
+    peer.getContentPane.add(chartInsects, BorderLayout.NORTH)
+    val chartFood = new ChartPanel(foodChart)
+    chartFood.setPreferredSize(CHART_SIZE)
+    peer.getContentPane.add(chartFood, BorderLayout.SOUTH)
+    size = TIME_SERIES_SIZE
     visible = true
+    centerOnScreen()
 
     /** Create time series collection with insect number history from simulation data.
      *
