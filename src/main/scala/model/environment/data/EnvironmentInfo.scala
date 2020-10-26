@@ -29,7 +29,7 @@ sealed trait EnvironmentInfo {
   def ants: InsectReferences
 
   /** Highest used Id */
-  def maxAntId: Int
+  def maxInsectId: (Int, Int)
 
   /** Ants information */
   def foragingAntsInfo: Iterable[ForagingAntInfo]
@@ -79,7 +79,9 @@ sealed trait EnvironmentInfo {
   def removeInsect(info: InsectInfo): EnvironmentInfo
 
   /** Add an ant reference */
-  def addAnt(id: Int, ant: ActorRef): EnvironmentInfo
+  def addAnt(ant: ActorRef): EnvironmentInfo
+
+  def addEnemy(enemy: ActorRef): EnvironmentInfo
 
   /** Add starting ants */
   def createStartingAnts(ants: InsectReferences): EnvironmentInfo
@@ -93,13 +95,13 @@ object EnvironmentInfo {
 
   def apply(boundary: Boundary): EnvironmentInfo =
     EnvironmentData(None, boundary, Seq.empty, Seq.empty,
-      Map.empty, 0, Seq.empty, Seq.empty, Map.empty,
+      Map.empty, (0,0), Seq.empty, Seq.empty, Map.empty,
       Seq.empty, None, None, Map[Int, Pheromone](), Tree(), RTreeProlog())
 
   def apply(gui: Option[ActorRef], boundary: Boundary, obstacles: Seq[Obstacle], foods: Seq[Food],
             anthill: ActorRef, anthillInfo: Option[AnthillInfo]): EnvironmentInfo =
     EnvironmentData(gui, boundary, obstacles, foods,
-      Map.empty, 0, Seq.empty, Seq.empty, Map.empty,
+      Map.empty, (0,0), Seq.empty, Seq.empty, Map.empty,
       Seq.empty, Some(anthill), anthillInfo, Map.empty, Tree(), RTreeProlog())
 
 
@@ -118,7 +120,7 @@ object EnvironmentInfo {
                                            override val obstacles: Seq[Obstacle],
                                            override val foods: Seq[Food],
                                            override val ants: InsectReferences,
-                                           override val maxAntId: Int,
+                                           override val maxInsectId: (Int, Int),
                                            override val foragingAntsInfo: Seq[ForagingAntInfo],
                                            override val patrollingAntsInfo: Seq[PatrollingAntInfo],
                                            override val enemies: InsectReferences,
@@ -161,13 +163,17 @@ object EnvironmentInfo {
       case _ => this
     }
 
-    override def addAnt(id: Int, ant: ActorRef): EnvironmentInfo =
-      this.copy(ants = ants + (id -> ant), maxAntId = maxAntId + 1)
+    override def addAnt(ant: ActorRef): EnvironmentInfo =
+      this.copy(ants = ants + (maxInsectId._1 + 1 -> ant), maxInsectId = (maxInsectId._1 + 1, maxInsectId._2))
 
-    override def createStartingAnts(newAnts: Map[Int, ActorRef]): EnvironmentInfo =
-      this.copy(ants = ants ++ newAnts, maxAntId = maxAntId + newAnts.size)
+    override def addEnemy(enemy: ActorRef): EnvironmentInfo =
+      this.copy(enemies = enemies + (maxInsectId._2 + 1 -> enemy), maxInsectId = (maxInsectId._1, maxInsectId._2 + 1))
 
-    def addEnemies(newEnemies: InsectReferences): EnvironmentInfo = this.copy(enemies = enemies ++ newEnemies)
+    override def createStartingAnts(newAnts: InsectReferences): EnvironmentInfo =
+      this.copy(ants = ants ++ newAnts, maxInsectId = (maxInsectId._1 + newAnts.size, maxInsectId._2))
+
+    override def addEnemies(newEnemies: InsectReferences): EnvironmentInfo =
+      this.copy(enemies = enemies ++ newEnemies, maxInsectId = (maxInsectId._1, maxInsectId._2 + newEnemies.size))
 
     override def updatePheromones(newPheromones: Map[Int, Pheromone]): EnvironmentInfo = {
       val ids = pheromones.keys filterNot newPheromones.keys.toSet

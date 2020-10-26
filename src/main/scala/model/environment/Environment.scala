@@ -17,6 +17,8 @@ import model.environment.utility.InsectLifeUtilities._
 import model.environment.utility.{CollisionsInterceptor, FightsChecker}
 import model.insects.info.{SpecificInsectInfo, _}
 
+import scala.util.Random
+
 /** Environment actor
   *
   * @param state environment internal state
@@ -59,6 +61,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       if (randomSpawnAnt(state)) {
         self ! AntBirth(value)
       }
+      if(Random.nextDouble() < 0.1) self ! EnemyBirth(value)
       state.ants.values.foreach(_ ! Clock(value))
       state.ants.values.foreach(_ ! Pheromones(state.pheromones, state.tree))
       state.enemies.values.foreach(_ ! Clock(value))
@@ -97,7 +100,12 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     case AntBirth(clock: Int) =>
       val ant = createNewAnt(clock, context, state, PATROLLING_ANT_PROBABILITY)
       ant ! Clock(clock)
-      context >>> defaultBehaviour(state.addAnt(state.maxAntId + 1, ant))
+      context >>> defaultBehaviour(state.addAnt(ant))
+
+    case EnemyBirth(clock: Int) =>
+      val enemy = createNewEnemy(clock, context, state)
+      enemy ! Clock(clock)
+      context >>> defaultBehaviour(state.addEnemy(enemy))
 
     case KillInsect(info: InsectInfo) =>
       val newState = killInsect(context, state, info)

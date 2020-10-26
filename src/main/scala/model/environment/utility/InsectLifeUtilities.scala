@@ -43,7 +43,7 @@ object InsectLifeUtilities {
     */
   private[environment] def createNewAnt(clock: Int, context: ActorContext,
                                         state: EnvironmentInfo, patrollingAntProb: Double): ActorRef = {
-    val antId = state.maxAntId + 1
+    val antId = state.maxInsectId._1 + 1
     val birthPosition = state.anthillInfo.position
     if (math.random() < patrollingAntProb) {
       context.actorOf(model.insects.PatrollingAnt(model.insects.info.PatrollingAntInfo(
@@ -58,6 +58,17 @@ object InsectLifeUtilities {
         position = birthPosition,
         time = clock - 1), context.self), s"f-ant-$antId")
     }
+  }
+
+  private[environment] def createNewEnemy(clock: Int, context: ActorContext,
+                                        state: EnvironmentInfo): ActorRef = {
+    val enemyId = state.maxInsectId._2 + 1
+    val randomPosition = ObstacleFactory.randomPositionOutObstacleFromCenter(state.obstacles.toSeq,
+      state.boundary.center, MIN_DISTANCE_ENEMIES_FROM_ANTHILL, MAX_DISTANCE_ENEMIES_FROM_ANTHILL)
+    context.actorOf(Enemy(EnemyInfo(
+      id = enemyId,
+      position = randomPosition,
+      time = clock - 1), context.self), s"p-ant-$enemyId")
   }
 
   /** Create enemies.
