@@ -9,7 +9,7 @@ object RTree {
   /** Define a new type, describing a range: lower bound coordinate and upper bound coordinate */
   type Range = (Double, Double)
 
-  /** A node of r-tree
+  /** A node of r-tree.
    *
    * @param id     identifier of node
    * @param rangeX range along x coordinate
@@ -18,7 +18,7 @@ object RTree {
    */
   case class Node[A](id: Option[A], rangeX: Range, rangeY: Range) {
 
-    /** Checks if two ranges in 2D space are intersected
+    /** Checks if two ranges in 2D space are intersected.
      *
      * @param otherRanges ranges to be compared
      * @return whether ranges are intersected
@@ -104,7 +104,7 @@ object RTree {
 
 object ScalaEngine {
 
-  /** Query over an r-tree
+  /** Query over an r-tree.
    *
    * @param position reference position in which query is done
    * @param tree     r-tree to be queried

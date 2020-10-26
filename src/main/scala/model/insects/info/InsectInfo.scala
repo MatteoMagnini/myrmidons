@@ -4,62 +4,61 @@ import model.Drawable
 import common.geometry.Vector2D
 
 /**
- * The information in common with all kind of insects.
- */
+  * The information in common with all kind of insects.
+  */
 trait InsectInfo extends Drawable {
 
   /**
-   * @return the insect identifier
-   */
+    * @return the insect identifier
+    */
   def id: Int
 
   /** position is taken from drawable */
 
   /**
-   * @return the inertia of the insect
-   */
+    * @return the inertia of the insect
+    */
   def inertia: Vector2D
 
   /**
-   * @return the energy of the insect
-   */
+    * @return the energy of the insect
+    */
   def energy: Double
 
   /**
-   * @return the time of the insect that should be equal to the time of the simulation
-   */
+    * @return the time of the insect that should be equal to the time of the simulation
+    */
   def time: Int
 
 }
 
-/**
- * The information in common with all kind of insects.
- *
- * @tparam A the specific type of insect
- */
+/** The information in common with all kind of insects.
+  *
+  * @tparam A the specific type of insect
+  */
 trait SpecificInsectInfo[A <: SpecificInsectInfo[A]] extends InsectInfo {
 
   /**
-   * @param newPosition the new position
-   * @return a new InsectInfo with the updated position
-   */
+    * @param newPosition the new position
+    * @return a new InsectInfo with the updated position
+    */
   def updatePosition(newPosition: Vector2D): A
 
   /**
-   * @param newInertia the new inertia
-   * @return a new InsectInfo with the updated inertia
-   */
+    * @param newInertia the new inertia
+    * @return a new InsectInfo with the updated inertia
+    */
   def updateInertia(newInertia: Vector2D): A
 
   /**
-   * @param delta to be added (can be negative)
-   * @return a new InsectInfo with the updated energy
-   */
+    * @param delta to be added (can be negative)
+    * @return a new InsectInfo with the updated energy
+    */
   def updateEnergy(delta: Double): A
 
   /**
-   * @return a new InsectInfo with the incremented time
-   */
+    * @return a new InsectInfo with the incremented time
+    */
   def incrementTime(): A
 }
 

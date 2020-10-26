@@ -4,7 +4,7 @@ import common.geometry.Vector2D
 
 import scala.reflect.ClassTag
 
-/** Manage pheromone operation.
+/** Manage [[model.environment.pheromones.Pheromone]] operation.
  *
  * @tparam A pheromone type
  */

@@ -4,7 +4,7 @@ import common.geometry.Vector2DFactory.ZeroVector2D
 import model.environment.Fights.InsectFight._
 import model.environment.Fights.{Fight, loser, _}
 import model.environment.utility.FightsChecker
-import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo, PatrollingAntInfo}
+import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 
@@ -15,12 +15,12 @@ class FightsTest extends AnyWordSpecLike with Matchers {
   "A fight between foraging ant and insect" when {
     val ant = ForagingAntInfo(null)
     val insect = EnemyInfo()
-    val fight: Fight[InsectInfo, EnemyInfo] = Fight(ant, insect)
+    val fight: Fight[ForagingAntInfo, EnemyInfo] = Fight(ant, insect, ZeroVector2D())
 
     "happens" should {
 
       "have as looser foraging ant" in {
-        assert(loser(fight).fold(ant => true, enemy => false))
+        assert(loser(fight)._1.fold(_ => true, _ => false))
       }
     }
   }
@@ -28,21 +28,18 @@ class FightsTest extends AnyWordSpecLike with Matchers {
   "A collection of fights between foraging ants and insects" when {
 
     val nFights = 5
-    val fights: Iterable[Fight[InsectInfo, EnemyInfo]] = for {
+    val fights: Iterable[Fight[ForagingAntInfo, EnemyInfo]] = for {
       _ <- 0 to nFights
-      ant: InsectInfo = ForagingAntInfo(null)
+      ant = ForagingAntInfo(null)
       enemy: EnemyInfo = EnemyInfo()
-    } yield Fight(ant.asInstanceOf[InsectInfo], enemy)
+    } yield Fight(ant, enemy, ZeroVector2D())
 
     "happens" should {
 
       "have as losers foraging ants" in {
-        val insectLosers = losers(fights)
+        val insectLosers = losers(fights).map(_._1)
         for (loser <- insectLosers) {
-          assert(loser fold(
-            ant => true,
-            enemy => false
-          ))
+          assert(loser fold(_ => true, _ => false))
         }
       }
     }
@@ -53,13 +50,13 @@ class FightsTest extends AnyWordSpecLike with Matchers {
     val ant = PatrollingAntInfo(null, energy = antEnergy)
     val insectEnergy = 10
     val insect = EnemyInfo(energy = insectEnergy)
-    val fight: Fight[InsectInfo, EnemyInfo] = Fight(ant, insect)
+    val fight: Fight[PatrollingAntInfo, EnemyInfo] = Fight(ant, insect, ZeroVector2D())
 
     "happens" should {
 
       "have as loser insect with lower energy" in {
 
-        assert(loser(fight).fold(
+        assert(loser(fight)._1.fold(
           x => x.energy == (antEnergy min insectEnergy),
           y => y.energy == (antEnergy min insectEnergy)
         ))
@@ -71,19 +68,19 @@ class FightsTest extends AnyWordSpecLike with Matchers {
 
     val nFights = 5
     val maxEnergy = 100
-    val fights: Iterable[Fight[InsectInfo, EnemyInfo]] = for {
+    val fights: Iterable[Fight[PatrollingAntInfo, EnemyInfo]] = for {
       _ <- 0 to nFights
       antEnergy = Random.nextInt(maxEnergy)
-      ant: InsectInfo = PatrollingAntInfo(null, energy = antEnergy)
+      ant = PatrollingAntInfo(null, energy = antEnergy)
       insectEnergy = Random.nextInt(maxEnergy)
-      enemy: EnemyInfo = EnemyInfo(energy = insectEnergy)
-    } yield Fight(ant.asInstanceOf[InsectInfo], enemy)
+      enemy = EnemyInfo(energy = insectEnergy)
+    } yield Fight(ant, enemy, ZeroVector2D())
 
     "happens" should {
 
       "have as losers insects with lower energy in each fight" in {
         val minEnergies = fights.map(x => x.firstFighter.energy min x.secondFighter.energy)
-        val insectLosers = losers(fights)
+        val insectLosers = losers(fights).map(_._1)
         for ((energy, loser) <- minEnergies zip insectLosers) {
           assert(loser fold(
             x => x.energy == energy,
@@ -94,18 +91,20 @@ class FightsTest extends AnyWordSpecLike with Matchers {
     }
   }
 
-  "A foraging ant and an enemy" when {
-    val ant = ForagingAntInfo(null, position = ZeroVector2D())
-    val enemy = EnemyInfo(position = ZeroVector2D())
+  "Ants and an enemy" when {
+    val foragingAnt = ForagingAntInfo(null, position = ZeroVector2D())
+    val patrollingAnt = PatrollingAntInfo(null, position = ZeroVector2D(), energy = 10)
+    val enemy = EnemyInfo(position = ZeroVector2D(), energy = 20)
 
     "are in the same position" should {
-      val fightsChecker = FightsChecker(Seq(ant), Seq(enemy))
+      val fightsChecker = FightsChecker(Seq(foragingAnt), Seq(patrollingAnt), Seq(enemy))
 
-      "begin a fight" in {
-        assert(fightsChecker.fights.size == 1)
+      "begin fights" in {
+        assert(fightsChecker.foragingFights.size == 1)
+        assert(fightsChecker.patrollingFights.size == 1)
       }
-      "have ant as loser" in {
-        assert(fightsChecker.checkFights._1.size == 1)
+      "have correct losers" in {
+        assert(fightsChecker.checkFights._1.size == 2)
         assert(fightsChecker.checkFights._2.isEmpty)
       }
     }

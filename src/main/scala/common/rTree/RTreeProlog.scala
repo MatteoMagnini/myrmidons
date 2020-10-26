@@ -6,7 +6,7 @@ import common.rTree.PrologFacilities._
 import common.rTree.RTree.{Node, Range, Tree}
 import model.environment.pheromones._
 
-/** Scala-prolog integration: convert prolog functions and get results
+/** Scala-prolog integration: convert prolog functions and get results.
  *
  * @param engine prolog engine
  */
@@ -17,7 +17,7 @@ class RTreeProlog(val engine: Prolog) {
   private val getLeavesList = "getLeavesList"
   private val query = "query"
 
-  /** Inserts a node in a tree
+  /** Inserts a node in a tree.
    *
    * @param node node to be inserted
    * @param tree starting tree
@@ -30,7 +30,7 @@ class RTreeProlog(val engine: Prolog) {
     result getAsTree
   }
 
-  /** Removes a node from a tree
+  /** Removes a node from a tree.
    *
    * @param node node to be removed
    * @param tree starting tree
@@ -43,7 +43,7 @@ class RTreeProlog(val engine: Prolog) {
     result getAsTree
   }
 
-  /** Queries a tree over a certain range
+  /** Queries a tree over a certain range.
    *
    * @param position center of query range
    * @param tree     tree to be queried
@@ -60,7 +60,7 @@ class RTreeProlog(val engine: Prolog) {
     }
   }
 
-  /** Get all leaves of tree
+  /** Get all leaves of tree.
    *
    * @param tree input tree
    * @return list of tree leaves

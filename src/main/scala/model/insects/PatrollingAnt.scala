@@ -13,12 +13,11 @@ import model.insects.Ants.PatrollingAnt._
 import model.insects.competences._
 import model.insects.info.PatrollingAntInfo
 
-/**
- * A patrolling ant with state and behaviour.
- *
- * @param info        of the ant
- * @param environment of the simulation
- */
+/** A patrolling ant with state and behaviour.
+  *
+  * @param info        of the ant
+  * @param environment of the simulation
+  */
 case class PatrollingAnt(override val info: PatrollingAntInfo,
                          override val environment: ActorRef) extends Ant[PatrollingAntInfo] {
 

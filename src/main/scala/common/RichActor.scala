@@ -5,7 +5,7 @@ import akka.actor.ActorContext
 
 object RichActor {
 
-  /** Short signature for become to behaviour.
+  /** Short signature to change behaviour.
    *
    * @param context to switch.
    */

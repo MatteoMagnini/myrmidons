@@ -17,10 +17,12 @@ import model.environment.utility.InsectLifeUtilities._
 import model.environment.utility.{CollisionsInterceptor, FightsChecker}
 import model.insects.info.{SpecificInsectInfo, _}
 
+import scala.util.Random
+
 /** Environment actor
- *
- * @param state environment internal state
- */
+  *
+  * @param state environment internal state
+  */
 class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
 
   override def receive: Receive = initializationBehaviour(state)
@@ -59,8 +61,9 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       if (randomSpawnAnt(state)) {
         self ! AntBirth(value)
       }
-      state.ants.values.foreach(_ ! Clock(value))
+      if(Random.nextDouble() < 0.1) self ! EnemyBirth(value)
       state.ants.values.foreach(_ ! Pheromones(state.pheromones, state.tree))
+      state.ants.values.foreach(_ ! Clock(value))
       state.enemies.values.foreach(_ ! Clock(value))
       state.anthill.get ! Clock(value)
       val newState = if (value % 100 == 0) checkFoodSpawn(state) else state
@@ -97,7 +100,12 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
     case AntBirth(clock: Int) =>
       val ant = createNewAnt(clock, context, state, PATROLLING_ANT_PROBABILITY)
       ant ! Clock(clock)
-      context >>> defaultBehaviour(state.addAnt(state.maxAntId + 1, ant))
+      context >>> defaultBehaviour(state.addAnt(ant))
+
+    case EnemyBirth(clock: Int) =>
+      val enemy = createNewEnemy(clock, context, state)
+      enemy ! Clock(clock)
+      context >>> defaultBehaviour(state.addEnemy(enemy))
 
     case KillInsect(info: InsectInfo) =>
       val newState = killInsect(context, state, info)
@@ -130,14 +138,15 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
   }
 
   private def sendInfoToGUI(info: EnvironmentInfo): Unit = {
-    val fightsChecker = FightsChecker(info.foragingAntsInfo ++ info.patrollingAntsInfo, info.enemiesInfo)
+    val fightsChecker = FightsChecker(info.foragingAntsInfo, info.patrollingAntsInfo, info.enemiesInfo)
     val fights = fightsChecker.checkFights
+    fights._1.foreach(ant => info.ants(ant.insect) ! KillInsect(ant.insect))
+    fights._2.foreach(enemy => info.enemies(enemy.insect) ! KillInsect(enemy.insect))
+
     val obstacles = info.obstacles ++ info.foods
     val insect = info.foragingAntsInfo ++ info.patrollingAntsInfo ++ info.enemiesInfo
     val pheromones: Seq[Pheromone] = info.pheromones
-    fights._1.foreach(ant => info.ants(ant) ! KillInsect(ant))
-    fights._2.foreach(enemy => info.enemies(enemy) ! KillInsect(enemy))
-    info.gui.get ! Repaint(info.anthillInfo.get +: (insect ++ obstacles ++ pheromones ++ fightsChecker.fights).toSeq)
+    info.gui.get ! Repaint(info.anthillInfo.get +: (insect ++ obstacles ++ pheromones ++ fights._1 ++ fights._2).toSeq)
     context >>> defaultBehaviour(info.emptyInsectInfo())
   }
 }

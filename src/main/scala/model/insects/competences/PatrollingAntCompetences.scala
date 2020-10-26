@@ -9,7 +9,6 @@ import model.insects.Ants.PatrollingAnt._
 import model.insects.info.PatrollingAntInfo
 
 /** Specific competences suitable only for foraging ants.
- *
  */
 trait PatrollingAntCompetences extends AntCompetences[PatrollingAntInfo]
 
