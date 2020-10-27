@@ -9,6 +9,8 @@ import model.environment.anthill.AnthillInfo
 import model.environment.elements.{Food, Obstacle}
 import model.environment.pheromones.Pheromone
 import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo, PatrollingAntInfo}
+import common.SeqWithReplace._
+
 
 /** Internal state of environment. */
 sealed trait EnvironmentInfo {
@@ -76,11 +78,13 @@ sealed trait EnvironmentInfo {
   /** Returns updated insect anthill information */
   def updateAnthillInfo(anthillInfo: Option[AnthillInfo]): EnvironmentInfo
 
+  /** Remove an insect reference */
   def removeInsect(info: InsectInfo): EnvironmentInfo
 
   /** Add an ant reference */
   def addAnt(ant: ActorRef): EnvironmentInfo
 
+  /** Add an enemy reference */
   def addEnemy(enemy: ActorRef): EnvironmentInfo
 
   /** Add starting ants */
@@ -106,14 +110,6 @@ object EnvironmentInfo {
 
 
   /** Internal state of environment.
-   *
-   * @param gui              reference to gui actor
-   * @param boundary         boundary constrains of environment
-   * @param obstacles        obstacles in environment
-   * @param ants             references to ant actors
-   * @param foragingAntsInfo ants information
-   * @param anthill          references to anthill actor
-   * @param anthillInfo      anthill information
    */
   private[this] case class EnvironmentData(override val gui: Option[ActorRef],
                                            override val boundary: Boundary,
@@ -133,7 +129,6 @@ object EnvironmentInfo {
                                           )
     extends EnvironmentInfo {
 
-    /** Returns ant info, adding ant information */
     override def updateInsectInfo(insectInfo: InsectInfo): EnvironmentData = insectInfo match {
       case insectInfo: EnemyInfo => this.copy(enemiesInfo = insectInfo +: enemiesInfo)
       case insectInfo: ForagingAntInfo => this.copy(foragingAntsInfo = insectInfo +: foragingAntsInfo)
@@ -143,8 +138,6 @@ object EnvironmentInfo {
 
     override def emptyInsectInfo(): EnvironmentData =
       this.copy(foragingAntsInfo = Seq.empty, patrollingAntsInfo = Seq.empty, enemiesInfo = Seq.empty)
-
-    import common.SeqWithReplace._
 
     override def updateFood(food: Food, updatedFood: Food): EnvironmentData =
       if (updatedFood.quantity > 0) {
