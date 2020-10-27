@@ -18,5 +18,5 @@ libraryDependencies ++= Seq(
   "com.google.code.gson" % "gson" % "2.2.4"
 )
 useCoursier := false
-coverageEnabled := true
+coverageEnabled := false
 mainClass in assembly := Some("Myrmidons")
