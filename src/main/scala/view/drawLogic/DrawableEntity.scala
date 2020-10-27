@@ -123,14 +123,4 @@ object DrawableEntities {
     }
   }
 
-  /* implicit object drawDeadEnemy extends DrawableEntity[DeadEnemy] {
-     override def draw(elem: DeadEnemy, g: Graphics2D, size: Dimension,
-                       zoom: Double, slackX: Double, slackY: Double): Unit = {
-       g.setColor(Color.red)
-       drawEllipse(elem.position.x - FIGHT_DRAW_SIZE / SET_TO_CENTER,
-         elem.insect.position.y + FIGHT_DRAW_SIZE / SET_TO_CENTER,
-         FIGHT_DRAW_SIZE, FIGHT_DRAW_SIZE, g, zoom, slackX, slackY)
-     }
-   }*/
-
 }

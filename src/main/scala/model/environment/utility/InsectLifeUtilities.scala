@@ -68,7 +68,7 @@ object InsectLifeUtilities {
     context.actorOf(Enemy(EnemyInfo(
       id = enemyId,
       position = randomPosition,
-      time = clock - 1), context.self), s"p-ant-$enemyId")
+      time = clock - 1), context.self), s"enemy-$enemyId")
   }
 
   /** Create enemies.
