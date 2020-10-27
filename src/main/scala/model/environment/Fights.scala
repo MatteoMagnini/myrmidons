@@ -1,8 +1,7 @@
 package model.environment
 
 import common.geometry.Vector2D
-import model.Drawable
-import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo, PatrollingAntInfo}
+import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
 
 object Fights {
 
@@ -12,11 +11,6 @@ object Fights {
     * @param secondFighter second entity
     */
   case class Fight[A, B](firstFighter: A, secondFighter: B, position: Vector2D)
-
-  /** A fight outcome: defines how to determine who lost the fight */
-  trait FightOutcome[A, B] {
-    def loser(firstFighter: A, secondFighter: B): Either[A, B]
-  }
 
   /** Given a fight, returns loser and position of it
     *
@@ -32,8 +26,13 @@ object Fights {
     * @return losers among provided fights and their positions
     */
   def losers[A, B](fights: Iterable[Fight[A, B]])(implicit outcome: FightOutcome[A, B])
-  : Seq[(Either[A, B], Vector2D)] = {
+  : Seq[(Either[A, B], Vector2D)] =
     fights.map(f => (outcome.loser(f.firstFighter, f.secondFighter), f.position)).toSeq
+
+
+  /** A fight outcome: defines how to determine who lost the fight */
+  trait FightOutcome[A, B] {
+    def loser(firstFighter: A, secondFighter: B): Either[A, B]
   }
 
   object InsectFight {
