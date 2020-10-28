@@ -118,16 +118,20 @@ object MyrmidonsPanel {
       /*
        * Return info for set anthill food an ants size labels.
        */
-      val anthillInfo: AnthillInfo = infoEntities.find {
+      val anthillInfo = infoEntities.find {
         case _: AnthillInfo => true
         case _ => false
-      }.get.asInstanceOf[AnthillInfo]
+      }
+      var anthillFoodAmount: Double = 0
+        if(anthillInfo.isDefined){
+          anthillFoodAmount = anthillInfo.get.asInstanceOf[AnthillInfo].foodAmount
+      }
       val antsCount = infoEntities.count {
         case _: ForagingAntInfo => true
         case _: PatrollingAntInfo => true
         case _ => false
       }
-      (antsCount, anthillInfo.foodAmount)
+      (antsCount, anthillFoodAmount)
     }
 
     def zoomIn(): Unit = {

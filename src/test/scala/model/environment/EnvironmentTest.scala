@@ -153,11 +153,11 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
       val result = sender.expectMsgType[Repaint]
       nAntsPreBirth = result.info count antsFilter
 
-      environment ! AntBirth(1)
       environment ! Clock(2)
+      environment ! AntBirth(2)
+
       val result2 = sender.expectMsgType[Repaint]
       nAntsPostBirth = result2.info count antsFilter
-
       "see ants number increased" in {
         assert(nAntsPostBirth > nAntsPreBirth)
       }
