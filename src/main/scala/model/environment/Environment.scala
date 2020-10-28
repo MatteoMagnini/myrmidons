@@ -14,7 +14,7 @@ import model.environment.elements.EnvironmentElements.{BoundaryHasInside, _}
 import model.environment.elements.{Food, Obstacle, ObstacleFactory}
 import model.environment.pheromones.Pheromone
 import model.environment.utility.InsectLifeUtilities._
-import model.environment.utility.{CollisionsInterceptor, FightsChecker}
+import model.environment.utility.{CollisionsInterceptor, ENEMIES_SPAWN_PROBABILITY, FightsChecker}
 import model.insects.info.{SpecificInsectInfo, _}
 
 import scala.util.Random
@@ -61,7 +61,7 @@ class Environment(state: EnvironmentInfo) extends Actor with ActorLogging {
       if (randomSpawnAnt(state)) {
         self ! AntBirth(value)
       }
-      if(Random.nextDouble() < 0.1) self ! EnemyBirth(value)
+      if(Random.nextDouble() < ENEMIES_SPAWN_PROBABILITY) self ! EnemyBirth(value)
       state.ants.values.foreach(_ ! Pheromones(state.pheromones, state.tree))
       state.ants.values.foreach(_ ! Clock(value))
       state.enemies.values.foreach(_ ! Clock(value))
