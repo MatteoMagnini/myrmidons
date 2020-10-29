@@ -132,7 +132,7 @@ remove(node(IDI,RangeXI,RangeYI), tree(L,N2,R), tree(L,N2,T)) :-
 % Element to be removed isn't in tree
 remove(_, T, T).
 
-% fixTree(+Tree, -Tree) --> returns fixed tree (with minimal intervals wrt nodes)
+% fixTree(+TreeI, -TreeO) --> returns fixed tree (with minimal intervals wrt nodes)
 % Base case: empty tree
 fixTree(nil, nil).
 
@@ -160,7 +160,7 @@ fixTree(tree(L, _, R), Tree) :-
 				takeRoot(T1, LV), takeRoot(T2, RV), nodeMinRange(LV, RV, V),
 				createTree(T1, V, T2, Tree).
 
-% removeWithFix(+Node, +Tree, -Tree) --> returns new tree with removed node (fixing tree) NB: node to be removed has to be leaf
+% removeWithFix(+Node, +TreeI, -TreeO) --> returns new tree with removed node (fixing tree) NB: node to be removed has to be leaf
 removeWithFix(Node, ITree, OTree) :- remove(Node, ITree, TTree), fixTree(TTree, OTree).
 
 
