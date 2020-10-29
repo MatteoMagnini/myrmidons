@@ -53,11 +53,7 @@ class RTreeProlog(val engine: Prolog) {
     val variable = Variable()
     val ranges: (Range, Range) = position.rangeOfInfluence(INFLUENCE_RADIUS)
     val goal = new Struct(query, tree, ranges._1, ranges._2, variable)
-    try {
-      engine.solve(goal).getTerm(variable.getName).getAsList.map(_.getAsNode).map(_.id.get)
-    } catch {
-      case _: Exception => List.empty
-    }
+    engine.solve(goal).getTerm(variable.getName).getAsList.map(_.getAsNode).map(_.id.get)
   }
 
   /** Get all leaves of tree.
