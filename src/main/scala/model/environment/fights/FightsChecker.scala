@@ -1,9 +1,8 @@
 package model.environment.fights
 
 import common.geometry.Vector2D
-import model.Drawable
-import model.environment.fights.Fights.InsectFightImplicits._
-import model.environment.fights.Fights.{Fight, _}
+import model.environment.fights.Fights._
+import model.environment.fights.InsectFightImplicits._
 import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo, PatrollingAntInfo}
 
 /** Checker of fights.
@@ -55,13 +54,3 @@ object FightsChecker {
     } yield Fight(ant, enemy, ant.position)
 
 }
-
-/** Dead insect in a fight */
-sealed trait DeadInsect extends Drawable {
-  def insect: InsectInfo
-}
-
-case class DeadAnt(override val insect: InsectInfo, override val position: Vector2D) extends DeadInsect
-
-case class DeadEnemy(override val insect: EnemyInfo, override val position: Vector2D) extends DeadInsect
-

@@ -1,9 +1,9 @@
 package model.environment
 
 import common.geometry.Vector2DFactory.ZeroVector2D
-import model.environment.fights.Fights.InsectFightImplicits._
-import model.environment.fights.Fights.{Fight, _}
-import model.environment.fights.FightsChecker
+import model.environment.fights.Fights._
+import model.environment.fights.InsectFightImplicits._
+import model.environment.fights.{Fight, FightsChecker}
 import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
