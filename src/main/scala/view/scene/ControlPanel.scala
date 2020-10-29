@@ -7,7 +7,7 @@ import common.message.SharedMessage.StartSimulation
 import model.environment.data.EnvironmentInfo
 import model.environment.{Boundary, Environment}
 import view.actor.uiMessage.{RestartSimulation, ShowAndSaveReport, StopSimulation, setRate}
-import view.actor.{ReportManager, ReportManagerInfo, UiActor, uiActorInfo}
+import view.actor.{ReportManager, ReportManagerInfo, UiActor, UiActorInfo}
 
 import scala.swing.event.ButtonClicked
 import scala.swing.{Button, CheckBox, FlowPanel, GridPanel, Label, Separator, TextField}
@@ -29,21 +29,21 @@ trait ControlPanel extends GridPanel {
   /** Flag to control timer */
   def startFlag: Boolean
 
-  /** Label, use to set each step in simulation */
-  def stepText: Label
+  /** Use to set each step in simulation  */
+  def setAntPopulationLabel(newPopulation: String): Unit
 
-  /** Label, use to set each ant size in simulation */
-  def antPopulationText: Label
+  /** Use to set each ant size in simulation */
+  def setStepLabel(newStep: String): Unit
 
-  /** Label, use to set each anthill food in simulation */
-  def anthillFoodAmount: Label
+  /** Use to set each anthill food in simulation */
+  def setAnthillFoodAmount(newAnthillFoodAmount: String): Unit
+
 }
 
 object ControlPanel {
   def apply(myrmidonsPanel: MyrmidonsPanel): ControlPanel = new ControlPanelImpl(myrmidonsPanel)
 
   /** GridPane with simulation control button.
-   *
    *
    * @param myrmidonsPanel panel to pass at actor to draw entities.
    */
@@ -62,6 +62,9 @@ object ControlPanel {
     private val timeLabel = new Label("Clock Rate:")
     private val timeInput = new TextField(columns = 3)
     private val buttonSetTime = new Button("Set Rate")
+    private val step = new Label("0")
+    private val antPopulation = new Label("0")
+    private val anthillFoodAmount = new Label("0")
     private var antSize = 0
     private var anthillFood = 0
     private var obstacleSize = 0
@@ -71,13 +74,10 @@ object ControlPanel {
     var uiActor: ActorRef = _
     var environment: ActorRef = _
     var reportManager: ActorRef = _
-    uiActor = system.actorOf(UiActor(uiActorInfo(myrmidonsPanel, this)))
+    uiActor = system.actorOf(UiActor(UiActorInfo(myrmidonsPanel, this)))
     environment = system.actorOf(Environment(EnvironmentInfo(boundary)), name = "env-actor")
     reportManager = system.actorOf(ReportManager(ReportManagerInfo()))
     var startFlag = false
-    var stepText = new Label("0")
-    var antPopulationText = new Label("0")
-    var anthillFoodAmount = new Label("0")
     val pheromoneLayer = new CheckBox("Hide pheromones")
 
     this.stopButton.enabled = false
@@ -85,12 +85,22 @@ object ControlPanel {
     this.reportButton.enabled = false
 
 
+    override def setStepLabel(newStep: String): Unit =
+      step.text = newStep
+
+    override def setAntPopulationLabel(newPopulation: String): Unit =
+      antPopulation.text = newPopulation
+
+    override def setAnthillFoodAmount(newAnthillFoodAmount: String): Unit =
+      anthillFoodAmount.text = newAnthillFoodAmount
+
+
     contents ++= Seq(new FlowPanel {
       contents ++= Seq(startButton, stopButton, restartButton,
         reportButton, timeLabel, timeInput, buttonSetTime, pheromoneLayer)
     },
       new FlowPanel {
-        contents ++= Seq(stepLabel, stepText, populationLabel, antPopulationText,
+        contents ++= Seq(stepLabel, step, populationLabel, antPopulation,
           new Separator(), anthillFoodAmountLabel, anthillFoodAmount)
       })
 
@@ -142,12 +152,12 @@ object ControlPanel {
         this.startButton.enabled = false
         this.reportButton.enabled = false
 
-        val uiRestart: ActorRef = system.actorOf(UiActor(uiActorInfo(myrmidonsPanel, this)))
+        val uiRestart: ActorRef = system.actorOf(UiActor(UiActorInfo(myrmidonsPanel, this)))
         val reportRestart: ActorRef = system.actorOf(ReportManager(ReportManagerInfo()))
         uiActor = uiRestart
         reportManager = reportRestart
         val environmentRestart: ActorRef = system.actorOf(Environment(EnvironmentInfo(boundary)),
-          name = s"env+${stepText.text}")
+          name = s"env+${step.text}")
         environment = environmentRestart
         tellStart()
 

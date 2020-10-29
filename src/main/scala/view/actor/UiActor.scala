@@ -14,12 +14,12 @@ import scala.concurrent.duration.DurationInt
  * @param state uiActor state.
  */
 
-class UiActor(state: uiActorInfo)
+class UiActor(state: UiActorInfo)
   extends Actor with ActorLogging with Timers {
 
   override def receive: Receive = defaultBehaviour(state)
 
-  private def defaultBehaviour(state: uiActorInfo): Receive = {
+  private def defaultBehaviour(state: UiActorInfo): Receive = {
 
     case Ready =>
       timers.startSingleTimer(state.currentState, StepOver, state.rate.millis)
@@ -28,8 +28,8 @@ class UiActor(state: uiActorInfo)
       if (state.currentState % REPORT_INC_CLOCK == 0) {
         state.control.reportManager.tell(ReportInfo(info), self)
       }
-      val entitiesProperties = state.setEntities(info)
-      state.drawEntities()
+      val entitiesProperties = state.setDrawableEntities(info)
+      state.draw()
       state.setControl(state.currentState, entitiesProperties)
 
       if (state.stopFlag) {
@@ -39,7 +39,7 @@ class UiActor(state: uiActorInfo)
 
     case StepOver =>
       state.control.environment.tell(Clock(state.currentState), self)
-      context >>> defaultBehaviour(uiActorInfo(state.panel, state.control,
+      context >>> defaultBehaviour(UiActorInfo(state.panel, state.control,
         state.stopFlag, state.currentState, state.rate))
 
     case StopSimulation =>
@@ -59,5 +59,5 @@ class UiActor(state: uiActorInfo)
 }
 
 object UiActor {
-  def apply(state: uiActorInfo): Props = Props(classOf[UiActor], state)
+  def apply(state: UiActorInfo): Props = Props(classOf[UiActor], state)
 }
