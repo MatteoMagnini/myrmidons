@@ -137,33 +137,6 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
     }
   }
 
-  "Environment with an ant" when {
-    val sender = TestProbe()
-    implicit val senderRef: ActorRef = sender.ref
-
-    val nAnts = 1
-    val environment = system.actorOf(Environment(EnvironmentInfo(boundary)), name = "env-actor-4")
-    var nAntsPreBirth = 0
-    var nAntsPostBirth = 0
-
-    "other ants born" should {
-      environment ! StartSimulation(nAnts, 0, None, None, 0.0)
-      sender expectMsg Ready
-      environment ! Clock(1)
-      val result = sender.expectMsgType[Repaint]
-      nAntsPreBirth = result.info count antsFilter
-
-      environment ! Clock(2)
-      environment ! AntBirth(2)
-
-      val result2 = sender.expectMsgType[Repaint]
-      nAntsPostBirth = result2.info count antsFilter
-      "see ants number increased" in {
-        assert(nAntsPostBirth > nAntsPreBirth)
-      }
-    }
-  }
-
   "Environment" when {
     val sender = TestProbe()
     implicit val senderRef: ActorRef = sender.ref
