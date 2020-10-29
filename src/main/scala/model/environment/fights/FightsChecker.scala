@@ -19,7 +19,8 @@ class FightsChecker(val foragingFights: Seq[Fight[ForagingAntInfo, EnemyInfo]],
     *         and collection of [[model.environment.fights.DeadEnemy]]
     */
   def checkFights: (Seq[DeadAnt], Seq[DeadEnemy]) = {
-    def _checkFights[A <: InsectInfo](fights: Seq[(Either[A, EnemyInfo], Vector2D)]): (Seq[DeadAnt], Seq[DeadEnemy]) = {
+    def _checkFights[A <: InsectInfo, B <: EnemyInfo]
+    (fights: Seq[(Either[A, B], Vector2D)]): (Seq[DeadAnt], Seq[DeadEnemy]) = {
       fights match {
         case h :: t => h._1.fold(ant => (DeadAnt(ant, h._2) +: _checkFights(t)._1, _checkFights(t)._2),
           enemy => (_checkFights(t)._1, DeadEnemy(enemy, h._2) +: _checkFights(t)._2))
@@ -45,8 +46,8 @@ object FightsChecker {
     * @param enemiesInfo enemies collection
     * @return fights between insects
     */
-  private def findFights[A <: InsectInfo](antsInfo: Iterable[A],
-                                          enemiesInfo: Iterable[EnemyInfo]): Iterable[Fight[A, EnemyInfo]] =
+  private def findFights[A <: InsectInfo, B <: InsectInfo](antsInfo: Iterable[A],
+                                          enemiesInfo: Iterable[B]): Iterable[Fight[A, B]] =
     for {
       ant <- antsInfo
       enemy <- enemiesInfo
