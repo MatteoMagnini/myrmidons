@@ -6,6 +6,7 @@ PPS Course 19-20 project.
 
 Myrmidons is a simulation software for an ant colony in a wild environment.
 The simulation is populated by the following entities:
+
 * Anthill;
 * Ants of different kind;
 * Opponent insect;
