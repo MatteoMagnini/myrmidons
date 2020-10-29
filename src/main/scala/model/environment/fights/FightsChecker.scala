@@ -1,9 +1,9 @@
-package model.environment.utility
+package model.environment.fights
 
 import common.geometry.Vector2D
 import model.Drawable
-import model.environment.Fights.InsectFight._
-import model.environment.Fights.{Fight, _}
+import model.environment.fights.Fights.InsectFightImplicits._
+import model.environment.fights.Fights.{Fight, _}
 import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo, PatrollingAntInfo}
 
 /** Checker of fights.
@@ -11,13 +11,13 @@ import model.insects.info.{EnemyInfo, ForagingAntInfo, InsectInfo, PatrollingAnt
   * @param foragingFights   fights between foraging ants and enemies
   * @param patrollingFights fights between patrolling ants and enemies
   */
-class FightsChecker(val foragingFights: Iterable[Fight[ForagingAntInfo, EnemyInfo]],
-                    val patrollingFights: Iterable[Fight[PatrollingAntInfo, EnemyInfo]]) {
+class FightsChecker(val foragingFights: Seq[Fight[ForagingAntInfo, EnemyInfo]],
+                    val patrollingFights: Seq[Fight[PatrollingAntInfo, EnemyInfo]]) {
 
   /** Check losers of a collection of fights.
     *
-    * @return collection of [[model.environment.utility.DeadAnt]]
-    *         and collection of [[model.environment.utility.DeadEnemy]]
+    * @return collection of [[model.environment.fights.DeadAnt]]
+    *         and collection of [[model.environment.fights.DeadEnemy]]
     */
   def checkFights: (Seq[DeadAnt], Seq[DeadEnemy]) = {
     def _checkFights[A <: InsectInfo](fights: Seq[(Either[A, EnemyInfo], Vector2D)]): (Seq[DeadAnt], Seq[DeadEnemy]) = {
@@ -28,7 +28,7 @@ class FightsChecker(val foragingFights: Iterable[Fight[ForagingAntInfo, EnemyInf
       }
     }
 
-    _checkFights(losers(foragingFights) ++ losers(patrollingFights))
+    _checkFights(foragingFights.getLosers ++ patrollingFights.getLosers)
   }
 }
 
@@ -37,8 +37,8 @@ object FightsChecker {
   def apply(foragingAntsInfo: Iterable[ForagingAntInfo],
             patrollingAntInfo: Iterable[PatrollingAntInfo],
             enemiesInfo: Iterable[EnemyInfo]): FightsChecker =
-    new FightsChecker(findFights(foragingAntsInfo, enemiesInfo),
-      findFights(patrollingAntInfo, enemiesInfo))
+    new FightsChecker(findFights(foragingAntsInfo, enemiesInfo).toSeq,
+      findFights(patrollingAntInfo, enemiesInfo).toSeq)
 
   /** Given a collection of ants and a collection of enemies, find fights between them.
     *

@@ -1,9 +1,9 @@
 package model.environment
 
 import common.geometry.Vector2DFactory.ZeroVector2D
-import model.environment.Fights.InsectFight._
-import model.environment.Fights.{Fight, loser, _}
-import model.environment.utility.FightsChecker
+import model.environment.fights.Fights.InsectFightImplicits._
+import model.environment.fights.Fights.{Fight, _}
+import model.environment.fights.FightsChecker
 import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
@@ -20,7 +20,7 @@ class FightsTest extends AnyWordSpecLike with Matchers {
     "happens" should {
 
       "have as looser foraging ant" in {
-        assert(loser(fight)._1.fold(_ => true, _ => false))
+        assert(fight.getLoser._1.fold(_ => true, _ => false))
       }
     }
   }
@@ -28,7 +28,7 @@ class FightsTest extends AnyWordSpecLike with Matchers {
   "A collection of fights between foraging ants and insects" when {
 
     val nFights = 5
-    val fights: Iterable[Fight[ForagingAntInfo, EnemyInfo]] = for {
+    val fights: Seq[Fight[ForagingAntInfo, EnemyInfo]] = for {
       _ <- 0 to nFights
       ant = ForagingAntInfo(null)
       enemy: EnemyInfo = EnemyInfo()
@@ -37,7 +37,7 @@ class FightsTest extends AnyWordSpecLike with Matchers {
     "happens" should {
 
       "have as losers foraging ants" in {
-        val insectLosers = losers(fights).map(_._1)
+        val insectLosers = fights.getLosers.map(_._1)
         for (loser <- insectLosers) {
           assert(loser fold(_ => true, _ => false))
         }
@@ -56,7 +56,7 @@ class FightsTest extends AnyWordSpecLike with Matchers {
 
       "have as loser insect with lower energy" in {
 
-        assert(loser(fight)._1.fold(
+        assert(fight.getLoser._1.fold(
           x => x.energy == (antEnergy min insectEnergy),
           y => y.energy == (antEnergy min insectEnergy)
         ))
@@ -68,7 +68,7 @@ class FightsTest extends AnyWordSpecLike with Matchers {
 
     val nFights = 5
     val maxEnergy = 100
-    val fights: Iterable[Fight[PatrollingAntInfo, EnemyInfo]] = for {
+    val fights: Seq[Fight[PatrollingAntInfo, EnemyInfo]] = for {
       _ <- 0 to nFights
       antEnergy = Random.nextInt(maxEnergy)
       ant = PatrollingAntInfo(null, energy = antEnergy)
@@ -80,7 +80,7 @@ class FightsTest extends AnyWordSpecLike with Matchers {
 
       "have as losers insects with lower energy in each fight" in {
         val minEnergies = fights.map(x => x.firstFighter.energy min x.secondFighter.energy)
-        val insectLosers = losers(fights).map(_._1)
+        val insectLosers = fights.getLosers.map(_._1)
         for ((energy, loser) <- minEnergies zip insectLosers) {
           assert(loser fold(
             x => x.energy == energy,

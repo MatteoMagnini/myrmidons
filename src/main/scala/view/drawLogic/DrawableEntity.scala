@@ -6,8 +6,8 @@ import java.awt.{Color, Polygon}
 
 import model.environment.anthill.AnthillInfo
 import model.environment.elements.{Food, Obstacle}
+import model.environment.fights.{DeadAnt, DeadEnemy, DeadInsect}
 import model.environment.pheromones.{DangerPheromone, DangerPheromoneInfo, Pheromone}
-import model.environment.utility.{DeadAnt, DeadEnemy, DeadInsect}
 import model.insects.info.{ForagingAntInfo, InsectInfo, PatrollingAntInfo}
 import view.Colors.{ENEMIES_COLOR, _}
 import view._
@@ -113,8 +113,8 @@ object DrawableEntities {
     override def draw(elem: DeadInsect, g: Graphics2D, size: Dimension,
                       zoom: Double, slackX: Double, slackY: Double): Unit = {
       elem match {
-        case x: DeadAnt => g.setColor(Color.black)
-        case x: DeadEnemy => g.setColor(Color.red)
+        case _: DeadAnt => g.setColor(Color.black)
+        case _: DeadEnemy => g.setColor(Color.red)
       }
 
       drawEllipse(elem.position.x - FIGHT_DRAW_SIZE / SET_TO_CENTER,

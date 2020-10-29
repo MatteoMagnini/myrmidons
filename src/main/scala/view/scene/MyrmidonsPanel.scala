@@ -3,8 +3,8 @@ package view.scene
 import model.Drawable
 import model.environment.anthill.AnthillInfo
 import model.environment.elements.Obstacle
+import model.environment.fights.DeadInsect
 import model.environment.pheromones.Pheromone
-import model.environment.utility.DeadInsect
 import model.insects.info.{ForagingAntInfo, InsectInfo, PatrollingAntInfo}
 import view.controller.{Keyboard, Mouse, MouseWheel}
 import view.drawLogic._

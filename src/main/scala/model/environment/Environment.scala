@@ -12,9 +12,10 @@ import model.environment.anthill.{Anthill, AnthillInfo}
 import model.environment.data.{EnvironmentInfo, InsectReferences}
 import model.environment.elements.EnvironmentElements.{BoundaryHasInside, _}
 import model.environment.elements.{Food, Obstacle, ObstacleFactory}
+import model.environment.fights.FightsChecker
 import model.environment.pheromones.Pheromone
 import model.environment.utility.InsectLifeUtilities._
-import model.environment.utility.{CollisionsInterceptor, ENEMIES_SPAWN_PROBABILITY, FightsChecker}
+import model.environment.utility.{CollisionsInterceptor, ENEMIES_SPAWN_PROBABILITY}
 import model.insects.info.{SpecificInsectInfo, _}
 
 import scala.util.Random
