@@ -15,10 +15,10 @@ import scala.util.Random
 object InsectLifeUtilities {
 
   /** Stochastic spawn of ant.
-    *
-    * @param state environment information.
-    * @return true if ant has to be spawn
-    */
+   *
+   * @param state environment information.
+   * @return true if ant has to be spawn
+   */
   private[environment] def randomSpawnAnt(state: EnvironmentInfo): Boolean = {
     val antHillFoodPercentage = state.anthillInfo.get.foodAmount / state.anthillInfo.get.maxFoodAmount
     val scaleFactor = ANT_SPAWN_FACTOR / MAX_FOOD
@@ -26,21 +26,21 @@ object InsectLifeUtilities {
   }
 
   /** Stochastic spawn of enemies.
-    *
-    * @return true if enemy has to be spawn
-    */
+   *
+   * @return true if enemy has to be spawn
+   */
   private[environment] def randomSpawnEnemies(): Boolean = {
     Random.nextDouble() < ENEMIES_SPAWN_PROBABILITY
   }
 
   /** Creation new ant.
-    *
-    * @param clock             current clock
-    * @param context           actor context
-    * @param state             environment information
-    * @param patrollingAntProb probability of spawn patrolling ant
-    * @return
-    */
+   *
+   * @param clock             current clock
+   * @param context           actor context
+   * @param state             environment information
+   * @param patrollingAntProb probability of spawn patrolling ant
+   * @return reference to new ant.
+   */
   private[environment] def createNewAnt(clock: Int, context: ActorContext,
                                         state: EnvironmentInfo, patrollingAntProb: Double): ActorRef = {
     val antId = state.maxInsectId._1 + 1
@@ -61,7 +61,7 @@ object InsectLifeUtilities {
   }
 
   private[environment] def createNewEnemy(clock: Int, context: ActorContext,
-                                        state: EnvironmentInfo): ActorRef = {
+                                          state: EnvironmentInfo): ActorRef = {
     val enemyId = state.maxInsectId._2 + 1
     val randomPosition = ObstacleFactory.randomPositionOutObstacleFromCenter(state.obstacles.toSeq,
       state.boundary.center, MIN_DISTANCE_ENEMIES_FROM_ANTHILL, MAX_DISTANCE_ENEMIES_FROM_ANTHILL)
@@ -72,13 +72,13 @@ object InsectLifeUtilities {
   }
 
   /** Create enemies.
-    *
-    * @param context   actor context
-    * @param obstacles list of obstacles
-    * @param nEnemies  number of enemies
-    * @param center    center of simulation
-    * @return
-    */
+   *
+   * @param context   actor context
+   * @param obstacles list of obstacles
+   * @param nEnemies  number of enemies
+   * @param center    center of simulation
+   * @return references to new enemies.
+   */
   private[environment] def createEnemies(context: ActorContext,
                                          obstacles: Seq[Obstacle], nEnemies: Int, center: Vector2D): InsectReferences =
     (0 until nEnemies).map(i => {
@@ -88,12 +88,12 @@ object InsectLifeUtilities {
     }).toMap
 
   /** Kill insect.
-    *
-    * @param context actor context
-    * @param state   environment state
-    * @param info    insect information
-    * @return
-    */
+   *
+   * @param context actor context
+   * @param state   environment state
+   * @param info    insect information
+   * @return environment state without killed insect.
+   */
   private[environment] def killInsect(context: ActorContext,
                                       state: EnvironmentInfo, info: InsectInfo): EnvironmentInfo = {
     context.stop(context.sender())

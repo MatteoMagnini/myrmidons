@@ -70,7 +70,7 @@ package object rTree {
 
   /** Conversion from tree to prolog term */
   implicit def getTreeAsTerm(t: Tree[Int]): Term = t match {
-    case x: NotEmptyTree[Int] => new Struct(tree, getTreeAsTerm(t.left), t.root.get, getTreeAsTerm(t.right))
+    case _: NotEmptyTree[Int] => new Struct(tree, getTreeAsTerm(t.left), t.root.get, getTreeAsTerm(t.right))
     case _ => Term.createTerm(nil)
   }
 

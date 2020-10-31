@@ -35,20 +35,16 @@ class InsectInfoTest extends TestKit(ActorSystem("InsectInfoTest"))
                    energy: Double = 100,
                    inertia: Vector2D = ZeroVector2D(),
                    pheromoneIsEmpty: Boolean = true,
-                   proximityIsEmpty: Boolean = true, //Not tested now
                    foodAmount: Double = 0,
-                   time: Int = 0,
-                   id: Int = 0): Boolean = {
+                   time: Int = 0): Boolean = {
 
         info.position == position &&
           info.isInsideTheAnthill == isInsideTheAnthill &&
           info.energy == energy &&
           info.inertia == inertia &&
           info.foodPheromones.isEmpty == pheromoneIsEmpty &&
-          //info.proximitySensor.entities.isEmpty  == proximityIsEmpty &&
           info.foodAmount == foodAmount &&
-          info.time == time &&
-          info.id == id
+          info.time == time
       }
 
       val info1 = ForagingAntInfo(senderRef)

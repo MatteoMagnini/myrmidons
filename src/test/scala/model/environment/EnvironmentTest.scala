@@ -4,7 +4,7 @@ import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{TestKit, TestProbe}
 import common.geometry.Vector2D
 import common.geometry.Vector2DFactory.ZeroVector2D
-import common.message.EnvironmentMessage.{AntBirth, Ready, Repaint}
+import common.message.EnvironmentMessage.{Ready, Repaint}
 import common.message.SharedMessage._
 import model.Drawable
 import model.environment.data.EnvironmentInfo
@@ -26,7 +26,7 @@ class EnvironmentTest extends TestKit(ActorSystem("environment-test"))
   val topLeftCorner: (Int, Int) = (0, 0)
   val width = 100
   val height = 100
-  val boundary = Boundary(topLeftCorner._1, topLeftCorner._2, width, height)
+  val boundary: Boundary = Boundary(topLeftCorner._1, topLeftCorner._2, width, height)
 
   val antsFilter: Drawable => Boolean = {
     case _: ForagingAntInfo => true

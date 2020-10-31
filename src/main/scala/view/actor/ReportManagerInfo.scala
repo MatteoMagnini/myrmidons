@@ -3,7 +3,6 @@ package view.actor
 
 import model.environment.anthill.AnthillInfo
 import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
-import view.actor.InfoReport.InfoReportImpl
 
 
 trait ReportManagerInfo {

@@ -8,7 +8,7 @@ import org.scalatest.wordspec.AnyWordSpecLike
 
 class RTreeTest extends AnyWordSpecLike with Matchers with BeforeAndAfterAll {
 
-  val engine = RTreeProlog()
+  val engine: RTreeProlog = RTreeProlog()
   def mergedRanges(r1: Range, r2: Range): Range =
     (if (r1._1 <= r2._1) r1._1 else r2._1, if (r1._2 >= r2._2) r1._2 else r2._2)
 
