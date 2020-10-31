@@ -11,7 +11,7 @@ import org.scalatest.wordspec.AnyWordSpecLike
 
 class PheromonesRTreeTest extends AnyWordSpecLike with Matchers with BeforeAndAfterAll {
 
-  val engine = RTreeProlog()
+  val engine: RTreeProlog = RTreeProlog()
   val decreasingFunction: Double => Double = x => x - DELTA
 
   "Prolog engine" when {

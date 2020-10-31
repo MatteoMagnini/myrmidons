@@ -40,7 +40,8 @@ object InsectMessage {
   case class AddPheromone(pheromone: Pheromone, threshold: Double) extends Message
 
   /** When ant takes food from food source.
-   * Message sent from [[model.insects.Ant]] to [[model.environment.Environment]] when it want to take food from food source.
+   * Message sent from [[model.insects.Ant]] to [[model.environment.Environment]] when it want to
+   * take food from food source.
    * Message sent from [[model.environment.Environment]] to [[model.insects.Ant]] to approve the food action.
    *
    * @param delta    taken food quantity

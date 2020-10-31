@@ -4,14 +4,13 @@ import java.io.{FileWriter, PrintWriter}
 import java.util
 
 import akka.actor.{Actor, ActorLogging, Props}
+import com.google.gson.GsonBuilder
+import common.RichActor._
 import model.Drawable
 import model.environment.anthill.AnthillInfo
 import model.insects.info.{EnemyInfo, ForagingAntInfo, PatrollingAntInfo}
-import common.RichActor._
 import view.actor.uiMessage._
 import view.frame.TimeSeriesFrame
-import com.google.gson.GsonBuilder
-import scala.collection.immutable.ListMap
 
 /** Actor that manage save and report information.
  *

@@ -3,8 +3,6 @@ name := "pps-19-myrmidons"
 version := "0.1"
 
 scalaVersion := "2.12.6"
-javacOptions ++= Seq("-source", "1.11")
-
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-Xcheckinit", "-encoding", "utf8")
 val AkkaVersion = "2.6.8"
 
@@ -19,4 +17,6 @@ libraryDependencies ++= Seq(
 )
 useCoursier := false
 coverageEnabled := false
+test in assembly := {}
+assemblyJarName in assembly := "pps-19-Myrmidons-1.0.jar"
 mainClass in assembly := Some("Myrmidons")

@@ -6,7 +6,7 @@ import common.message.AnthillMessage.UpdateAnthillCondition
 import common.message.EnvironmentMessage.{FoodNear, NewPosition, Pheromones}
 import common.message.InsectMessage._
 import common.message.SharedMessage.{Clock, Context}
-import common.rTree.{ScalaEngine, tree}
+import common.rTree.ScalaEngine
 import model.environment.pheromones.DangerPheromoneInfo._
 import model.environment.pheromones.{DangerPheromone, FoodPheromone, Pheromone}
 import model.insects.Ants.ForagingAnt._
