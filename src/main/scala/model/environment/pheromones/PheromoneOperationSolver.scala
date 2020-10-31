@@ -18,7 +18,7 @@ class PheromoneOperationSolver[A <: Pheromone] {
         pheromone.decreasingFunction(pheromone.intensity)))
     }
 
-  def merge[B <: Pheromone: ClassTag](constructor: (Vector2D, Double => Double, Double) => B, pheromone: A,
+  def merge[B <: Pheromone: ClassTag](constructor: (Vector2D, Double => Double, Double) => B, pheromone: B,
                                       otherPheromone: Pheromone, threshold: Double = 1E-10,
                                       intensity: Double): Option[B] = otherPheromone match {
     case p:B =>
